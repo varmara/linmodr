@@ -6,104 +6,109 @@ title: Линейные модели, дисперсионный и регрес
 
 ### 1.Знакомство с R
 
-- [html](01_introduction_to_r.html)
-- [код R]
+- [html](01_intro_to_r.html)
+- [код R](01_code_intro_to_r.R)
 
 ### 2.Тестирование гипотез
 - [html](02_hypothesis_testing.html)
-- [код R]
+- [код R](02_code_hypothesis_testing.R)
 - Данные
 - [pdf]
 
-### 3.Анализ мощности [html](03_power_analysis.html)
+### 3.Анализ мощности 
+
+- [html](03_power.html)
+- [код R](03_code_power.R)
+- Данные
+- [pdf]
 
 ### 4.Простая линейная регрессия
 
-- [html](04_linear_regression.html)
-- [код R]
+- [html](04_LM.html)
+- [код R](04_code_LM.R)
 - Данные
 - [pdf]
 
 ### 5.Проверка условий применимости регрессионных моделей
 
-- [html](05_diagnostics_of_regression_models.html)
-- [код R]
+- [html](05_model_validation.html)
+- [код R](05_code_model_validation.R)
 - Данные
 - [pdf]
 
 ### 6.Множественная линейная регрессия
 
-- [html](06_multiple_linear_regression.html)
-- [код R]
+- [html](06_multiple_LM.html)
+- [код R](06_code_multiple_LM.R)
 - Данные
 - [pdf]
 
 ### 7.Сравнение линейных моделей
 
 - [html](07_model_selection.html)
-- [код R]
+- [код R](07_code_model_selection.R)
 - Данные
 - [pdf]
 
 ### 8.Линейные модели с непрерывными и дискретными предикторами
-[html](08_linear_regression_with_continuous_and_discreet_predictors.html)
-- [код R]
+[html](08_LM_with_continuous_and_discrete_predictors.html)
+- [код R](08_code_LM_with_continuous_and_discrete_predictors.R)
 - Данные
 - [pdf]
 
 ### 9.Линейные модели только с дискретными предикторами (дисперсионный анализ)
 
 - [html](09_anova.html)
-- [код R]
+- [код R](09_code_anova.R)
 - Данные
 - [pdf]
 
 ### 10.Многофакторный дисперсионный анализ
 
 - [html](10_two-way_anova_and_interactions.html)
-- [код R]
+- [код R](10_code_two-way_anova_and_interactions.R)
 - Данные
 - [pdf]
 
 ### 11.Линейные модели для бинарных данных (логистическая регрессия)
 
-- [html](11_general_linear_models_for_binary_data.html)
-- [код R]
+- [html](11_GLM_binary.html)
+- [код R](11_code_GLM_binary.R)
 - Данные
 - [pdf]
 
 ### 12.Линейные модели для счетных данных
 
 - [html](12_general_linear_models_for_count_data.html)
-- [код R]
+- [код R](12_GLM_count.R)
 - Данные
 - [pdf]
 
 ### 13.Смешанные линейные модели
 
-- [html](13_general_linear_mixed_models.html)
-- [код R]
+- [html](13_GLMM_gaussian.html)
+- [код R](13_code_GLMM_gaussian_st.R)
 - Данные
 - [pdf]
 
 ### 14.Коррекция гетерогенности дисперсий в смешанных линейных моделях
 
-- [html](14_modelling_variance_structure.html)
-- [код R]
+- [html](14_variance_structure.html)
+- [код R](14_code_variance_structure.R)
 - Данные
 - [pdf]
 
 ### 15.Обобщенные смешанные линейные модели для бинарных данных
 
-- [html](15_general_linear_mixed_models_for_binary_data.html)
-- [код R]
+- [html](15_GLMM_binary.html)
+- [код R](15_code_GLMM_binary.R)
 - Данные
 - [pdf]
 
 ### 16.Обобщенные смешанные модели для счетных данных
 
-- [html](16_general_linear_mixed_models_for_count_data.html)
-- [код R]
+- [html](16_GLMM_count.html)
+- [код R](16_code_GLMM_count.R)
 - Данные
 - [pdf]
 
