@@ -338,18 +338,18 @@ div.tocify {
 <h1>Устанавливаем рабочую директорию</h1>
 <p>Есть несколько способов установки пути к рабочей директории:</p>
 <ol style="list-style-type: decimal">
-<li>Выберите в меню Session -&gt; Set working Directory… -&gt; To Source File Location (Если вы уже сохранили код).</li>
-<li>На вкладке Files в одной из рабочих областей RStudio выберите многоточие … -&gt; в открывшемся системном диалоге выбора файлов найдите директорию, в которой лежит ваш код и нажмите OK</li>
-<li>Можно вручную прописать путь к рабочей директории в кавычках в качестве аргумента функции setwd</li>
+<li>Выберите в меню <code>Session -&gt; Set working Directory... -&gt; To Source File Location</code> (Если вы уже сохранили код).</li>
+<li>На вкладке <code>Files</code> в одной из рабочих областей RStudio выберите многоточие <code>...</code> -&gt; в открывшемся системном диалоге выбора файлов найдите директорию, в которой лежит ваш код и нажмите OK</li>
+<li>Можно вручную прописать путь к рабочей директории в кавычках в качестве аргумента функции <code>setwd()</code></li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;~/lect-linmodr/Intro&quot;</span>)</code></pre></div>
 </div>
 <div id="--" class="section level1">
 <h1>Как получить помощь</h1>
 <ol style="list-style-type: decimal">
-<li>В RStudio можно поставить курсор на слово setwd и нажать F1</li>
-<li>Перед названием функции можно напечатать знак вопроса и выполнить эту строку ?setwd</li>
-<li>Можно воспользоваться функцией help()</li>
+<li>В RStudio можно поставить курсор на слово <code>setwd</code> и нажать <code>F1</code></li>
+<li>Перед названием функции можно напечатать знак вопроса и выполнить эту строку <code>?setwd</code></li>
+<li>Можно воспользоваться функцией <code>help()</code></li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">help</span>(<span class="st">&quot;setwd&quot;</span>)</code></pre></div>
 </div>
@@ -366,7 +366,7 @@ div.tocify {
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2</span>^<span class="dv">4</span></code></pre></div>
 <pre><code>## [1] 16</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(<span class="dv">27</span>)</code></pre></div>
-<pre><code>## [1] 5.196152</code></pre>
+<pre><code>## [1] 5.2</code></pre>
 </div>
 <div class="section level1">
 <h1>Переменные</h1>
@@ -389,7 +389,7 @@ var_2</code></pre></div>
 <div id="-" class="section level1">
 <h1>Структуры данных</h1>
 <p>Данные в R можно хранить в виде разных объектов.</p>
-<p>В результате выполнения следующих команд получаются <em>скалярные величины</em>. Просто числа. Одно выражение - одно значение</p>
+<p>В результате выполнения следующих команд числа. Одно выражение - одно значение.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">23</span></code></pre></div>
 <pre><code>## [1] 23</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(<span class="dv">25</span>)</code></pre></div>
@@ -625,28 +625,20 @@ snail_colours <span class="co"># это текстовый вектор.</span><
 <p>Сумму элементов вектора при помощи функции <code>sum()</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(NAs_NANs)</code></pre></div>
 <pre><code>## [1] NA</code></pre>
-<p>Упс! Почему-то получилось NA</p>
-<p>Чтобы узнать, почему и как это исправить - посмотрите в help(“sum”). Выяснится, что у функции sum() есть аргумент na.rm, который по умолчанию принимает значение FALSE, то есть NA не учитываются при подсчете суммы.</p>
-<p>Если мы передадим функции sum аргумент na.rm = TRUE, то получится правильная сумма</p>
+<p>Упс! Почему-то получилось <code>NA</code></p>
+<p>Чтобы узнать, почему и как это исправить - посмотрите в <code>help(&quot;sum&quot;)</code>. Выяснится, что у функции <code>sum()</code> есть аргумент <code>na.rm</code>, который по умолчанию принимает значение <code>FALSE</code>, то есть <code>NA</code> не учитываются при подсчете суммы.</p>
+<p>Если мы передадим функции <code>sum</code> аргумент <code>na.rm = TRUE</code>, то получится правильная сумма</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <pre><code>## [1] 80</code></pre>
-<p>Теперь давайте попробуем вручную посчитать среднее значение элементов в векторе NAs_NANs и положить его в переменную</p>
-<p>Осторожно! В знаменателе должна быть не просто длина вектора, а число элементов, которые не равны NA</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">sum</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) /<span class="st"> </span>(<span class="kw">length</span>(NAs_NANs) -<span class="st"> </span><span class="dv">1</span>)
-a</code></pre></div>
-<pre><code>## [1] 11.42857</code></pre>
-<p>Проверяем при помощи встроенной функции mean()</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(NAs_NANs)</code></pre></div>
-<pre><code>## [1] NA</code></pre>
-<p>Она тоже не работает, если в векторе есть NA, но у нее тоже есть аргумент na.rm</p>
+<p>Та же история с функцией <code>mean</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1] 11.42857</code></pre>
-<p>Попробуем написать пользовательскую функцию mmean(), которая будет по умолчанию считать среднее значение элементов в векторе с учетом пропущенных значений (NA)</p>
+<pre><code>## [1] 11.4</code></pre>
+<p>Попробуем написать пользовательскую функцию <code>mmean()</code>, которая будет по умолчанию считать среднее значение элементов в векторе с учетом пропущенных значений (<code>NA</code>)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mmean &lt;-<span class="st"> </span>function(x){
   <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
   }</code></pre></div>
-<p>В этом коде: - mmean - переменная, название функции. В эту переменную мы складываем функцию, которую создает функция function() - function() - функция, которая делает функции. В скобках перечисляются аргументы (названия переменных, которые мы передаем в функцию, чтобы она что-то сделала с ними) - { } - в фигурных скобках тело функции - последовательность действий, которую нужно сделать с аргументами</p>
-<p>У больших функций бывает еще инструкция return(), которая сообщает, что именно должна возвращать наша функция. Вот как выглядела бы наша функция с этой инструкцией</p>
+<p>В этом коде: - mmean - переменная, название функции. В эту переменную мы складываем функцию, которую создает функция <code>function()</code> - <code>function()</code> - функция, которая делает функции. В скобках перечисляются аргументы (названия переменных, которые мы передаем в функцию, чтобы она что-то сделала с ними) - <code>{ }</code> - в фигурных скобках тело функции - последовательность действий, которую нужно сделать с аргументами</p>
+<p>У больших функций бывает еще инструкция <code>return()</code>, которая сообщает, что именно должна возвращать наша функция. Вот как выглядела бы наша функция с этой инструкцией</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mmean &lt;-<span class="st"> </span>function(x){
   res &lt;-<span class="st"> </span><span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
   <span class="kw">return</span>(res)
