@@ -1,0 +1,109 @@
+---
+title: Линейные модели, дисперсионный и регрессионный анализ с использованием R
+---
+
+## Темы занятий
+
+### 1.Знакомство с R
+
+- [html](01_introduction_to_r.html)
+- [код R]
+
+### 2.Тестирование гипотез
+- [html](02_hypothesis_testing.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 3.Анализ мощности [html](03_power_analysis.html)
+
+### 4.Простая линейная регрессия
+
+- [html](04_linear_regression.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 5.Проверка условий применимости регрессионных моделей
+
+- [html](05_diagnostics_of_regression_models.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 6.Множественная линейная регрессия
+
+- [html](06_multiple_linear_regression.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 7.Сравнение линейных моделей
+
+- [html](07_model_selection.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 8.Линейные модели с непрерывными и дискретными предикторами
+[html](08_linear_regression_with_continuous_and_discreet_predictors.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 9.Линейные модели только с дискретными предикторами (дисперсионный анализ)
+
+- [html](09_anova.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 10.Многофакторный дисперсионный анализ
+
+- [html](10_two-way_anova_and_interactions.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 11.Линейные модели для бинарных данных (логистическая регрессия)
+
+- [html](11_general_linear_models_for_binary_data.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 12.Линейные модели для счетных данных
+
+- [html](12_general_linear_models_for_count_data.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 13.Смешанные линейные модели
+
+- [html](13_general_linear_mixed_models.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 14.Коррекция гетерогенности дисперсий в смешанных линейных моделях
+
+- [html](14_modelling_variance_structure.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 15.Обобщенные смешанные линейные модели для бинарных данных
+
+- [html](15_general_linear_mixed_models_for_binary_data.html)
+- [код R]
+- Данные
+- [pdf]
+
+### 16.Обобщенные смешанные модели для счетных данных
+
+- [html](16_general_linear_mixed_models_for_count_data.html)
+- [код R]
+- Данные
+- [pdf]
+
