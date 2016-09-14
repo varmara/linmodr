@@ -11,7 +11,7 @@ title: Линейные модели, дисперсионный и регрес
 ### 2.Тестирование гипотез
 - [html](02_hypothesis_testing.html)
 - [код R](02_code_hypothesis_testing.R)
-- [pdf](02_code_hypothesis_testing.pdf)
+- [pdf](02_hypothesis_testing.pdf)
 
 ### 3.Анализ мощности 
 
