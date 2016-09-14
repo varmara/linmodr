@@ -31,7 +31,7 @@
         usePrettify: true,
         enableSlideAreas: true,
         enableTouch: true,
-                        favIcon: '05_diagnostics_of_regression_models_files/logo.png',
+                        favIcon: '05_model_validation_files/logo.png',
               },
 
       // Author information
@@ -80,7 +80,7 @@
       position: absolute;
       bottom: 20px;
       left: 60px;
-      background: url(05_diagnostics_of_regression_models_files/logo.png) no-repeat 0 50%;
+      background: url(05_model_validation_files/logo.png) no-repeat 0 50%;
       -webkit-background-size: 30px 30px;
       -moz-background-size: 30px 30px;
       -o-background-size: 30px 30px;
@@ -100,7 +100,7 @@
 <slides class="layout-widescreen">
 
   <slide class="title-slide segue nobackground">
-        <aside class="gdbar"><img src="05_diagnostics_of_regression_models_files/logo.png"></aside>
+        <aside class="gdbar"><img src="05_model_validation_files/logo.png"></aside>
         <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
     <hgroup class="auto-fadein">
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
@@ -240,7 +240,7 @@ head(brain_diag, 2)</pre>
 <pre class = 'prettyprint lang-r'>ggplot(data = brain_diag, aes(x = .fitted, y = .stdresid)) + geom_point() + 
     geom_hline(aes(yintercept = 0))</pre>
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Внесем некоторые дополнения</h2></hgroup><article  id="--" class="smaller columns-2">
 
@@ -249,7 +249,7 @@ head(brain_diag, 2)</pre>
   geom_hline(yintercept = 0) + 
   geom_smooth(method=&quot;loess&quot;, se=FALSE) </pre>
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto auto auto 0;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto auto auto 0;" /></p>
 
 <p>Что мы видим?<br/>- Большая часть стандартизованных остатков в пределах двух стандартных отклонений.<br/>- Есть одно влиятельное наблюдение, которое нужно проверить, но сила его влияния невелика.<br/>- Среди остатков нет тренда.<br/>- Но есть иной паттерн!</p>
 
@@ -300,7 +300,7 @@ head(brain_diag, 2)</pre>
 
 <p>Они становятся лучше заметны на графиках рассеяния остатков (Residual plots)</p>
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Что делать, если связь нелинейна?</h2></hgroup><article  id="----">
 
@@ -311,7 +311,7 @@ head(brain_diag, 2)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Пример линеаризующего преобразования</h2></hgroup><article  id="--">
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>2. Независимость \(Y\) друг от друга</h2></hgroup><article  id="-y---">
 
@@ -329,7 +329,7 @@ head(brain_diag, 2)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Симулированный пример: Автокоррелированные данные.</h2></hgroup><article  id="---.">
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Критерий Дарбина-Уотсона: Формальный тест на автокорреляцию</h2></hgroup><article  id="------">
 
@@ -343,7 +343,7 @@ durbinWatsonTest(brain_model)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Симулированный пример: Автокоррелированные данные.</h2></hgroup><article  id="---.-1" class="smaller columns-2">
 
-<p>Данные имеют ярко выраженную автокорреляцию <img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Данные имеют ярко выраженную автокорреляцию <img src="05_model_validation_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <p><br> <br></p>
 
@@ -376,7 +376,7 @@ durbinWatsonTest(lm_autocor)</pre>
 <pre class = 'prettyprint lang-r'>ggplot(brain_model, aes(x = .stdresid)) + geom_histogram(binwidth = 0.4, 
     fill = &quot;blue&quot;, color = &quot;black&quot;)</pre>
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <p>На частотной гистограмме остатков НЕ ВСЕГДА хорошо видны отклонения от нормальности</p>
 
@@ -385,7 +385,7 @@ durbinWatsonTest(lm_autocor)</pre>
 <pre class = 'prettyprint lang-r'>library(car)
 qqPlot(brain_model)</pre>
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 <p><br> <br> <em>Квантиль</em> - значение, которое заданная случайная величина не превышает с фиксированной вероятностью.</p>
 
@@ -398,7 +398,7 @@ sd_val &lt;- sd(brain_diag$.stdresid)
 ggplot(brain_diag, aes(sample = .stdresid)) + geom_point(stat = &quot;qq&quot;) + 
     geom_abline(intercept = mean_val, slope = sd_val)</pre>
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <p>Мы видим, что отклонения от нормальности есть!<br/>Но! Метод устойчив к небольшим отклонениям от нормальности.</p>
 
@@ -406,7 +406,7 @@ ggplot(brain_diag, aes(sample = .stdresid)) + geom_point(stat = &quot;qq&quot;) 
 
 <p>Это самое важное ограничивающее условие!<br/>Многие тесты чувствительны к гетероскедастичности.</p>
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Формальные тесты на гетероскедастичность</h2></hgroup><article  id="---" class="columns-2">
 
@@ -438,7 +438,7 @@ bptest(PIQ ~ MRINACount, data = brain) </pre>
 
 <p>Решение 1. Применить преобразование зависимой переменной (в некоторых случаях и предиктора).</p>
 
-<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Что делать если вы столкнулись с гетероскедастичностью?</h2></hgroup><article  id="-------1">
 

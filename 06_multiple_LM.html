@@ -31,7 +31,7 @@
         usePrettify: true,
         enableSlideAreas: true,
         enableTouch: true,
-                        favIcon: '06_multiple_linear_regression_files/logo.png',
+                        favIcon: '06_multiple_LM_files/logo.png',
               },
 
       // Author information
@@ -80,7 +80,7 @@
       position: absolute;
       bottom: 20px;
       left: 60px;
-      background: url(06_multiple_linear_regression_files/logo.png) no-repeat 0 50%;
+      background: url(06_multiple_LM_files/logo.png) no-repeat 0 50%;
       -webkit-background-size: 30px 30px;
       -moz-background-size: 30px 30px;
       -o-background-size: 30px 30px;
@@ -100,7 +100,7 @@
 <slides class="layout-widescreen">
 
   <slide class="title-slide segue nobackground">
-        <aside class="gdbar"><img src="06_multiple_linear_regression_files/logo.png"></aside>
+        <aside class="gdbar"><img src="06_multiple_LM_files/logo.png"></aside>
         <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
     <hgroup class="auto-fadein">
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
@@ -182,7 +182,7 @@ head(bird)</pre>
 
 <h3>Для случая с одним предиктором \(y_i = \beta_0 + \beta_1x_i + \epsilon_i\) - линия регрессии</h3>
 
-<p><img src="06_multiple_linear_regression_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="06_multiple_LM_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Геометрическая интерпретация множественной линейной модели</h2></hgroup><article  id="-----1" class="columns-2">
 
@@ -192,7 +192,7 @@ head(bird)</pre>
 
 <p>Плоскость в трехмерном пространстве</p>
 
-<p><img src="06_multiple_linear_regression_files/figure-html/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><img src="06_multiple_LM_files/figure-html/unnamed-chunk-4-1.png" width="576" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Геометрическая интерпретация множественной линейной модели</h2></hgroup><article  id="-----2">
 
@@ -205,13 +205,13 @@ head(bird)</pre>
 <pre class = 'prettyprint lang-r'>library(car)
 scatterplotMatrix(bird)</pre>
 
-<p><img src="06_multiple_linear_regression_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="06_multiple_LM_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Явные проблемы</h2></hgroup><article  id="-">
 
 <h3>Есть сильные корреляции между некоторым предикторами.</h3>
 
-<p><img src="06_multiple_linear_regression_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="06_multiple_LM_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Постоим линейную модель</h2></hgroup><article  id="--">
 
@@ -283,24 +283,24 @@ ggplot(ABUND_diag, aes(x = .fitted, y = .stdresid)) +
   geom_smooth(se=FALSE) + 
   geom_hline(aes(yintercept = 0))</pre>
 
-<p><img src="06_multiple_linear_regression_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="06_multiple_LM_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Проверяем распределение остатков на соответствие нормальному распределению</h2></hgroup><article  id="------">
 
 <pre class = 'prettyprint lang-r'>ggplot(ABUND_diag, aes(x = .resid)) + geom_histogram(binwidth = 5) </pre>
 
-<p><img src="06_multiple_linear_regression_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="06_multiple_LM_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Проверяем распределение остатков на соответствие нормальному распределению</h2></hgroup><article  id="-------1">
 
 <pre class = 'prettyprint lang-r'>library(car)
 qqPlot(model)</pre>
 
-<p><img src="06_multiple_linear_regression_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="06_multiple_LM_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Проверяем на гетероскедастичность</h2></hgroup><article  id="--">
 
-<p><img src="06_multiple_linear_regression_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="06_multiple_LM_files/figure-html/unnamed-chunk-13-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 <pre class = 'prettyprint lang-r'>library(lmtest)
 bptest(model)</pre>
@@ -644,7 +644,7 @@ summary(model4)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Как трактовать взаимодействия?</h2></hgroup><article  id="--">
 
-<p><img src="06_multiple_linear_regression_files/figure-html/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" /> НО! Не всегда все так просто трактуется&#8230;<br/>Часто трактовка взаимодействий затруднительна, особенно если предкторов много.</p>
+<p><img src="06_multiple_LM_files/figure-html/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" /> НО! Не всегда все так просто трактуется&#8230;<br/>Часто трактовка взаимодействий затруднительна, особенно если предкторов много.</p>
 
 </article></slide><slide class=''><hgroup><h2>Include or Don&#39;t include? That is the question&#8230;</h2></hgroup><article  id="include-or-dont-include-that-is-the-question..." class="smaller">
 

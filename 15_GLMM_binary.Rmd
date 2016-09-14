@@ -1,16 +1,12 @@
 ---
-title       : Смешанные модели для бинарных зависимых величин
-subtitle    : Линейные модели, осень 2015
+title       : "Смешанные модели для бинарных зависимых величин"
+subtitle    : "Линейные модели..."
 author: Вадим Хайтов, Марина Варфоломеева
-presenters: [{
-    name: 'Вадим Хайтов',
-    company: 'каф. ЗБП, СПбГУ',
-    }]
 output:
   ioslides_presentation:
-    widescreen: true
-    css: my_styles.css
-    logo: Linmod_logo.png
+    widescreen: yes
+    css: assets/my_styles.css
+    logo: assets/Linmod_logo.png
 ---
 
 ## Вы узнаете
@@ -23,25 +19,13 @@ output:
 - Применить для построения модели функции из нескольких пакетов, реализованных в R.
 
 
-
-
-```{r setup, include = FALSE, cache = FALSE}
-#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
-# to configure markdown parsing
-options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
-#------
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 # output options
 options(width = 70, scipen = 6, digits = 3)
-
-# to render cyrillics in plots use cairo pdf
-options(device = function(file, width = 7, height = 7, ...) {
-  cairo_pdf(tempfile(), width = width, height = height, ...)
-  })
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', cache=FALSE, tidy = TRUE, fig.width = 7, fig.height = 3, message=FALSE, warning=FALSE)
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
 ```
-
 
 
 # Вспомним основные идеи работы с бинарными переменными

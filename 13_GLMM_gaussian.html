@@ -31,7 +31,7 @@
         usePrettify: true,
         enableSlideAreas: true,
         enableTouch: true,
-                        favIcon: '13_general_linear_mixed_models_files/logo.png',
+                        favIcon: '13_GLMM_gaussian_files/logo.png',
               },
 
       // Author information
@@ -80,7 +80,7 @@
       position: absolute;
       bottom: 20px;
       left: 60px;
-      background: url(13_general_linear_mixed_models_files/logo.png) no-repeat 0 50%;
+      background: url(13_GLMM_gaussian_files/logo.png) no-repeat 0 50%;
       -webkit-background-size: 30px 30px;
       -moz-background-size: 30px 30px;
       -o-background-size: 30px 30px;
@@ -100,7 +100,7 @@
 <slides class="layout-widescreen">
 
   <slide class="title-slide segue nobackground">
-        <aside class="gdbar"><img src="13_general_linear_mixed_models_files/logo.png"></aside>
+        <aside class="gdbar"><img src="13_GLMM_gaussian_files/logo.png"></aside>
         <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
     <hgroup class="auto-fadein">
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
@@ -209,7 +209,7 @@ update_geom_defaults(&quot;point&quot;, list(shape = 19))
 ggplot(sl, aes(x = Reaction, y = 1:nrow(sl), colour = Subject)) + 
   geom_point() + guides(colour = guide_legend(ncol = 2))</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /> &gt;- Субъектов с необычным временем реакции нет<br/>&gt;- Видно, что у разных субъектов время реакции различается. Есть быстрые, есть медленные. Межиндивидуальную изменчивость нельзя игнорировать.</p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /> &gt;- Субъектов с необычным временем реакции нет<br/>&gt;- Видно, что у разных субъектов время реакции различается. Есть быстрые, есть медленные. Межиндивидуальную изменчивость нельзя игнорировать.</p>
 
 </article></slide><slide class=''><hgroup><h2>Что делать с разными субъектами?</h2></hgroup><article  id="----">
 
@@ -239,7 +239,7 @@ ggplot(sl, aes(x = Reaction, y = 1:nrow(sl), colour = Subject)) +
 <div class="columns-2">
 <p>Если мы не учитываем группирующий фактор, все будет &quot;очень достоверно&quot; из-за низких стандартных ошибок.<br/>Но в этом случае условие независимости будет нарушено, поэтому все не так как кажется.</p>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-6-1.png" width="432" style="display: block; margin: auto;" /></p></div>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-6-1.png" width="432" style="display: block; margin: auto;" /></p></div>
 
 </article></slide><slide class=''><hgroup><h2>Неправильный вариант 2. Группирующий фактор как фиксированный.</h2></hgroup><article  id="--2.----.">
 
@@ -261,7 +261,7 @@ ggplot(wrong2_diag, aes(x = Days, colour = Subject)) +
   geom_point(data = sl, aes(y = Reaction)) +
   guides(colour = guide_legend(ncol = 2))</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <ul class = 'build'>
 <li>Нас не интересует, как различается время реакции каждого конкретного субъекта. Можем попытаться вместо подбора отдельных интерсептов, оценить разброс их значений.</li>
@@ -521,7 +521,7 @@ sl$.stdresid &lt;- resid(M1, type = &quot;pearson&quot;)
 sl$.fitted &lt;- fitted(M1)
 ggplot(sl) + geom_point(aes(x = .fitted, y = .stdresid, colour = Subject))</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <ul class = 'build'>
 <li>Есть большие остатки, гетерогенность дисперсий</li>
@@ -536,7 +536,7 @@ grid.arrange(
   p + geom_boxplot(aes(x = Subject)),
   ncol = 2)</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-11-1.png" width="960" style="display: block; margin: auto;" /> &gt; - Большой остаток у наблюдения 332 субъекта &gt; - Нелинейный паттерн &gt; - Гетерогенность дисперсий &gt; - Пока оставим все как есть</p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-11-1.png" width="960" style="display: block; margin: auto;" /> &gt; - Большой остаток у наблюдения 332 субъекта &gt; - Нелинейный паттерн &gt; - Гетерогенность дисперсий &gt; - Пока оставим все как есть</p>
 
 </article></slide><slide class=''><hgroup><h2>2. Проверяем, какие из фиксированных факторов влияют одним из трех вариантов:</h2></hgroup><article  id="---------">
 
@@ -752,7 +752,7 @@ new_data$.se &lt;- sqrt(diag(X %*% vcov(MFinal1) %*% t(X)))</pre>
     ymin = .fitted - 1.98 * .se, ymax = .fitted + 1.98 * .se)) + 
     geom_point(data = sl, aes(x = Days, y = Reaction))</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>2-й вариант. График с предсказаниями для индивидуальных уровней случайного фактора</h2></hgroup><article  id="-.--------" class="smaller">
 
@@ -763,7 +763,7 @@ ggplot(new_data, aes(x = Days, y = .fitted1, group = Subject)) +
         .se, ymax = .fitted1 + 1.98 * .se), alpha = 0.5) + geom_line() + 
     geom_point(data = sl, aes(x = Days, y = Reaction))</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-21-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-21-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 <pre class = 'prettyprint lang-r'># попробуйте добавить facet_wrap(~Subject)</pre>
 
@@ -796,7 +796,7 @@ sl$.stdresid1 &lt;- resid(MS1, type = &quot;pearson&quot;)
 sl$.fitted1 &lt;- fitted(MS1)
 ggplot(sl) + geom_point(aes(x = .fitted1, y = .stdresid1, colour = Subject))</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <ul class = 'build'>
 <li>Есть большие остатки, гетерогенность дисперсий</li>
@@ -810,7 +810,7 @@ grid.arrange(
   p + geom_boxplot(aes(x = Subject)),
   ncol = 2)</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-24-1.png" width="960" style="display: block; margin: auto;" /> &gt; - Большой остаток у наблюдения 332 субъекта &gt; - Нелинейный паттерн &gt; - Гетерогенность дисперсий</p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-24-1.png" width="960" style="display: block; margin: auto;" /> &gt; - Большой остаток у наблюдения 332 субъекта &gt; - Нелинейный паттерн &gt; - Гетерогенность дисперсий</p>
 
 </article></slide><slide class=''><hgroup><h2>2. Проверяем, какие из фиксированных факторов влияют при помощи likelihood ratio test</h2></hgroup><article  id="--------likelihood-ratio-test">
 
@@ -857,7 +857,7 @@ new_data$.se &lt;- sqrt(diag(X %*% vcov(MSFinal) %*% t(X)))</pre>
     ymin = .fitted - 1.98 * .se, ymax = .fitted + 1.98 * .se)) + 
     geom_point(data = sl, aes(x = Days, y = Reaction))</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>2-й вариант. График с предсказаниями для индивидуальных уровней случайного фактора</h2></hgroup><article  id="-.---------1" class="smaller">
 
@@ -868,7 +868,7 @@ ggplot(new_data, aes(x = Days, y = .fitted1, group = Subject)) +
         .se, ymax = .fitted1 + 1.98 * .se), alpha = 0.5) + geom_line() + 
     geom_point(data = sl, aes(x = Days, y = Reaction))</pre>
 
-<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-29-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="13_GLMM_gaussian_files/figure-html/unnamed-chunk-29-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 <pre class = 'prettyprint lang-r'># попробуйте добавить facet_wrap(~Subject)</pre>
 

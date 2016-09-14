@@ -179,7 +179,7 @@ head(brain)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Вспомним: <em>Сила и направление связи между величинами</em></h2></hgroup><article  id="------">
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Коэффициенты корреляции и условия их применимости</h2></hgroup><article  id="-----">
 
@@ -260,7 +260,7 @@ head(brain)</pre>
 
 <pre class = 'prettyprint lang-r'>pl_brain</pre>
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Два подхода к исследованию: <br> Тестирование гипотезы <br>VS<br> Построение модели</h2></hgroup><article  id="------vs--">
 
@@ -296,13 +296,13 @@ head(brain)</pre>
 </article></slide><slide class=''><hgroup><h2>Детерминистские и стохастические модели</h2></hgroup><article  id="---">
 
 <div class="columns-2">
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-9-1.png" width="384" style="display: block; margin: auto;" /> Модель: \(у_i = 2 + 5x_i\)<br/>Два парметра: угловой коэффициент (slope) \(b_1=5\); свободный член (intercept) \(b_0=2\) Чему равен \(y\) при \(x=10\)?</p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-9-1.png" width="384" style="display: block; margin: auto;" /> Модель: \(у_i = 2 + 5x_i\)<br/>Два парметра: угловой коэффициент (slope) \(b_1=5\); свободный член (intercept) \(b_0=2\) Чему равен \(y\) при \(x=10\)?</p>
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-10-1.png" width="384" style="display: block; margin: auto;" /> Модель: \(у = 2 + 5x + \epsilon\)<br/>Появляется дополнительный член \(\epsilon_i\) Он вводит в модель влияние неучтенных моделью факторов. Обычно считают, что \(\epsilon \in N(0, \sigma^2)\)</p></div>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-10-1.png" width="384" style="display: block; margin: auto;" /> Модель: \(у = 2 + 5x + \epsilon\)<br/>Появляется дополнительный член \(\epsilon_i\) Он вводит в модель влияние неучтенных моделью факторов. Обычно считают, что \(\epsilon \in N(0, \sigma^2)\)</p></div>
 
 </article></slide><slide class=''><hgroup><h2>Модели с дискретными предикторами</h2></hgroup><article  id="---">
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <p>Модель для данного примера имеет такой вид<br/>\(response = 4.6 + 5.3I_{Level2} + 9.9 I_{Level3}\)</p>
 
@@ -312,7 +312,7 @@ head(brain)</pre>
 
 <p>Какая из линий &quot;лучше&quot; описывает облако точек?</p>
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Найти оптимальную модель позволяет регрессионный анализ</h2></hgroup><article  id="-----">
 
@@ -433,7 +433,7 @@ brain_model</pre>
 
 </article></slide><slide class=''><hgroup><h2>Как трактовать значения параметров регрессионной модели?</h2></hgroup><article  id="-----">
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-13-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-13-1.png" width="864" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Как трактовать значения параметров регрессионной модели?</h2></hgroup><article  id="------1">
 
@@ -551,13 +551,13 @@ brain_model</pre>
 
 <pre class = 'prettyprint lang-r'>pl_brain + geom_smooth(method=&quot;lm&quot;) </pre>
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-16-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 <p><br> <br> <br> Доверительная зона регрессии. В ней с 95% вероятностью лежит регрессионная прямая, описывающая связь в генеральной совокупности. <br> Возникает из-за неопределенности оценок коэффициентов регрессии, вследствие выборочного характера оценок.</p>
 
 </article></slide><slide class=''><hgroup><h2>Симулированный пример</h2></hgroup><article  id="-">
 
-<p>Линии регресси, полученные для 100 выборок (по 20 объектов в каждой), взятых из одной и той же генеральной совокупности <img src="04_linear_regression_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Линии регресси, полученные для 100 выборок (по 20 объектов в каждой), взятых из одной и той же генеральной совокупности <img src="04_LM_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Доверительные интервалы для коэффициентов уравнения регрессии</h2></hgroup><article  id="-----">
 
@@ -574,7 +574,7 @@ brain_model</pre>
 
 </article></slide><slide class=''><hgroup><h2>Для разных \(\alpha\) можно построить разные доверительные интервалы</h2></hgroup><article  id="--alpha-----">
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-19-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-19-1.png" width="864" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Важно!</h2></hgroup><article >
 
@@ -611,7 +611,7 @@ head(brain_predicted)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Отражаем на графике область значений, в которую попадут 95% предсказанных величин IQ</h2></hgroup><article  id="--------95---iq-1">
 
-<p><img src="04_linear_regression_files/figure-html/pl-predict-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/pl-predict-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Код для этого графика</h2></hgroup><article  id="---" class="smaller">
 
@@ -644,7 +644,7 @@ ggtitle(&quot;Confidence interval \n and confidence area for prediction&quot;)</
 
 <p><dev class="columns-2"> <em>Модель &quot;работает&quot; только в том диапазоне значений независимой переменной (\(x\)), для которой она построена (интерполяция). Экстраполяцию надо применять с большой осторожностью.</em></p>
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-22-1.png" width="864" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-22-1.png" width="864" style="display: block; margin: auto;" /></p>
 
 <p></dev></p>
 
@@ -708,7 +708,7 @@ ggtitle(&quot;Confidence interval \n and confidence area for prediction&quot;)</
 
 <p><em>Объясненная дисперсия зависимой перменной</em><br/>\(SS_{Regression}=\sum{(\hat{y}-\bar{y})^2}\)<br/>\(df_{Regression} = 1\)<br/>\(MS_{Regression} =\frac{SS_{Regression}}{df}\) <br><br> <em>Остаточная дисперсия завсимой переменной</em><br/>\(SS_{Residual}=\sum{(\hat{y}-y_i)^2}\)<br/>\(df_{Residual} = n-2\)<br/>\(MS_{Residual} =\frac{SS_{Residual}}{df_{Residual}}\)<br/><br><br> <em>Полная дисперсия зависимой переменной</em><br/>\(SS_{Total}=\sum{(\bar{y}-y_i)^2}\)<br/>\(df_{Total} = n-1\)<br/>\(MS_{Total} =\frac{SS_{Total}}{df_{Total}}\)</p>
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-24-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>F критерий</h2></hgroup><article  id="f-">
 
@@ -721,7 +721,7 @@ ggtitle(&quot;Confidence interval \n and confidence area for prediction&quot;)</
 
 <p>Логика та же, что и с t-критерием</p>
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-25-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 <p>Форма F-распределения зависит от двух параметров \(df_{Regression} = 1\) и \(df_{Residual} = n-2\)</p>
 
@@ -733,7 +733,7 @@ ggtitle(&quot;Confidence interval \n and confidence area for prediction&quot;)</
 
 <h3>В чем различие между этми двумя моделями?</h3>
 
-<p><img src="04_linear_regression_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="04_LM_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Оценка качества подгонки модели с помощью коэффициента детерминации</h2></hgroup><article  id="--------1">
 

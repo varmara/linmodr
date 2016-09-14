@@ -1,11 +1,12 @@
 ---
-title: Линейная регрессия
+title: "Линейная регрессия"
+subtitle    : "Линейные модели..."
 author: Вадим Хайтов, Марина Варфоломеева
 output:
   ioslides_presentation:
-    css: my_styles.css
     widescreen: yes
-subtitle: Линейные модели, дисперсионный и регрессионный анализ с использованием R
+    css: assets/my_styles.css
+    logo: assets/Linmod_logo.png
 ---
 
 
@@ -25,23 +26,13 @@ subtitle: Линейные модели, дисперсионный и регр�
 + Протестировать гипотезы о наличии зависимости при помощи t-критерия или F-критерия
 + Оценить предсказательную силу модели 
 
-```{r setup, include = FALSE, cache = FALSE}
-#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
-# to configure markdown parsing
-options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
-#------
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 # output options
 options(width = 70, scipen = 6, digits = 3)
-
-# to render cyrillics in plots use cairo pdf
-options(device = function(file, width = 7, height = 7, ...) {
-  cairo_pdf(tempfile(), width = width, height = height, ...)
-  })
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3)
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
 ```
-
 # Знакомимся с даными
 
 ## Пример: IQ и размеры мозга {.flexbox .vcenter}

@@ -140,7 +140,7 @@
 
 <h3>Вероятности гипотез</h3>
 
-<p><img src="03_power_analysis_files/figure-html/power_curves-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/power_curves-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Типы ошибок при проверке гипотез</h2></hgroup><article  id="-----1">
 
@@ -167,7 +167,7 @@
 
 <h3>Ошибки I рода</h3>
 
-<p><img src="03_power_analysis_files/figure-html/power_alpha-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/power_alpha-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Типы ошибок при проверке гипотез</h2></hgroup><article  id="-----2">
 
@@ -194,7 +194,7 @@
 
 <h3>Ошибки II рода</h3>
 
-<p><img src="03_power_analysis_files/figure-html/power_beta-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/power_beta-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Типы ошибок при проверке гипотез</h2></hgroup><article  id="-----3">
 
@@ -221,7 +221,7 @@
 
 <h3>Мощность теста - способность выявлять различия \(Power = 1 - \beta\)</h3>
 
-<p><img src="03_power_analysis_files/figure-html/unnamed-chunk-1-1.png" width="969.6" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/unnamed-chunk-1-1.png" width="969.6" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Анализ мощности</h2></hgroup><article  id="-">
 
@@ -543,7 +543,7 @@ bal &lt;- read_excel(path = &quot;data/balance.xlsx&quot;, sheet = 1)</pre>
 ggplot(data = bal, aes(x = age_group, y = forward_backward)) + 
   geom_boxplot()</pre>
 
-<p><img src="03_power_analysis_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <ul class = 'build'>
 <li>Установите до конца сеанса другую тему</li>
@@ -554,7 +554,7 @@ ggplot(data = bal, aes(x = age_group, y = forward_backward)) +
 <pre class = 'prettyprint lang-r'>theme_set(theme_bw())
 ggplot(data = bal, aes(x = age_group, y = forward_backward)) + geom_boxplot()</pre>
 
-<p><img src="03_power_analysis_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Раскрашиваем график</h2></hgroup><article  id="-">
 
@@ -566,7 +566,7 @@ ggplot(data = bal, aes(x = age_group, y = forward_backward)) + geom_boxplot()</p
 ggplot(data = bal, aes(x = age_group, y = forward_backward, colour = age_group)) + 
     geom_boxplot()</pre>
 
-<p><img src="03_power_analysis_files/figure-html/unnamed-chunk-18-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/unnamed-chunk-18-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article >
 
@@ -582,7 +582,7 @@ ggplot(data = bal, aes(x = age_group, y = forward_backward, colour = age_group))
     fill = &quot;Возрастная \nгруппа&quot;)
 gg_balance</pre>
 
-<p><img src="03_power_analysis_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>A priory анализ мощности по данным пилотного исследования</h2></hgroup><article  id="a-priory------">
 
@@ -774,15 +774,15 @@ pwr.t.test(n = 10, d = effect_real,
 
 </article></slide><slide class=''><hgroup><h2>Чем больше объем выборки—тем больше мощность</h2></hgroup><article  id="-----">
 
-<p><img src="03_power_analysis_files/figure-html/pwr_vs_n-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/pwr_vs_n-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Чем больше уровень значимости—тем больше мощность</h2></hgroup><article  id="-----">
 
-<p><img src="03_power_analysis_files/figure-html/unnamed-chunk-28-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/unnamed-chunk-28-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Чем больше величина различий—тем больше мощность</h2></hgroup><article  id="-----">
 
-<p><img src="03_power_analysis_files/figure-html/unnamed-chunk-29-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="03_power_files/figure-html/unnamed-chunk-29-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Скажите</h2></hgroup><article >
 

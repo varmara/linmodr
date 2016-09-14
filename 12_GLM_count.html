@@ -31,7 +31,7 @@
         usePrettify: true,
         enableSlideAreas: true,
         enableTouch: true,
-                        favIcon: '12_general_linear_models_for_count_data_files/logo.png',
+                        favIcon: '12_GLM_count_files/logo.png',
               },
 
       // Author information
@@ -80,7 +80,7 @@
       position: absolute;
       bottom: 20px;
       left: 60px;
-      background: url(12_general_linear_models_for_count_data_files/logo.png) no-repeat 0 50%;
+      background: url(12_GLM_count_files/logo.png) no-repeat 0 50%;
       -webkit-background-size: 30px 30px;
       -moz-background-size: 30px 30px;
       -o-background-size: 30px 30px;
@@ -100,7 +100,7 @@
 <slides class="layout-widescreen">
 
   <slide class="title-slide segue nobackground">
-        <aside class="gdbar"><img src="12_general_linear_models_for_count_data_files/logo.png"></aside>
+        <aside class="gdbar"><img src="12_GLM_count_files/logo.png"></aside>
         <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
     <hgroup class="auto-fadein">
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
@@ -146,7 +146,7 @@
 
 <p>\(-\infty \le Y \le +\infty\)</p>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Распределение Пуассона</h2></hgroup><article  id="-" class="columns-2">
 
@@ -164,7 +164,7 @@
 
 <p>\(0 \le Y \le +\infty\),<br/>\(Y\) <strong>целочисленные</strong></p>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Гамма-распределение</h2></hgroup><article  id="-" class="columns-2">
 
@@ -182,7 +182,7 @@
 
 <p>\(0 &lt; Y \le +\infty\)<br/>Внимание! \(Y\) строго больше 0</p>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto 0 auto auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto 0 auto auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Отрицательное биномиальное распределение</h2></hgroup><article  id="--">
 
@@ -199,7 +199,7 @@
 
 <p>\(0 \le Y \le +\infty\),   \(Y\) <strong>целочисленные</strong></small></p>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p></div>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p></div>
 
 </article></slide><slide class=''><hgroup><h2>Биномиальное распределение</h2></hgroup><article  id="-">
 
@@ -216,7 +216,7 @@
 
 <p>\(0 \le Y \le +\infty\),   \(Y\) <strong>целочисленные</strong> </small></p>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" /></p></div>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" /></p></div>
 
 </article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Распределение зависимой переменной и линия регрессии</h2></hgroup><article  id="-----">
 
@@ -268,7 +268,7 @@
 
 <pre class = 'prettyprint lang-r'>M_sim1 &lt;- glm(y ~ x, data = dat, family = poisson(link = &quot;log&quot;))</pre>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Модели, основанные на распределении Пуассона и отрицательном биномиальном распределении</h2></hgroup><article  id="--------">
 
@@ -335,7 +335,7 @@ Anova(M2)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Посмотрим на предсказания этой модели</h2></hgroup><article  id="----">
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <ul class = 'build'>
 <li>Модель предсказывает, что взрослые негативно влияют на обилие молоди.<br/></li>
@@ -349,7 +349,7 @@ Anova(M2)</pre>
 ggplot(M2_diag, aes(x = .fitted, y = .stdresid)) + geom_point() +
   geom_hline(yintercept = 0) + geom_smooth(se = FALSE)</pre>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <ul class = 'build'>
 <li>Явные признаки гетероскедастичности!</li>
@@ -384,7 +384,7 @@ Anova(M3)</pre>
 <pre class = 'prettyprint lang-r'>M3_diag &lt;- data.frame(.fitted = predict(M3),
                       .pears_resid = residuals(M3, type = &quot;pearson&quot;))</pre>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <p>Рассеяние остатков выглядит лучше!</p>
 
@@ -566,7 +566,7 @@ Anova(M4a)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Предсказания упрощенной модели</h2></hgroup><article  id="--">
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-20-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-20-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 <ul class = 'build'>
 <li><strong>Биологический вывод: взрослые мидии препятствуют пополнению молодью</strong></li>
@@ -614,7 +614,7 @@ fi</pre>
 ggplot(M5_diag, aes(x=.fitted, y = .pears_resid)) + geom_point() +
   geom_hline(yintercept = 0) + geom_smooth(se = F)</pre>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article  id="-1">
 
@@ -622,7 +622,7 @@ ggplot(M5_diag, aes(x=.fitted, y = .pears_resid)) + geom_point() +
 
 </article></slide><slide class=''><hgroup><h2>Визуализируем предсказание модели</h2></hgroup><article  id="--">
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/m-viz-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/m-viz-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 <ul class = 'build'>
 <li><strong>Биологический вывод: В разные годы харакер взаимосвязи молоди и взрослых мидий может быть разным</strong></li>
@@ -1055,7 +1055,7 @@ Anova(Mod_nb)</pre>
 ggplot(Mod_nb_test, aes(x=.fitted, y = .pears_resid)) + geom_point() +
   geom_smooth(se = FALSE)</pre>
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Проверим на избыточность дисперсии</h2></hgroup><article  id="---">
 
@@ -1070,7 +1070,7 @@ fi</pre>
 
 </article></slide><slide class=''><hgroup><h2>Визуализируем предсказание модели</h2></hgroup><article  id="---1">
 
-<p><img src="12_general_linear_models_for_count_data_files/figure-html/af-viz-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="12_GLM_count_files/figure-html/af-viz-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Код для графика</h2></hgroup><article  id="---1">
 

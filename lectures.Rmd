@@ -5,15 +5,13 @@ title: Линейные модели, дисперсионный и регрес
 ## Темы занятий
 
 ### 1.Знакомство с R
-
 - [html](01_intro_to_r.html)
 - [код R](01_code_intro_to_r.R)
 
 ### 2.Тестирование гипотез
 - [html](02_hypothesis_testing.html)
 - [код R](02_code_hypothesis_testing.R)
-- Данные
-- [pdf]
+- [pdf](02_code_hypothesis_testing.pdf)
 
 ### 3.Анализ мощности 
 

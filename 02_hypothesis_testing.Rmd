@@ -1,37 +1,25 @@
 ---
-title: Тестирование статистических гипотез
-subtitle: Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015
-author: Вадим Хайтов, Марина Варфоломеева
-presenters: [{
-    name: 'Firstname Lastname',
-    company: 'Job Title, Google',
-    }]
+title: "Тестирование статистических гипотез"
+author: "Марина Варфоломеева, Вадим Хайтов"
+subtitle: Линейные модели...
 output:
   ioslides_presentation:
-    widescreen: true
-    css: my_styles.css
+    css: assets/my_styles.css
+    logo: assets/Linmod_logo.png
+    widescreen: yes
 ---
 
 ## Вы сможете
 
-- Уверенно объяснить, что такое статистический критерий и как он работает
+- Объяснить, что такое статистический критерий и как он работает
 - Применить команды R для проверки наиболее распространенных типов гипотез
-- Понять что такое пермутационный метод тестирования гипотез
+- Объяснить что такое пермутационный метод тестирования гипотез
 - Написать R код, позволяющий реализовать пермутационный метод 
 
 
-```{r setup, include = FALSE, cache = FALSE}
-#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
-# to configure markdown parsing
-options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
-#------
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 # output options
 options(width = 70, scipen = 6, digits = 3)
-
-# to render cyrillics in plots use cairo pdf
-options(device = function(file, width = 7, height = 7, ...) {
-  cairo_pdf(tempfile(), width = width, height = height, ...)
-  })
 library(knitr)
 # chunk default options
 opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
@@ -52,7 +40,7 @@ $$p= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$
 
 <div class="columns-2">
 
-```{r, echo=FALSE, fig.width=4, fig.height = 4, warning=FALSE}
+```{r, echo=FALSE, purl=FALSE, fig.width=4, fig.height = 4, warning=FALSE}
 library (ggplot2)
 theme_set(theme_bw(base_size = 14))
 Mu <- 10
@@ -84,7 +72,7 @@ $$p= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$
 
 Вот график ее частотного распределения в генеральной совокупности.
 
-```{r echo=FALSE, warning=FALSE}
+```{r echo=FALSE, purl=FALSE, warning=FALSE}
 set.seed(38)
 X <- rnorm(n = 10000, mean = 50, sd = 7) # создаем вектор из 10000 значений нормально распределенной величины
 Mu <- mean(X)
@@ -94,7 +82,7 @@ gg_population
 
 ## Возьмем выборку из этой генеральной совокупности
 
-```{r echo=FALSE, warning=FALSE}
+```{r echo=FALSE, purl=FALSE, warning=FALSE}
 i_1 <- sample(x = 10000, 20)
 sample_1 <- X[i_1]
 Mu_1 <- mean(sample_1)
@@ -116,7 +104,7 @@ $$SD=\sqrt{\frac{\sum{(x_i - \bar{x})^2}}{n-1}}$$
 
 ## В разных выборках средние значения будут отличаться.
 
-```{r echo=FALSE, fig.height=5.5, warning=FALSE}
+```{r echo=FALSE, purl=FALSE, fig.height=5.5, warning=FALSE}
 i_2 <- sample(x = 10000, 50)
 sample_2 <- X[i_2]
 Mu_2 <- mean(sample_2)
@@ -130,7 +118,7 @@ grid.arrange(gg_population, gg_sample_1, gg_sample_2, ncol = 1, heights = c(1, 1
 
 Давайте возьмем много-много выборок, вычислим для каждой выборочное среднее и построим распределение этих выборочных средних.
 
-```{r echo=FALSE}
+```{r echo=FALSE, purl=FALSE}
 # Создаем пустой вектор для записи средних
 my_means <- rep(NA, 100)
 # Цикл
@@ -147,7 +135,7 @@ for (smpl in 1:100) {
 
 **Среднее значение выборочных средних стремится к среднему в генеральной совокупности**
 
-```{r echo=FALSE, warning=FALSE}
+```{r echo=FALSE, purl=FALSE, warning=FALSE}
 gg_means <- ggplot(data = data.frame(means = my_means), aes(x = means)) + geom_histogram(binwidth=1, fill="steelblue", color="black") + labs(title = "100 sample means, N = 5") + xlim(30, 70) + geom_vline(aes(xintercept = Mu), colour = "red", size = 1) + geom_vline(aes(xintercept = mean(my_means)), colour = "red", size = 1, linetype = "dashed")
 gg_means
 ```
@@ -158,7 +146,7 @@ $$SE _\bar{x} = \sigma / \sqrt{N}$$
 
 <div class=columns-2>
 
-```{r echo=FALSE, fig.width=4, fig.height=5, warning=FALSE}
+```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=5, warning=FALSE}
 # Создаем пустой вектор для записи средних
 my_means_30 <- rep(NA, 100)
 # Цикл
@@ -181,7 +169,7 @@ Cтандартная ошибка среднего (= стандартное о
 
 <div class="columns-2">
 
-```{r echo = FALSE, fig.height=5, fig.width=4, warning=FALSE}
+```{r echo=FALSE, purl=FALSE, fig.height=5, fig.width=4, warning=FALSE}
 grid.arrange(gg_population, gg_means_30, ncol = 1)
 ```
 
@@ -197,11 +185,13 @@ grid.arrange(gg_population, gg_means_30, ncol = 1)
 
 </div>
 
-## Давайте научимся стандартизировать нормальное распределение
+## Стандартизация
+
+$$z_i=\frac{x_i - \bar{x}}{SE}$$
 
 <div class="columns-2">
 
-```{r echo=FALSE, fig.height=5, fig.width=4.5}
+```{r echo=FALSE, purl=FALSE, fig.height=5, fig.width=4.5}
 Xi <- rnorm(n = 10000, mean = 50, sd = 7)
 Mu <- mean(Xi)
 SD <- sd(Xi)
@@ -215,10 +205,7 @@ gg_z <- ggplot(data = Z, aes(x = Zi)) + geom_histogram(binwidth = 0.3, fill = "s
 grid.arrange(gg_sample, gg_z, ncol = 1)
 ```
 
-
 Стандартное нормальное распределение можно получить после **стандартизации**
-
-$$z_i=\frac{x_i - \bar{x}}{SE}$$
 
 **После стандартизации всегда**:
 
@@ -256,7 +243,7 @@ $$SE_d = \sqrt{\frac{sd_1^2(n_1-1) +sd_2^2(n_2-1)}{n_1+n_2-2}(\frac{1}{n_1} + \f
 
 Таким образом, t-распределение это всего лишь __стандартизованное распределение разностей двух средних значений из одной генеральной совокупности__!
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl=FALSE}
 t <- seq(-10,10,0.1)
 pt <- dt(t, 4)
 ggplot(data.frame(t=t, pt=pt), aes(x=t, y=pt)) + geom_line(size=2) + geom_vline(aes(xintercept = 0)) + xlab("Standardized difference between means") + ylab("Probability")
@@ -286,7 +273,7 @@ $$ \frac {\bar{x _1} - \bar{x _2}} {\sqrt{\frac {sd _1^2} {n _1} + \frac{sd _2^2
 
 То есть представим себе, что мы много раз (например, 1000) взяли пары выборок из одной и той же генеральной совокупности.
 
-```{r gg-t-our, echo=FALSE}
+```{r gg-t-our, echo=FALSE, purl=FALSE}
 # Способ 1. Создаем пустой вектор, чтобы хранить результаты
 t_samp_1 <- rep(x = NA, times = 1000)
 for (i in 1:1000) {
@@ -327,10 +314,10 @@ gg_t_our
 
 ## Для оценки интересующей нас вероятности, нам надо понять сколько раз из 1000 мы встретим величину больше 2 (или меньше -2)      
 
-```{r gg-t-our, echo=FALSE}
+```{r gg-t-our, echo=FALSE, purl=FALSE}
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, purl=FALSE}
 # Доля значений t > 2 или t < -2  
 # Для распределения, полученного вручную
 p1 <- sum(t_samp_1 > 2 | t_samp_1 < -2)/length(t_samp_1)
@@ -342,7 +329,7 @@ p1 <- sum(t_samp_1 > 2 | t_samp_1 < -2)/length(t_samp_1)
 
 ## Для строгой оценки этой вероятности оценивают долю площади под кривой, описывающей   распределение (кривая плотности вероятности).
   
-```{r echo=FALSE}
+```{r echo=FALSE, purl=FALSE}
 dt_limit1 <- function(x, t_kr=2, df=18) {
 y <- dt(x, df)
 y[x < -t_kr | x > t_kr] <- NA
@@ -357,7 +344,7 @@ pl_t + stat_function(fun=dt, args=list(df=18), geom="area", fill="steelblue", al
 
 ## Но можно поставить вопрос иначе | Где находится значение t, которое отделяет 95% площади под кривой?
 
-```{r gg-t, echo=FALSE}
+```{r gg-t, echo=FALSE, purl=FALSE}
 dt_limit1 <- function(x, t_kr=1.96, df=18) {
 y <- dt(x, df)
 y[x < -t_kr | x > t_kr] <- NA
@@ -374,7 +361,7 @@ gg_t + stat_function(fun=dt, args=list(df=18), geom="area", fill="steelblue", al
 
 ## Но можно поставить вопрос иначе | Где находится значение t, которое отделяет 95% площади под кривой?
 
-```{r gg-t, echo=FALSE}
+```{r gg-t, echo=FALSE, purl=FALSE}
 ```
 
 Иными словами, если $t > t _{crit}$, то вероятность получить такую стандартизированную разницу средних двух выборок из одной совокупности очень низка ($p < 0.05$). 
@@ -414,7 +401,7 @@ df_height <- data.frame(gender = factor(gender),
 
 Здесь обе выборки пока еще смешаны. Давайте разберемся на примере этого неправильного графика, как устроены графики пакета `ggplot`
 
-```{r echo=FALSE}
+```{r echo=FALSE, purl=FALSE}
 theme_set(theme_grey())
 ```
 
@@ -462,7 +449,7 @@ ggplot(df_height, aes(x = height)) +
   geom_histogram(binwidth = 2, colour = "grey40")
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, purl=FALSE}
 theme_set(theme_bw(base_size = 14))
 ```
 
@@ -526,7 +513,7 @@ t_height
 
 Это вероятность получения из одной совокупности ($H_0$ верна) двух выборок с такими, как мы получили, выборочными оценками среднего и среднеквадратичного отклонения.
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, purl=FALSE, warning=FALSE}
 library(grid)
 tt <- t_height$statistic
 dff <- t_height$parameter
@@ -563,6 +550,8 @@ $H_0: \mu_1-\mu_2=0$; $H_a: \mu_1\ne\mu_2$
 
 т.е. м.б. $\mu_1 > \mu_2$  и  $\mu_1 < \mu_2$  
 
+<br />
+
 *Односторонний тест*
 
 $H_0: \mu_1-\mu_2=0$; $H_a: \mu_2 > \mu_1$ 
@@ -572,7 +561,7 @@ $H_0: \mu_1-\mu_2=0$; $H_a: \mu_2 > \mu_1$
 </br>
 </div>
 
-```{r, fig.height=2.5, fig.width=10, echo=FALSE}
+```{r, fig.height=2.5, fig.width=10, echo=FALSE, purl=FALSE}
 # Двухсторонний тест
 dt_limit2 <- function(x, t_kr=1.96, df=18) {
 y <- dt(x, df)
@@ -596,8 +585,9 @@ pl_t_1 <- pl_t_1 + stat_function(fun=dt, args=list(df=18), geom="area", fill="st
 grid.arrange(pl_t_2, pl_t_1, ncol = 2)
 ```
 
-Отвержение $H_0$ происходит при меньшем значении t. </br>
-В случае с t-критерием будьте осторожны! Используя односторонние тесты, мы повышаем вероятность неправильного отвержения $H_0$. 
+В односторонних тестах $H_0$ отвергается при меньшем значении t.
+
+Будьте осторожны! Используя односторонние тесты, мы повышаем вероятность неправильного отвержения $H_0$. 
 
 
 ## Порядок применения t-критерия для сравнения выборок
@@ -610,17 +600,18 @@ grid.arrange(pl_t_2, pl_t_1, ncol = 2)
     - Если дисперсии не равны, $df = \frac {(sd _1 / \sqrt{n _1} + sd _2 / \sqrt{n _2})} {(sd _1 / \sqrt {n _1})^2 / (n _1 + 1) +  (sd _2 / \sqrt {n _2})^2/(n _2 + 1)} - 2$
 5. Строим референсное t-распределение для даного $df$ при истинной $H_0$
 6. Вычисляем величину уровня значимсти $p$  
-<small>
-Пункты 3-6 за нас может сделать функция `t.test()`  
 - Если $p < \alpha$, отвергаем $H _0$, наблюдаются достоверные различия между средними 
 - Если $p > \alpha$, сохраняем $H_a$, достоверных различий не выявляется
-</small>
+
+Пункты 3-6 за нас может сделать функция `t.test()`  
 
 # ЧАСТЬ 3. Пермутационный метод тестирования гипотез
 
 ## Пермутации - это перестановки.
 
-Если две сравниваемые выборки взяты из одной совокупности, то обмен элементами между ними ничего не изменит. Степень различия между выборками (значение статистики) должно остаться более или менее тем же самым.
+Если две сравниваемые выборки взяты из одной совокупности, то обмен элементами между ними не изменит степень их различия.
+
+Значит, если выборки из одной совокупности, то значение статистики должно остаться более или менее тем же самым.
 
 ## Применяем пермутационный метод
 
@@ -701,7 +692,7 @@ df_perm$less <- df_perm$d_p < d_initial
 
 ## Получаем распределение статистики $d_{perm}$
 
-```{r, gg-dperm-pl, echo=FALSE, fig.height=7, fig.width=8, cache=FALSE}
+```{r, gg-dperm-pl, echo=FALSE, purl=FALSE, fig.height=7, fig.width=8, cache=FALSE}
 dperm_pl <- ggplot(df_perm, aes(x = d_p, fill = less)) + 
   geom_histogram (binwidth = 0.05, colour = "black") +
   geom_vline(aes(xintercept = d_initial), linetype = 2) +
@@ -735,7 +726,7 @@ p_perm <- length(dperm[dperm >= d_initial] ) / Nperm
 
 > - Любой статистический критерий работает принципиально так же, как t-критерий: вычисляется значение тестовой статистики, которое сравнивается с референсным  
 распределением, получающимся при истинности $H _0$
-> - У любого статистического критерия есть свои условия примнимости (assumptions)
+> - У любого статистического критерия есть свои условия применимости (assumptions)
 
 ## Дополнительные источники
 

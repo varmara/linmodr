@@ -31,7 +31,7 @@
         usePrettify: true,
         enableSlideAreas: true,
         enableTouch: true,
-                        favIcon: '11_general_linear_models_for_binary_data_files/logo.png',
+                        favIcon: '11_GLM_binary_files/logo.png',
               },
 
       // Author information
@@ -80,7 +80,7 @@
       position: absolute;
       bottom: 20px;
       left: 60px;
-      background: url(11_general_linear_models_for_binary_data_files/logo.png) no-repeat 0 50%;
+      background: url(11_GLM_binary_files/logo.png) no-repeat 0 50%;
       -webkit-background-size: 30px 30px;
       -moz-background-size: 30px 30px;
       -o-background-size: 30px 30px;
@@ -100,7 +100,7 @@
 <slides class="layout-widescreen">
 
   <slide class="title-slide segue nobackground">
-        <aside class="gdbar"><img src="11_general_linear_models_for_binary_data_files/logo.png"></aside>
+        <aside class="gdbar"><img src="11_GLM_binary_files/logo.png"></aside>
         <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
     <hgroup class="auto-fadein">
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
@@ -181,11 +181,11 @@ head(liz)</pre>
 
 <p><strong>но она категорически не годится</strong></p>
 
-<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-3-1.png" width="384" style="display: block; margin: auto 0 auto auto;" /></p></div>
+<p><img src="11_GLM_binary_files/figure-html/unnamed-chunk-3-1.png" width="384" style="display: block; margin: auto 0 auto auto;" /></p></div>
 
 </article></slide><slide class=''><hgroup><h2>Эти данные лучше описывает логистическая кривая</h2></hgroup><article  id="-----" class="columns-2">
 
-<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p><img src="11_GLM_binary_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p>
 
 <p>Логистическая кривая описывается такой формулой</p>
 
@@ -442,7 +442,7 @@ Dev_nul &lt;- -2*as.numeric(logLik(update(liz_model, ~-PARATIO)))
 
 </article></slide><slide class=''><hgroup><h2>Подобранные коэффициенты позволяют построить логистическую кривую</h2></hgroup><article  id="-----" class="smaller columns-2">
 
-<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-13-1.png" width="432" style="display: block; margin: auto auto auto 0;" /></p>
+<p><img src="11_GLM_binary_files/figure-html/unnamed-chunk-13-1.png" width="432" style="display: block; margin: auto auto auto 0;" /></p>
 
 <p>Cерая область - доверительный интервал для логистической регрессии</p>
 
@@ -485,7 +485,7 @@ ggplot(MyData, aes(x = PARATIO, y = Predicted)) +
   ylab (&quot;Вероятность&quot;) + 
   ggtitle(&quot;Вероятность встречи ящериц&quot;)</pre>
 
-<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-15-1.png" width="432" style="display: block; margin: auto 0 auto auto;" /></p>
+<p><img src="11_GLM_binary_files/figure-html/unnamed-chunk-15-1.png" width="432" style="display: block; margin: auto 0 auto auto;" /></p>
 
 </article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>За кулисами вычислений</h2></hgroup><article  id="--">
 
@@ -534,7 +534,7 @@ MyData$CiLow  &lt;- exp(MyData$eta - 1.96 *MyData$se) /
   geom_line(color = &quot;blue&quot;, size=2) + 
   ylab(&quot;Вероятность встречи&quot;)</pre>
 
-<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-20-1.png" width="432" style="display: block; margin: auto 0 auto auto;" /></p>
+<p><img src="11_GLM_binary_files/figure-html/unnamed-chunk-20-1.png" width="432" style="display: block; margin: auto 0 auto auto;" /></p>
 
 </article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Множественная логистическая регрессия</h2></hgroup><article  id="--">
 
@@ -726,7 +726,7 @@ anova(M1, M2, test = &quot;Chi&quot;)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Визуализируем предсказания модели</h2></hgroup><article  id="--">
 
-<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-28-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="11_GLM_binary_files/figure-html/unnamed-chunk-28-1.png" width="768" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Диагностика модели</h2></hgroup><article  id="-" class="smaller">
 
@@ -736,13 +736,13 @@ anova(M1, M2, test = &quot;Chi&quot;)</pre>
 ggplot(M2_diag, aes(x = .fitted, y = .pears_resid)) + 
   geom_point() + geom_smooth(se = FALSE)</pre>
 
-<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="11_GLM_binary_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <p>Явного паттерна в остатках нет, но есть другая проблема</p>
 
 </article></slide><slide class=''><hgroup><h2>Zero inflation</h2></hgroup><article  id="zero-inflation">
 
-<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="11_GLM_binary_files/figure-html/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <p>Преобладают отрицательные остатки.<br/>Это связано с проблемой, называемой <em>&quot;zero inflation&quot;</em>, - в зависимой переменной слишком много нулей.</p>
 

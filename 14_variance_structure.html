@@ -31,7 +31,7 @@
         usePrettify: true,
         enableSlideAreas: true,
         enableTouch: true,
-                        favIcon: '14_modelling_variance_structure_files/logo.png',
+                        favIcon: '14_variance_structure_files/logo.png',
               },
 
       // Author information
@@ -80,7 +80,7 @@
       position: absolute;
       bottom: 20px;
       left: 60px;
-      background: url(14_modelling_variance_structure_files/logo.png) no-repeat 0 50%;
+      background: url(14_variance_structure_files/logo.png) no-repeat 0 50%;
       -webkit-background-size: 30px 30px;
       -moz-background-size: 30px 30px;
       -o-background-size: 30px 30px;
@@ -100,7 +100,7 @@
 <slides class="layout-widescreen">
 
   <slide class="title-slide segue nobackground">
-        <aside class="gdbar"><img src="14_modelling_variance_structure_files/logo.png"></aside>
+        <aside class="gdbar"><img src="14_variance_structure_files/logo.png"></aside>
         <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
     <hgroup class="auto-fadein">
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
@@ -205,13 +205,13 @@ anova(M1_lm)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Проведем диагностику данной модели</h2></hgroup><article  id="---">
 
-<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="14_variance_structure_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <p>Мы не можем доверять величинам уровня значимости! Нарушается условие применимости линейных моделей, основанных на нормальном распределении остатков с неизменной дисперсией.</p>
 
 </article></slide><slide class=''><hgroup><h2>Ковариата дисперсии (Variance covariate)</h2></hgroup><article  id="--variance-covariate" class="smaller">
 
-<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="14_variance_structure_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <p>Видно, что дисперсия остатков убывает по мере увеличения значения переменной <code>Large</code> и меняется год от года</p>
 
@@ -466,19 +466,19 @@ M16_gls &lt;- gls(mod_formula, data = myt, weights = varComb(varIdent(form = ~Ba
 
 </article></slide><slide class=''><hgroup><h2>Диагностика модели с оптимальной структурой дисперсии</h2></hgroup><article  id="-----">
 
-<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="14_variance_structure_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Диагностика модели с оптимальной структурой дисперсии</h2></hgroup><article  id="------1">
 
-<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="14_variance_structure_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Диагностика модели с оптимальной структурой дисперсии</h2></hgroup><article  id="------2">
 
-<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="14_variance_structure_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Диагностика модели с оптимальной структурой дисперсии</h2></hgroup><article  id="------3">
 
-<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="14_variance_structure_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Можно ли упростить модель?</h2></hgroup><article  id="---">
 
@@ -506,7 +506,7 @@ anova(M5_gls_ML, M5_gls_ML_a)</pre>
 <pre class = 'prettyprint lang-r'>qplot(x = c(1997, 1999:2011), y = as.vector(unlist(M5_gls$modelStruct))) + 
     xlab(&quot;Годы&quot;) + ylab(&quot;Delta&quot;)</pre>
 
-<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="14_variance_structure_files/figure-html/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 <ul class = 'build'>
 <li>В большинстве случаев параметр \(\delta\) &lt; 0</li>
@@ -602,7 +602,7 @@ M3 &lt;- lme(weight ~ Time * Diet, data = bw, random = ~1 + Time | Rat)</pre>
 
 </article></slide><slide class=''><hgroup><h2>Рассеяние остатков в модели</h2></hgroup><article  id="---">
 
-<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="14_variance_structure_files/figure-html/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Моделируем структуру дисперсии</h2></hgroup><article  id="--">
 
@@ -652,7 +652,7 @@ MyData$Predicted &lt;- predict(M3_5, newdata = MyData, level = 0)
 ggplot(MyData, aes(x = Time, y = Predicted, color = Diet)) + geom_line(size = 1.5) + 
     geom_point(data = bw, aes(x = Time, y = weight), position = position_jitter())</pre>
 
-<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="14_variance_structure_files/figure-html/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Summary</h2></hgroup><article  id="summary">
 

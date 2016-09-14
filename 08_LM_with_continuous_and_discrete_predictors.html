@@ -31,7 +31,7 @@
         usePrettify: true,
         enableSlideAreas: true,
         enableTouch: true,
-                        favIcon: '08_linear_models_with_continuous_and_discreet_predictors_files/logo.png',
+                        favIcon: '08_LM_with_continuous_and_discrete_predictors_files/logo.png',
               },
 
       // Author information
@@ -80,7 +80,7 @@
       position: absolute;
       bottom: 20px;
       left: 60px;
-      background: url(08_linear_models_with_continuous_and_discreet_predictors_files/logo.png) no-repeat 0 50%;
+      background: url(08_LM_with_continuous_and_discrete_predictors_files/logo.png) no-repeat 0 50%;
       -webkit-background-size: 30px 30px;
       -moz-background-size: 30px 30px;
       -o-background-size: 30px 30px;
@@ -100,7 +100,7 @@
 <slides class="layout-widescreen">
 
   <slide class="title-slide segue nobackground">
-        <aside class="gdbar"><img src="08_linear_models_with_continuous_and_discreet_predictors_files/logo.png"></aside>
+        <aside class="gdbar"><img src="08_LM_with_continuous_and_discrete_predictors_files/logo.png"></aside>
         <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
     <hgroup class="auto-fadein">
       <h1 data-config-title><!-- populated from slide_config.json --></h1>
@@ -186,7 +186,7 @@ gg_cl &lt;- ggplot(data = clover, aes(y = Clover, x = Yarrow)) +
        y = &quot;Урожайность клевера, г/кв.м&quot;)
 gg_cl + geom_smooth(method = &quot;lm&quot;)</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Не зная про несколько участков, мы бы просто подобрали обычную линейную регрессию</h2></hgroup><article  id="-----------">
 
@@ -236,7 +236,7 @@ summary(M1)</pre>
 
 <pre class = 'prettyprint lang-r'>gg_cl + aes(colour = Plot) + labs(colour = &quot;Участок&quot;)</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Дискретные предикторы тоже можно включать в линейные модели.</h2></hgroup><article  id="-------.">
 
@@ -554,13 +554,13 @@ my_df &lt;- minmax %&gt;% group_by(Plot) %&gt;%
        y = &quot;Урожайность клевера, г/кв.м&quot;)
 gg_cl_parallel</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Добавим отдельные панели</h2></hgroup><article  id="--">
 
 <pre class = 'prettyprint lang-r'>gg_cl_parallel + facet_wrap(~ Plot)</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Но может быть линии на самом деле не параллельны?</h2></hgroup><article  id="--------" class="smaller">
 
@@ -609,7 +609,7 @@ coef(M3)</pre>
   geom_smooth(method = &quot;lm&quot;, alpha = 0.2) +
   labs(colour = &quot;Участок&quot;, fill = &quot;Участок&quot;)</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Проверяем условия применимости</h2></hgroup><article  id="--">
 
@@ -620,7 +620,7 @@ plot(M3, which = 3)
 plot(M3, which = 4)
 par(op)</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-34-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-34-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 <p>Есть подозрение на гетерогенность дисперсий</p>
 
@@ -730,7 +730,7 @@ plot(M1, which = 3)
 plot(M1, which = 4)
 par(op)</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-40-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-40-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 <p>Есть подозрение на гетерогенность дисперсий</p>
 
@@ -839,7 +839,7 @@ any(is.na(goat))</pre>
   scale_colour_discrete(&quot;Способ обработки&quot;, breaks = c(&quot;intensive&quot;, &quot;standard&quot;), labels = c(&quot;Интенсивный&quot;, &quot;Стандартный&quot;))
 gg_g + geom_smooth(method = &quot;lm&quot;)</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Проверяем условия применимости</h2></hgroup><article  id="---1">
 
@@ -849,7 +849,7 @@ plot(MG1, which = 3)
 plot(MG1, which = 4)
 par(op)</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-51-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-51-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 <p>Все хорошо</p>
 
@@ -895,7 +895,7 @@ plot(MG2, which = 3)
 plot(MG2, which = 4)
 par(op)</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-54-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-54-1.png" width="960" style="display: block; margin: auto;" /></p>
 
 <p>Все в порядке</p>
 
@@ -975,7 +975,7 @@ my_df &lt;- goat %&gt;%
   geom_point(data = goat)
 gg_g_parallel</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-60-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-60-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Подписываем оси</h2></hgroup><article  id="-">
 
@@ -986,7 +986,7 @@ gg_g_parallel</pre>
   scale_fill_discrete(&quot;Способ обработки&quot;, breaks = c(&quot;intensive&quot;, &quot;standard&quot;), 
                       labels = c(&quot;Интенсивный&quot;, &quot;Стандартный&quot;))</pre>
 
-<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-61-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="08_LM_with_continuous_and_discrete_predictors_files/figure-html/unnamed-chunk-61-1.png" width="672" style="display: block; margin: auto;" /></p>
 
 </article></slide><slide class=''><hgroup><h2>Take home messages</h2></hgroup><article  id="take-home-messages">
 
