@@ -1,0 +1,507 @@
+---
+title: Диагностика линейных моделей
+subtitle: Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015
+author: Вадим Хайтов, Марина Варфоломеева
+presenters: [{
+    name: 'Firstname Lastname',
+    company: 'Job Title, Google',
+    }]
+output:
+  ioslides_presentation:
+    widescreen: true
+    css: my_styles.css
+    logo: Linmod_logo.png
+---
+
+
+```{r setup, include = FALSE, cache = FALSE}
+#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
+# to configure markdown parsing
+options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
+#------
+# output options
+options(width = 70, scipen = 6, digits = 3)
+
+# to render cyrillics in plots use cairo pdf
+options(device = function(file, width = 7, height = 7, ...) {
+  cairo_pdf(tempfile(), width = width, height = height, ...)
+  })
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3)
+```
+
+## Мы рассмотрим 
+
++ Диагностика линейных моделей
+- 
+
+## Зависит ли уровень интеллекта от размера головного мозга? {.flexbox .vcenter}  
+
+С этим примером мы познакомились в прошлый раз.
+
+<div class="columns-2"> 
+
++ Было исследовано 20 девушек и 20 молодых людей 
++ У каждого индивида определяли биометрические параметры: вес, рост, размер головного мозга (количество пикселей на изображении ЯМР сканера)
++ Интеллект был протестирован с помощью IQ тестов
+
+Пример взят из работы: Willerman, L., Schultz, R., Rutledge, J. N., and Bigler, E. (1991), "In Vivo Brain Size and Intelligence," Intelligence, 15, 223-228.  
+Данные представлены в библиотеке *"The Data and Story Library"* 
+http://lib.stat.cmu.edu/DASL/  
+
+<img src="images/MRI.png" width="500" height="500" >   
+
+</div>
+
+## Посмотрим на датасет   
+
+```{r}
+brain <- read.csv("data/IQ_brain.csv", header = TRUE)
+head(brain)
+```
+
+
+## Подберем модель, наилучшим образом описывающую зависимость результатов IQ-теста от размера головного мозга
+
+```{r brain-mod}
+brain_model <- lm(PIQ ~ MRINACount, data = brain)
+brain_model
+```
+
+
+## Анализ остатков линейных моделей
+
+### Проверка на наличие влиятельных наблюдений
+
+### Проверка условий применимости линейных моделей
+1. Линейность связи между зависимой перменной ($Y$) и предикторами ($X$)
+2. Независимость $Y$ друг от друга
+3. Нормальное распределение $Y$ для каждого уровня значенй $X$
+4. Гомогенность дисерсии $Y$ в пределах всех уровней значений $X$
+5. Отсутствие коллинеарности предикторов (для можественной регрессии)
+
+
+## Первый этап диагностики линейных моделей - это проверка на наличие влиятельных наблюдений 
+
+_Влиятельные наблюдения_ - наблюдения, вносящие слишком большой вклад в оценку парметров (коэффициентов) модели.
+
+
+<img src="figure/leverage.png" width="400" height="400" >   
+
+<div class = "footnote">
+Из кн. Quinn & Keugh, 2002
+</div>
+
+
+## Сначала научимся извлекать из результатов необходимые сведения:{.smaller .columns-2}
+
+Для этого служит функция `fortify()` из пакета `{ggplot2}`
+```{r}
+require(ggplot2)
+brain_diag <- fortify(brain_model)
+head(brain_diag, 2)
+
+```
+
+<br>
+<br>
+_Уже знакомые:_
+
+`.fitted` - предсказанные значения   
+`.resid` - остатки  
+<br>
+_Новые величины, которые нам понадобятся:_
+<br>
+<br>
+
+`.hat` - "воздействие" данного наблюдения (_leverage_)  
+`.cooksd` - расстояние Кука   
+`.stdresid` - стандартизованные остатки  
+
+
+## Типы остатков
+
+Просто остатки: 
+$$e_i = y_i - \hat{y_i}$$
+
+Стандартизованные остатки:
+$$\frac{e_i}{\sqrt{MS_{Residual}}}$$
+
+
+Стьюдентовские остатки: 
+$$\frac{e_i}{\sqrt{MS_{Residual}(1-h_i)}}$$
+
+
+Последние удобнее, так как можно сказать какие остатки большие, а какие маленькие при сравнении разных моделей
+
+## Воздействие точек $h_i$, `.hat` (Leverage) {.columns-2}
+
+<img src="figure/leverage.png" width="300" height="300" >
+
+<img src="figure/see-saw.png" width="300" height="300" >
+
+###Эта велична, показывает насколько каждое значение $x_i$ влияет на ход линии регрессии, то есть на $\hat{y_i}$  
+
+- Точки, располагающиеся дальше от $\bar{x}$, оказывают более сильное влияние на $\hat{y_i}$  
+- Эта величина, в норме, варьирует в промежутке от $1/n$ до 1  
+- Если  $h_i > 2(p/n)$, то надо внимательно посмотреть на данное значение  
+- Удобнее другая величина - расстояние Кука
+
+
+## Расстояние Кука (Cook's distance) {.columns-2} 
+
+###Описывает как повлияет на модель удаление данного наблюдения
+
+$$D_i = \frac{\sum{(\hat{y_j}-\hat{y}_{j(i)})^2}}{pMSE}$$ 
+$\hat{y_j}$ - значение предсказанное полной моделью  
+$\hat{y}_{j(i)}$ - значение, предказанное моделью, построенной без учета $i$-го значения предиктора   
+$p$ - количество параметров в модели   
+$MSE$ - среднеквадратичная ошибка модели   
+<br>
+Расстояние Кука  одновременно учитывает величину остатков по всей модели и влиятельность (leverage) отдельных точек <br>       
+- Распределение статистики $D_i$ близко к F-распределению          
+- Если расстояние Кука $D_i > 1$, то данное наблюдение можно рассматривать как выброс (outlier)   
+<br>
+- Для более жесткого выделения выбросов используют пороговую величину, зависящую от объема выборки $D_i > 4/(N − k − 1)$.    
+ N - Объем выборки, k - число предикторов.
+
+## Задание
+Для модели `brain_model` постройте график рссеяния стандартизированных остатков в зависимости от предсказанных значений
+
+_Hint_: вспомните, что мы уже получили датафрейм `brain_diag`
+
+## Решение
+
+```{r, fig.align='center', fig.width=7, tidy=TRUE }
+ggplot(data = brain_diag, aes(x = .fitted, y = .stdresid)) + geom_point() + geom_hline(aes(yintercept = 0))
+```
+
+
+## Внесем некоторые дополнения {.smaller .columns-2}
+
+```{r, fig.width=5, fig.align='left'}
+ggplot(data = brain_diag, aes(x = .fitted, y = .stdresid)) +
+  geom_point(aes(size = .cooksd)) + 
+  geom_hline(yintercept = 0) + 
+  geom_smooth(method="loess", se=FALSE) 
+```
+
+Что мы видим?           
+- Большая часть стандартизованных остатков в пределах двух стандартных отклонений.         
+- Есть одно влиятельное наблюдение, которое нужно проверить, но сила его влияния невелика.             
+- Среди остатков нет тренда.            
+- Но есть иной паттерн!    
+
+
+## Что делать с влиятельными наблюдениями?
+
+### Метод 1. Удаление влиятельных наблюдений   
+_Будьте осторожны!_ Отскакивающие значения могут иметь важное значение.
+Удалять следует только очевидные ошибки в наблюдениях.   
+После их удаления необходимо пересчитать модель.   
+
+## Что делать с влиятельными наблюдениями?
+
+### Метод 2. Преобразование переменных    
+Наиболее частые преобразования, используемые для построения линейных моделей   
+
+Трансформация  |  Формула  
+------------- | -------------   
+-2 | $1/Y^2$  
+-1  | $1/Y$  
+-0.5  | $1/\sqrt(Y)$  
+логарифмирование | $log(Y)$  
+логит | $ln(\frac{Y}{1-Y})$  
+
+
+# Условия применимости линейных моделей (Assumptions)
+
+## 1. Линейность связи   
+
+Нелинейные зависимости не всегда видны на исходных графиках в осях Y vs X
+
+Они становятся лучше заметны на графиках рассеяния остатков (Residual plots)
+
+```{r, echo=FALSE, fig.align='center', fig.align='center', fig.height=5}
+library(ggplot2)
+library(gridExtra)
+
+x <- rnorm(100, 10, 3)
+y <- (x^2.7) + rnorm(100, 0, 100)
+
+pl_1 <- ggplot(data.frame(x=x, y=y), aes(x=x, y=y)) + geom_point() 
+
+lm1 <- lm(y ~ x)
+
+pl_1res <- ggplot(data.frame(fit=fitted(lm1), res=residuals(lm1)), aes(x=fit, y=res)) + geom_point() + geom_hline(yintercept=0) + xlab("Fitted") + ylab("Residuals")
+
+
+x2 <- runif(100, 1, 10)
+
+y2 <- sin(x2) + 0.5*x2 + rnorm(100, 0, 0.7)
+ 
+pl_2 <- ggplot(data.frame(x=x2, y=y2), aes(x=x, y=y)) + geom_point() 
+
+lm2 <- lm(y2 ~ x2)
+
+pl_2res <- ggplot(data.frame(fit=fitted(lm2), res=residuals(lm2)), aes(x=fit, y=res)) + geom_point() + geom_hline(yintercept=0) + xlab("Fitted") + ylab("Residuals") 
+
+grid.arrange(pl_1, pl_2, pl_1res, pl_2res)
+```
+
+## Что делать, если связь нелинейна?  
+
+ 1. Можно применить линеаризующее преобразование    
+ 2. Можно построить нелинейную модель (об этом будем говорить отдельно)
+
+## Пример линеаризующего преобразования   
+
+```{r, echo=FALSE, warning=FALSE, fig.align='center', fig.height=5}
+x <- runif(100, 2, 5)
+y <- (2^(2*x)) + rnorm(100, 0, 10)
+
+pl_raw <- ggplot(data.frame(x=(x), y=(y)), aes(x=x, y=y)) + geom_point() + geom_smooth(method="lm") 
+
+pl_log <- ggplot(data.frame(x= (x), y=log(y)), aes(x=x, y=y)) + geom_point() + geom_smooth(method="lm") + ylab("Log (y)")
+
+grid.arrange(pl_raw, pl_log, ncol=2)
+
+```
+
+## 2. Независимость $Y$ друг от друга
+
+* Каждое значение $Y_i$ должно быть независимо от любого $Y_j$ 
+* Это должно контролироваться на этапе планирования сбора матриала 
+* Наиболее частые источники зависимостей: 
+    + псевдоповторности  
+    + временные и пространственые автокорреляции   
+* Взаимозависимоти могут проявляться на графиках рассеяния остатков  (Residual plots) 
+
+## Симулированный пример: Автокоррелированные данные.
+
+```{r,echo=FALSE, fig.align='center', fig.height=5, fig.width=5}
+x3 <- seq(1, 100, 1)
+  
+  
+y3 <-  diffinv(rnorm(99)) + rnorm(100, 0, 2)
+
+y3 <- y3[1:100]
+pl_3 <- ggplot(data.frame(x=x3, y=y3), aes(x=x, y=y)) + geom_point() + geom_smooth(method="lm")
+
+lm3 <- lm(y3 ~ x3)
+
+pl_3res <- ggplot(data.frame(fit=fitted(lm3), res=residuals(lm3)), aes(x=fit, y=res)) + geom_point() + geom_smooth(se = FALSE) + geom_hline(yintercept=0) + xlab("Fitted") + ylab("Residuals")
+
+grid.arrange(pl_3, pl_3res, nrow=2)
+```
+
+## Критерий Дарбина-Уотсона: Формальный тест на автокорреляцию
+
+```{r, message=FALSE, warning=FALSE}
+library(car)
+brain_model <- lm(PIQ ~ MRINACount, data = brain)
+durbinWatsonTest(brain_model)
+```
+
+
+## Симулированный пример: Автокоррелированные данные. {.smaller .columns-2}
+
+Данные имеют ярко выраженную автокорреляцию
+```{r, echo=FALSE, fig.height=5}
+x <- seq(1, 100, 1)
+y <-  diffinv(rnorm(99)) + rnorm(100, 0, 4)
+dat <- data.frame(x, y)
+ggplot(dat, aes(x=x, y=y)) + geom_point() + geom_smooth(method="lm")
+
+```
+
+<br>
+<br>
+```{r}
+lm_autocor <- lm(y ~ x, data = dat)
+durbinWatsonTest(lm_autocor)
+```
+
+
+## 3. Нормальное распределение $Y$ для каждого уровня значенй $X$ {.smaller .columns-2}
+
+<img src="figure/Zuur.png" width="400" height="300" >   
+
+<img src="figure/Normality.png" width="400" height="200" > 
+* $Y_i \sim N(\mu_{y_i}, \sigma^2)$
+* В идеале, каждому $X_i$ должно соответствовать большое количество наблюдений $Y$ 
+* На практике такое бывает только в случае моделей с дискретными предикторами
+* Соответствие нормальности распределения можно оценить по "поведению" _случайной части модели_.
+
+
+## Фиксированная и случайная часть модели
+
+$$y_i = \beta_0 + \beta_1x_i + \epsilon_i$$
+
+>- Фиксированная часть: $y_i = \beta_0 + \beta_1x_i$ задает жесткую связь между $x_i$ и $y_i$
+>- Случайная часть: $\epsilon_i$
+>- Так как $y_i - \beta_0 - \beta_1x_i = 0$, то $\epsilon_i \sim N(0, \sigma^2)$ 
+>- Если с моделью все ОК, то условие нормального распределения остатков должно соблюдаться
+
+
+## Можно построить частотное распределение остатков
+```{r, fig.hight=9, tidy=TRUE}
+ggplot(brain_model, aes(x = .stdresid)) + 
+  geom_histogram(binwidth = 0.4, fill = "blue", color = "black") 
+
+```
+
+На частотной гистограмме остатков НЕ ВСЕГДА хорошо видны отклонения от нормальности
+
+## Проверка нормальности распределения остатков с помощью нормальновероятностного графика стандартизованных остатков {.columns-2} 
+
+```{r, fig.height=4, fig.width=5, tidy=TRUE}
+library(car)
+qqPlot(brain_model)
+```
+
+<br>
+<br>
+_Квантиль_ - значение, которое заданная случайная величина не превышает с фиксированной вероятностью.       
+
+Если точки - это случайные величины из $N(0, \sigma^2)$, то они должны лечь вдоль прямой $Y=X$       
+
+## Все то же самое с использоваением возможностей `ggplot`
+
+```{r, fig.height=3, fig.align='center', tidy=TRUE}
+mean_val <- mean(brain_diag$.stdresid)
+sd_val <- sd(brain_diag$.stdresid)
+ggplot(brain_diag, aes(sample = .stdresid)) + geom_point(stat = "qq") + geom_abline(intercept = mean_val, slope = sd_val)
+```
+
+Мы видим, что отклонения от нормальности есть!  
+Но! Метод устойчив к небольшим отклонениям от нормальности.
+
+
+## 4. Постоянство дисперсии - гомоскедастичность
+Это самое важное ограничивающее условие!   
+Многие тесты чувствительны к гетероскедастичности.     
+
+
+```{r, echo=FALSE, warning=FALSE, fig.height=4, fig.align='center'}
+library(ggplot2)
+library(gridExtra)
+
+set.seed(12345)
+x <- rnorm(1000,10, 3)
+b_0 <- 100 
+b_1 <- 20
+h <- function(x) 10* x 
+eps <- rnorm(1000, 0, h(x))
+y <- b_0 + b_1*x + eps
+dat <- data.frame(x, y)
+dat$log_y <- log(y)
+pl_heter <- ggplot(dat, aes(x=x, y=y)) + geom_point() + geom_smooth(method="lm")
+
+dat_diag <- fortify(lm(y~x, data=dat))
+pl_heter_resid <- ggplot(dat_diag, aes(x = .fitted, y = .stdresid)) + geom_point() + geom_smooth(se=FALSE)
+
+grid.arrange (pl_heter, pl_heter_resid, ncol=2)
+
+```
+
+
+## Формальные тесты на гетероскедастичность {.columns-2}
+
++ Для линейных моделей с непрерывным предиктором применяется, например, тест Бройша-Пагана (Breusch-Pagan test)  
++ Для моделей с дискретными предикторами чаще применяют тест Кокрана (Cochran test)
+
+```{r, message=FALSE, warning=FALSE}
+library(lmtest)
+#Симулированные данные
+bptest(y ~ x, data = dat) 
+#Реальные данные
+bptest(PIQ ~ MRINACount, data = brain) 
+```
+
+## Что делать если вы столкнулись с гетероскедастичностью? 
+Решение 1. Применить преобразование зависимой переменной (в некоторых случаях и предиктора).  
+
+```{r, echo=FALSE,warning=FALSE, fig.width=6, fig.height=5, fig.align='center'}
+
+dat_diag2 <- fortify(lm(log_y~x, data=dat))
+
+
+pl_heter2 <- ggplot(dat, aes(x=x, y=log_y)) + geom_point() + geom_smooth(method="lm")
+
+pl_heter_resid2 <- ggplot(dat_diag2, aes(x = .fitted, y = .stdresid)) + geom_point() + geom_smooth(se=FALSE)
+
+pl_heter <- pl_heter + ggtitle("No transformation")
+pl_heter2 <- pl_heter2 + ggtitle("Log transformed Y")
+
+
+grid.arrange (pl_heter, pl_heter2,  pl_heter_resid, pl_heter_resid2,  nrow=2)
+
+```
+
+
+## Что делать если вы столкнулись с гетероскедастичностью? 
+
+Решение 1. Применить преобразование зависимой переменной (в некоторых случаях и предиктора).  
+
+###Недостатки:    
+1. Не всегда спасает.  
+2. Модель описывает поведение не исходной, а преобразованной величины. _"Если вы не можете доказать А, докажите В и сделайте вид, что это было А"_ (Кобаков, 2014)  
+
+
+## Что делать если вы столкнулись с гетероскедастичностью?
+
+Решение 2. Построить более сложную модель, которая учитывала бы гетерогенность дисперсии зависимой перменной.  
+
+"Welcome to our world, the world of _mixed effects modelling_."(Zuur et al., 2009)  
+
+Об этом речь впереди!
+
+
+## Некоторые распространенные паттерны на диаграммах рассеяния остатков {.columns-2}
+
+<img src="figure/Residuals.png" width="500" height="500" > 
+
+из Logan, 2010, стр. 174  
+
+a) Случайное рассеяние остатков. Гомогенность дисперсии и линейность соблюдаются. _Модель хорошая!_  
+b) Клиновидный паттерн. Есть гетероскедастичность. _Модель плохая!_   
+c) Остатки рассеяны равномерно, но модель неполна. Нужны дополниетльные предикторы. _Модель можно улучшить!_   
+d) Нелинейнй паттерн сохранился. Линейная модель применена некорректно. _Модель плохая!_  
+
+
+## Можно автоматически проверить соблюдение условий применимости с помощью средств R {.smaller}
+HO будьте осторожны!
+```{r}
+library(gvlma)
+gvlma(brain_model)
+
+```
+
+
+## Задание: Выполните три блока кода (см. код лекции). 
+
+### Какие нарушения условий применимости линейных моделей здесь наблюдаются?
+
+
+## Что нужно писать в тексте статьи по поводу проверки валидности моделей?
+
+>- Вариант 1. Привести электронные дополнительные материалы с необходимыми графиками.
+>- Вариант 2. Привести в тексте работы результаты применения тестов на гомогеность дисперси, автокоррелированность (если используются пространственые или временные предикторы) и нормальность распределиня остатков.
+>- Вариант3. Написать в главе _"Материал и методика"_ фразу вроде такой: "Визуальная проверка графиков рассяния остатков не выявила заметных отклонений от условий равенства дисперсий и нормальности".
+
+## Summary
+
+>- Не любая модель с достверными результатами проверки $H_0$ валидна.  
+>- Обязательный этап работы с моделями - проверка условий применимости.  
+>- Наиболее важную информацию о валидности модели дает анализ остатков.    
+
+## Что почитать
+
++ Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014.
++ Quinn G.P., Keough M.J. (2002) Experimental design and data analysis for biologists, pp. 92-98, 111-130
++ Diez D. M., Barr C. D., Cetinkaya-Rundel M. (2014) Open Intro to Statistics., pp. 354-367.
++ Logan M. (2010) Biostatistical Design and Analysis Using R. A Practical Guide, pp. 170-173, 208-211
++ Legendre P., Legendre L. (2012) Numerical ecology. Second english edition. Elsevier, Amsterdam. 
+

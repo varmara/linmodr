@@ -1,0 +1,532 @@
+---
+title: "Линейные модели с дискретными предикторами"
+subtitle: Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015
+author: Марина Варфоломеева, Вадим Хайтов
+presenters: [{
+    name: 'Марина Варфоломеева',
+    company: 'каф. ЗБП, СПбГУ',
+    }]
+output:
+  ioslides_presentation:
+    widescreen: true
+    css: my_styles.css
+    logo: Linmod_logo.png
+---
+
+```{r setup, include = FALSE, cache = FALSE}
+#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
+# to configure markdown parsing
+options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
+#------
+# output options
+options(width = 70, scipen = 6, digits = 3)
+
+# to render cyrillics in plots use cairo pdf
+options(device = function(file, width = 7, height = 7, ...) {
+  cairo_pdf(tempfile(), width = width, height = height, ...)
+  })
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3)
+```
+
+```{r libs-funs, echo=FALSE}
+lm_equation <- function(fit, strict = TRUE, rnd = 2){
+#   extracting call formula 
+  frml <- as.character(fit$call)[2]
+#   extract signs
+    sign <- ifelse(grepl("-", coef(fit)[-1]), " - ", " + ")
+  # extract coefficients
+  coeffs <- format(round(abs(coef(fit)), rnd), digits = 2, trim = TRUE)
+  if(strict == TRUE){
+    i <- 1:(length(coeffs) - 1)
+    vars <- c("Y", paste0(" X", i))
+    
+  } else {
+# extract vector of variable names
+  vars <- c(all.vars(formula(fit))[1], names(fit$coefficients)[-1])
+# combine everything
+  }
+  start <- ifelse(coef(fit)[1] > 0, paste(vars[1], coeffs[1], sep = " = "), paste(vars[1], coeffs[1], sep = " = - "))
+  end <- paste(sign, coeffs[-1], vars[-1], sep = "", collapse = "")
+  return(cat(start, end, sep = ""))
+}
+```
+
+## Мы рассмотрим
+
+### Вы сможете
+
+# Дисперсионный анализ
+
+## Модель однофакторного дисперсионного анализа
+
+$$y _{ij} = \mu + \alpha _i + \epsilon _{ij}$$
+
+$\alpha$ - фактор с _i_ = 1, ..., _I_ группами  
+$\mu$ - общее среднее  
+_j_ = 1, ..., $J _i$ - число наблюдений на каждом из уровней фактора  
+
+Чтобы можно было найти параметры такой модели, приходится вводить ограничения одним из способов:
+
+$\mu = 0$ | $\alpha_1 = 0$ | $\sum_i{J_i\alpha_i} = 0$
+----|----|-----
+|  | Модель фиктивных переменных</br>Dummy (indicator) coding = treatment parametrization = reference cell model |  Модель эффектов</br>Deviation (effects) coding = Sum to zero parametrization
+|  | по-умолчанию используется в R | часто используется для объяснения в книгах и в др. программах
+|  | contr.treatment | contr.sum
+
+## Модель эффектов, contr.sum
+
+При условии, что $\sum_i{J_i\alpha_i} = 0$, значения зависимой переменной в группах можно описать как отклонения от общего среднего.
+
+$$y _{ij} = \mu + \alpha _i + \epsilon _{ij}$$
+
+Из чего складываются средние значения в группах по фактору? 
+
+Группа | Общее среднее | Эффект для данного уровня | <small>Случайная изменчивость</small>
+----- | ----- | ----- | -----
+A1 | $\mu$ | $\alpha _1$ | $\epsilon _{1j}$
+A2 | $\mu$ | $\alpha _2$ | $\epsilon _{2j}$
+... | ... | ... | ...
+Ai | $\mu$ | $\alpha _i$ | $\epsilon _{ij}$
+
+## contr.treatment
+
+Модель $y _{ij} = \mu + \alpha _i + \epsilon _{ij}$, если  $\alpha_1 = 0$ примет уже знакомую нам форму
+
+$$y _{ij} = \beta _0 + \beta _1 x _1 + ... + \beta _i x _{i-1} + \epsilon _{ij}$$
+
+Коэффициенты линейной модели обозначают отклонения от базового уровня
+
+Группа | Среднее на базовом уровне | Эффект для данного уровня | <small>Случайная изменчивость</small>
+----- | ----- | ----- | -----
+A1 | $\beta_0$ |  | $\epsilon _{1j}$
+A2 | $\beta_0$ | $beta_1$ | $\epsilon _{2j}$
+... | ... | ... | ... | ...
+Ai | $\beta_0$ | $beta_{i-1}$ | $\epsilon _{ij}$
+
+## Пример: яйца кукушек
+
+- `species`  - вид птиц-хозяев (фактор)
+- `length` - длина яиц кукушек в гнездах хозяев (зависимая переменная)
+
+```{r, data-cu}
+library(DAAG)
+data("cuckoos")
+# Положим данные в переменную с коротким названием, чтобы меньше печатать
+cu <- cuckoos
+head(cu, 3)
+```
+
+<div class = "footnote">Данные: Latter, 1902; источник: Tippett, 1931 </div>
+
+## Исследуем данные
+
+```{r}
+# Пропущенных значений нет
+sum(is.na(cu))
+
+# Данные не сбалансированы - размеры групп разные.
+table(cu$species)
+```
+
+## Изменим названия уровней фактора, чтобы было легче понять о каких птицах речь
+
+```{r, tidy=FALSE}
+levels(cu$species)
+levels(cu$species) <- c("лес_зав", "луг_кон", "бел_тряс", 
+                        "малин", "лес_кон", "крапив")
+```
+
+## Задание: Постройте график
+
+Постройте график зависимости размера яиц кукушек от вида птиц-хозяев, в гнездах которых были обнаружены яйца. Какой геом лучше подойдет для изображения (`geom_point`, `geom_boxplot`)?
+
+Раскрасьте график в зависимости от вида птиц-хозяев (используйте эстетики `fill` или `colour` - чем отличаются результаты?)
+
+### Дополнительное задание:
+
+Попробуйте сменить палитру раскраски, используя `scale_colour_brewer` (варианты можно посмотреть в справке в подразделе примеров или в интернете [Colors (ggplot2): раздел RColorBrewer palette chart](http://www.cookbook-r.com/Graphs/Colors_(ggplot2\)/#palettes-color-brewer ))
+
+## Решение
+
+```{r}
+library(ggplot2)
+theme_set(theme_bw(base_size = 16) + 
+            theme(legend.key = element_blank()))
+# основа для графика без геомов
+gg_cu <- ggplot(data = cu, aes(x = species, y = length))
+```
+
+
+## Точечные графики
+
+В данном случае точечные графики не очень удачны, даже если мы вносим небольшую случайную погрешность в координаты по дискретной оси $x$ (`position = position_jitter(width = 0.2)`)
+
+```{r, eval=FALSE, tidy=FALSE}
+gg_cu + geom_point(aes(colour = species))
+gg_cu + geom_point(aes(colour = species), 
+                   position = position_jitter(width = 0.2))
+```
+```{r, echo=FALSE, message=FALSE, fig.width=10}
+library(gridExtra)
+grid.arrange(
+gg_cu + geom_point(aes(colour = species)),
+gg_cu + geom_point(aes(colour = species), position = position_jitter(width = 0.2)),
+ncol = 2)
+```
+
+## Боксплоты
+
+```{r, eval=FALSE}
+gg_cu + geom_boxplot(aes(colour = species))
+gg_cu + geom_boxplot(aes(fill = species))
+```
+```{r, echo=FALSE, message=FALSE, fig.width=10}
+grid.arrange(
+gg_cu + geom_boxplot(aes(colour = species)),
+gg_cu + geom_boxplot(aes(fill = species)),
+ncol = 2)
+```
+
+## Хорошо бы поменять порядок уровней
+
+Сейчас боксы расположены в беспорядке. Упорядочим их по убыванию средней длины яиц. Для этого 
+
+1) при помощи функции reorder() упорядочиваем по возрастанию средней длины яиц  
+2) меняем порядок уровней на противоположный.
+
+
+
+```{r, tidy=FALSE}
+# упорядочим по значению среднего в группах (сначала по возрастанию, потом наоборот)
+cu$species <- reorder(cu$species, cu$length, FUN = mean)
+cu$species <- factor(cu$species, levels = rev(levels(cu$species)))
+```
+
+## График с новым порядком уровней
+
+Поскольку изменив порядок уровней мы внесли изменения в исходные данные, придется полностью обновить график (т.к.`ggplot()` хранит данные внутри графика).
+
+```{r}
+gg_box <- ggplot(data = cu, aes(x = species, y = length)) + 
+  geom_boxplot(aes(fill = species))
+gg_box
+```
+
+## Понравившийся график, если понадобится, можно в любой момент довести до ума, а остальные удалить {.smaller}
+
+```{r, tidy=FALSE, fig.height=4}
+gg_box + labs(x = "Вид хозяев", y = "Длина яиц кукушек, мм") + 
+  # Другая палитра заливки
+  scale_fill_brewer(name = "Вид \nхозяев", palette = "Dark2") + 
+  # Названия видов
+  scale_x_discrete(labels = c("Лесная\nзавирушка", "Лесной\nконек",
+"Белая\nтрясогузка", "Малиновка", "Луговой\nконек", "Крапивник")) + 
+  # Положение легенды, формат подписей по оси х
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+```
+
+## Задание: 
+
+- Сколько переменных-болванок нужно, чтобы записать модель зависимости длины яиц кукушек от вида птиц-хозяев?
+
+- Подберите линейную модель зависимости длины яиц кукушек в гнездах от вида птиц-хозяев
+
+- Проверьте условия применимости дисперсионного анализа
+
+## Решение:
+
+### Сколько переменных-болванок нужно, чтобы записать модель зависимости длины яиц кукушек от вида птиц-хозяев?
+
+- 5 переменных-болванок (т.к. 6 уровней у фактора species - `levels(cu$species)`, уровень `r levels(cu$species)[1]` будет базовым, и для его кодирования не нужна отдельная переменная).
+
+Вот так бы они выглядели, если бы нужно было создавать их вручную.
+
+```{r}
+levels(cu$species)
+(gr1 <- as.numeric(cu$species == "лес_кон"))
+gr2 <- as.numeric(cu$species == "бел_тряс")
+gr3 <- as.numeric(cu$species == "малин")
+gr4 <- as.numeric(cu$species == "луг_кон")
+gr5 <- as.numeric(cu$species == "крапив")
+```
+
+
+## Условия примененимости дисперсионного анализа:
+
+- Случайность и независимость групп и наблюдений внутри групп
+- Нормальное распределение остатков
+- Гомогенность дисперсий остатков
+
+### Другие ограничения:
+
+- Лучше работает, если размеры групп примерно одинаковы (т.наз. сбалансированный дисперсионный комплекс)
+- Устойчив к отклонениям от нормального распределения (при равных объемах групп или при больших выборках)
+
+## Решение:
+
+```{r, message=FALSE, fig.width=10, fig.hold = T}
+mod <- lm(length ~ species, data = cu)
+### Проверяем условия применимости
+library(car)
+op <- par(mfrow = c(1, 3))
+qqPlot(mod)
+plot(mod, which = 1)
+plot(mod, which = 3)
+par(op)
+```
+
+## Решение:
+
+```{r, message=FALSE}
+library(lmtest)
+bptest(mod)
+```
+
+## Коэффициенты линейной модели
+
+Влияет ли вид птиц-хозяев на длину яиц кукушек? Было бы удобнее, если бы ответ был из одного числа, вместо пачки коэффициентов. Дисперсионный анализ позволит оценить влияние каждого из факторов.
+
+```{r}
+summary(mod)
+```
+
+## Структура общей изменчивости {.smaller}
+
+Общая изменчивость (SSt) = Факторная (SSx) + Случайная (SSe)
+
+Если выборки из одной совокупности, то
+Факторная изменчивость = Случайная изменчивость
+
+```{r echo = FALSE, warning=FALSE, fig.width = 10.5, fig.height=5, message=FALSE}
+lims <- range(cu$length) + c(-1, 1)
+yannot <- lims[1] + 0.5
+pos <- position_jitter(width = 0.2)
+gmean <- mean(cu$length, na.rm = TRUE)
+
+gg_cu <- gg_cu %+% cu + aes(colour = species) + theme_bw(base_size = 12) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8)) + ylim(lims[1], lims[2]) + labs(x = "Вид хозяев", y = "Длина яиц кукушек, мм")
+
+# # Общая изменчивость (отклонения от общего среднего)
+gg_cu_total <- gg_cu + 
+  geom_jitter(position = pos) +
+  geom_hline(yintercept = gmean, linetype = "dashed") + 
+  ggtitle("Общая изменчивость\n(отклонения от общего среднего)") +
+  annotate("text", label = "Общее\nсреднее", 
+           x = 0,  y = gmean, hjust = -0.1, size = 4) + 
+  annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6) 
+
+library(plyr)
+# Межгрупповая изменчивость (связанная с фактором)
+gg_cu_factor <- gg_cu + 
+  geom_hline(aes(yintercept = gmean), linetype = "dashed") + 
+  stat_summary(fun.y = "mean", geom = "point", size = 20, shape = 45) + 
+  ggtitle("Факторная изменчивость\n(межгрупповая)")+
+    annotate("text", label = "SS[x] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
+
+# Внутригрупповая изменчивость (случайная)
+gg_cu_error <- gg_cu + 
+  geom_jitter(position = position_jitter(width = 0.3)) +
+  stat_summary(fun.y = "mean", geom = "point", size = 20, shape = 45, colour = "black") + 
+  ggtitle("Случайная изменчивость\n(внутригрупповая)")+
+    annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
+
+grid.arrange(gg_cu_total, gg_cu_factor, gg_cu_error, ncol = 3, widths = c(0.38, 0.31, 0.31))
+```
+
+## Таблица дисперсионного анализа  {.smaller}
+
+Гипотезы:  
+$H _0: MS _x = MS _e$, $H _A: MS _x ≠ MS _e$
+
+Источник изменчивости  |  Суммы квадратов отклонений,<br /><br /> SS   |   Число степеней свободы,<br /><br /> df   | Средний квадрат отклонений<br />(дисперсия),<br /> MS | <br /><br /><br /> F  
+---------------------- | --------- | ------ | ------------------- | -----
+Название фактора | $$SS _x = \sum{(\bar y - \hat y _i)^2}$$ | $$df _x = a - 1$$ | $$MS _x = \frac{SS _x}{df _x}$$ | $$F _{df _r, df _e} = \frac{MS _r}{MS _e}$$
+Случайная | $$SS _e = \sum{(y _i - \hat y _i)^2}$$ | $$df _e = N - a$$ | $$MS _e = \frac{SS _e}{df _e}$$ | 
+Общая | $$SS _t = \sum {(\bar y - y _i)^2}$$ | $$df _t = N - 1$$ | 
+
+## Делаем дисперсионный анализ в R
+
+В R есть много функций для дисперсионного анализа. Мы рекомендуем `Anova()` из пакета `car`
+
+```{r, message=FALSE}
+cu_anova <- Anova(mod)
+cu_anova
+```
+
+```{r, echo=FALSE}
+result <- cu_anova
+dfs <- paste0(result$Df, collapse= ",")
+fval <- round(result$'F value'[1], 2)
+sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[1] <= 0.05, "$p < 0.05$", ""))
+```
+
+> - Длина яиц кукушек в гнездах разных птиц-хозяев достоверно различается ($F _{`r dfs`} = `r fval`$, `r sign`).
+
+## Как понять, какие именно группы различаются
+
+Дисперсионный анализ говорит нам только есть ли влияние фактора, но не говорит, какие именно группы различаются.
+
+Коэффициенты линейной модели в summary(mod) содержат лишь часть ответа - сравнение средних значених всех групп со средним на базовом уровне.
+
+Если нас интересуют другие возможные попарные сравнения, нужно сделать пост хок тест.
+
+# Пост-хок тесты
+
+## Post-hoc тесты
+
+Пост-хок тесты - попарные сравнения средних __после того, как дисперсионный анализ показал, что влияние фактора достоверно__
+
+### Свойства post-hoc тестов:
+
+- __Применяются, только если влияние фактора значимо__
+- Делают поправку для снижения вероятности ошибки I рода $\alpha$, (но не слишком большую, чтобы не
+снизилась мощность, и чтобы не возросла вероятность ошибки II рода $\beta$)
+  - Учитывают величину различий между средними
+  - Учитывают количество сравниваемых пар
+- Различаются по степени консервативности (тест Тьюки - разумный компромисс) 
+- Работают лучше при равных объемах групп, при гомогенности дисперсий
+
+## Пост-хок тест Тьюки в R
+
+- `glht()` - "general linear hypotheses testing"
+- `linfct` - аргумент, задающий гипотезу для тестирования
+
+- `mcp()` - функция, чтобы задавать множественные сравнения (обычные пост-хоки)
+- `species` = "Tukey" - тест Тьюки по фактору `species`
+
+```{r, message=FALSE}
+library(multcomp)
+cu_ph <- glht(mod, linfct = mcp(species = "Tukey"))
+```
+
+## Результаты попарных сравнений (тест Тьюки)
+
+Таблица результатов пост хок теста практически нечитабельна. Лучше построить график.
+
+```{r}
+summary(cu_ph)
+```
+
+> - Размер яиц кукушек в гнездах крапивника достоверно меньше, чем в гнездах лугового конька (тест Тьюки, $p < 0.01$). Размер яиц кукушек в гнездах лесной завирушки, белой трясогузки, малиновки и лесного конька не различается, но яйца в гнездах этих видов крупнее, чем у лугового конька или крапивника (тест Тьюки, от $p < 0.01$ до 0.05).
+
+## Таблица с описательной статистикой по группам {.smaller}
+
+Пакет `dplyr`:
+
+- `%>%` оператор, перенаправляет значение слева в функцию справа в качестве исходных данных
+- `group_by` дальнейшие вычисления идут по группам, заданным ее аргументами
+- `summarise` описывает группу строк значениями, вычисленным по формуле или нескольким
+
+```{r, cu-summary, message=FALSE}
+library(dplyr)
+cu_summary <- cu %>% 
+  group_by(species) %>%
+  summarise(.n = n(),
+            .mean = mean(length), 
+            .sd = sd(length))
+cu_summary
+```
+
+## Задание
+
+Дополните код, чтобы одновременно рассчитывать доверительные интервалы к средним значениям.
+
+```{r, cu-summary, eval=FALSE}
+```
+
+## Решение
+
+```{r}
+cu_summary <- cu %>% 
+  group_by(species) %>%
+  summarise(.n = n(),
+            .mean = mean(length), 
+            .sd = sd(length),
+            .se = .sd/sqrt(.n),
+            lwr = .mean - qnorm(0.025) * .se,
+            upr = .mean + qnorm(0.025) * .se
+            )
+cu_summary
+```
+
+
+## Столбчатый график можно использовать для представления результатов
+
+```{r, tidy=FALSE, fig.height=4}
+gg_means <- ggplot(cu_summary, aes(x = species, y = .mean)) + 
+  geom_bar(stat = "identity", fill = "steelblue", width = 0.5) + 
+  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.2) +
+  labs(x = "Вид птиц-хозяев", y = "Длина яиц кукушек, мм")
+gg_means
+```
+
+## Можно привести результаты пост-хок теста на столбчатом графике
+
+Достоверно различающиеся по пост-хок тесту группы обозначим разными буквами
+
+```{r, tidy=FALSE, fig.height=4}
+gg_means_coded <- gg_means + 
+  geom_text(aes(y = 1.6,  label = c("A", "A", "AB", "AB", "B", "C")), 
+            colour = "white", size = 7)
+gg_means_coded
+```
+
+
+## Если не нравится, как висят столбцы,<br />можно настроить развертку оси $y$
+
+```{r, tidy=FALSE, fig.height=4}
+gg_means_coded + scale_y_continuous(expand = c(0, 0), 
+        limits = c(0, max(cu$length) + 1))
+```
+
+
+## И наконец, можно переименовать уровни фактора species прямо внутри графика
+
+```{r, tidy=FALSE, fig.height=4}
+gg_means_coded + 
+  scale_y_continuous(expand = c(0,0), limits = c(0, max(cu$length) + 1)) +
+  scale_x_discrete(labels = c("Лесная\nзавирушка", "Лесной\nконек",
+"Белая\nтрясогузка", "Малиновка", "Луговой\nконек", "Крапивник"))
+```
+
+
+## Сохраняем таблицу дисперсионного анализа в файл
+
+```{r eval = FALSE, tidy=FALSE}
+# 1) в csv
+write.table(file = "cuckoos_res.csv", x = cuckoos_anova, sep = "\t")
+
+# 2) в xls или xlsx с помощью XLConnect
+# library(XLConnect) 
+# writeWorksheetToFile(data = cuckoos_anova, file = "cuckoos_res.xls", 
+# sheet = "anova_table")
+
+# 3) отправляем в буфер обмена (только Windows) для вставки в Word-Excel
+write.table(file = "clipboard", x = cuckoos_anova, sep = "\t")
+```
+
+После этого, таблицу нужно отредактировать:
+
+- округлить числа до разумного небольшого числа значащих цифр после точки
+- округлить значения доверительных вероятностей _p_ или заменить их на сравнения с критич. уровнями значимости (_p_ < 0.01, _p_ < 0.05 или "не значимо")
+- изменить названия факторов на те, которые будут использоваться в отчете/публикации
+
+## Take home messages
+
+- Дисперсионный анализ - линейная модель с дискретными предикторами, существует в нескольких параметризациях, которые отличаются трактовками коэффициентов
+- При помощи дисперсионного анализа можно проверить гипотезу о равенстве средних значений в группах
+- Условия применимости дисперсионного анализа
+    - Случайность и независимость групп и наблюдений внутри групп
+    - Нормальное распределение в группах
+    - Гомогенность дисперсий в группах
+- При множественных попарных сравнениях увеличивается вероятность ошибки первого рода, поэтому нужно вносить поправку для уровня значимости
+- Post hoc тесты - это попарные сравнения после дисперсионного анализа, которые позволяют сказать, какие именно средние различаются
+
+## Дополнительные ресурсы
+
+- Quinn, Keough, 2002, pp. 173-207
+- Logan, 2010, pp. 254 - 282
+- [Open Intro to Statistics](http://www.openintro.org/stat/), pp.236-246 
+- Sokal, Rohlf, 1995, pp. 179-260
+- Zar, 2010, pp. 189-207

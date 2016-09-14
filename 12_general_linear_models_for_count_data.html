@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Линейные модели для счетных данных</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Линейные модели для счетных данных',
+                        subtitle: 'Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: '12_general_linear_models_for_count_data_files/logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Вадим Хайтов, Марина Варфоломеева' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(12_general_linear_models_for_count_data_files/logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="12_general_linear_models_for_count_data_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Мы рассмотрим</h2></hgroup><article  id="-">
+
+<ul>
+<li>Различные варианты анализа, применяющегося для тех случаев, когда зависимая перменная - счетная величина (целые неотрицательные числа)</li>
+</ul>
+
+<h3>Вы сможете</h3>
+
+<ul>
+<li>Объяснить особенности разных типов распределений, принадлежащих экспоненциальному семейству.</li>
+<li>Построить пуасоновскую и квази-пуассоновскую линейную модель</li>
+<li>Объяснить проблемы, связанные с избыточностью дисперсии в модели</li>
+<li>Построить модель, основанную на отрицательном биномиальном распределении</li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Различные типы распределений</h2></hgroup><article  id="--">
+
+</article></slide><slide class=''><hgroup><h2>Распределение</h2></hgroup><article >
+
+<p>То, что мы в быту привыкли называть <strong>распределением</strong> - это функция плотности вероятности.</p>
+
+<p><strong>Плотность вероятности</strong> - это функция, описывающая вероятность получения разных значений случайной величины</p>
+
+</article></slide><slide class=''><hgroup><h2>Нормальное распределение</h2></hgroup><article  id="-" class="columns-2">
+
+<p>\[f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^2}}\]</p>
+
+<h3>Два параметра (\(\mu\), \(\sigma\))</h3>
+
+<p>Среднее:   \(E(Y) = \mu\)</p>
+
+<p>Дисперсия: \(var(Y) = \sigma^2\)</p>
+
+<h3>Пределы варьирования</h3>
+
+<p>\(-\infty \le Y \le +\infty\)</p>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Распределение Пуассона</h2></hgroup><article  id="-" class="columns-2">
+
+<p>\[f(y;\mu)= \frac{\mu^y \times e{-\mu}}{y!}\]</p>
+
+<h3>Один параметр (\(\mu\))</h3>
+
+<p>Среднее:   \(E(Y) = \mu\)</p>
+
+<p>Дисперсия: \(var(Y) = \mu\)</p>
+
+<p><strong>Важное свойство</strong>: При увеличении значения \(\mu\) увеличивается размах варьирования</p>
+
+<h3>Пределы варьирования</h3>
+
+<p>\(0 \le Y \le +\infty\),<br/>\(Y\) <strong>целочисленные</strong></p>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-2-1.png" width="480" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Гамма-распределение</h2></hgroup><article  id="-" class="columns-2">
+
+<p>\(f(y; \mu, \nu) = \frac{1}{\Gamma(\nu)}\times (\frac{\nu}{\mu})^{\nu} \times y^{\nu-1} \times e^{\frac{y \times \nu}{\mu}}\)</p>
+
+<h3>Два параметра (\(\mu\), \(\nu\))</h3>
+
+<p>Среднее:   \(E(Y) = \mu\)</p>
+
+<p>Дисперсия: \(var(Y) = \frac {\mu^2}{\nu}\)</p>
+
+<p>Параметр \(\nu\) определяет степень избыточности дисперсии</p>
+
+<h3>Пределы варьирования</h3>
+
+<p>\(0 &lt; Y \le +\infty\)<br/>Внимание! \(Y\) строго больше 0</p>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-3-1.png" width="480" style="display: block; margin: auto 0 auto auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Отрицательное биномиальное распределение</h2></hgroup><article  id="--">
+
+<p>\(f(y; k, \mu) = \frac{\Gamma(y + k)}{\Gamma(k) \times \Gamma(y+1)} \times (\frac{k}{\mu + k})^k \times (1 - \frac{k}{\mu + k})^y\)</p>
+
+<div class="columns-2">
+<p><small>Это смесь Пуассоновского и Гамма распределений: \(Y\) демонстрируют распределение Пуассона с \(\mu\), подчиняющимися Гамма-распределению.</p>
+
+<h3>Два параметра (\(\mu\), \(k\))</h3>
+
+<p>Среднее:   \(E(Y) = \mu\)<br/>Дисперсия: \(var(Y) = \mu + \frac {\mu^2}{k}\)<br/>Параметр \(k\) определяет степень избыточности дисперсии.<br/><strong>Важное свойство</strong>: Приближается к распр. Пуассона при очень больших \(k\).</p>
+
+<h3>Пределы варьирования</h3>
+
+<p>\(0 \le Y \le +\infty\),   \(Y\) <strong>целочисленные</strong></small></p>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p></div>
+
+</article></slide><slide class=''><hgroup><h2>Биномиальное распределение</h2></hgroup><article  id="-">
+
+<p>\(f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}\)</p>
+
+<div class="columns-2">
+<p><small></p>
+
+<h3>Два параметра (\(N\), \(\pi\))</h3>
+
+<p>Среднее:    \(E(Y) = N \times \pi\)<br/>Дисперсия: \(var(Y) = N \times \pi \times (1-\pi)\)<br/>Параметр \(N\) определяет количество объектов в испытании<br/>Парметр \(\pi\) - вероятность события (\(y = 1\))</p>
+
+<h3>Пределы варьирования</h3>
+
+<p>\(0 \le Y \le +\infty\),   \(Y\) <strong>целочисленные</strong> </small></p>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-5-1.png" width="480" style="display: block; margin: auto;" /></p></div>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Распределение зависимой переменной и линия регрессии</h2></hgroup><article  id="-----">
+
+</article></slide><slide class=''><hgroup><h2>Связующая функция (Link function)</h2></hgroup><article  id="--link-function">
+
+<p>Предсказаные значения, т.е. \(E(Y_i)\), лежат на линии регрессии</p>
+
+<div class="columns-2">
+
+<p><img src="images/poisson_model.png" width="500" height="500" ></p>
+
+<p><img src="images/Zuur.png" width="500" height="500" ><br/>из кн. Zuur et al.2009</p>
+
+<p></dev></p>
+
+</article></slide><slide class=''><hgroup><h2>Связующая функция (Link function)</h2></hgroup><article  id="--link-function-1">
+
+<p>Для каждого типа распределения характер связи между \(\mu_i\) и значениями предиктора может быть разным.<br/>Функция, описывающая связь между \(\mu_i\) и значениями предикторов, называется <em>связующей функцией</em></p>
+
+<h3>Наиболее распространенные (канонические) связующие функции</h3>
+
+<table class = 'rmdtable'>
+<col width="19%" />
+<col width="19%" />
+<col width="19%" />
+<tr class="header">
+<th align="left">Характер величин</th>
+<th align="left">Распределение</th>
+<th align="left">Связующая функция (link function)</th>
+</tr>
+<tr class="odd">
+<td align="left">Непрерывные величины, потенциально варьирующие в пределах \(-\infty , + \infty\)</td>
+<td align="left">Гауссовское (Нормальное)</td>
+<td align="left">identity \(X\beta = \mu\)</td>
+</tr>
+<tr class="even">
+<td align="left">Бинарные величины (1; 0), или количество (доля) объектов, относящихся к одному из двух классов</td>
+<td align="left">Биномиальное распределение</td>
+<td align="left">logit \(X\beta = ln(\frac{\mu}{1 - \mu})\)</td>
+</tr>
+<tr class="odd">
+<td align="left">Счетные величины (0, 1, 2, 3&#8230;)</td>
+<td align="left">Распределение Пуассона или Отрицательное биномиальное распределение</td>
+<td align="left">log \(X\beta = ln(\mu)\)</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Логарифмическая связующая функция и распределение Пуассона</h2></hgroup><article  id="-----" class="smaller">
+
+<pre class = 'prettyprint lang-r'>M_sim1 &lt;- glm(y ~ x, data = dat, family = poisson(link = &quot;log&quot;))</pre>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Модели, основанные на распределении Пуассона и отрицательном биномиальном распределении</h2></hgroup><article  id="--------">
+
+</article></slide><slide class=''><hgroup><h2>Способствуют ли взрослые мидии притоку молоди?</h2></hgroup><article  id="-----">
+
+<p>Даные взяты из работы Khaitov, 2013</p>
+
+<pre class = 'prettyprint lang-r'>juv_ad &lt;- read.table(&quot;data/mussel_juv_ad.csv&quot;, sep=&quot;;&quot;, header =T)
+head(juv_ad, 12)</pre>
+
+<div class="columns-2">
+<pre >##    Year Bank Sample Juv Adult
+## 1  1997 vor4      1  90    42
+## 2  1997 vor4      2 134    25
+## 3  1997 vor4      3 166    27
+## 4  1997 vor4      4 168    48
+## 5  1997 vor4      5 102    25
+## 6  1997 vor4      6  69    57
+## 7  1998 vor4      1 410    21
+## 8  1998 vor4      2  73    76
+## 9  1998 vor4      3 347     0
+## 10 1998 vor4      5 402     5
+## 11 1998 vor4      6 158    28
+## 12 1999 vor4      1 282     0</pre>
+
+<p><img src="images/mussel_bed.png" width="400" height="400" ></p></div>
+
+</article></slide><slide class=''><hgroup><h2>В этих данных ожидается проблема автокорреляции остатков</h2></hgroup><article  id="------">
+
+<h3>Вопрос:</h3>
+
+<p>Как можно учесть в модели многолетний характер сбора материала?</p>
+
+</article></slide><slide class=''><hgroup><h2>Построим простую линейную модель</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>M1 &lt;- glm(Juv ~ Adult * factor(Year), data = juv_ad)
+drop1(M1, test = &quot;F&quot;)</pre>
+
+<pre >## Single term deletions
+## 
+## Model:
+## Juv ~ Adult * factor(Year)
+##                    Df Deviance  AIC F value Pr(&gt;F)  
+## &lt;none&gt;                  256799 1024                 
+## Adult:factor(Year) 14   361458 1026    1.72  0.076 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Можно убрать взаимодействие</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>M2 &lt;- lm(Juv ~ Adult  +  factor(Year), data = juv_ad)
+library(car)
+Anova(M2)</pre>
+
+<pre >## Anova Table (Type II tests)
+## 
+## Response: Juv
+##               Sum Sq Df F value  Pr(&gt;F)    
+## Adult          63886  1    12.9 0.00059 ***
+## factor(Year) 1357772 14    19.6 &lt; 2e-16 ***
+## Residuals     361458 73                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Посмотрим на предсказания этой модели</h2></hgroup><article  id="----">
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li>Модель предсказывает, что взрослые негативно влияют на обилие молоди.<br/></li>
+<li>Модель предсказывает отрицательные значения!</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Диагностика модели</h2></hgroup><article  id="-">
+
+<pre class = 'prettyprint lang-r'>M2_diag &lt;- fortify(M2)
+
+ggplot(M2_diag, aes(x = .fitted, y = .stdresid)) + geom_point() +
+  geom_hline(yintercept = 0) + geom_smooth(se = FALSE)</pre>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li>Явные признаки гетероскедастичности!</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Два способа решения проблем с моделью</h2></hgroup><article  id="-----">
+
+<ol>
+<li>Провести логарифмирование зависимой переменной и построить модель для логарифмированных величин.</li>
+<li>Построить модель, основанную на распределении Пуассона.</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Модель, основанная на распределении Пуассона</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>M3 &lt;- glm(Juv ~ Adult * factor(Year), 
+          data = juv_ad, family = &quot;poisson&quot;)
+library(car)
+Anova(M3)</pre>
+
+<pre >## Analysis of Deviance Table (Type II tests)
+## 
+## Response: Juv
+##                    LR Chisq Df Pr(&gt;Chisq)    
+## Adult                   272  1     &lt;2e-16 ***
+## factor(Year)           5031 14     &lt;2e-16 ***
+## Adult:factor(Year)      439 14     &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Диагностика модели</h2></hgroup><article  id="--1">
+
+<pre class = 'prettyprint lang-r'>M3_diag &lt;- data.frame(.fitted = predict(M3),
+                      .pears_resid = residuals(M3, type = &quot;pearson&quot;))</pre>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Рассеяние остатков выглядит лучше!</p>
+
+</article></slide><slide class=''><hgroup><h2>Избыточность дисперсии (Overdispersion)</h2></hgroup><article  id="--overdispersion">
+
+<p>В Пуассоновской регрессии мы моделируем изменение распределения Пуассона в зависимости от каких-то предикторов.</p>
+
+<p>В распределении Пуассона \(E(Y) = \mu\) и \(var(Y) = \mu\)</p>
+
+<p>Если в имеющихся данных \(var(Y) &gt; \mu\), то нарушается условие применимости пуассоновской регрессии.</p>
+
+</article></slide><slide class=''><hgroup><h2>Избыточность дисперсии (Overdispersion)</h2></hgroup><article  id="--overdispersion-1">
+
+<h3>Первый способ оценки избыточности дисперсии</h3>
+
+<pre class = 'prettyprint lang-r'>Resid_M3 &lt;- resid(M3, type = &quot;pearson&quot;) # Пирсоновские остатки
+
+N &lt;- nrow(juv_ad) # Объем выборки
+
+p &lt;- length(coef(M3))   # Число параметров в модели
+
+df &lt;- (N - p) # число степенейсвободы
+
+fi &lt;- sum(Resid_M3^2) /df  #Величина fi показывает во сколько раз в среднем sigma &gt; mu для данной модели
+
+fi</pre>
+
+<pre >## [1] 16.8</pre>
+
+<p>Дисперсия в 16.756 раза больше среднего!</p>
+
+</article></slide><slide class=''><hgroup><h2>Избыточность дисперсии (Overdispersion)</h2></hgroup><article  id="--overdispersion-2">
+
+<h3>Второй способ оценки избыточности дисперсии</h3>
+
+<pre class = 'prettyprint lang-r'>library(qcc)
+qcc.overdispersion.test(juv_ad$Juv, type = &quot;poisson&quot;)</pre>
+
+<pre >##                    
+## Overdispersion test Obs.Var/Theor.Var Statistic p-value
+##        poisson data               103      9079       0</pre>
+
+</article></slide><slide class=''><hgroup><h2>Избыточность дисперсии (Overdispersion)</h2></hgroup><article  id="--overdispersion-3" class="smaller">
+
+<h3>Очень маленькие стандартные ошибки (и все очень достоверно) - это явный признак избыточности дисперсии</h3>
+
+<pre class = 'prettyprint lang-r'>summary(M3)</pre>
+
+<pre >## 
+## Call:
+## glm(formula = Juv ~ Adult * factor(Year), family = &quot;poisson&quot;, 
+##     data = juv_ad)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -10.779   -2.370   -0.074    2.127    7.858  
+## 
+## Coefficients:
+##                        Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)             5.14952    0.11551   44.58  &lt; 2e-16 ***
+## Adult                  -0.00955    0.00305   -3.13  0.00173 ** 
+## factor(Year)1998        0.89375    0.12042    7.42  1.2e-13 ***
+## factor(Year)1999        0.46774    0.12279    3.81  0.00014 ***
+## factor(Year)2000       -0.67585    0.20462   -3.30  0.00096 ***
+## factor(Year)2001        0.09944    0.23147    0.43  0.66748    
+## factor(Year)2002       -0.46104    0.25068   -1.84  0.06589 .  
+## factor(Year)2003        0.99365    0.12334    8.06  7.9e-16 ***
+## factor(Year)2004        0.34742    0.13293    2.61  0.00896 ** 
+## factor(Year)2005        0.51396    0.13149    3.91  9.3e-05 ***
+## factor(Year)2006        0.40032    0.12997    3.08  0.00207 ** 
+## factor(Year)2007       -1.51444    0.21138   -7.16  7.8e-13 ***
+## factor(Year)2008        0.89713    0.12124    7.40  1.4e-13 ***
+## factor(Year)2009        0.47749    0.12401    3.85  0.00012 ***
+## factor(Year)2010        0.31445    0.13054    2.41  0.01600 *  
+## factor(Year)2011        1.05365    0.12258    8.60  &lt; 2e-16 ***
+## Adult:factor(Year)1998 -0.01150    0.00336   -3.42  0.00063 ***
+## Adult:factor(Year)1999  0.01496    0.01048    1.43  0.15355    
+## Adult:factor(Year)2000  0.02677    0.00580    4.62  3.9e-06 ***
+## Adult:factor(Year)2001 -0.00481    0.00490   -0.98  0.32698    
+## Adult:factor(Year)2002  0.00534    0.00533    1.00  0.31643    
+## Adult:factor(Year)2003 -0.02341    0.00411   -5.69  1.2e-08 ***
+## Adult:factor(Year)2004 -0.01631    0.00591   -2.76  0.00575 ** 
+## Adult:factor(Year)2005 -0.00882    0.00381   -2.31  0.02062 *  
+## Adult:factor(Year)2006 -0.04550    0.00760   -5.99  2.1e-09 ***
+## Adult:factor(Year)2007  0.05039    0.00944    5.34  9.4e-08 ***
+## Adult:factor(Year)2008  0.00569    0.00349    1.63  0.10312    
+## Adult:factor(Year)2009 -0.00642    0.00508   -1.26  0.20637    
+## Adult:factor(Year)2010  0.00445    0.00398    1.12  0.26394    
+## Adult:factor(Year)2011  0.01949    0.00351    5.55  2.8e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 7992.3  on 88  degrees of freedom
+## Residual deviance: 1008.2  on 59  degrees of freedom
+## AIC: 1695
+## 
+## Number of Fisher Scoring iterations: 4</pre>
+
+</article></slide><slide class=''><hgroup><h2>Источники избыточности дисперсии</h2></hgroup><article  id="--">
+
+<ol>
+<li>Мнимая избыточность дисперсии
+
+<ul>
+<li>Наличие отскакивающих значений<br/></li>
+<li>Как следствие пропущенных ковариат или взаимодействий предикторов<br/></li>
+<li>Наличие внутригрупповых корреляций (нарушение независимости выборок)</li>
+<li>Нелинейный характер взаимосвязи между ковариатами и зависимой переменной</li>
+<li>Неверно подобранная связывающая функция</li>
+<li>Количество нулей больше, чем предсказывает распределение Пуассона (Zero inflation)<br/></li>
+</ul></li>
+<li>Истинная избыточность дисперсии, как следствие природы данных.</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Как бороться с избыточностью дисперсии</h2></hgroup><article  id="----">
+
+<p>Если избыточнсть дисперсии <em>мнимая</em>, то ее надо устранить, введя в модель соответствующие поправки.</p>
+
+<p>Если избыточность дисперсии <em>истинная</em>, то необходима более серьезная коррекция модели.</p>
+
+</article></slide><slide class=''><hgroup><h2>Два пути решения проблемы при истинной избыточности дисперсии</h2></hgroup><article  id="-------">
+
+<ol>
+<li>Построить квази-пуассоновскую модель</li>
+<li>Построить модель, основанную на отрицательном биномиальном распределении</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Квази-пуассоновские модели</h2></hgroup><article  id="--">
+
+<p>Отличие от пуассоновсой модели заключается лишь в том, что в квази-пуассоновских моделях вводится поправка для связи дисперсии и матожидания.</p>
+
+<p>В этой модели матожидание \(E(Y) = \mu\) и дисперсия \(var(Y) = \phi \times \mu\)</p>
+
+<p><br></p>
+
+<p>Величина \(\phi\) показывает во сколько раз дисперсия превышает матожидание.</p>
+
+<p>\[\phi =  \frac{var(Y)}{\mu}=\frac {\frac{\sum{(\epsilon_i)^2}}{N - p}}  {\mu} =  \frac{\sum{(\epsilon_{pearson})^2}}{N - p}\]</p>
+
+<ul class = 'build'>
+<li>Модель, по сути, остается той же, что и пуассоновская, но изменяются стандартные ошибки оценок параметров, они домножаются на \(\sqrt{\phi}\)</li>
+<li>Для квази-пуассоновских моделй не определена функция максимального правдоподобия и, следовательно, нельзя вычислить AIC</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Квази-пуассоновская модель</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>M4 &lt;- glm(Juv ~ Adult * factor(Year), data = juv_ad, family = &quot;quasipoisson&quot;)
+Anova(M4)</pre>
+
+<pre >## Analysis of Deviance Table (Type II tests)
+## 
+## Response: Juv
+##                    LR Chisq Df Pr(&gt;Chisq)    
+## Adult                  16.2  1   0.000056 ***
+## factor(Year)          300.3 14    &lt; 2e-16 ***
+## Adult:factor(Year)     26.2 14      0.024 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+<p><strong>Важно:</strong> Распределение разности девианс лишь приблизительно описывается распределением \(\chi^2\). Поэтому уровни значимости близкие к 0.05 нельзя рассматривать как надежные. <br><br/>Уровень значимости для взаимодействия в данной модели близок к 0.05. Можно подумать об упрощении модели!</p>
+
+</article></slide><slide class=''><hgroup><h2>Квази-пуассоновская модель</h2></hgroup><article  id="---1">
+
+<p>Упрощенная модель</p>
+
+<pre class = 'prettyprint lang-r'>M4a &lt;- glm(Juv ~ Adult  + factor(Year), data = juv_ad, family = &quot;quasipoisson&quot;)
+Anova(M4a)</pre>
+
+<pre >## Analysis of Deviance Table (Type II tests)
+## 
+## Response: Juv
+##              LR Chisq Df Pr(&gt;Chisq)    
+## Adult            13.8  1     0.0002 ***
+## factor(Year)    254.9 14     &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Предсказания упрощенной модели</h2></hgroup><article  id="--">
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-20-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li><strong>Биологический вывод: взрослые мидии препятствуют пополнению молодью</strong></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Модель, основанная на отрицательном биномиальном распределении</h2></hgroup><article  id="-----">
+
+<pre class = 'prettyprint lang-r'>library(MASS)
+M5 &lt;- glm.nb(Juv ~ Adult*factor(Year) , data = juv_ad, link = &quot;log&quot;)
+Anova(M5)</pre>
+
+<pre >## Analysis of Deviance Table (Type II tests)
+## 
+## Response: Juv
+##                    LR Chisq Df Pr(&gt;Chisq)    
+## Adult                    27  1 0.00000016 ***
+## factor(Year)            370 14    &lt; 2e-16 ***
+## Adult:factor(Year)       34 14     0.0023 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+<p>Уровень значимости для взаимодействия заметно ниже 0.05. Взаимодействие факторов отбросить нельзя!</p>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article >
+
+<p>Проверьте на избыточность дисперсии модель, основанную на отрицательном биномиальном распеделении</p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article >
+
+<pre class = 'prettyprint lang-r'>Resid_M5 &lt;- resid(M5, type = &quot;pearson&quot;) # Пирсоновские остатки
+N &lt;- nrow(juv_ad) # Объем выборки
+p &lt;- length(coef(M5)) +1   # Число параметров в модели
+df &lt;- (N - p) # число степенейсвободы
+fi &lt;- sum(Resid_M5^2) /df  #Величина fi показывает
+# во сколько раз в среднем sigma &gt; mu для данной модели
+fi</pre>
+
+<pre >## [1] 1.47</pre>
+
+</article></slide><slide class=''><hgroup><h2>Диагностика модели</h2></hgroup><article  id="--2">
+
+<pre class = 'prettyprint lang-r'>M5_diag &lt;- data.frame(.fitted = predict(M5), 
+                      .pears_resid = residuals(M5, type = &quot;pearson&quot;))
+
+ggplot(M5_diag, aes(x=.fitted, y = .pears_resid)) + geom_point() +
+  geom_hline(yintercept = 0) + geom_smooth(se = F)</pre>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article  id="-1">
+
+<p>Визуализируйте предсказания модели, основанной на отрицательном биномиальном распределении</p>
+
+</article></slide><slide class=''><hgroup><h2>Визуализируем предсказание модели</h2></hgroup><article  id="--">
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/m-viz-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li><strong>Биологический вывод: В разные годы харакер взаимосвязи молоди и взрослых мидий может быть разным</strong></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Код для графика</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>MyData &lt;- expand.grid(Year = factor(seq(min(juv_ad$Year), 
+    max(juv_ad$Year))), Adult = seq(min(juv_ad$Adult), 
+    max(juv_ad$Adult)))
+
+MyData$Predicted &lt;- predict(M5, newdata = MyData, type = &quot;response&quot;)
+ggplot(MyData, aes(x = Adult, y = Predicted, group = Year)) + 
+    geom_line(color = &quot;blue&quot;) + geom_hline(yintercept = 0) + 
+    ylab(&quot;Ожидаемое количество молоди&quot;) + 
+    geom_point(data = juv_ad, aes(x = Adult, y = Juv, 
+        color = factor(Year))) + facet_wrap(~Year, 
+    ncol = 5) + guides(color = FALSE)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Таким образом</h2></hgroup><article  id="-">
+
+<ol>
+<li>Модели, основанные на неподходящем типе распределения, могут давать нереалистичные предсказанные значения.</li>
+<li>В зависимости от того, как сконструирована модель, можно получить результаты, которые позволят сформулировать принципиально разные биологические выводы.</li>
+</ol>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Выбор оптимальной модели</h2></hgroup><article  id="--">
+
+</article></slide><slide class=''><hgroup><h2>Какие факторы определяют супружескую неверность?</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>data(Affairs, package = &quot;AER&quot;)
+af &lt;- Affairs</pre>
+
+<p>Оригинальная работа: Fair, R.C. (1978). A Theory of Extramarital Affairs. Journal of Political Economy, 86, 45–61.</p>
+
+<div class="columns-2">
+<p><code>affairs</code> - Количество внебрачных свзяей за последний год<br/><code>gender</code> - пол<br/><code>age</code> - возраст<br/><code>yearsmarried</code> - сколько ле в браке<br/><code>children</code> - наличие детей<br/><code>religiousness</code> - уровеь религиозности<br/><code>education</code> - уровень образования<br/><code>rating</code> - самооценка ощущений от брака</p></div>
+
+</article></slide><slide class=''><hgroup><h2>Задание:</h2></hgroup><article  id="-2">
+
+<ol>
+<li>Постройте оптимальную модель, описывающую зависимость количества внебрачных связей в зависимости от пола, времени, проведенного в браке, наличия детей, уровня религиозности и уровня образованности.<br/></li>
+<li>Проверьте валидность данной модели</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-1">
+
+<pre class = 'prettyprint lang-r'>Mod &lt;- glm(affairs ~ gender * yearsmarried * children * religiousness + 
+    education, data = af, family = &quot;poisson&quot;)</pre>
+
+<p><small></p>
+
+<pre class = 'prettyprint lang-r'>summary(Mod)</pre>
+
+<pre >## 
+## Call:
+## glm(formula = affairs ~ gender * yearsmarried * children * religiousness + 
+##     education, family = &quot;poisson&quot;, data = af)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+##  -3.27   -1.78   -1.26   -0.60    6.74  
+## 
+## Coefficients:
+##                                                   Estimate Std. Error
+## (Intercept)                                         0.6798     0.5380
+## gendermale                                         -1.2262     0.7071
+## yearsmarried                                        0.2747     0.0666
+## childrenyes                                         0.7479     0.6325
+## religiousness                                      -0.5268     0.1915
+## education                                          -0.0274     0.0149
+## gendermale:yearsmarried                             0.0325     0.0796
+## gendermale:childrenyes                              1.7851     0.8714
+## yearsmarried:childrenyes                           -0.2238     0.0740
+## gendermale:religiousness                            0.5167     0.2605
+## yearsmarried:religiousness                         -0.0183     0.0241
+## childrenyes:religiousness                           0.1421     0.2405
+## gendermale:yearsmarried:childrenyes                -0.0833     0.0902
+## gendermale:yearsmarried:religiousness              -0.0282     0.0288
+## gendermale:childrenyes:religiousness               -0.7454     0.3216
+## yearsmarried:childrenyes:religiousness              0.0216     0.0266
+## gendermale:yearsmarried:childrenyes:religiousness   0.0499     0.0324
+##                                                   z value Pr(&gt;|z|)
+## (Intercept)                                          1.26   0.2064
+## gendermale                                          -1.73   0.0829
+## yearsmarried                                         4.13 0.000037
+## childrenyes                                          1.18   0.2371
+## religiousness                                       -2.75   0.0059
+## education                                           -1.84   0.0662
+## gendermale:yearsmarried                              0.41   0.6829
+## gendermale:childrenyes                               2.05   0.0405
+## yearsmarried:childrenyes                            -3.03   0.0025
+## gendermale:religiousness                             1.98   0.0473
+## yearsmarried:religiousness                          -0.76   0.4473
+## childrenyes:religiousness                            0.59   0.5544
+## gendermale:yearsmarried:childrenyes                 -0.92   0.3555
+## gendermale:yearsmarried:religiousness               -0.98   0.3274
+## gendermale:childrenyes:religiousness                -2.32   0.0205
+## yearsmarried:childrenyes:religiousness               0.81   0.4174
+## gendermale:yearsmarried:childrenyes:religiousness    1.54   0.1242
+##                                                      
+## (Intercept)                                          
+## gendermale                                        .  
+## yearsmarried                                      ***
+## childrenyes                                          
+## religiousness                                     ** 
+## education                                         .  
+## gendermale:yearsmarried                              
+## gendermale:childrenyes                            *  
+## yearsmarried:childrenyes                          ** 
+## gendermale:religiousness                          *  
+## yearsmarried:religiousness                           
+## childrenyes:religiousness                            
+## gendermale:yearsmarried:childrenyes                  
+## gendermale:yearsmarried:religiousness                
+## gendermale:childrenyes:religiousness              *  
+## yearsmarried:childrenyes:religiousness               
+## gendermale:yearsmarried:childrenyes:religiousness    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 2925.5  on 600  degrees of freedom
+## Residual deviance: 2518.8  on 584  degrees of freedom
+## AIC: 3047
+## 
+## Number of Fisher Scoring iterations: 7</pre>
+
+<p></small></p>
+
+</article></slide><slide class=''><hgroup><h2>Проверка на избыточность дисперсии</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'># Проверка на Overdispersion
+Resid_Mod &lt;- resid(Mod, type = &quot;pearson&quot;) 
+N &lt;- nrow(af) 
+p &lt;- length(coef(Mod)) 
+df &lt;- (N - p) 
+fi &lt;- sum(Resid_Mod^2) /df  
+fi</pre>
+
+<pre >## [1] 6.44</pre>
+
+</article></slide><slide class=''><hgroup><h2>Строим квази-пуассоновскую модель</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>Mod1 &lt;- glm(affairs ~ gender * yearsmarried * children * religiousness * 
+    education, data = af, family = &quot;quasipoisson&quot;)</pre>
+
+<p><small></p>
+
+<pre class = 'prettyprint lang-r'>summary(Mod1)</pre>
+
+<pre >## 
+## Call:
+## glm(formula = affairs ~ gender * yearsmarried * children * religiousness * 
+##     education, family = &quot;quasipoisson&quot;, data = af)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -3.356  -1.699  -1.197  -0.518   6.833  
+## 
+## Coefficients:
+##                                                              Estimate
+## (Intercept)                                                  -0.72294
+## gendermale                                                    6.32757
+## yearsmarried                                                 -0.13878
+## childrenyes                                                  21.26596
+## religiousness                                                 2.68502
+## education                                                     0.10930
+## gendermale:yearsmarried                                       1.87507
+## gendermale:childrenyes                                      -27.44754
+## yearsmarried:childrenyes                                     -1.24552
+## gendermale:religiousness                                     -3.35695
+## yearsmarried:religiousness                                   -0.01597
+## childrenyes:religiousness                                   -10.10729
+## gendermale:education                                         -0.52222
+## yearsmarried:education                                        0.01782
+## childrenyes:education                                        -1.44076
+## religiousness:education                                      -0.23255
+## gendermale:yearsmarried:childrenyes                          -0.86718
+## gendermale:yearsmarried:religiousness                        -0.47529
+## gendermale:childrenyes:religiousness                         11.26910
+## yearsmarried:childrenyes:religiousness                        0.56754
+## gendermale:yearsmarried:education                            -0.09418
+## gendermale:childrenyes:education                              1.97936
+## yearsmarried:childrenyes:education                            0.08050
+## gendermale:religiousness:education                            0.27615
+## yearsmarried:religiousness:education                          0.00383
+## childrenyes:religiousness:education                           0.71028
+## gendermale:yearsmarried:childrenyes:religiousness            -0.00469
+## gendermale:yearsmarried:childrenyes:education                 0.01680
+## gendermale:yearsmarried:religiousness:education               0.01994
+## gendermale:childrenyes:religiousness:education               -0.82013
+## yearsmarried:childrenyes:religiousness:education             -0.04129
+## gendermale:yearsmarried:childrenyes:religiousness:education   0.01511
+##                                                             Std. Error
+## (Intercept)                                                   11.55629
+## gendermale                                                    15.47884
+## yearsmarried                                                   1.28616
+## childrenyes                                                   14.96782
+## religiousness                                                  4.61169
+## education                                                      0.77941
+## gendermale:yearsmarried                                        2.14783
+## gendermale:childrenyes                                        19.12367
+## yearsmarried:childrenyes                                       1.45496
+## gendermale:religiousness                                       5.84741
+## yearsmarried:religiousness                                     0.47583
+## childrenyes:religiousness                                      5.74652
+## gendermale:education                                           1.00639
+## yearsmarried:education                                         0.08122
+## childrenyes:education                                          1.01421
+## religiousness:education                                        0.31845
+## gendermale:yearsmarried:childrenyes                            2.31968
+## gendermale:yearsmarried:religiousness                          0.70212
+## gendermale:childrenyes:religiousness                           7.13962
+## yearsmarried:childrenyes:religiousness                         0.53301
+## gendermale:yearsmarried:education                              0.12702
+## gendermale:childrenyes:education                               1.24743
+## yearsmarried:childrenyes:education                             0.09344
+## gendermale:religiousness:education                             0.38721
+## yearsmarried:religiousness:education                           0.03019
+## childrenyes:religiousness:education                            0.39169
+## gendermale:yearsmarried:childrenyes:religiousness              0.76524
+## gendermale:yearsmarried:childrenyes:education                  0.13881
+## gendermale:yearsmarried:religiousness:education                0.04196
+## gendermale:childrenyes:religiousness:education                 0.46874
+## yearsmarried:childrenyes:religiousness:education               0.03419
+## gendermale:yearsmarried:childrenyes:religiousness:education    0.04622
+##                                                             t value
+## (Intercept)                                                   -0.06
+## gendermale                                                     0.41
+## yearsmarried                                                  -0.11
+## childrenyes                                                    1.42
+## religiousness                                                  0.58
+## education                                                      0.14
+## gendermale:yearsmarried                                        0.87
+## gendermale:childrenyes                                        -1.44
+## yearsmarried:childrenyes                                      -0.86
+## gendermale:religiousness                                      -0.57
+## yearsmarried:religiousness                                    -0.03
+## childrenyes:religiousness                                     -1.76
+## gendermale:education                                          -0.52
+## yearsmarried:education                                         0.22
+## childrenyes:education                                         -1.42
+## religiousness:education                                       -0.73
+## gendermale:yearsmarried:childrenyes                           -0.37
+## gendermale:yearsmarried:religiousness                         -0.68
+## gendermale:childrenyes:religiousness                           1.58
+## yearsmarried:childrenyes:religiousness                         1.06
+## gendermale:yearsmarried:education                             -0.74
+## gendermale:childrenyes:education                               1.59
+## yearsmarried:childrenyes:education                             0.86
+## gendermale:religiousness:education                             0.71
+## yearsmarried:religiousness:education                           0.13
+## childrenyes:religiousness:education                            1.81
+## gendermale:yearsmarried:childrenyes:religiousness             -0.01
+## gendermale:yearsmarried:childrenyes:education                  0.12
+## gendermale:yearsmarried:religiousness:education                0.48
+## gendermale:childrenyes:religiousness:education                -1.75
+## yearsmarried:childrenyes:religiousness:education              -1.21
+## gendermale:yearsmarried:childrenyes:religiousness:education    0.33
+##                                                             Pr(&gt;|t|)
+## (Intercept)                                                    0.950
+## gendermale                                                     0.683
+## yearsmarried                                                   0.914
+## childrenyes                                                    0.156
+## religiousness                                                  0.561
+## education                                                      0.889
+## gendermale:yearsmarried                                        0.383
+## gendermale:childrenyes                                         0.152
+## yearsmarried:childrenyes                                       0.392
+## gendermale:religiousness                                       0.566
+## yearsmarried:religiousness                                     0.973
+## childrenyes:religiousness                                      0.079
+## gendermale:education                                           0.604
+## yearsmarried:education                                         0.826
+## childrenyes:education                                          0.156
+## religiousness:education                                        0.466
+## gendermale:yearsmarried:childrenyes                            0.709
+## gendermale:yearsmarried:religiousness                          0.499
+## gendermale:childrenyes:religiousness                           0.115
+## yearsmarried:childrenyes:religiousness                         0.287
+## gendermale:yearsmarried:education                              0.459
+## gendermale:childrenyes:education                               0.113
+## yearsmarried:childrenyes:education                             0.389
+## gendermale:religiousness:education                             0.476
+## yearsmarried:religiousness:education                           0.899
+## childrenyes:religiousness:education                            0.070
+## gendermale:yearsmarried:childrenyes:religiousness              0.995
+## gendermale:yearsmarried:childrenyes:education                  0.904
+## gendermale:yearsmarried:religiousness:education                0.635
+## gendermale:childrenyes:religiousness:education                 0.081
+## yearsmarried:childrenyes:religiousness:education               0.228
+## gendermale:yearsmarried:childrenyes:religiousness:education    0.744
+##                                                              
+## (Intercept)                                                  
+## gendermale                                                   
+## yearsmarried                                                 
+## childrenyes                                                  
+## religiousness                                                
+## education                                                    
+## gendermale:yearsmarried                                      
+## gendermale:childrenyes                                       
+## yearsmarried:childrenyes                                     
+## gendermale:religiousness                                     
+## yearsmarried:religiousness                                   
+## childrenyes:religiousness                                   .
+## gendermale:education                                         
+## yearsmarried:education                                       
+## childrenyes:education                                        
+## religiousness:education                                      
+## gendermale:yearsmarried:childrenyes                          
+## gendermale:yearsmarried:religiousness                        
+## gendermale:childrenyes:religiousness                         
+## yearsmarried:childrenyes:religiousness                       
+## gendermale:yearsmarried:education                            
+## gendermale:childrenyes:education                             
+## yearsmarried:childrenyes:education                           
+## gendermale:religiousness:education                           
+## yearsmarried:religiousness:education                         
+## childrenyes:religiousness:education                         .
+## gendermale:yearsmarried:childrenyes:religiousness            
+## gendermale:yearsmarried:childrenyes:education                
+## gendermale:yearsmarried:religiousness:education              
+## gendermale:childrenyes:religiousness:education              .
+## yearsmarried:childrenyes:religiousness:education             
+## gendermale:yearsmarried:childrenyes:religiousness:education  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for quasipoisson family taken to be 6.52)
+## 
+##     Null deviance: 2925.5  on 600  degrees of freedom
+## Residual deviance: 2378.1  on 569  degrees of freedom
+## AIC: NA
+## 
+## Number of Fisher Scoring iterations: 9</pre>
+
+<p></small></p>
+
+</article></slide><slide class=''><hgroup><h2>Подбираем оптимальную модель</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>step(Mod1) #Для квази-пуассоновских моделей эта функция работать
+# не будет, так как не определен AIC</pre>
+
+</article></slide><slide class=''><hgroup><h2>Строим модель, основанную на отрицательном биномиальном распределении</h2></hgroup><article  id="------" class="smaller">
+
+<pre class = 'prettyprint lang-r'>Mod_nb &lt;- glm.nb(affairs ~ gender * yearsmarried * children * 
+    religiousness + education, data = af)
+Anova(Mod_nb)</pre>
+
+<pre >## Analysis of Deviance Table (Type II tests)
+## 
+## Response: affairs
+##                                            LR Chisq Df Pr(&gt;Chisq)    
+## gender                                         0.12  1     0.7282    
+## yearsmarried                                  17.87  1   0.000024 ***
+## children                                       1.24  1     0.2647    
+## religiousness                                 15.06  1     0.0001 ***
+## education                                      1.93  1     0.1645    
+## gender:yearsmarried                            0.22  1     0.6366    
+## gender:children                                0.02  1     0.8975    
+## yearsmarried:children                          7.98  1     0.0047 ** 
+## gender:religiousness                           0.01  1     0.9179    
+## yearsmarried:religiousness                     0.28  1     0.5965    
+## children:religiousness                         0.02  1     0.8758    
+## gender:yearsmarried:children                   0.82  1     0.3662    
+## gender:yearsmarried:religiousness              0.80  1     0.3715    
+## gender:children:religiousness                  2.25  1     0.1337    
+## yearsmarried:children:religiousness            1.78  1     0.1825    
+## gender:yearsmarried:children:religiousness     0.06  1     0.8032    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Подбираем оптимальную модель</h2></hgroup><article  id="---1">
+
+<pre class = 'prettyprint lang-r'>step(Mod_nb)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Сморим на результаты оптимальной модели</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>Mod_nb_final &lt;- glm.nb(formula = affairs ~ yearsmarried + 
+    children + religiousness + yearsmarried:children, 
+    data = af, init.theta = 0.1346363532, link = log)</pre>
+
+<p><small></p>
+
+<pre class = 'prettyprint lang-r'>summary(Mod_nb_final)</pre>
+
+<pre >## 
+## Call:
+## glm.nb(formula = affairs ~ yearsmarried + children + religiousness + 
+##     yearsmarried:children, data = af, init.theta = 0.1346359871, 
+##     link = log)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -1.090  -0.824  -0.700  -0.372   1.910  
+## 
+## Coefficients:
+##                          Estimate Std. Error z value  Pr(&gt;|z|)    
+## (Intercept)               -0.4047     0.4309   -0.94    0.3476    
+## yearsmarried               0.2978     0.0631    4.72 0.0000024 ***
+## childrenyes                1.3847     0.4621    3.00    0.0027 ** 
+## religiousness             -0.4171     0.1064   -3.92 0.0000878 ***
+## yearsmarried:childrenyes  -0.2232     0.0690   -3.24    0.0012 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for Negative Binomial(0.135) family taken to be 1)
+## 
+##     Null deviance: 375.76  on 600  degrees of freedom
+## Residual deviance: 335.57  on 596  degrees of freedom
+## AIC: 1477
+## 
+## Number of Fisher Scoring iterations: 1
+## 
+## 
+##               Theta:  0.1346 
+##           Std. Err.:  0.0148 
+## 
+##  2 x log-likelihood:  -1465.2630</pre>
+
+<p></small></p>
+
+</article></slide><slide class=''><hgroup><h2>Проводим диагностику оптимальной модели</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>Mod_nb_test &lt;- data.frame(.fitted = predict(Mod_nb_final), 
+                          .pears_resid = residuals(Mod_nb, type = &quot;pearson&quot;))
+
+ggplot(Mod_nb_test, aes(x=.fitted, y = .pears_resid)) + geom_point() +
+  geom_smooth(se = FALSE)</pre>
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Проверим на избыточность дисперсии</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>Resid_Mod &lt;- resid(Mod_nb_final, type = &quot;pearson&quot;) 
+N &lt;- nrow(af) 
+p &lt;- length(coef(Mod_nb_final)) 
+df &lt;- (N - p) 
+fi &lt;- sum(Resid_Mod^2) /df  
+fi</pre>
+
+<pre >## [1] 0.723</pre>
+
+</article></slide><slide class=''><hgroup><h2>Визуализируем предсказание модели</h2></hgroup><article  id="---1">
+
+<p><img src="12_general_linear_models_for_count_data_files/figure-html/af-viz-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Код для графика</h2></hgroup><article  id="---1">
+
+<pre class = 'prettyprint lang-r'>MyData &lt;- expand.grid(yearsmarried = seq(min(af$yearsmarried), 
+    max(af$yearsmarried)), children = c(&quot;yes&quot;, &quot;no&quot;), 
+    religiousness = seq(min(af$religiousness), max(af$religiousness)))
+MyData$Predicted &lt;- predict(Mod_nb_final, newdata = MyData, 
+    type = &quot;response&quot;)
+
+ggplot(MyData, aes(x = yearsmarried, y = Predicted, 
+    color = religiousness)) + geom_line(aes(group = religiousness), 
+    size = 1.5) + facet_grid(~children, labeller = label_both) + 
+    scale_color_gradient(low = &quot;yellow&quot;, high = &quot;red&quot;) + 
+    geom_point(data = af, aes(x = yearsmarried, y = affairs), 
+        position = position_jitter(width = 1, height = 1))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Summary</h2></hgroup><article  id="summary">
+
+<ul class = 'build'>
+<li>В случае счетных зависимых перменных (неотрицательных целочисленных величин) применяются модели, основанные на распределении Пуассона или отрицаетльном биномиальном распределении.<br/></li>
+<li>Важным ограничивающим условием применения этих моделей является отсутствие избыточности дисперсии.<br/></li>
+<li>Избыточность дисперсии может быть истинной и мнимой.<br/></li>
+<li>При истинной избыточности дисперсии модель можно скорректировать, поcтроив квази-пуассоновскую модель (вводятся поправки для ошибок оценок коэффициентов модели).</li>
+<li>Другой подход - построение моделей, основанных на отрицательном биномиальном распределении.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Что почитать</h2></hgroup><article  id="-">
+
+<ul>
+<li>Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014.</li>
+<li>Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. - Statistics for biology and health. Springer, New York, NY.</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

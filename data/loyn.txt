@@ -1,0 +1,40 @@
+##############################################################################
+#									     #
+#	Legend of formats and contents for data files accompany		     #
+#	"Experimental Design and Data Analysis for Biologists"		     #
+#	By G. P. Quinn and M. J. Keough, 2002			   	     #
+#									     #
+#	----------------------------------------------------------	     #
+#	Used in Box 6-2, Box 6-7, Box 6-8, Box 6-9, Box 6-10, Tab 6-3,       #
+#	Fig 6-3, Fig 6-4, Fig 6-6, Fig 6-9				     #
+#	Box 13-3 (GAM), Fig 13-3					     #
+#									     #	
+##############################################################################
+
+Format of the files: (Box 6-2, Box 6-7, Box 6-8, Box 6-10?, Tab 6-3, Fig 6-3, Fig 6-4, Fig 6-6, Fig 6-7)
+	* loyn.xls (Microsoft Excel)
+	* loyn.csv (comma delimeted ascii text file)
+
+File contents:
+	* ABUND - abundance of forest birds in patch
+	* AREA - patch area (ha)
+	* YR.ISOL - number of years since patch was isolated
+	* DIST - distance to nearest patch (km)
+	* LDIST - distance to nearest larger patch (km)
+	* GRAZE - grazing intesity in patch (1 to 5 indicating light to heavy)
+	* ALT - altitude (m above sealevel) of patch
+	* L10DIST - log10 transformation of DIST
+	* L10LDIST - log10 transformation of LDIST
+	* L10AREA - log10 transformation of LAREA
+	* CYR.ISOL - centered YR.ISOL
+	* CL10AREA - centered L10AREA
+	* CGRAZE - centered GRAZE
+	* RESID1 - residuals from linear regression of ABUND against L10AREA + YR.ISOL + GRAZE + L10AREA*YR.ISOL + YR.ISOL*GRAZE + L10AREA*GRAZE + L10AREA*YR.ISOL*GRAZE
+	* PREDICT1 - predicted ABUND from linear regression of ABUND against L10AREA + YR.ISOL + GRAZE + L10AREA*YR.ISOL + YR.ISOL*GRAZE + L10AREA*GRAZE + L10AREA*YR.ISOL*GRAZE
+	* AREARESY - residuals from OLS regression of ABUND against L10DIST + L10LDIST + YR.ISOL + GRAZE + ALT
+	* AREARESX - residuals from OLS regression of L10AREA against L10DIST + L10LDIST + YR.ISOL + GRAZE + ALT
+	* GRAZRESY - residuals from OLS regression of ABUND against L10DIST + L10LDIST + YR.ISOL + L10AREA + ALT
+	* GRAZRESX - residuals from OLS regression of GRAZE against L10DIST + L10LDIST + YR.ISOL + L10AREA + ALT 
+	* YRRESY - residuals from OLS regression of ABUND against L10DIST + L10LDIST + L10AREA + GRAZE + ALT
+	* YRRESX - residuals from OLS regression of YR.ISOL against L10DIST + L10LDIST + L10AREA + GRAZE + ALT 
+----------------------------------------------------------------------------------

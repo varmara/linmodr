@@ -1,0 +1,28 @@
+Clover data story
+http://www.statlab.uni-heidelberg.de
+
+The purpose of the study was to estimate the effect of the agricultural
+weed yarrow, /achillea millefolium/, on the yield of white clover,
+/trifolium repens/. It was anticipated that the clover yield would
+decrease as teh density of the yarrow increased.
+Three areas A,B,C were selected in the clover seed crop. Ten 0.1m^2
+quadrats were positioned within each area using random coordinates on a
+20x20 grid. In each quadrat the clover seed was harvested and weighted,
+and the density of yarrow assessed by counting the number of yarrow
+flower stems.
+
+
+
+*Data file:* weevils data <weevils.data>
+*Variables:*
+
+Clover yield
+    Clover seed yield in g/m^2
+Yarrow stems
+    Number of yarrow flower stems per m^2
+Area
+    area A, B, C
+
+*Source:* D.J. Saville, G. R. Wood: /Statistical Methods: The Geometric
+Approach/. Ch. 15, Ch. 17. New York:Springer 1991.
+

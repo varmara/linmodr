@@ -1,0 +1,30 @@
+TREAT,TIME,RICHNESS
+control,2, 5
+control,2, 7
+control,2, 5
+control,2, 7
+control,2, 5
+control,4,20
+control,4,18
+control,4,20
+control,4,18
+control,4,17
+control,6,25
+control,6,27
+control,6,26
+control,6,26
+nutrient,2, 6
+nutrient,2, 8
+nutrient,2, 6
+nutrient,2, 6
+nutrient,2, 7
+nutrient,4,33
+nutrient,4,36
+nutrient,4,27
+nutrient,4,22
+nutrient,4,30
+nutrient,6,32
+nutrient,6,28
+nutrient,6,36
+nutrient,6,29
+nutrient,6,40

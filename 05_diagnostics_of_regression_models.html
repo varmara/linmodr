@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Диагностика линейных моделей</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Диагностика линейных моделей',
+                        subtitle: 'Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: '05_diagnostics_of_regression_models_files/logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Вадим Хайтов, Марина Варфоломеева' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(05_diagnostics_of_regression_models_files/logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="05_diagnostics_of_regression_models_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Мы рассмотрим</h2></hgroup><article  id="-">
+
+<ul>
+<li>Диагностика линейных моделей</li>
+<li></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Зависит ли уровень интеллекта от размера головного мозга?</h2></hgroup><article  id="-------" class="flexbox vcenter">
+
+<p>С этим примером мы познакомились в прошлый раз.</p>
+
+<div class="columns-2">
+<ul>
+<li>Было исследовано 20 девушек и 20 молодых людей</li>
+<li>У каждого индивида определяли биометрические параметры: вес, рост, размер головного мозга (количество пикселей на изображении ЯМР сканера)</li>
+<li>Интеллект был протестирован с помощью IQ тестов</li>
+</ul>
+
+<p>Пример взят из работы: Willerman, L., Schultz, R., Rutledge, J. N., and Bigler, E. (1991), &quot;In Vivo Brain Size and Intelligence,&quot; Intelligence, 15, 223-228.<br/>Данные представлены в библиотеке <em>&quot;The Data and Story Library&quot;</em> <a href='http://lib.stat.cmu.edu/DASL/' title=''>http://lib.stat.cmu.edu/DASL/</a></p>
+
+<p><img src="images/MRI.png" width="500" height="500" ></p></div>
+
+</article></slide><slide class=''><hgroup><h2>Посмотрим на датасет</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>brain &lt;- read.csv(&quot;data/IQ_brain.csv&quot;, header = TRUE)
+head(brain)</pre>
+
+<pre >##   Gender FSIQ VIQ PIQ Weight Height MRINACount
+## 1 Female  133 132 124    118   64.5     816932
+## 2   Male  140 150 124     NA   72.5    1001121
+## 3   Male  139 123 150    143   73.3    1038437
+## 4   Male  133 129 128    172   68.8     965353
+## 5 Female  137 132 134    147   65.0     951545
+## 6 Female   99  90 110    146   69.0     928799</pre>
+
+</article></slide><slide class=''><hgroup><h2>Подберем модель, наилучшим образом описывающую зависимость результатов IQ-теста от размера головного мозга</h2></hgroup><article  id="-------iq-----">
+
+<pre class = 'prettyprint lang-r'>brain_model &lt;- lm(PIQ ~ MRINACount, data = brain)
+brain_model</pre>
+
+<pre >## 
+## Call:
+## lm(formula = PIQ ~ MRINACount, data = brain)
+## 
+## Coefficients:
+## (Intercept)   MRINACount  
+##     1.74376      0.00012</pre>
+
+</article></slide><slide class=''><hgroup><h2>Анализ остатков линейных моделей</h2></hgroup><article  id="---">
+
+<h3>Проверка на наличие влиятельных наблюдений</h3>
+
+<h3>Проверка условий применимости линейных моделей</h3>
+
+<ol>
+<li>Линейность связи между зависимой перменной (\(Y\)) и предикторами (\(X\))</li>
+<li>Независимость \(Y\) друг от друга</li>
+<li>Нормальное распределение \(Y\) для каждого уровня значенй \(X\)</li>
+<li>Гомогенность дисерсии \(Y\) в пределах всех уровней значений \(X\)</li>
+<li>Отсутствие коллинеарности предикторов (для можественной регрессии)</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Первый этап диагностики линейных моделей - это проверка на наличие влиятельных наблюдений</h2></hgroup><article  id="------------">
+
+<p><em>Влиятельные наблюдения</em> - наблюдения, вносящие слишком большой вклад в оценку парметров (коэффициентов) модели.</p>
+
+<p><img src="figure/leverage.png" width="400" height="400" ></p>
+
+<div class="footnote">
+<p>Из кн. Quinn &amp; Keugh, 2002</p></div>
+
+</article></slide><slide class=''><hgroup><h2>Сначала научимся извлекать из результатов необходимые сведения:</h2></hgroup><article  id="------" class="smaller columns-2">
+
+<p>Для этого служит функция <code>fortify()</code> из пакета <code>{ggplot2}</code></p>
+
+<pre class = 'prettyprint lang-r'>require(ggplot2)
+brain_diag &lt;- fortify(brain_model)
+head(brain_diag, 2)</pre>
+
+<pre >##   PIQ MRINACount   .hat .sigma  .cooksd .fitted .resid .stdresid
+## 1 124     816932 0.0664   20.9 0.049838     100  24.02    1.1840
+## 2 124    1001121 0.0669   21.3 0.000304     122   1.87    0.0921</pre>
+
+<p><br> <br> <em>Уже знакомые:</em></p>
+
+<p><code>.fitted</code> - предсказанные значения<br/><code>.resid</code> - остатки<br/><br> <em>Новые величины, которые нам понадобятся:</em> <br> <br></p>
+
+<p><code>.hat</code> - &quot;воздействие&quot; данного наблюдения (<em>leverage</em>)<br/><code>.cooksd</code> - расстояние Кука<br/><code>.stdresid</code> - стандартизованные остатки</p>
+
+</article></slide><slide class=''><hgroup><h2>Типы остатков</h2></hgroup><article  id="-">
+
+<p>Просто остатки: \[e_i = y_i - \hat{y_i}\]</p>
+
+<p>Стандартизованные остатки: \[\frac{e_i}{\sqrt{MS_{Residual}}}\]</p>
+
+<p>Стьюдентовские остатки: \[\frac{e_i}{\sqrt{MS_{Residual}(1-h_i)}}\]</p>
+
+<p>Последние удобнее, так как можно сказать какие остатки большие, а какие маленькие при сравнении разных моделей</p>
+
+</article></slide><slide class=''><hgroup><h2>Воздействие точек \(h_i\), <code>.hat</code> (Leverage)</h2></hgroup><article  id="--h_i-.hat-leverage" class="columns-2">
+
+<p><img src="figure/leverage.png" width="300" height="300" ></p>
+
+<p><img src="figure/see-saw.png" width="300" height="300" ></p>
+
+<h3>Эта велична, показывает насколько каждое значение \(x_i\) влияет на ход линии регрессии, то есть на \(\hat{y_i}\)</h3>
+
+<ul>
+<li>Точки, располагающиеся дальше от \(\bar{x}\), оказывают более сильное влияние на \(\hat{y_i}\)<br/></li>
+<li>Эта величина, в норме, варьирует в промежутке от \(1/n\) до 1<br/></li>
+<li>Если \(h_i &gt; 2(p/n)\), то надо внимательно посмотреть на данное значение<br/></li>
+<li>Удобнее другая величина - расстояние Кука</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Расстояние Кука (Cook&#39;s distance)</h2></hgroup><article  id="--cooks-distance" class="columns-2">
+
+<h3>Описывает как повлияет на модель удаление данного наблюдения</h3>
+
+<p>\[D_i = \frac{\sum{(\hat{y_j}-\hat{y}_{j(i)})^2}}{pMSE}\] \(\hat{y_j}\) - значение предсказанное полной моделью<br/>\(\hat{y}_{j(i)}\) - значение, предказанное моделью, построенной без учета \(i\)-го значения предиктора<br/>\(p\) - количество параметров в модели<br/>\(MSE\) - среднеквадратичная ошибка модели<br/><br> Расстояние Кука одновременно учитывает величину остатков по всей модели и влиятельность (leverage) отдельных точек <br><br/>- Распределение статистики \(D_i\) близко к F-распределению<br/>- Если расстояние Кука \(D_i &gt; 1\), то данное наблюдение можно рассматривать как выброс (outlier)<br/><br> - Для более жесткого выделения выбросов используют пороговую величину, зависящую от объема выборки \(D_i &gt; 4/(N − k − 1)\).<br/>N - Объем выборки, k - число предикторов.</p>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article >
+
+<p>Для модели <code>brain_model</code> постройте график рссеяния стандартизированных остатков в зависимости от предсказанных значений</p>
+
+<p><em>Hint</em>: вспомните, что мы уже получили датафрейм <code>brain_diag</code></p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article >
+
+<pre class = 'prettyprint lang-r'>ggplot(data = brain_diag, aes(x = .fitted, y = .stdresid)) + geom_point() + 
+    geom_hline(aes(yintercept = 0))</pre>
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Внесем некоторые дополнения</h2></hgroup><article  id="--" class="smaller columns-2">
+
+<pre class = 'prettyprint lang-r'>ggplot(data = brain_diag, aes(x = .fitted, y = .stdresid)) +
+  geom_point(aes(size = .cooksd)) + 
+  geom_hline(yintercept = 0) + 
+  geom_smooth(method=&quot;loess&quot;, se=FALSE) </pre>
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto auto auto 0;" /></p>
+
+<p>Что мы видим?<br/>- Большая часть стандартизованных остатков в пределах двух стандартных отклонений.<br/>- Есть одно влиятельное наблюдение, которое нужно проверить, но сила его влияния невелика.<br/>- Среди остатков нет тренда.<br/>- Но есть иной паттерн!</p>
+
+</article></slide><slide class=''><hgroup><h2>Что делать с влиятельными наблюдениями?</h2></hgroup><article  id="----">
+
+<h3>Метод 1. Удаление влиятельных наблюдений</h3>
+
+<p><em>Будьте осторожны!</em> Отскакивающие значения могут иметь важное значение. Удалять следует только очевидные ошибки в наблюдениях.<br/>После их удаления необходимо пересчитать модель.</p>
+
+</article></slide><slide class=''><hgroup><h2>Что делать с влиятельными наблюдениями?</h2></hgroup><article  id="-----1">
+
+<h3>Метод 2. Преобразование переменных</h3>
+
+<p>Наиболее частые преобразования, используемые для построения линейных моделей</p>
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left">Трансформация</th>
+<th align="left">Формула</th>
+</tr>
+<tr class="odd">
+<td align="left">-2</td>
+<td align="left">\(1/Y^2\)</td>
+</tr>
+<tr class="even">
+<td align="left">-1</td>
+<td align="left">\(1/Y\)</td>
+</tr>
+<tr class="odd">
+<td align="left">-0.5</td>
+<td align="left">\(1/\sqrt(Y)\)</td>
+</tr>
+<tr class="even">
+<td align="left">логарифмирование</td>
+<td align="left">\(log(Y)\)</td>
+</tr>
+<tr class="odd">
+<td align="left">логит</td>
+<td align="left">\(ln(\frac{Y}{1-Y})\)</td>
+</tr>
+</table>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Условия применимости линейных моделей (Assumptions)</h2></hgroup><article  id="----assumptions">
+
+</article></slide><slide class=''><hgroup><h2>1. Линейность связи</h2></hgroup><article  id="-">
+
+<p>Нелинейные зависимости не всегда видны на исходных графиках в осях Y vs X</p>
+
+<p>Они становятся лучше заметны на графиках рассеяния остатков (Residual plots)</p>
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Что делать, если связь нелинейна?</h2></hgroup><article  id="----">
+
+<ol>
+<li>Можно применить линеаризующее преобразование<br/></li>
+<li>Можно построить нелинейную модель (об этом будем говорить отдельно)</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Пример линеаризующего преобразования</h2></hgroup><article  id="--">
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>2. Независимость \(Y\) друг от друга</h2></hgroup><article  id="-y---">
+
+<ul>
+<li>Каждое значение \(Y_i\) должно быть независимо от любого \(Y_j\)</li>
+<li>Это должно контролироваться на этапе планирования сбора матриала</li>
+<li>Наиболее частые источники зависимостей:
+
+<ul>
+<li>псевдоповторности<br/></li>
+<li>временные и пространственые автокорреляции<br/></li>
+</ul></li>
+<li>Взаимозависимоти могут проявляться на графиках рассеяния остатков (Residual plots)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Симулированный пример: Автокоррелированные данные.</h2></hgroup><article  id="---.">
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-7-1.png" width="480" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Критерий Дарбина-Уотсона: Формальный тест на автокорреляцию</h2></hgroup><article  id="------">
+
+<pre class = 'prettyprint lang-r'>library(car)
+brain_model &lt;- lm(PIQ ~ MRINACount, data = brain)
+durbinWatsonTest(brain_model)</pre>
+
+<pre >##  lag Autocorrelation D-W Statistic p-value
+##    1           0.229          1.47   0.102
+##  Alternative hypothesis: rho != 0</pre>
+
+</article></slide><slide class=''><hgroup><h2>Симулированный пример: Автокоррелированные данные.</h2></hgroup><article  id="---.-1" class="smaller columns-2">
+
+<p>Данные имеют ярко выраженную автокорреляцию <img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p><br> <br></p>
+
+<pre class = 'prettyprint lang-r'>lm_autocor &lt;- lm(y ~ x, data = dat)
+durbinWatsonTest(lm_autocor)</pre>
+
+<pre >##  lag Autocorrelation D-W Statistic p-value
+##    1           0.467          1.03       0
+##  Alternative hypothesis: rho != 0</pre>
+
+</article></slide><slide class=''><hgroup><h2>3. Нормальное распределение \(Y\) для каждого уровня значенй \(X\)</h2></hgroup><article  id="--y-----x" class="smaller columns-2">
+
+<p><img src="figure/Zuur.png" width="400" height="300" ></p>
+
+<p><img src="figure/Normality.png" width="400" height="200" > * \(Y_i \sim N(\mu_{y_i}, \sigma^2)\) * В идеале, каждому \(X_i\) должно соответствовать большое количество наблюдений \(Y\) * На практике такое бывает только в случае моделей с дискретными предикторами * Соответствие нормальности распределения можно оценить по &quot;поведению&quot; <em>случайной части модели</em>.</p>
+
+</article></slide><slide class=''><hgroup><h2>Фиксированная и случайная часть модели</h2></hgroup><article  id="----">
+
+<p>\[y_i = \beta_0 + \beta_1x_i + \epsilon_i\]</p>
+
+<ul class = 'build'>
+<li>Фиксированная часть: \(y_i = \beta_0 + \beta_1x_i\) задает жесткую связь между \(x_i\) и \(y_i\)</li>
+<li>Случайная часть: \(\epsilon_i\)</li>
+<li>Так как \(y_i - \beta_0 - \beta_1x_i = 0\), то \(\epsilon_i \sim N(0, \sigma^2)\)</li>
+<li>Если с моделью все ОК, то условие нормального распределения остатков должно соблюдаться</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Можно построить частотное распределение остатков</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>ggplot(brain_model, aes(x = .stdresid)) + geom_histogram(binwidth = 0.4, 
+    fill = &quot;blue&quot;, color = &quot;black&quot;)</pre>
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>На частотной гистограмме остатков НЕ ВСЕГДА хорошо видны отклонения от нормальности</p>
+
+</article></slide><slide class=''><hgroup><h2>Проверка нормальности распределения остатков с помощью нормальновероятностного графика стандартизованных остатков</h2></hgroup><article  id="---------" class="columns-2">
+
+<pre class = 'prettyprint lang-r'>library(car)
+qqPlot(brain_model)</pre>
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-12-1.png" width="480" style="display: block; margin: auto;" /></p>
+
+<p><br> <br> <em>Квантиль</em> - значение, которое заданная случайная величина не превышает с фиксированной вероятностью.</p>
+
+<p>Если точки - это случайные величины из \(N(0, \sigma^2)\), то они должны лечь вдоль прямой \(Y=X\)</p>
+
+</article></slide><slide class=''><hgroup><h2>Все то же самое с использоваением возможностей <code>ggplot</code></h2></hgroup><article  id="-------ggplot">
+
+<pre class = 'prettyprint lang-r'>mean_val &lt;- mean(brain_diag$.stdresid)
+sd_val &lt;- sd(brain_diag$.stdresid)
+ggplot(brain_diag, aes(sample = .stdresid)) + geom_point(stat = &quot;qq&quot;) + 
+    geom_abline(intercept = mean_val, slope = sd_val)</pre>
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Мы видим, что отклонения от нормальности есть!<br/>Но! Метод устойчив к небольшим отклонениям от нормальности.</p>
+
+</article></slide><slide class=''><hgroup><h2>4. Постоянство дисперсии - гомоскедастичность</h2></hgroup><article  id="----">
+
+<p>Это самое важное ограничивающее условие!<br/>Многие тесты чувствительны к гетероскедастичности.</p>
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Формальные тесты на гетероскедастичность</h2></hgroup><article  id="---" class="columns-2">
+
+<ul>
+<li>Для линейных моделей с непрерывным предиктором применяется, например, тест Бройша-Пагана (Breusch-Pagan test)<br/></li>
+<li>Для моделей с дискретными предикторами чаще применяют тест Кокрана (Cochran test)</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(lmtest)
+#Симулированные данные
+bptest(y ~ x, data = dat) </pre>
+
+<pre >## 
+##  studentized Breusch-Pagan test
+## 
+## data:  y ~ x
+## BP = 90, df = 1, p-value &lt;2e-16</pre>
+
+<pre class = 'prettyprint lang-r'>#Реальные данные
+bptest(PIQ ~ MRINACount, data = brain) </pre>
+
+<pre >## 
+##  studentized Breusch-Pagan test
+## 
+## data:  PIQ ~ MRINACount
+## BP = 3, df = 1, p-value = 0.1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Что делать если вы столкнулись с гетероскедастичностью?</h2></hgroup><article  id="------">
+
+<p>Решение 1. Применить преобразование зависимой переменной (в некоторых случаях и предиктора).</p>
+
+<p><img src="05_diagnostics_of_regression_models_files/figure-html/unnamed-chunk-16-1.png" width="576" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Что делать если вы столкнулись с гетероскедастичностью?</h2></hgroup><article  id="-------1">
+
+<p>Решение 1. Применить преобразование зависимой переменной (в некоторых случаях и предиктора).</p>
+
+<h3>Недостатки:</h3>
+
+<ol>
+<li>Не всегда спасает.<br/></li>
+<li>Модель описывает поведение не исходной, а преобразованной величины. <em>&quot;Если вы не можете доказать А, докажите В и сделайте вид, что это было А&quot;</em> (Кобаков, 2014)</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Что делать если вы столкнулись с гетероскедастичностью?</h2></hgroup><article  id="-------2">
+
+<p>Решение 2. Построить более сложную модель, которая учитывала бы гетерогенность дисперсии зависимой перменной.</p>
+
+<p>&quot;Welcome to our world, the world of <em>mixed effects modelling</em>.&quot;(Zuur et al., 2009)</p>
+
+<p>Об этом речь впереди!</p>
+
+</article></slide><slide class=''><hgroup><h2>Некоторые распространенные паттерны на диаграммах рассеяния остатков</h2></hgroup><article  id="------" class="columns-2">
+
+<p><img src="figure/Residuals.png" width="500" height="500" ></p>
+
+<p>из Logan, 2010, стр. 174</p>
+
+<ol>
+<li>Случайное рассеяние остатков. Гомогенность дисперсии и линейность соблюдаются. <em>Модель хорошая!</em><br/></li>
+<li>Клиновидный паттерн. Есть гетероскедастичность. <em>Модель плохая!</em><br/></li>
+<li>Остатки рассеяны равномерно, но модель неполна. Нужны дополниетльные предикторы. <em>Модель можно улучшить!</em><br/></li>
+<li>Нелинейнй паттерн сохранился. Линейная модель применена некорректно. <em>Модель плохая!</em></li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Можно автоматически проверить соблюдение условий применимости с помощью средств R</h2></hgroup><article  id="---------r" class="smaller">
+
+<p>HO будьте осторожны!</p>
+
+<pre class = 'prettyprint lang-r'>library(gvlma)
+gvlma(brain_model)</pre>
+
+<pre >## 
+## Call:
+## lm(formula = PIQ ~ MRINACount, data = brain)
+## 
+## Coefficients:
+## (Intercept)   MRINACount  
+##     1.74376      0.00012  
+## 
+## 
+## ASSESSMENT OF THE LINEAR MODEL ASSUMPTIONS
+## USING THE GLOBAL TEST ON 4 DEGREES-OF-FREEDOM:
+## Level of Significance =  0.05 
+## 
+## Call:
+##  gvlma(x = brain_model) 
+## 
+##                    Value p-value                Decision
+## Global Stat        2.459   0.652 Assumptions acceptable.
+## Skewness           0.121   0.728 Assumptions acceptable.
+## Kurtosis           1.849   0.174 Assumptions acceptable.
+## Link Function      0.100   0.751 Assumptions acceptable.
+## Heteroscedasticity 0.388   0.533 Assumptions acceptable.</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание: Выполните три блока кода (см. код лекции).</h2></hgroup><article  id="-----.--.">
+
+<h3>Какие нарушения условий применимости линейных моделей здесь наблюдаются?</h3>
+
+</article></slide><slide class=''><hgroup><h2>Что нужно писать в тексте статьи по поводу проверки валидности моделей?</h2></hgroup><article  id="----------">
+
+<ul class = 'build'>
+<li>Вариант 1. Привести электронные дополнительные материалы с необходимыми графиками.</li>
+<li>Вариант 2. Привести в тексте работы результаты применения тестов на гомогеность дисперси, автокоррелированность (если используются пространственые или временные предикторы) и нормальность распределиня остатков.</li>
+<li>Вариант3. Написать в главе <em>&quot;Материал и методика&quot;</em> фразу вроде такой: &quot;Визуальная проверка графиков рассяния остатков не выявила заметных отклонений от условий равенства дисперсий и нормальности&quot;.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Summary</h2></hgroup><article  id="summary">
+
+<ul class = 'build'>
+<li>Не любая модель с достверными результатами проверки \(H_0\) валидна.<br/></li>
+<li>Обязательный этап работы с моделями - проверка условий применимости.<br/></li>
+<li>Наиболее важную информацию о валидности модели дает анализ остатков.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Что почитать</h2></hgroup><article  id="-">
+
+<ul>
+<li>Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014.</li>
+<li>Quinn G.P., Keough M.J. (2002) Experimental design and data analysis for biologists, pp. 92-98, 111-130</li>
+<li>Diez D. M., Barr C. D., Cetinkaya-Rundel M. (2014) Open Intro to Statistics., pp. 354-367.</li>
+<li>Logan M. (2010) Biostatistical Design and Analysis Using R. A Practical Guide, pp. 170-173, 208-211</li>
+<li>Legendre P., Legendre L. (2012) Numerical ecology. Second english edition. Elsevier, Amsterdam.</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

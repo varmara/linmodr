@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Знакомство с R</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #0000ff; } /* Keyword */
+code > span.ch { color: #008080; } /* Char */
+code > span.st { color: #008080; } /* String */
+code > span.co { color: #008000; } /* Comment */
+code > span.ot { color: #ff4000; } /* Other */
+code > span.al { color: #ff0000; } /* Alert */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #008000; font-weight: bold; } /* Warning */
+code > span.cn { } /* Constant */
+code > span.sc { color: #008080; } /* SpecialChar */
+code > span.vs { color: #008080; } /* VerbatimString */
+code > span.ss { color: #008080; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { } /* Variable */
+code > span.cf { color: #0000ff; } /* ControlFlow */
+code > span.op { } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #ff4000; } /* Preprocessor */
+code > span.do { color: #008000; } /* Documentation */
+code > span.an { color: #008000; } /* Annotation */
+code > span.cv { color: #008000; } /* CommentVar */
+code > span.at { } /* Attribute */
+code > span.in { color: #008000; } /* Information */
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="assets/my_styles.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.9em;
+  padding-left: 5px;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+  padding-left: 10px;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/linmodr-course/">Proteomics course</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="index.html">Начало</a></li>
+        <li><a href="resources.html">Ссылки и ресурсы</a></li>
+        <li><a href="coding_practices.html">Правила хорошего кода</a></li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Знакомство с R</h1>
+
+</div>
+
+
+<div class="section level1">
+<h1>Комментарии</h1>
+<p>Комментарии в текстах программ обозначаются символом #</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># это комментарии, они не будут выполняться</span></code></pre></div>
+</div>
+<div id="----rstudio" class="section level1">
+<h1>Полезные клавиатурные сокращения в RStudio</h1>
+<ul>
+<li><code>Ctrl + Shift + C</code> - закомментировать/раскомментировать выделенный фрагмент кода</li>
+<li><code>Ctrl + Enter</code> - отправляет строку из текстового редактора в консоль, а если выделить несколько строк, то будет выполнен этот фрагмент кода.</li>
+<li><code>Tab</code> или <code>Ctrl + Space</code> - нажмите после того как начали набирать название функции или переменной, и появится список автоподстановки. Это помогает печатать код быстро и с меньшим количеством ошибок.</li>
+</ul>
+</div>
+<div id="--" class="section level1">
+<h1>Устанавливаем рабочую директорию</h1>
+<p>Есть несколько способов установки пути к рабочей директории:</p>
+<ol style="list-style-type: decimal">
+<li>Выберите в меню Session -&gt; Set working Directory… -&gt; To Source File Location (Если вы уже сохранили код).</li>
+<li>На вкладке Files в одной из рабочих областей RStudio выберите многоточие … -&gt; в открывшемся системном диалоге выбора файлов найдите директорию, в которой лежит ваш код и нажмите OK</li>
+<li>Можно вручную прописать путь к рабочей директории в кавычках в качестве аргумента функции setwd</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;~/lect-linmodr/Intro&quot;</span>)</code></pre></div>
+</div>
+<div id="--" class="section level1">
+<h1>Как получить помощь</h1>
+<ol style="list-style-type: decimal">
+<li>В RStudio можно поставить курсор на слово setwd и нажать F1</li>
+<li>Перед названием функции можно напечатать знак вопроса и выполнить эту строку ?setwd</li>
+<li>Можно воспользоваться функцией help()</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">help</span>(<span class="st">&quot;setwd&quot;</span>)</code></pre></div>
+</div>
+<div id="r----" class="section level1">
+<h1>R как калькулятор, математические операции</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2+2</span></code></pre></div>
+<pre><code>## [1] 4</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1024</span>/<span class="dv">2</span></code></pre></div>
+<pre><code>## [1] 512</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1</span>:<span class="dv">10</span></code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">34</span>*<span class="dv">4</span></code></pre></div>
+<pre><code>## [1] 136</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2</span>^<span class="dv">4</span></code></pre></div>
+<pre><code>## [1] 16</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(<span class="dv">27</span>)</code></pre></div>
+<pre><code>## [1] 5.196152</code></pre>
+</div>
+<div class="section level1">
+<h1>Переменные</h1>
+<p>Оператор присваивания это символ стрелочки <code>&lt;-</code>. Он работает справа налево, это значит, что значение выражения в его правой части присваивается объекту в левой части.</p>
+<p>Переменные - это такие контейнеры, в которые можно положить разные данные и даже функции.</p>
+<p>Имена переменных могут содержать латинские буквы обоих регистров, символы точки . и подчеркивания _ , а так же цифры. Имена переменных должны начинаться с латинских букв. Создавайте понятные и “говорящие” имена переменных.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">var_1 &lt;-<span class="st"> </span><span class="dv">1024</span> /<span class="st"> </span><span class="dv">2</span>
+<span class="dv">1238</span> *<span class="st"> </span><span class="dv">3</span> -&gt;<span class="st"> </span>var_2
+var_2</code></pre></div>
+<pre><code>## [1] 3714</code></pre>
+<p>Как выбрать название переменной?</p>
+<ul>
+<li><code>a</code> - плохо, и даже <code>b</code>, <code>с</code>, или <code>х</code>. Но в некоторых случаях допустимо:)</li>
+<li><code>var1</code> - плохо, но уже лучше</li>
+<li><code>var_1</code> - плохо, но уже лучше</li>
+<li><code>shelllength</code> - говорящее, но плохо читается</li>
+<li><code>shell_length</code>, <code>wing_colour</code> или <code>leg_num</code> - хорошие говорящие и читабельные названия</li>
+</ul>
+</div>
+<div id="-" class="section level1">
+<h1>Структуры данных</h1>
+<p>Данные в R можно хранить в виде разных объектов.</p>
+<p>В результате выполнения следующих команд получаются <em>скалярные величины</em>. Просто числа. Одно выражение - одно значение</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">23</span></code></pre></div>
+<pre><code>## [1] 23</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(<span class="dv">25</span>)</code></pre></div>
+<pre><code>## [1] 5</code></pre>
+<p>На самом деле, эти величины - просто векторы единичной длины</p>
+<div class="section level2">
+<h2>Векторы</h2>
+<p><em>Векторы</em> - один объект, внутри которого несколько значений.</p>
+<div id="--" class="section level3">
+<h3>Способы создания векторов:</h3>
+<ul>
+<li>Оператор: используется для создания целочисленных векторов, где значения следуют одно за другим без пропусков</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1</span>:<span class="dv">10</span> <span class="co"># от одного до 10</span></code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">-<span class="dv">5</span>:<span class="dv">3</span> <span class="co"># от -5 до 3</span></code></pre></div>
+<pre><code>## [1] -5 -4 -3 -2 -1  0  1  2  3</code></pre>
+<ul>
+<li>Функция <code>c()</code> - от англ. concatenate. Следите, чтобы было английское си, а не русское эс:).</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">?c <span class="co"># посмотрите хелп к функции</span></code></pre></div>
+<p>Функция <code>c</code> принимает несколько (произвольное количество) аргументов, разделенных запятыми. Она собирает из них вектор.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>)</code></pre></div>
+<pre><code>## [1] 2 4 6</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(-<span class="fl">9.3</span>, <span class="dv">0</span>, <span class="fl">2.17</span>, <span class="fl">21.3</span>)</code></pre></div>
+<pre><code>## [1] -9.30  0.00  2.17 21.30</code></pre>
+<p>Векторы можно хранить в переменных для последующего использования</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num &lt;-<span class="st"> </span>-<span class="dv">11</span>:<span class="dv">12</span> <span class="co"># численный вектор от -11 до 12 сохранен в переменной vect_num</span>
+vect_num_1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1.3</span>, <span class="fl">1.7</span>, <span class="fl">1.2</span>, <span class="fl">0.9</span>, <span class="fl">1.6</span>, <span class="fl">1.4</span>) <span class="co"># численный вектор, сохранен в переменной vect_num_1</span></code></pre></div>
+</div>
+<div id="--" class="section level3">
+<h3>Адресация внутри векторов</h3>
+<p>При помощи оператора <code>[]</code>, мужно обратится к некоторым элементам вектора. В квадратных скобках вам нужно указать один или несколько порядковых номеров элементов</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">1</span>] <span class="co"># первый элемент в векторе vect_num</span></code></pre></div>
+<pre><code>## [1] -11</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">10</span>] <span class="co"># 10-й элемент</span></code></pre></div>
+<pre><code>## [1] -2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">22</span>]</code></pre></div>
+<pre><code>## [1] 10</code></pre>
+<p>Если вам нужно несколько элементов, то их нужно передать квадратным скобкам в виде вектора. Например, нам нужны элементы с 3 по 5. Вот вектор, который содержит значения 3, 4 и 5.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">3</span>:<span class="dv">5</span></code></pre></div>
+<pre><code>## [1] 3 4 5</code></pre>
+<p>Если мы его напишем в квадратных скобках, то добудем элементы с такими порядковыми номерами</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">3</span>:<span class="dv">5</span>]</code></pre></div>
+<pre><code>## [1] -9 -8 -7</code></pre>
+<p>Аналогично, если вам нужны элементы не подряд, то передайте вектор с номерами элементов, который вы создали при помощи функции c() c(2, 4, 6) # это вектор содержащий 2, 4 и 6, поэтому</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>)] <span class="co"># возвращает 2-й, 4-й и 6-й элементы</span></code></pre></div>
+<pre><code>## [1] -10  -8  -6</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">20</span>)] <span class="co"># возвращает 1-й, 10-й и 20-й элементы</span></code></pre></div>
+<pre><code>## [1] -11  -2   8</code></pre>
+<p>Вектор - одномерный объект. У его элементов только один порядковый номер (индекс). Поэтому при обращении к элементам вектора нужно указывать только одно число или один вектор с адресами.</p>
+<p>Правильно:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>)] <span class="co"># возвращает 1-й, 3-й и 5-й элементы</span></code></pre></div>
+<pre><code>## [1] -11 -10  -7</code></pre>
+<p>Но R выдаст ошибку, если при обращении к вектору, вы не создавали вектор, а просто перечислили номера элементов через запятую.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>] <span class="co"># ошибка</span>
+vect_num[<span class="dv">15</span>, <span class="dv">9</span>, <span class="dv">1</span>] <span class="co"># ошибка</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">15</span>, <span class="dv">9</span>, <span class="dv">1</span>)] <span class="co"># правильно</span></code></pre></div>
+<pre><code>## [1]   3  -3 -11</code></pre>
+<p>При помощи функции c() можно объединять несколько векторов и скаляров в один вектор</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">5</span>:<span class="dv">9</span>)</code></pre></div>
+<pre><code>## [1] 1 1 5 6 7 8 9</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(vect_num, vect_num)</code></pre></div>
+<pre><code>##  [1] -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4   5
+## [18]   6   7   8   9  10  11  12 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2
+## [35]  -1   0   1   2   3   4   5   6   7   8   9  10  11  12</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="dv">100</span>, vect_num)</code></pre></div>
+<pre><code>##  [1] 100 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4
+## [18]   5   6   7   8   9  10  11  12</code></pre>
+<p>Добываем 1, 3, 5 и с 22 по 24 элементы</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">22</span>:<span class="dv">24</span>)]</code></pre></div>
+<pre><code>## [1] -11  -9  -7  10  11  12</code></pre>
+</div>
+</div>
+</div>
+<div id="---r" class="section level1">
+<h1>Типы данных в R</h1>
+<div id="-" class="section level2">
+<h2>Числовые данные</h2>
+<p>только что видели</p>
+</div>
+<div id="-" class="section level2">
+<h2>Текстовые данные</h2>
+<p>Каждый текстовый элемент (говорят “строка” - string) должен быть окружен кавычками - двойными или одинарными</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">&quot;это текст&quot;</span></code></pre></div>
+<pre><code>## [1] &quot;это текст&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">&#39;это тоже текст&#39;</span></code></pre></div>
+<pre><code>## [1] &quot;это тоже текст&quot;</code></pre>
+<p>Текстовые значения можно объединять в вектора.</p>
+<p>Это текстовый вектор</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;violet&quot;</span>)
+rainbow <span class="co"># весь вектор</span></code></pre></div>
+<pre><code>## [1] &quot;red&quot;    &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
+<p>Добываем первый и последний элементы</p>
+<p>В данном случае я точно знаю, что их 6, мне нужны 1 и 6.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">6</span>)]</code></pre></div>
+<pre><code>## [1] &quot;red&quot;    &quot;violet&quot;</code></pre>
+<p>Добываем элементы с 3 по 6</p>
+<p>Если у вас вдруг слишком короткий вектор в этом задании, то можно склеить новый из двух</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">double_rainbow &lt;-<span class="st"> </span><span class="kw">c</span>(rainbow, rainbow)
+double_rainbow</code></pre></div>
+<pre><code>##  [1] &quot;red&quot;    &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot; &quot;red&quot;   
+##  [8] &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow[<span class="dv">3</span>:<span class="dv">6</span>] <span class="co"># элементы с 3 по 6</span></code></pre></div>
+<pre><code>## [1] &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
+</div>
+<div id="-" class="section level2">
+<h2>Логические данные</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="ot">TRUE</span> <span class="co"># истина</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="ot">FALSE</span> <span class="co"># ложь</span></code></pre></div>
+<pre><code>## [1] FALSE</code></pre>
+<p>Для ленивых - можно сокращать первыми заглавными буквами. Но лучше так не делать, чтобы читать программы было легче</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(T, T, T, T, F, F, T, T)</code></pre></div>
+<pre><code>## [1]  TRUE  TRUE  TRUE  TRUE FALSE FALSE  TRUE  TRUE</code></pre>
+<p>Логический вектор</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">TRUE</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>, <span class="ot">FALSE</span>, <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## [1]  TRUE  TRUE  TRUE FALSE FALSE  TRUE</code></pre>
+<p>Еще логический вектор</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">short_logical_vector &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="ot">FALSE</span>, <span class="ot">TRUE</span>)</code></pre></div>
+<p>Создаем длинный логический вектор.</p>
+<p>Чтобы создавать длинные вектора из повторяющихся элементов, можно использовать функцию rep()</p>
+<pre><code>?rep</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rep</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">times =</span> <span class="dv">3</span>) <span class="co"># 1 повторяется 3 раза</span></code></pre></div>
+<pre><code>## [1] 1 1 1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rep</span>(<span class="dt">x =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">times =</span> <span class="dv">5</span>) <span class="co"># &quot;red&quot; повторяется 5 раз</span></code></pre></div>
+<pre><code>## [1] &quot;red&quot; &quot;red&quot; &quot;red&quot; &quot;red&quot; &quot;red&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rep</span>(<span class="dt">x =</span> <span class="ot">TRUE</span>, <span class="dt">times =</span> <span class="dv">2</span>) <span class="co"># TRUE повторяется 2 раза</span></code></pre></div>
+<pre><code>## [1] TRUE TRUE</code></pre>
+<p>В R названия аргументов функций можно не указывать, если вы используете аргументы в том же порядке, что прописан в help к этой функции.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">5</span>) <span class="co"># TRUE повторяется 5 раз, аргументы без названий</span></code></pre></div>
+<pre><code>## [1] TRUE TRUE TRUE TRUE TRUE</code></pre>
+<p>Создаем логический вектор, где TRUE повторяется 3 раза, FALSE 3 раза и TRUE 4 раза. Результат сохраняем в переменной vect_log</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_log &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="ot">FALSE</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">4</span>))
+vect_log</code></pre></div>
+<pre><code>##  [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE</code></pre>
+</div>
+<div class="section level2">
+<h2>Факторы</h2>
+<p>Факторы - это способ хранения дискретных (=категориальных данных). Например, если вы поймали 10 улиток и посмотрели их цвет. У большого количества улиток небольшое счетное количество возможных цветов.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">snail_colours &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;yellow&quot;</span>)
+snail_colours <span class="co"># это текстовый вектор.</span></code></pre></div>
+<pre><code>## [1] &quot;red&quot;    &quot;green&quot;  &quot;green&quot;  &quot;green&quot;  &quot;yellow&quot; &quot;yellow&quot; &quot;yellow&quot; &quot;yellow&quot;</code></pre>
+<p>Но цвет “желтый” обозначает одно и то же для каждой из улиток. Поэтому в целях экономии места можно записать цвета этих улиток в виде вектора, в котором численным значениям будут сопоставлены “этикетки” (называются “уровни” - levels) - названия цветов. Мы можем создать “фактор” цвет улиток.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">factor</span>(snail_colours)</code></pre></div>
+<pre><code>## [1] red    green  green  green  yellow yellow yellow yellow
+## Levels: green red yellow</code></pre>
+<p>уровни этого фактора</p>
+<ul>
+<li>1 - green,</li>
+<li>2 - red,</li>
+<li>3 - yellow</li>
+</ul>
+<p>По умолчанию, R назначает порядок уровней по алфавиту. Можно изменить порядок (см. <code>help(&quot;factor&quot;)</code>). Нам это пригодится позже</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">double_rainbow <span class="co"># текстовый вектор</span></code></pre></div>
+<pre><code>##  [1] &quot;red&quot;    &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot; &quot;red&quot;   
+##  [8] &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
+<p>Создаем фактор из текстового вектора и складываем его в переменную</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_double_rainbow &lt;-<span class="st"> </span><span class="kw">factor</span>(double_rainbow)</code></pre></div>
+</div>
+<div id="-------" class="section level2">
+<h2>Как узнать, что за данные хранятся в переменной?</h2>
+<p>Чтобы узнать, что за данные хранятся в переменной, используйте функцию <code>class()</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(f_double_rainbow)</code></pre></div>
+<pre><code>## [1] &quot;factor&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(vect_log)</code></pre></div>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(vect_num)</code></pre></div>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(rainbow)</code></pre></div>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+</div>
+</div>
+<div id="---r" class="section level1">
+<h1>Встроенные константы в R</h1>
+<p>Встроенные константы в R: NA, NULL, NAN, Inf</p>
+<ul>
+<li>NA - англ “not available”. Когда объект был, но его свойство не измерили или не записали.</li>
+<li>NULL - пусто - просто ничего нет</li>
+<li>NaN - “not a number”</li>
+<li>Inf - “infinity” - бесконечность</li>
+</ul>
+<p>Вот текстовый вектор с пропущенным значением</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow_1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="ot">NA</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;violet&quot;</span>)</code></pre></div>
+<p>Кстати, если попросили добыть из вектора номер элемента, которого там точно нет, то R выдаст NA, потому, что такого элемента нет</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow_1[<span class="dv">198</span>]</code></pre></div>
+<pre><code>## [1] NA</code></pre>
+<p>Поэкспериментируем с векторами. Проверим, как работают арифметические операции</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num +<span class="st"> </span><span class="dv">2</span></code></pre></div>
+<pre><code>##  [1] -9 -8 -7 -6 -5 -4 -3 -2 -1  0  1  2  3  4  5  6  7  8  9 10 11 12 13
+## [24] 14</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num *<span class="st"> </span><span class="dv">2</span></code></pre></div>
+<pre><code>##  [1] -22 -20 -18 -16 -14 -12 -10  -8  -6  -4  -2   0   2   4   6   8  10
+## [18]  12  14  16  18  20  22  24</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num *<span class="st"> </span>(-<span class="dv">2</span>)</code></pre></div>
+<pre><code>##  [1]  22  20  18  16  14  12  10   8   6   4   2   0  -2  -4  -6  -8 -10
+## [18] -12 -14 -16 -18 -20 -22 -24</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num ^<span class="dv">2</span></code></pre></div>
+<pre><code>##  [1] 121 100  81  64  49  36  25  16   9   4   1   0   1   4   9  16  25
+## [18]  36  49  64  81 100 121 144</code></pre>
+<p>Теперь посмотрим на встроенные константы в действии.</p>
+<p>Создаем новый вектор для экспериментов</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="ot">NA</span>, <span class="dv">7</span>, <span class="dv">0</span>, <span class="dv">22</span>:<span class="dv">24</span>)</code></pre></div>
+<p>Вот так он выглядит</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs</code></pre></div>
+<pre><code>## [1]  1  3 NA  7  0 22 23 24</code></pre>
+<p>Что произойдет с NA?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs +<span class="st"> </span><span class="dv">2</span> <span class="co"># останется NA</span></code></pre></div>
+<pre><code>## [1]  3  5 NA  9  2 24 25 26</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs *<span class="st"> </span><span class="dv">0</span> <span class="co"># останется NA</span></code></pre></div>
+<pre><code>## [1]  0  0 NA  0  0  0  0  0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs /<span class="st"> </span><span class="dv">0</span>  <span class="co"># останется NA</span></code></pre></div>
+<pre><code>## [1] Inf Inf  NA Inf NaN Inf Inf Inf</code></pre>
+<p>Но в последнем случае вы увидите</p>
+<ul>
+<li>Inf при делении чисел на ноль</li>
+<li>NaN при делении нуля на ноль</li>
+</ul>
+<p>NaN получится, если взять корень из отрицательного числа</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(-<span class="dv">1</span>)</code></pre></div>
+<pre><code>## Warning in sqrt(-1): NaNs produced</code></pre>
+<pre><code>## [1] NaN</code></pre>
+</div>
+<div id="--r" class="section level1">
+<h1>Функции в R</h1>
+<p>Вы уже видели массу функций, их легко узнать по скобкам после ключевого слова. Познакомимся еще с несколькими и научимся писать пользовательские функции. Пользовательские функции позволяют автоматизировать повторяющиеся действия и делают код легко читаемым.</p>
+<p>Вот наш вектор</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs</code></pre></div>
+<pre><code>## [1]  1  3 NA  7  0 22 23 24</code></pre>
+<p>Длину вектора можно вычислить при помощи функции <code>length()</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">length</span>(NAs_NANs)</code></pre></div>
+<pre><code>## [1] 8</code></pre>
+<p>Сумму элементов вектора при помощи функции <code>sum()</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(NAs_NANs)</code></pre></div>
+<pre><code>## [1] NA</code></pre>
+<p>Упс! Почему-то получилось NA</p>
+<p>Чтобы узнать, почему и как это исправить - посмотрите в help(“sum”). Выяснится, что у функции sum() есть аргумент na.rm, который по умолчанию принимает значение FALSE, то есть NA не учитываются при подсчете суммы.</p>
+<p>Если мы передадим функции sum аргумент na.rm = TRUE, то получится правильная сумма</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## [1] 80</code></pre>
+<p>Теперь давайте попробуем вручную посчитать среднее значение элементов в векторе NAs_NANs и положить его в переменную</p>
+<p>Осторожно! В знаменателе должна быть не просто длина вектора, а число элементов, которые не равны NA</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">sum</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) /<span class="st"> </span>(<span class="kw">length</span>(NAs_NANs) -<span class="st"> </span><span class="dv">1</span>)
+a</code></pre></div>
+<pre><code>## [1] 11.42857</code></pre>
+<p>Проверяем при помощи встроенной функции mean()</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(NAs_NANs)</code></pre></div>
+<pre><code>## [1] NA</code></pre>
+<p>Она тоже не работает, если в векторе есть NA, но у нее тоже есть аргумент na.rm</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## [1] 11.42857</code></pre>
+<p>Попробуем написать пользовательскую функцию mmean(), которая будет по умолчанию считать среднее значение элементов в векторе с учетом пропущенных значений (NA)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mmean &lt;-<span class="st"> </span>function(x){
+  <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+  }</code></pre></div>
+<p>В этом коде: - mmean - переменная, название функции. В эту переменную мы складываем функцию, которую создает функция function() - function() - функция, которая делает функции. В скобках перечисляются аргументы (названия переменных, которые мы передаем в функцию, чтобы она что-то сделала с ними) - { } - в фигурных скобках тело функции - последовательность действий, которую нужно сделать с аргументами</p>
+<p>У больших функций бывает еще инструкция return(), которая сообщает, что именно должна возвращать наша функция. Вот как выглядела бы наша функция с этой инструкцией</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mmean &lt;-<span class="st"> </span>function(x){
+  res &lt;-<span class="st"> </span><span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+  <span class="kw">return</span>(res)
+}</code></pre></div>
+<p>Проверим нашу функцию при помощи встроенной функции</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(vect_num, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## [1] 0.5</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mmean</span>(vect_num)</code></pre></div>
+<pre><code>## [1] 0.5</code></pre>
+<p>Работает</p>
+</div>
+
+<p><small>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">linmodr</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="varmara.github.io/linmodr-course" property="cc:attributionName" rel="cc:attributionURL">Marina Varfolomeeva, Vadim Khaitov, and Yuta tamberg</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+</small></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

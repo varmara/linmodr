@@ -1,0 +1,162 @@
+/* <style type="text/css">*/
+
+/* Format title slide */
+
+/*.title-slide {
+
+}  */
+
+.footnote {
+  position: absolute;
+  bottom: 28px;
+  left: 60px;
+  z-index: 10;
+  font-size: 18px;
+}
+
+/* Reduce Space between Title and Body */
+
+slides > slide > hgroup + article {
+  margin-top: 10px;
+}
+
+/* Remove Border, Margins and Padding from iframe */
+iframe {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+slide.fill {
+  background-repeat: no-repeat;
+  @include background-size(cover);
+}
+
+slide.fill img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-width: 100%;
+  min-height: 100%;
+
+  z-index: -1;
+}
+
+article p, article li, article li.build{
+  font-family: 'Helvetica', 'Crimson Text', 'Garamond',  'Palatino', sans-serif;
+  text-align: justify;
+  font-size:0.9em;
+  line-height: 1em;
+  color: #454545;
+}
+
+slide:not(.segue):not(.prompt) h1{
+  font-size: 1.6em;
+  letter-spacing: -1px;
+  line-height: 1.4em;
+  margin-top: 10px;
+  margin-bottom: 15px;
+/*  color: #193441;*/
+/*  color: #02574D;*/
+  color: #CC2904;
+}
+
+slide.title-slide h1 {
+  letter-spacing: -1px;
+  line-height: 1.5em;
+  margin-top: 10px;
+  margin-bottom: 15px;
+/*  color: #193441;*/
+/*  color: #02574D;*/
+  color: #CC2904;
+}
+
+slide.title-slide h2 {
+  font-size: 1.5em;
+  letter-spacing: -1px;
+  line-height: 1.2em;
+  margin-bottom: 15px;
+/*  color: #193441;*/
+/*  color: #02574D;*/
+  color: #CC2904;
+}
+
+slide.title-slide p {
+  font-size: 1.2em;
+  color: #CC2904;
+}
+
+slide.segue p, slide.segue li{
+  font-family: 'Helvetica', 'Crimson Text', 'Garamond',  'Palatino', sans-serif;
+  text-align: justify;
+  font-size:1em;
+  line-height: 1.1em;
+  color: #e2e2e2;
+}
+
+slide:not(.segue):not(.prompt) h2{
+  font-size: 1.4em;
+  letter-spacing: -1px;
+  line-height: 1.1em;
+  margin-bottom: 15px;
+/*  color: #193441;*/
+/*  color: #02574D;*/
+  color: #CC2904;
+}
+
+slide:not(.segue):not(.prompt) h3{
+  font-size: 1em;
+  letter-spacing: -1px;
+  line-height: 0.9em;
+  margin-bottom: 15px;
+  font-weight: inherit;
+/*  color: #797979;*/
+  color: #CC2904;
+}
+
+/* Format code and body */
+
+body, td {
+   font-size: 1.1em;
+}
+
+code.r{
+  font-size: 12px;
+  text-align: left;
+}
+pre {
+  font-size: 0.9em;
+  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+  line-height: 1.1em;
+  margin-bottom: 12px;
+  text-align:left;
+}
+pre code {
+  font-size: 0.9em;
+  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+  line-height: 1.1em;
+  margin-bottom: -18px;
+  text-align: left;
+  border: 1px solid #ccc;
+}
+code {
+  font-size: 0.9em;
+  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+  line-height: 1.1em;
+  margin-bottom: -18px;
+  text-align:left;
+}
+
+em {
+  font-style: italic;
+}
+
+strong {
+  font-weight: bold;
+}
+
+small {
+  font-size: 0.8em;
+}
+
+/*</style>*/

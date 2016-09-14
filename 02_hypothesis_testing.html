@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Тестирование статистических гипотез</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Тестирование статистических гипотез',
+                        subtitle: 'Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                      },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Вадим Хайтов, Марина Варфоломеева' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Вы сможете</h2></hgroup><article  id="-">
+
+<ul>
+<li>Уверенно объяснить, что такое статистический критерий и как он работает</li>
+<li>Применить команды R для проверки наиболее распространенных типов гипотез</li>
+<li>Понять что такое пермутационный метод тестирования гипотез</li>
+<li>Написать R код, позволяющий реализовать пермутационный метод</li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>ЧАСТЬ 1. Основы основ</h2></hgroup><article  id="-1.--">
+
+<ul>
+<li>Нормальное распределение величин</li>
+<li>Параметры распределения</li>
+<li>Выборочные оценки параметров распределения</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Нормальное распределение</h2></hgroup><article  id="-">
+
+<p><em>Распределение</em> - это функция, описывающая связь между значениями величины и вероятностью ее встречи в генеральной совокупности</p>
+
+<p><em>Нормальное распределение</em> придумал немецкий математик Карл Гаусс</p>
+
+<p>\[p= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}\]</p>
+
+<div class="columns-2">
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-1-1.png" width="384" style="display: block; margin: auto;" /></p>
+
+<img src='images/Gauss.png' title='fig:'/><p class='caption'>Гаусс</p></div>
+
+</article></slide><slide class=''><hgroup><h2>Параметры нормального распределения</h2></hgroup><article  id="--">
+
+<p>\[p= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}\]</p>
+
+<p>Как и любая функция, функция, описывающая нормальное распределение, имеет параметры</p>
+
+<p>Два параметра нормального распределения:</p>
+
+<ul>
+<li>\(\mu\) - Ожидаемое значение случайной величины (среднее значение, которое получится после большого числа выборок из генеральной совокупности)</li>
+<li>\(\sigma\) - Характеризует разброс значений в генеральной совокупности. (\(\sigma^2\) - дисперсия)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Мы обычно работаем с выборками из генеральной совокупности</h2></hgroup><article  id="-------">
+
+<p>Давайте для наших экспериментов создадим генеральную совокупность с параметрами \(\mu = 50\) и \(\sigma = 7\).</p>
+
+<p>Вот график ее частотного распределения в генеральной совокупности.</p>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Возьмем выборку из этой генеральной совокупности</h2></hgroup><article  id="-----">
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Оценкой параметра \(\mu\) является среднеее значение в выборке</p>
+
+<p>\[\bar{x}=\frac{\sum{x_i}}{n}\]</p>
+
+<p>Оценкой параметра \(\sigma\) является среднеквадратичное отклонение</p>
+
+<p>\[SD=\sqrt{\frac{\sum{(x_i - \bar{x})^2}}{n-1}}\]</p>
+
+</article></slide><slide class=''><hgroup><h2>В разных выборках средние значения будут отличаться.</h2></hgroup><article  id="------.">
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>А что будет со средними, если взять много-много выборок?</h2></hgroup><article  id="---------">
+
+<p>Давайте возьмем много-много выборок, вычислим для каждой выборочное среднее и построим распределение этих выборочных средних.</p>
+
+<p><strong>Выборочные средние нормально распределены с параметрами</strong> \(\mu\) и \(SD _\bar{x}\)</p>
+
+<p><strong>Среднее значение выборочных средних стремится к среднему в генеральной совокупности</strong></p>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Чем больше объем выборок, тем точнее оценка среднего в генеральной совокупности</h2></hgroup><article  id="----------">
+
+<p>\[SE _\bar{x} = \sigma / \sqrt{N}\]</p>
+
+<div class=columns-2>
+
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-7-1.png" width="384" style="display: block; margin: auto;" /></p>
+
+<p>Cтандартная ошибка среднего (= стандартное отклонение выборочного распределения среднего) будет в N раз меньше, чем дисперсия в генеральной совокупности</p>
+
+<p>То есть, чем больше будет объем выборок, тем меньше будет эта стандартная ошибка, и тем точнее мы оценим среднее в генеральной совокупности.</p>
+
+<div/>
+
+
+</article></slide><slide class=''><hgroup><h2>Теорема центрального предела (ТЦП)</h2></hgroup><article  id="---">
+
+<div class="columns-2">
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-8-1.png" width="384" style="display: block; margin: auto;" /></p>
+
+<p>ТЦП в неформальном пересказе:</p>
+
+<blockquote>
+<p><strong>Распределение выборочных средних приближается к нормальному при условии, что объемы выборок достаточно велики, а распределение в генеральной совокупности не слишком асимметрично</strong></p>
+</blockquote>
+
+<p>ТЦП выполняется и для других исходных распределений, помимо нормального.</p>
+
+<p>Применение ТЦП: - доверительные интервалы - статистические тесты</p></div>
+
+</article></slide><slide class=''><hgroup><h2>Давайте научимся стандартизировать нормальное распределение</h2></hgroup><article  id="----">
+
+<div class="columns-2">
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-9-1.png" width="432" style="display: block; margin: auto;" /></p>
+
+<p>Стандартное нормальное распределение можно получить после <strong>стандартизации</strong></p>
+
+<p>\[z_i=\frac{x_i - \bar{x}}{SE}\]</p>
+
+<p><strong>После стандартизации всегда</strong>:</p>
+
+<ul>
+<li><p>среднее \(\mu = 0\)</p></li>
+<li><p>стандартное отклонение \(\sigma = 1\)</p></li>
+</ul>
+
+<p>Для стандартного нормального распределения легко можно посчитать вероятность получения определенных значений (площадь под кривой)</p></div>
+
+</article></slide><slide class=''><hgroup><h2>И вот, наконец&#8230;</h2></hgroup><article  id="--...">
+
+<p>t-распеделение Стьюдента (Student, 1908)</p>
+
+<p>\[t=\frac{d}{SE_d}\]</p>
+
+<img src='images/William_Sealy_Gosset.png' title='fig:'/><p class='caption'>William Sealy Gosset</p>
+
+</article></slide><slide class=''><hgroup><h2>t Стьюдента (Student, 1908)</h2></hgroup><article  id="t--student-1908">
+
+<p>\[t=\frac{d}{SE_d}\]</p>
+
+<ul>
+<li><p>\(d=\bar{x_1} - \bar{x_2}\) - это разность между двумя средними значениями</p></li>
+<li><p>\(SE_d\) - Общее среднеквадратичное отклонение разности двух средних</p></li>
+</ul>
+
+<p>\[SE_d = \sqrt{\frac{sd_1^2(n_1-1) +sd_2^2(n_2-1)}{n_1+n_2-2}(\frac{1}{n_1} + \frac{1}{n_2})}\]</p>
+
+<p>Если \(n_1 = n_2\), то формула существенно упрощается</p>
+
+<p><small>\[SE_d = \sqrt{\frac {sd_1^2} {n_1} + \frac {sd_2^2} {n_2}}\]</small></p>
+
+</article></slide><slide class=''><hgroup><h2>t-распределение</h2></hgroup><article  id="t-">
+
+<p>Таким образом, t-распределение это всего лишь <strong>стандартизованное распределение разностей двух средних значений из одной генеральной совокупности</strong>!</p>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Форма этого распределения зависит только от одного параметра</p>
+
+<p>\[df = n_1 + n_2 - 2\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Мы можем оценить вероятность получить разницу между средними определенного размера</h2></hgroup><article  id="---------">
+
+<h3>Задача</h3>
+
+<p>Если мы берем из одной генеральной совокупности две выборки по \(n_1 = n_2 = 10\), то с какой вероятностью стандартизированная разность между ними окажется больше 2 (или меньше -2)?</p>
+
+<p>Т.е.</p>
+
+<p>\[ \frac {\bar{x _1} - \bar{x _2}} {\sqrt{\frac {sd _1^2} {n _1} + \frac {sd _2^2} {n _2}}} &gt; 2\]</p>
+
+<p>или</p>
+
+<p>\[ \frac {\bar{x _1} - \bar{x _2}} {\sqrt{\frac {sd _1^2} {n _1} + \frac{sd _2^2} {n _2}}} &lt; -2\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Эту вероятность можно вычислить строго, но мы попробуем сделать это вручную</h2></hgroup><article  id="----------">
+
+<p>Для того, чтобы &quot;пощупать руками&quot; суть критерия, давайте смоделируем процесс взятия парных выборок <strong>из одной</strong> генеральной совокупности.</p>
+
+<p>То есть представим себе, что мы много раз (например, 1000) взяли пары выборок из одной и той же генеральной совокупности.</p>
+
+<p><img src="02_hypothesis_testing_files/figure-html/gg-t-our-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Для оценки интересующей нас вероятности, нам надо понять сколько раз из 1000 мы встретим величину больше 2 (или меньше -2)</h2></hgroup><article  id="-----------1000-----2----2">
+
+<p><img src="02_hypothesis_testing_files/figure-html/gg-t-our-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Доля значений \(t &gt; 2\) или \(t &lt; -2\) для распределения t, полученного вручную будет 0.058</p>
+
+</article></slide><slide class=''><hgroup><h2>Для строгой оценки этой вероятности оценивают долю площади под кривой, описывающей распределение (кривая плотности вероятности).</h2></hgroup><article  id="--------------.">
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Для заданной границы \(t&gt;2\) (\(t&lt;-2\)) это будет отношение закрашенной площади под кривой к общей площади</p>
+
+</article></slide><slide class=''><hgroup><h2>Но можно поставить вопрос иначе </h2><h3> Где находится значение t, которое отделяет 95% площади под кривой?</h3></hgroup><article  id="--------t---95---">
+
+<p><img src="02_hypothesis_testing_files/figure-html/gg-t-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Значения t, которые входят в область 95% - с высокой вероятностью (95%) можно получить, если выборки из одной генеральной совокупности.</p>
+
+<p>Значения t, которые не попадают в область 95% - маловероятно получить, если выборки из одной генеральной совокупности (5%).</p>
+
+</article></slide><slide class=''><hgroup><h2>Но можно поставить вопрос иначе </h2><h3> Где находится значение t, которое отделяет 95% площади под кривой?</h3></hgroup><article  id="--------t---95----1">
+
+<p><img src="02_hypothesis_testing_files/figure-html/gg-t-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Иными словами, если \(t &gt; t _{crit}\), то вероятность получить такую стандартизированную разницу средних двух выборок из одной совокупности очень низка (\(p &lt; 0.05\)).</p>
+
+<ul class = 'build'>
+<li>Теперь у на есть инструмент для проверки статистических гипотез - <strong>статистический критерий</strong>, или <strong>статистический тест</strong></li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>ЧАСТЬ 2. Тестирование статистических гипотез</h2></hgroup><article  id="-2.---">
+
+<ul>
+<li>Формулировка биологической гипотезы</li>
+<li>Численное выражение биологической гипотезы (\(H\))</li>
+<li>Формулировка антигипотезы (\(H_0\) - нулевой гипотезы)</li>
+<li>Тестирование нулевой гипотезы</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<p><img src="images/underwood.png" width="685" height="540" alt="Underwood, 1997"></p>
+
+<p>(Underwood, 1997)</p>
+
+</article></slide><slide class=''><hgroup><h2>Простейший пример тестирования гипотезы</h2></hgroup><article  id="---">
+
+<p>Создадим две выборки из популяций с нормальным распределением величин и заведомо отличающимися значениями \(\mu\)</p>
+
+<pre class = 'prettyprint lang-r'># Зерно для генератора случайных чисел для сопоставимости результатов
+set.seed(456) 
+# Создаем две выборки по 100 из нормального распределения с разными параметрами
+male &lt;- rnorm(n = 100, mean = 130, sd = 5)
+female &lt;- rnorm(n = 100, mean = 129, sd = 5)
+gender &lt;- c(rep(&quot;M&quot;, 100), rep(&quot;F&quot;, 100))
+# Сохраняем выборки в датафрейме для удобства
+df_height &lt;- data.frame(gender = factor(gender),
+                        height = c(male, female))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Давайте построим частотные распределения этих двух выборок</h2></hgroup><article  id="------">
+
+<p>Здесь обе выборки пока еще смешаны. Давайте разберемся на примере этого неправильного графика, как устроены графики пакета <code>ggplot</code></p>
+
+<pre class = 'prettyprint lang-r'>library(ggplot2)
+ggplot(df_height, aes(x = height)) + 
+  geom_histogram(binwidth = 5, colour = &quot;grey40&quot;)</pre>
+
+<p><img src="02_hypothesis_testing_files/figure-html/gg-plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Элементы графика ggplot</h2></hgroup><article  id="--ggplot">
+
+<pre class = 'prettyprint lang-r'>ggplot(df_height, aes(x = height)) + 
+  geom_histogram(binwidth = 5, colour = &quot;grey40&quot;)</pre>
+
+<ul>
+<li><code>ggplot()</code> - создаем график и добавляем к нему графические слои - геомы</li>
+<li><code>geom_histogram()</code> - геом, который создает гистограммы</li>
+<li><code>aes()</code> - функция управляет &quot;эстетиками&quot; - тем, как именно переменные отображаются в виде графических параметров. Может находится внутри <code>ggplot()</code>, а может внутри любого геома.</li>
+</ul>
+
+<p>Примеры эстетик:</p>
+
+<ul>
+<li><code>x</code> - переменная, которая будет по оси Х</li>
+<li><code>colour</code> - цвет контура</li>
+<li><code>fill</code> - цвет заливки</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Изменим ширину интервалов гистограммы</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>ggplot(df_height, aes(x = height)) + 
+  geom_histogram(binwidth = 2, colour = &quot;grey40&quot;)</pre>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Изменим оформление (тему) графика</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'># # На один раз
+# ggplot(df_height, aes(x = height)) + 
+#   geom_histogram(binwidth = 2, colour = &quot;grey40&quot;) +
+#   theme_classic()
+# # Или до конца сессии
+theme_set(theme_bw())
+ggplot(df_height, aes(x = height)) + 
+  geom_histogram(binwidth = 2, colour = &quot;grey40&quot;)</pre>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Разделим гистограммы по переменной gender при помощи цвета</h2></hgroup><article  id="----gender---">
+
+<pre class = 'prettyprint lang-r'>ggplot(df_height, aes(x = height, fill = gender)) + 
+  geom_histogram(binwidth = 3, colour = &quot;grey40&quot;, position = &quot;dodge&quot;)</pre>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>При помощи логических векторов посчитаем средние по переменной gender</h2></hgroup><article  id="--------gender">
+
+<p>Логические операторы:</p>
+
+<ul>
+<li><code>==</code> - проверка равенства</li>
+<li><code>!</code> - отрицание</li>
+<li><code>&amp;</code> - И</li>
+<li><code>|</code> - ИЛИ</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>f_male &lt;- df_height$gender == &quot;M&quot;
+f_female &lt;- !f_male
+mean_m &lt;- mean(df_height$height[f_male])
+mean_f &lt;- mean(df_height$height[f_female])</pre>
+
+</article></slide><slide class=''><hgroup><h2>Добавим линии, обозначающие средние значения</h2></hgroup><article  id="----">
+
+<p>Графики ggplot можно сохранять в переменных и потом достраивать</p>
+
+<pre class = 'prettyprint lang-r'>gg_height &lt;- ggplot(df_height, aes(x = height, fill = gender)) + 
+  geom_histogram(binwidth = 3, colour = &quot;grey40&quot;, position = &quot;dodge&quot;) +
+  geom_vline(aes(xintercept = mean_f), colour = &quot;red&quot;, size = 1) +
+  geom_vline(aes(xintercept = mean_m), colour = &quot;blue&quot;, size = 1, linetype = &quot;dashed&quot;)
+gg_height</pre>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Добавим подписи осей и заголовок</h2></hgroup><article  id="----">
+
+<h3>Частотное распределение этих двух выборок выглядит так</h3>
+
+<pre class = 'prettyprint lang-r'>gg_height + 
+  labs(x = &quot;Height (cm)&quot;, 
+       y = &quot;Count&quot;, 
+       title =&quot;Height distribution&quot;, 
+       fill = &quot;Gender&quot;)</pre>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Сравним две выборки с помощью t-критерия Стьюдента</h2></hgroup><article  id="-----t--">
+
+<pre class = 'prettyprint lang-r'>t_height &lt;- t.test(height ~ gender, data = df_height)
+t_height</pre>
+
+<pre >## 
+##  Welch Two Sample t-test
+## 
+## data:  height by gender
+## t = -3, df = 200, p-value = 0.002
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -3.562 -0.811
+## sample estimates:
+## mean in group F mean in group M 
+##             128             131</pre>
+
+<h3>Вопрос: Вероятность какого события отражает уровень значимости p=0.002?</h3>
+
+</article></slide><slide class=''><hgroup><h2>Уровень значимости p=0.002</h2></hgroup><article  id="--p0.002">
+
+<p>Это вероятность получения из одной совокупности (\(H_0\) верна) двух выборок с такими, как мы получили, выборочными оценками среднего и среднеквадратичного отклонения.</p>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Полученное нами эмпирическое значение t = -3.134 не попадает в область, ограниченную критическими значениями!<br/>Это значит, что ошибочный вывод о существовании различий мы будем делать не более, чем в 5% случаев, если подобный эксперимент будет проводиться многократно. И это нас устраивает, поскольку мы приняли \(\alpha=0.05\).</p>
+
+</article></slide><slide class=''><hgroup><h2>Допущения (Assumptions) t-критерия</h2></hgroup><article  id="-assumptions-t-">
+
+<ul>
+<li>Независимость выборок друг от друга<br/></li>
+<li>Нормальное распределение сравниваемых величин<br/></li>
+<li>Равенство дисперсий (выход - модификация Велча)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Почему в полученных результатах нашего теста df=197.82 дробное число?</h2></hgroup><article  id="------df197.82--">
+
+<p>R автоматичски вводит поправку на разность дисперсий (используется модифицированная версия теста - Welch-test)</p>
+
+<p>В этом тесте специально занижается df, что делает китерий более консервативным (то есть он реже отвергает \(H_0\), находит меньше ложных различий)</p>
+
+<p>\[df=\frac {(\frac {sd _1} {\sqrt {n _1}} + \frac {sd _2} {\sqrt {n _2}})} { \frac {(sd_1 / \sqrt{n_1})^2} {(n _1 + 1)} +  \frac {(sd _2 / \sqrt {n _2})^2} {(n_2+1)}} - 2\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Двусторонние и односторнние тесты</h2></hgroup><article  id="---">
+
+<div class="columns-2">
+<p><em>Двусторонний тест</em></p>
+
+<p>\(H_0: \mu_1-\mu_2=0\); \(H_a: \mu_1\ne\mu_2\)</p>
+
+<p>т.е. м.б. \(\mu_1 &gt; \mu_2\) и \(\mu_1 &lt; \mu_2\)</p>
+
+<p><em>Односторонний тест</em></p>
+
+<p>\(H_0: \mu_1-\mu_2=0\); \(H_a: \mu_2 &gt; \mu_1\) </br> </br> </br> </br></p></div>
+
+<p><img src="02_hypothesis_testing_files/figure-html/unnamed-chunk-25-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<p>Отвержение \(H_0\) происходит при меньшем значении t. </br> В случае с t-критерием будьте осторожны! Используя односторонние тесты, мы повышаем вероятность неправильного отвержения \(H_0\).</p>
+
+</article></slide><slide class=''><hgroup><h2>Порядок применения t-критерия для сравнения выборок</h2></hgroup><article  id="--t----">
+
+<ol>
+<li>Принимаем априорный пороговый уровень значимости, например \(\alpha = 0.05\)</li>
+<li>Для выборок вычисляем средние и среднеквадратичное отклонение</li>
+<li>Вычисляем эмпирическое значение t</li>
+<li>Находим число степеней свободы для данного t:
+
+<ul>
+<li>Если дисперсии равны, то \(df = n _1 + n _2 - 2\)</li>
+<li>Если дисперсии не равны, \(df = \frac {(sd _1 / \sqrt{n _1} + sd _2 / \sqrt{n _2})} {(sd _1 / \sqrt {n _1})^2 / (n _1 + 1) + (sd _2 / \sqrt {n _2})^2/(n _2 + 1)} - 2\)</li>
+</ul></li>
+<li>Строим референсное t-распределение для даного \(df\) при истинной \(H_0\)</li>
+<li>Вычисляем величину уровня значимсти \(p\)<br/><small> Пункты 3-6 за нас может сделать функция <code>t.test()</code><br/></li>
+</ol>
+
+<ul>
+<li>Если \(p &lt; \alpha\), отвергаем \(H _0\), наблюдаются достоверные различия между средними</li>
+<li>Если \(p &gt; \alpha\), сохраняем \(H_a\), достоверных различий не выявляется </small></li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>ЧАСТЬ 3. Пермутационный метод тестирования гипотез</h2></hgroup><article  id="-3.----">
+
+</article></slide><slide class=''><hgroup><h2>Пермутации - это перестановки.</h2></hgroup><article  id="----.">
+
+<p>Если две сравниваемые выборки взяты из одной совокупности, то обмен элементами между ними ничего не изменит. Степень различия между выборками (значение статистики) должно остаться более или менее тем же самым.</p>
+
+</article></slide><slide class=''><hgroup><h2>Применяем пермутационный метод</h2></hgroup><article  id="--">
+
+<p>Сравним при помощи пермутаций две выборки, описывающие рост мальчиков и девочек (<code>male</code> и <code>female</code>)</p>
+
+<pre class = 'prettyprint lang-r'>head(male)</pre>
+
+<pre >## [1] 123 133 134 123 126 128</pre>
+
+<pre class = 'prettyprint lang-r'>head(female)</pre>
+
+<pre >## [1] 130 133 129 129 121 135</pre>
+
+<p>Введем статистику</p>
+
+<p>\[d = |\bar{x_1} -\bar{x_2}|\]</p>
+
+<pre class = 'prettyprint lang-r'>d_initial &lt;- abs(mean(male) - mean(female))</pre>
+
+<p>При сравнении векторов <code>male</code> и <code>female</code> d = 2.186</p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article >
+
+<pre class = 'prettyprint lang-r'>head(male)</pre>
+
+<pre >## [1] 123 133 134 123 126 128</pre>
+
+<pre class = 'prettyprint lang-r'>head(female)</pre>
+
+<pre >## [1] 130 133 129 129 121 135</pre>
+
+<p>При пермутациях мы должны поменять местами, например,</p>
+
+<p>male[3] = 134 \(\longleftrightarrow\) female[5] = 120.6.</p>
+
+<p>А еще лучше поменять случайное количество элементов одной выборки на такое же количество элементов из другой выборки.</p>
+
+</article></slide><slide class=''><hgroup><h2>Получаем распределение статистики \(d_{perm}\)</h2></hgroup><article  id="---d_perm">
+
+<p>Для этого мы много раз случайно перемешиваем выборки и после каждой пермутации вычисляем значение статстики \(d_{perm}\)</p>
+
+<pre class = 'prettyprint lang-r'>Nperm &lt;- 10000              # число пермутаций
+dperm &lt;- rep(NA, Nperm)     # пустой вектор для результатов
+set.seed(76)             # зерно для генератора случайных чисел
+
+for (i in 1:(Nperm - 1))    # Повторяем 9999 раз
+{
+  BOX &lt;- c(male, female)    # смешиваем наши вектора
+  ord &lt;- sample(x = 1:200, size = 200)   # задаем новый порядок значений
+  f &lt;- BOX[ord[1:100]]      # первые 100 перемешанных значений
+  m &lt;- BOX [ord[101:200]]   # следующие 100 перемешанных значений
+  dperm[i] = abs(mean(m) - mean(f))  # считаем пермутационную статистику
+}
+
+head(dperm)</pre>
+
+<pre >## [1] 0.390 0.323 0.404 0.261 0.770 1.093</pre>
+
+</article></slide><slide class=''><hgroup><h2>Получаем распределение статистики \(d_{perm}\)</h2></hgroup><article  id="---d_perm-1">
+
+<p>Посмотрим в конец этого вектора</p>
+
+<pre class = 'prettyprint lang-r'>tail(dperm)</pre>
+
+<pre >## [1] 0.1022 0.1233 0.7545 0.0854 0.7536     NA</pre>
+
+<p>Последнее 10000-е значение не заполнено!</p>
+
+<p>В него надо вписать исходное, полученное до пермутаций, значение d = 2.186.</p>
+
+<p>Это необходимо, так как мы тестируем гипотезу о принадлежности этого значения случаному распределению.</p>
+
+<pre class = 'prettyprint lang-r'>dperm[Nperm] &lt;- d_initial</pre>
+
+<p>Для удобства, положим данные в датафрейм и отметим значения d &lt; d_initial</p>
+
+<pre class = 'prettyprint lang-r'>df_perm &lt;- data.frame(d_p = dperm)
+df_perm$less &lt;- df_perm$d_p &lt; d_initial</pre>
+
+</article></slide><slide class=''><hgroup><h2>Получаем распределение статистики \(d_{perm}\)</h2></hgroup><article  id="---d_perm-2">
+
+<p><img src="02_hypothesis_testing_files/figure-html/gg-dperm-pl-1.png" width="768" style="display: block; margin: auto;" /></p>
+
+<h3>Постройте такой график самостоятельно</h3>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article >
+
+<pre class = 'prettyprint lang-r'>dperm_pl &lt;- ggplot(df_perm, aes(x = d_p, fill = less)) + 
+  geom_histogram (binwidth = 0.05, colour = &quot;black&quot;) +
+  geom_vline(aes(xintercept = d_initial), linetype = 2) +
+  labs(x = &quot;Permutational d-values&quot;, y = &quot;Count&quot;,
+       fill = &quot;d &lt; d_initial&quot;)
+dperm_pl</pre>
+
+<p><img src="02_hypothesis_testing_files/figure-html/gg-dperm-pl-1.png" width="768" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Расчитаем величину уровня значимости</h2></hgroup><article  id="---">
+
+<p>\[p_{perm}= \frac{N _{d _{perm} &gt;= d}}{N _{perm}}\]</p>
+
+<pre class = 'prettyprint lang-r'>p_perm &lt;- length(dperm[dperm &gt;= d_initial] ) / Nperm</pre>
+
+<p>Итак, мы получили уровень значимости \(p_{perm}\) = 0.002</p>
+
+<p>Сравним его с уровнем значимоcти, вычисленным с помощью параметрического t-критерия p=0.002</p>
+
+<p>Они оба близки и оба выявляют достоверные различия</p>
+
+</article></slide><slide class=''><hgroup><h2>Take home messages</h2></hgroup><article  id="take-home-messages">
+
+<ul class = 'build'>
+<li>Любой статистический критерий работает принципиально так же, как t-критерий: вычисляется значение тестовой статистики, которое сравнивается с референсным<br/>распределением, получающимся при истинности \(H _0\)</li>
+<li>У любого статистического критерия есть свои условия примнимости (assumptions)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Дополнительные источники</h2></hgroup><article  id="-">
+
+<ul>
+<li>Гланц С. Медико-биологическая статистика. М: Практика, 1998. 459 с.</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

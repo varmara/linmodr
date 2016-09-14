@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Смешанные модели для бинарных зависимых величин</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Смешанные модели для бинарных зависимых величин',
+                        subtitle: 'Линейные модели, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: '15_general_linear_mixed_models_for_binary_data_files/logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Вадим Хайтов, Марина Варфоломеева' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(15_general_linear_mixed_models_for_binary_data_files/logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="15_general_linear_mixed_models_for_binary_data_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Вы узнаете</h2></hgroup><article  id="-">
+
+<ul>
+<li>Об обобщенных смешанных линейных моделях (GLMM) и о функциях R, которые могут их рассчитать</li>
+</ul>
+
+<h3>Вы сможете</h3>
+
+<ul>
+<li>Построить обобщенную смешанную модель для бинарных данных.</li>
+<li>Применить для построения модели функции из нескольких пакетов, реализованных в R.</li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Вспомним основные идеи работы с бинарными переменными</h2></hgroup><article  id="------">
+
+</article></slide><slide class=''><hgroup><h2>Вопросы</h2></hgroup><article >
+
+<ul class = 'build'>
+<li>Какое распределение используют при работе с бинарными данными?</li>
+<li>Сколько параметров в функции плотности вероятности этого распределения?</li>
+<li>В каком соотношении находятся матожидание и дисперсия этого распределения?</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Биномиальное распределение</h2></hgroup><article  id="-">
+
+<p>\(f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}\)</p>
+
+<div class="columns-2">
+<p><small></p>
+
+<h3>Два параметра (\(N\), \(\pi\))</h3>
+
+<p>Среднее:    \(E(Y) = N \times \pi\)<br/>Дисперсия: \(var(Y) = N \times \pi \times (1-\pi)\)<br/>Параметр \(N\) определяет количество объектов в испытании<br/>Парметр \(\pi\) - вероятность события (\(y = 1\))</p>
+
+<h3>Пределы варьирования</h3>
+
+<p>\(0 \le Y \le +\infty\),   \(Y\) <strong>целочисленные</strong> </small></p>
+
+<p><img src="15_general_linear_mixed_models_for_binary_data_files/figure-html/unnamed-chunk-1-1.png" width="480" style="display: block; margin: auto;" /></p></div>
+
+</article></slide><slide class=''><hgroup><h2>Вопросы</h2></hgroup><article  id="-1">
+
+<ul class = 'build'>
+<li>Что такое шансы? <br><br></li>
+<li>Что такое логиты? <br><br></li>
+<li>Какую связывающую функцию обычно используются при работе с бинарными перменными отклика?</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Шансы и логиты</h2></hgroup><article  id="--">
+
+<p>Дискретный отклик: 1 или 0<br/><br><br> Вероятност события: \(\pi = \frac{N_i}{N_{total}}\)<br/><br><br> Шансы (odds): \(odds=\frac{\pi}{1-\pi}\)<br/><br><br> <em>Логиты</em> (logit): \(ln(odds)=\ln(\frac{\pi}{1-\pi})\)</p>
+
+</article></slide><slide class=''><hgroup><h2>Связывающая функция для бинарных перменных отклика</h2></hgroup><article  id="-----">
+
+<p>Каноническая связывающая функция - <em>логит-функция</em>: \(\eta(\pi)=\ln(\frac{\pi}{1-\pi})\)</p>
+
+<p><code>family = binomial(link = &quot;logit&quot;)</code></p>
+
+<p>Помимо логит-функции можно применить еще несколько:</p>
+
+<p><em>Complementary Log-Log</em> связывающая функция : \(\eta(\pi)=\ln(-\ln(1-\pi))\)<br/><code>family = binomial(link = &quot;cloglog&quot;)</code></p>
+
+<p><em>Пробит</em> - связывающая фунция: \(\eta(\pi)=\Phi^{-1}(\pi)\)<br/><code>family = binomial(link = &quot;probit&quot;)</code></p>
+
+</article></slide><slide class=''><hgroup><h2>Что где находится на этом графике?</h2></hgroup><article  id="-----">
+
+<p><img src="15_general_linear_mixed_models_for_binary_data_files/figure-html/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Построение модели для бинарной переменной отклика</h2></hgroup><article  id="-----">
+
+</article></slide><slide class=''><hgroup><h2>Морские желуди: Кого съедят бореотрофоны?</h2></hgroup><article  id="----" class="smaller columns-2">
+
+<p>Данные взяты из работы<br/>Yakovis Y., Artemieva A. &quot;Bored to Death: Community-Wide Effect of Predation on a Foundation Species in a Low-Disturbance Arctic Subtidal System&quot; PLOS, 2015. DOI: 10.1371/journal.pone.0132973</p>
+
+<p><img src="images/druse.png" width="400" ></p>
+
+<p><img src="images/drilled_barnacle.png" height="550" ></p>
+
+</article></slide><slide class=''><hgroup><h2>Вопрос: от каких факторов зависит будет ли атакован балянус хищником?</h2></hgroup><article  id="---------">
+
+<p>Мы будем оценивать связь вероятности гибели балянуса от нападения <em>Boreotrophon clathratus</em>.</p>
+
+<h3>Дизайн сбора материала</h3>
+
+<p><img align="middle" src="images/design.png" width="600" height="400" ></p>
+
+</article></slide><slide class=''><hgroup><h2>Читаем данные</h2></hgroup><article  id="-">
+
+<pre class = 'prettyprint lang-r'>bal &lt;- read.table(&quot;data/Yakovis2.csv&quot;, header = TRUE, sep = &quot;;&quot;)</pre>
+
+<pre class = 'prettyprint lang-r'># Some housekeeping
+bal$Site &lt;- factor(bal$Site)
+bal$Sample &lt;- factor(bal$Sample)
+bal$Substrate_ID &lt;- factor(bal$Substrate_ID)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Переменные</h2></hgroup><article >
+
+<p><code>Site</code> -точка сбора материала<br/><code>Sample</code> - квдарат 1х1 м, на котором производился сбор друз<br/><code>BorN</code> - количество <em>Boreotrophon clathratus</em> на квадрате<br/><code>Substrate_ID</code> - Номер друзы<br/><code>ALength</code> - Диаметр апертуры<br/><code>Age</code> - Возраст балянуса<br/><code>Position</code> - Расположение балянуса (первичный субстрат/вторичный субстрат)<br/><code>Status</code> - живой/мертвый <br> <br> <code>Drill</code> - Зависимая переменная (0 - нет следов сверления; 1 - есть следы сверления)</p>
+
+<h3>Для ответа на поставленный вопрос целесообразно работать с мертвыми особями</h3>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article >
+
+<p>Вычислите какая доля живых и мертвых особей несет следы сверления</p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article >
+
+<pre class = 'prettyprint lang-r'>bal1 &lt;- bal[bal$Status == &quot;live_barnacle&quot;, ]
+mean(bal1$Drill == 1)</pre>
+
+<pre >## [1] 0.0128</pre>
+
+<pre class = 'prettyprint lang-r'>bal2 &lt;- bal[bal$Status == &quot;empty_test&quot;, ]
+mean(bal2$Drill == 1)</pre>
+
+<pre >## [1] 0.0816</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article  id="-1">
+
+<h3>Напишите код, который задаст формулу для фиксированной части модели</h3>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-1">
+
+<pre class = 'prettyprint lang-r'>Fix_effect &lt;- formula(Drill ~ BorN + ALength + Age + Position + Site)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article  id="-2">
+
+<h3>Напишите код, который задаст формулу для случайной части модели</h3>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-2">
+
+<pre class = 'prettyprint lang-r'>Rand_effect &lt;- formula(~1 | Sample/Substrate_ID)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Согласно дизайну сбора материала, необходимо построить обобщенную смешанную линейную модель (GLMM)</h2></hgroup><article  id="----------glmm">
+
+<p>Функция максимального правдоподобия для GLMM</p>
+
+<p>\[Lik(\beta, D) = \Pi_i\int f(Y_i|b_i)\times f(b_i)db_i\]</p>
+
+<p>Вычисление максимума функции правдоподобия для GLMM может производиться только в численном виде (аналитическое решение невозможно). Поэтому все алгоритмы очень затратны по времени.</p>
+
+</article></slide><slide class=''><hgroup><h2>Инструменты <code>R</code>, позволяющие подобрать GLMM</h2></hgroup><article  id="-r---glmm">
+
+<table class = 'rmdtable'>
+<col width="19%" />
+<col width="19%" />
+<col width="19%" />
+<tr class="header">
+<th align="left">Пакет</th>
+<th align="left">Функция</th>
+<th align="left">Особенности работы функции</th>
+</tr>
+<tr class="odd">
+<td align="left"><code>MASS</code></td>
+<td align="left"><code>glmPQL()</code></td>
+<td align="left">Использует penalised quasi-likelihood (PQL) алгоритм, следовательно не выдает AIC. Выбор оптмальной модели может производиться только на основе оценок статистической значимсоти параметров (критерий Вальда). Работает быстро.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>glmmML</code></td>
+<td align="left"><code>glmmML()</code></td>
+<td align="left">Выдает значение AIC. Может использовать только один уровень группирующих факторов. Работает быстро.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>lme4</code></td>
+<td align="left"><code>glmer()</code></td>
+<td align="left">Выдает значение AIC. Работает медленно. При сложных моделях часто не сходится.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>glmmADMB</code></td>
+<td align="left"><code>glmmadmb()</code></td>
+<td align="left">Выдает значение AIC. Работает ОЧЕНЬ медленно (Для сложных моделей и бльших объемов данных до нескольких часов).</td>
+</tr>
+</table>
+
+<p><strong>Важно!</strong>Во всех случаях надо с осторожостью принимать решения при уровнях значимости близкх к 5%!<br/>Альтернативный подход к построению сложных моделей - использование методов <strong>Байесовской статистики</strong></p>
+
+</article></slide><slide class=''><hgroup><h2>Подбираем модель с помощью функции <code>glmmPQL</code></h2></hgroup><article  id="-----glmmpql">
+
+<pre class = 'prettyprint lang-r'>library(MASS)
+
+M1_PQL &lt;- glmmPQL(Fix_effect, random = ~1 | Sample/Substrate_ID, data = bal2, 
+    family = &quot;binomial&quot;)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Результаты</h2></hgroup><article  class="smaller">
+
+<pre class = 'prettyprint lang-r'>summary(M1_PQL)</pre>
+
+<pre >## Linear mixed-effects model fit by maximum likelihood
+##  Data: bal2 
+##   AIC BIC logLik
+##    NA  NA     NA
+## 
+## Random effects:
+##  Formula: ~1 | Sample
+##         (Intercept)
+## StdDev:       0.358
+## 
+##  Formula: ~1 | Substrate_ID %in% Sample
+##         (Intercept) Residual
+## StdDev:        1.62    0.704
+## 
+## Variance function:
+##  Structure: fixed weights
+##  Formula: ~invwt 
+## Fixed effects: Drill ~ BorN + ALength + Age + Position + Site 
+##                   Value Std.Error   DF t-value p-value
+## (Intercept)       -4.12     0.445 1908   -9.25  0.0000
+## BorN               0.07     0.053    6    1.35  0.2243
+## ALength            0.15     0.046 1908    3.24  0.0012
+## Age               -0.10     0.077 1908   -1.29  0.1969
+## Positionsecondary  1.26     0.172 1908    7.34  0.0000
+## Site2             -0.30     0.612    6   -0.49  0.6437
+##  Correlation: 
+##                   (Intr) BorN   ALngth Age    Pstnsc
+## BorN              -0.776                            
+## ALength           -0.232 -0.035                     
+## Age                0.079  0.043 -0.907              
+## Positionsecondary -0.314  0.047  0.025  0.169       
+## Site2             -0.480  0.390 -0.021  0.042  0.069
+## 
+## Standardized Within-Group Residuals:
+##    Min     Q1    Med     Q3    Max 
+## -4.244 -0.366 -0.205 -0.116 13.809 
+## 
+## Number of Observations: 2120
+## Number of Groups: 
+##                   Sample Substrate_ID %in% Sample 
+##                        9                      209</pre>
+
+</article></slide><slide class=''><hgroup><h2>Подбираем модель с помощью функции <code>glmmML()</code></h2></hgroup><article  id="-----glmmml">
+
+<pre class = 'prettyprint lang-r'>library(glmmML)
+M1_ML &lt;- glmmML(Fix_effect, cluster = Substrate_ID, data = bal2)
+M2_ML &lt;- glmmML(Fix_effect, cluster = Sample, data = bal2)
+# Коэффициенты
+C_glmmML_1 &lt;- round(as.numeric(coefficients(M1_ML)), 3)
+C_glmmML_2 &lt;- round(as.numeric(coefficients(M2_ML)), 3)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Результаты первой модели</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>glmmML::summary.glmmML(M1_ML)</pre>
+
+<pre >## 
+## Call:  glmmML(formula = Fix_effect, data = bal2, cluster = Substrate_ID) 
+## 
+## 
+##                      coef se(coef)       z    Pr(&gt;|z|)
+## (Intercept)       -4.3674   0.4100 -10.653 0.000000000
+## BorN               0.0869   0.0405   2.149 0.032000000
+## ALength            0.1316   0.0609   2.162 0.031000000
+## Age               -0.0677   0.1036  -0.653 0.510000000
+## Positionsecondary  1.2967   0.2289   5.664 0.000000015
+## Site2             -0.2901   0.5432  -0.534 0.590000000
+## 
+## Scale parameter in mixing distribution:  1.42 gaussian 
+## Std. Error:                              0.164 
+## 
+##         LR p-value for H_0: sigma = 0:  4.77e-23 
+## 
+## Residual deviance: 1020 on 2113 degrees of freedom   AIC: 1030</pre>
+
+</article></slide><slide class=''><hgroup><h2>Результаты второй модели</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>glmmML::summary.glmmML(M2_ML)</pre>
+
+<pre >## 
+## Call:  glmmML(formula = Fix_effect, data = bal2, cluster = Sample) 
+## 
+## 
+##                      coef se(coef)      z Pr(&gt;|z|)
+## (Intercept)       -4.1523   0.4256 -9.757  0.0e+00
+## BorN               0.1173   0.0491  2.388  1.7e-02
+## ALength            0.0652   0.0515  1.266  2.1e-01
+## Age                0.0360   0.0859  0.419  6.8e-01
+## Positionsecondary  1.2242   0.1838  6.661  2.7e-11
+## Site2              0.2051   0.5305  0.387  7.0e-01
+## 
+## Scale parameter in mixing distribution:  0.458 gaussian 
+## Std. Error:                              0.137 
+## 
+##         LR p-value for H_0: sigma = 0:  0.00000327 
+## 
+## Residual deviance: 1090 on 2113 degrees of freedom   AIC: 1110</pre>
+
+</article></slide><slide class=''><hgroup><h2>Подбираем модель с помощью функции <code>glmer()</code></h2></hgroup><article  id="-----glmer">
+
+<pre class = 'prettyprint lang-r'>library(lme4)
+M1_glmer &lt;- glmer(Drill ~ BorN + ALength + Age + Position + Site + (1 | 
+    Sample/Substrate_ID), data = bal2, family = &quot;binomial&quot;)
+C_glmer &lt;- round(lme4::fixef(M1_glmer), 3)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Результаты</h2></hgroup><article  id="-1" class="smaller columns-2">
+
+<pre class = 'prettyprint lang-r'>summary(M1_glmer)</pre>
+
+<pre >## Generalized linear mixed model fit by maximum likelihood (Laplace
+##   Approximation) [glmerMod]
+##  Family: binomial  ( logit )
+## Formula: 
+## Drill ~ BorN + ALength + Age + Position + Site + (1 | Sample/Substrate_ID)
+##    Data: bal2
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##     1033     1078     -508     1017     2112 
+## 
+## Scaled residuals: 
+##    Min     1Q Median     3Q    Max 
+## -2.399 -0.262 -0.163 -0.101  9.177 
+## 
+## Random effects:
+##  Groups              Name        Variance Std.Dev.
+##  Substrate_ID:Sample (Intercept) 1.8576   1.363   
+##  Sample              (Intercept) 0.0634   0.252   
+## Number of obs: 2120, groups:  Substrate_ID:Sample, 209; Sample, 9
+## 
+## Fixed effects:
+##                   Estimate Std. Error z value    Pr(&gt;|z|)    
+## (Intercept)        -4.4038     0.4510   -9.76     &lt; 2e-16 ***
+## BorN                0.0941     0.0479    1.96       0.050 *  
+## ALength             0.1270     0.0614    2.07       0.039 *  
+## Age                -0.0606     0.1042   -0.58       0.561    
+## Positionsecondary   1.3065     0.2290    5.71 0.000000012 ***
+## Site2              -0.2310     0.5862   -0.39       0.693    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) BorN   ALngth Age    Pstnsc
+## BorN        -0.698                            
+## ALength     -0.295 -0.077                     
+## Age          0.103  0.085 -0.912              
+## Postnscndry -0.433  0.082  0.032  0.148       
+## Site2       -0.417  0.396 -0.050  0.074  0.090</pre>
+
+</article></slide><slide class=''><hgroup><h2>Сравним коэффициенты, подобранные разными функциями</h2></hgroup><article  id="----">
+
+<pre>
+          Parameter glmmPQL glmmML_1  glmmML_2  glmer
+1       (Intercept)  -4.119   -4.367   -4.152  -4.404
+2              BorN   0.072    0.087*   0.117*  0.094*
+3           ALength   0.148*   0.132*   0.065   0.127*
+4               Age  -0.100   -0.068    0.036  -0.061
+5 Positionsecondary   1.261*   1.297*   1.224*  1.306*
+6             Site2  -0.298   -0.290    0.205  -0.231
+
+
+</pre>
+
+<h3>Выбор на совести исследователя!</h3>
+
+</article></slide><slide class=''><hgroup><h2>Выбор оптимальной модели</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>drop1(M1_glmer)</pre>
+
+<pre >## Single term deletions
+## 
+## Model:
+## Drill ~ BorN + ALength + Age + Position + Site + (1 | Sample/Substrate_ID)
+##          Df  AIC
+## &lt;none&gt;      1033
+## BorN      1 1035
+## ALength   1 1035
+## Age       1 1031
+## Position  1 1064
+## Site      1 1031</pre>
+
+</article></slide><slide class=''><hgroup><h2>Выбор оптимальной модели</h2></hgroup><article  id="---1">
+
+<pre class = 'prettyprint lang-r'>M2_glmer &lt;- update(M1_glmer, . ~ . - Site)
+anova(M1_glmer, M2_glmer)</pre>
+
+<pre >## Data: bal2
+## Models:
+## M2_glmer: Drill ~ BorN + ALength + Age + Position + (1 | Sample/Substrate_ID)
+## M1_glmer: Drill ~ BorN + ALength + Age + Position + Site + (1 | Sample/Substrate_ID)
+##          Df  AIC  BIC logLik deviance Chisq Chi Df Pr(&gt;Chisq)
+## M2_glmer  7 1031 1071   -509     1017                        
+## M1_glmer  8 1033 1078   -508     1017  0.15      1       0.69</pre>
+
+</article></slide><slide class=''><hgroup><h2>Выбор оптимальной модели</h2></hgroup><article  id="---2">
+
+<pre class = 'prettyprint lang-r'>drop1(M2_glmer)</pre>
+
+<pre >## Single term deletions
+## 
+## Model:
+## Drill ~ BorN + ALength + Age + Position + (1 | Sample/Substrate_ID)
+##          Df  AIC
+## &lt;none&gt;      1031
+## BorN      1 1034
+## ALength   1 1033
+## Age       1 1029
+## Position  1 1063</pre>
+
+</article></slide><slide class=''><hgroup><h2>Выбор оптимальной модели</h2></hgroup><article  id="---3">
+
+<pre class = 'prettyprint lang-r'>M3_glmer &lt;- update(M2_glmer, . ~ . - Age)
+anova(M2_glmer, M3_glmer)</pre>
+
+<pre >## Data: bal2
+## Models:
+## M3_glmer: Drill ~ BorN + ALength + Position + (1 | Sample/Substrate_ID)
+## M2_glmer: Drill ~ BorN + ALength + Age + Position + (1 | Sample/Substrate_ID)
+##          Df  AIC  BIC logLik deviance Chisq Chi Df Pr(&gt;Chisq)
+## M3_glmer  6 1029 1063   -509     1017                        
+## M2_glmer  7 1031 1071   -509     1017  0.31      1       0.58</pre>
+
+</article></slide><slide class=''><hgroup><h2>Выбор оптимальной модели</h2></hgroup><article  id="---4">
+
+<pre class = 'prettyprint lang-r'>drop1(M3_glmer)</pre>
+
+<pre >## Single term deletions
+## 
+## Model:
+## Drill ~ BorN + ALength + Position + (1 | Sample/Substrate_ID)
+##          Df  AIC
+## &lt;none&gt;      1029
+## BorN      1 1032
+## ALength   1 1042
+## Position  1 1064</pre>
+
+</article></slide><slide class=''><hgroup><h2>Результаты</h2></hgroup><article  id="-2" class="smaller">
+
+<pre class = 'prettyprint lang-r'>summary(M3_glmer)</pre>
+
+<pre >## Generalized linear mixed model fit by maximum likelihood (Laplace
+##   Approximation) [glmerMod]
+##  Family: binomial  ( logit )
+## Formula: 
+## Drill ~ BorN + ALength + Position + (1 | Sample/Substrate_ID)
+##    Data: bal2
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##     1029     1063     -509     1017     2114 
+## 
+## Scaled residuals: 
+##    Min     1Q Median     3Q    Max 
+## -2.371 -0.262 -0.163 -0.103  9.193 
+## 
+## Random effects:
+##  Groups              Name        Variance Std.Dev.
+##  Substrate_ID:Sample (Intercept) 1.8092   1.345   
+##  Sample              (Intercept) 0.0773   0.278   
+## Number of obs: 2120, groups:  Substrate_ID:Sample, 209; Sample, 9
+## 
+## Fixed effects:
+##                   Estimate Std. Error z value     Pr(&gt;|z|)    
+## (Intercept)        -4.4498     0.4108  -10.83      &lt; 2e-16 ***
+## BorN                0.1035     0.0450    2.30      0.02154 *  
+## ALength             0.0948     0.0252    3.76      0.00017 ***
+## Positionsecondary   1.3335     0.2256    5.91 0.0000000034 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) BorN   ALngth
+## BorN        -0.663              
+## ALength     -0.517 -0.015       
+## Postnscndry -0.462  0.040  0.411</pre>
+
+</article></slide><slide class=''><hgroup><h2>Проверка валидности модели</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>plot(M3_glmer)</pre>
+
+<p><img src="15_general_linear_mixed_models_for_binary_data_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Проверка валидности модели</h2></hgroup><article  id="---1" class="smaller">
+
+<p><img src="15_general_linear_mixed_models_for_binary_data_files/figure-html/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Визуализация предсказаний модели</h2></hgroup><article  id="--" class="smaller">
+
+<p><img src="15_general_linear_mixed_models_for_binary_data_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Summary</h2></hgroup><article  id="summary">
+
+<ul>
+<li>Построение обобщенных смешанных моделей (GLMM) для бинарных перменных отклика аналогично построению моделей для GLM и LMM.</li>
+<li>Идеального алгоритма для построения GLMM пока нет.</li>
+<li>Существующие ныне алгоритмы пригодны только для простых моделей.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Что почитать</h2></hgroup><article  id="-">
+
+<ul>
+<li>Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. - Statistics for biology and health. Springer, New York, NY.</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

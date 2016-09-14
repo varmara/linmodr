@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Дисперсионный анализ, часть 2</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Дисперсионный анализ, часть 2',
+                        subtitle: 'Линейные модели, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: '10_two-way_anova_and_interactions_files/logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Марина Варфоломеева, Вадим Хайтов' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(10_two-way_anova_and_interactions_files/logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="10_two-way_anova_and_interactions_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Многофакторный дисперсионный анализ</h2></hgroup><article  id="--">
+
+<ul>
+<li>Модель многофакторного дисперсионного анализа</li>
+<li>Взаимодействие факторов</li>
+<li>Несбалансированные данные, типы сумм квадратов</li>
+<li>Многофакторный дисперсионный анализ в R</li>
+<li>Дисперсионный анализ в матричном виде</li>
+</ul>
+
+<h3>Вы сможете</h3>
+
+<ul>
+<li>Проводить многофакторный дисперсионный анализ и интерпретироваот его результаты с учетом взаимодействия факторов</li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Модель многофакторного дисперсионного анализа</h2></hgroup><article  id="---">
+
+</article></slide><slide class=''><hgroup><h2>Линейные модели с разным числом дискретных предикторов</h2></hgroup><article  id="------">
+
+<ul>
+<li>Два фактора A и B, двухфакторное взаимодействие</li>
+</ul>
+
+<p>\(y _{ijk} = \mu + \alpha _i + \beta _j + (\alpha \beta) _{ij} + \epsilon _{ijk}\)</p>
+
+<p><br /><br /></p>
+
+<ul>
+<li>Три фактора A, B и C, двухфакторные взаимодействия, трехфакторное взаимодействия</li>
+</ul>
+
+<p>\(y _{ijkl} = \mu + \alpha _i + \beta _j + \gamma _k + (\alpha \beta) _{ij} + (\alpha \gamma) _{ik} + (\beta \gamma) _{jk} + (\alpha \beta \gamma) _{ijk} + \epsilon _{ijkl}\)</p>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Взаимодействие дискретных предикторов</h2></hgroup><article  id="--">
+
+</article></slide><slide class=''><hgroup><h2>Взаимодействие дискретных предикторов</h2></hgroup><article  id="---1">
+
+<p>Взаимодействие факторов - когда эффект фактора B разный в зависимости от уровней фактора A и наоборот</p>
+
+<div class="columns-2">
+<p>На каких рисунках есть взаимодействие факторов?</p>
+
+<ul class = 'build'>
+<li>b, c - нет взаимодействия (эффект фактора B одинаковый для групп по фактору A, линии для разных групп по фактору B на графиках расположены параллельно)</li>
+<li>a, d - есть взаимодействие (эффект фактора B разный для групп по фактору A, на графиках линии для разных групп по фактору B расположены под наклоном).</li>
+</ul>
+
+<img src='images/interaction.png' title='fig:Взаимодействие факторов'/><p class='caption'>Взаимодействие факторов</p></div>
+
+<div class="footnote">
+Рисунок из Logan, 2010, fig.12.2</div>
+
+</article></slide><slide class=''><hgroup><h2>Влияют ли главные эффекты и взаимодействие?</h2></hgroup><article  id="-----">
+
+<img src='images/interaction1a.png' title='fig:Взаимодействие факторов'/><p class='caption'>Взаимодействие факторов</p>
+
+<ul class = 'build'>
+<li>взаимодействие достоверно, и не маскирует главные эффекты</li>
+<li>фактор А влияет</li>
+<li>фактор В влияет</li>
+</ul>
+
+<div class="footnote">
+Рисунок из Quinn, Keough, 2002, fig.9.3</div>
+
+</article></slide><slide class=''><hgroup><h2>Влияют ли главные эффекты и взаимодействие?</h2></hgroup><article  id="------1">
+
+<img src='images/interaction1b.png' title='fig:Взаимодействие факторов'/><p class='caption'>Взаимодействие факторов</p>
+
+<ul class = 'build'>
+<li>взаимодействие достоверно и мешает интерпретировать влияние факторов отдельно:</li>
+<li>для В2 зависимая переменная возрастает с изменением уровня А</li>
+<li>для В1 зависимая переменная возрастает только на А2, но не различается на А1 и А3</li>
+<li>если смотреть на главные эффекты, можно сделать неправильные выводы:</li>
+<li>фактор А влияет, группы А2 и А3 не отличаются</li>
+<li>фактор В влияет, в группе В2 зависимая переменная больше, чем в В1</li>
+</ul>
+
+<div class="footnote">
+Рисунок из Quinn, Keough, 2002, fig.9.3</div>
+
+</article></slide><slide class=''><hgroup><h2>Влияют ли главные эффекты и взаимодействие?</h2></hgroup><article  id="------2">
+
+<img src='images/interaction1c.png' title='fig:Взаимодействие факторов'/><p class='caption'>Взаимодействие факторов</p>
+
+<ul class = 'build'>
+<li>взаимодействие достоверно и мешает интерпретировать влияние факторов отдельно:</li>
+<li>А1В2, А3В2 и А2В1 не различаются, значение зависимой переменной в этих группах выше, чем в остальных</li>
+<li>А1В1, А3В1 и А2В2 не различаются</li>
+<li>если смотреть на главные эффекты, можно сделать неправильные выводы:</li>
+<li>факторы А и В не влияют</li>
+</ul>
+
+<div class="footnote">
+Рисунок из Quinn, Keough, 2002, fig.9.3</div>
+
+</article></slide><slide class=''><hgroup><h2>Взаимодействие факторов может маскировать главные эффекты</h2></hgroup><article  id="-----">
+
+<div class="column-2">
+<ul>
+<li>Если есть значимое взаимодействие</li>
+<li>главные эффекты обсуждать не имеет смысла<br/></li>
+<li>пост хок тесты проводятся только для ваимодействия</li>
+</ul>
+
+<img src='images/interaction1.png' title='fig:Взаимодействие факторов'/><p class='caption'>Взаимодействие факторов</p></div>
+
+<div class="footnote">
+Рисунок из Quinn, Keough, 2002, fig.9.3</div>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Несбалансированные данные, типы сумм квадратов</h2></hgroup><article  id="----">
+
+</article></slide><slide class=''><hgroup><h2>Несбалансированные данные - когда численности в группах по факторам различаются</h2></hgroup><article  id="----------">
+
+<div class="columns-2">
+<p>Например так,</p>
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left"></th>
+<th align="left">A1</th>
+<th align="left">A2</th>
+<th align="left">A3</th>
+</tr>
+<tr class="odd">
+<td align="left">B1</td>
+<td align="left">5</td>
+<td align="left">5</td>
+<td align="left">5</td>
+</tr>
+<tr class="even">
+<td align="left">B2</td>
+<td align="left">5</td>
+<td align="left">4</td>
+<td align="left">5</td>
+</tr>
+</table>
+
+<p>или так,</p>
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left"></th>
+<th align="left">A1</th>
+<th align="left">A2</th>
+<th align="left">A3</th>
+</tr>
+<tr class="odd">
+<td align="left">B1</td>
+<td align="left">3</td>
+<td align="left">8</td>
+<td align="left">4</td>
+</tr>
+<tr class="even">
+<td align="left">B2</td>
+<td align="left">4</td>
+<td align="left">7</td>
+<td align="left">4</td>
+</tr>
+</table></div>
+
+</article></slide><slide class=''><hgroup><h2>Проблемы несбалансированных дизайнов</h2></hgroup><article  id="--">
+
+<ul class = 'build'>
+<li>Оценки средних в разных группах с разным уровнем точности (Underwood 1997)</li>
+<li>ANOVA менее устойчив к отклонениям от условий применимости (особенно от гомогенности дисперсий) при разных размерах групп (Quinn Keough 2002, section 8.3)</li>
+<li>Проблемы с рассчетом мощности. Если \(\sigma _{\epsilon}^2 &gt; 0\) и размеры выборок разные, то \(MS _{factor} \over MS _{residuals}\) не следует F-распределению (Searle et al. 1992).</li>
+</ul>
+
+<p><br /><br /></p>
+
+<ul class = 'build'>
+<li>Cтарайтесь <em>планировать</em> группы равной численности!</li>
+<li>Но если не получилось - не страшно:</li>
+<li>Для фикс. эффектов неравные размеры - проблема только если значения доверительной вероятности <em>p</em> близки к выбранному критическому уровню значимости \(\alpha\)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Если несбалансированные данные, выберите правильный тип сумм квадратов</h2></hgroup><article  id="-------">
+
+<ul>
+<li>SSe и SSab также как в сбалансированных</li>
+<li><p>SSa, SSb - три способа расчета</p></li>
+<li>Для сбалансированных дизайнов - результаты одинаковы</li>
+<li><p>Для несбалансированных дизайнов рекомендуют <strong>суммы квадратов III типа</strong> если есть взаимодействие факторов (Maxwell &amp; Delaney 1990, Milliken, Johnson 1984, Searle 1993, Yandell 1997)</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Типы сумм квадратов в дисперсионном анализе</h2></hgroup><article  id="-----">
+
+<table class = 'rmdtable'>
+<col width="2%" />
+<col width="2%" />
+<col width="4%" />
+<col width="2%" />
+<tr class="header">
+<th align="left">Типы сумм квадратов</th>
+<th align="left">I тип</th>
+<th align="left">II тип</th>
+<th align="left">III тип</th>
+</tr>
+<tr class="odd">
+<td align="left">Название</td>
+<td align="left">Последовательная</td>
+<td align="left">Без учета взаимодействий высоких порядков</td>
+<td align="left">Иерархическая</td>
+</tr>
+<tr class="even">
+<td align="left">SS</td>
+<td align="left">SS(A),<br />SS(B ∣ A)<br />SS(AB ∣ B, A)</td>
+<td align="left">SS(A ∣ B)<br />SS(B ∣ A)<br />SS(AB ∣ B, A)</td>
+<td align="left">SS(A ∣ B, AB)<br />SS(B ∣ A, AB)<br />SS(AB ∣ B, A)</td>
+</tr>
+<tr class="odd">
+<td align="left">Величина эффекта зависит от выборки в группе</td>
+<td align="left">Да</td>
+<td align="left">Да</td>
+<td align="left">Нет</td>
+</tr>
+<tr class="even">
+<td align="left">Результат зависит от порядка включения факторов в модель</td>
+<td align="left">Да</td>
+<td align="left">Нет</td>
+<td align="left">Нет</td>
+</tr>
+<tr class="odd">
+<td align="left">Команда R</td>
+<td align="left"><code>aov()</code></td>
+<td align="left"><code>Anova()</code> (пакет <code>car</code>)</td>
+<td align="left"><code>Anova()</code> (пакет <code>car</code>)</td>
+</tr>
+</table>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Многофакторный дисперсионный анализ в R</h2></hgroup><article  id="----r">
+
+</article></slide><slide class=''><hgroup><h2>Пример: Удобрение и беспозвоночные</h2></hgroup><article  id="---">
+
+<p>Влияет ли добавление азотных и фосфорных удобрений на беспозвоночных?</p>
+
+<p>Небольшие искуственные субстраты экспонировали в течение разного времени в верхней части сублиторали (Hall et al., 2000).</p>
+
+<p>Факторы:</p>
+
+<ul>
+<li>срок экспозиции (2, 4 и 6 месяцев)</li>
+<li>удобрения (добавляли или нет)</li>
+</ul>
+
+<p>Планировали сделать 5 повторностей для каждого сочетания факторов</p>
+
+<p>Зависимая переменная:</p>
+
+<ul>
+<li>Число видов</li>
+</ul>
+
+<div class="footnote">
+Данные из Quinn, Keough, 2002</div>
+
+</article></slide><slide class=''><hgroup><h2>Знакомимся с данными</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>dat &lt;- read.csv(file = &quot;data/hall.csv&quot;)
+str(dat)</pre>
+
+<pre >## &#39;data.frame&#39;:    29 obs. of  3 variables:
+##  $ TREAT   : Factor w/ 2 levels &quot;control&quot;,&quot;nutrient&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ TIME    : int  2 2 2 2 2 4 4 4 4 4 ...
+##  $ RICHNESS: int  5 7 5 7 5 20 18 20 18 17 ...</pre>
+
+<pre class = 'prettyprint lang-r'># Для удобства названия переменных маленькими буквами
+colnames(dat) &lt;- tolower(colnames(dat))
+# Время делаем фактором
+dat$time &lt;- factor(dat$time)
+levels(dat$time)</pre>
+
+<pre >## [1] &quot;2&quot; &quot;4&quot; &quot;6&quot;</pre>
+
+</article></slide><slide class=''><hgroup><h2>Пропущенные значения</h2></hgroup><article  id="-">
+
+<pre class = 'prettyprint lang-r'>sum(is.na(dat))</pre>
+
+<pre >## [1] 0</pre>
+
+<pre class = 'prettyprint lang-r'>sapply(dat, function(x) sum(is.na(x)))</pre>
+
+<pre >##    treat     time richness 
+##        0        0        0</pre>
+
+<ul class = 'build'>
+<li>Нет пропущенных значений</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Объемы выборок в группах</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>table(dat$time, dat$treat)</pre>
+
+<pre >##    
+##     control nutrient
+##   2       5        5
+##   4       5        5
+##   6       4        5</pre>
+
+<ul class = 'build'>
+<li>Группы разного размера. Выбираем 3 тип сумм квадратов</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Посмотрим на боксплот</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>library(ggplot2)
+theme_set(theme_bw(base_size = 18) + theme(legend.key = element_blank()))
+gg_rich &lt;- ggplot(data = dat, aes(x = treat, y = richness, colour = time)) + 
+    geom_boxplot()
+gg_rich</pre>
+
+<p><img src="10_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Преобразовываем данные</h2></hgroup><article  id="-">
+
+<p>На боксплоте видна гетерогенность дисперсий. И это неспроста!</p>
+
+<p>Зависимая переменная <code>richness</code> &#8211; это счетная величина. Она подчиняется распределению Пуассона (и чем больше ее среднее значение, тем больше дисперсия).</p>
+
+<p>Правильно было бы воспользоваться обобщенными линейными моделями с Пуассоновским распределением ошибок вместо нормального. Но пока что мы попробуем преобразовать зависимую переменную, чтобы ее распределение стало больше походить на нормальное. Это может помочь, а может и нет.</p>
+
+<pre class = 'prettyprint lang-r'>dat$log_rich &lt;- log10(dat$richness + 1)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Линейная модель</h2></hgroup><article  id="-">
+
+<p>Внимание: при использовании III типа сумм квадратов, нужно <strong>обязательно указывать тип контрастов для факторов</strong> (<code>contrasts=list(фактор_1 = contr.sum, фактор_2=contr.sum)</code>).</p>
+
+<pre class = 'prettyprint lang-r'>fit &lt;- lm(log_rich ~ treat * time, data = dat, 
+    contrasts = list(treat = contr.sum, time = contr.sum))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание: Проверьте условия применимости дисперсионного анализа</h2></hgroup><article  id="-----">
+
+<ul>
+<li>Есть ли гомогенность дисперсий?</li>
+<li>Не видно ли трендов в остатках?</li>
+<li>Нормальное ли у остатков распределение?</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Решение: 1. Проверяем условия применимости</h2></hgroup><article  id="-1.---">
+
+<ul>
+<li>Есть ли гомогенность дисперсий?</li>
+<li>Не видно ли трендов в остатках?</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(car)
+residualPlots(fit)</pre>
+
+<p><img src="10_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li>Все хорошо</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Решение: 2. Проверяем условия применимости</h2></hgroup><article  id="-2.---">
+
+<ul>
+<li>Нормальное ли у остатков распределение?</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>qqPlot(fit)</pre>
+
+<p><img src="10_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li>Все хорошо</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Результаты дисперсионного анализа</h2></hgroup><article  id="--" class="smaller">
+
+<div class="columns-2">
+<pre class = 'prettyprint lang-r'>Anova(fit, type = 3)</pre>
+
+<pre >## Anova Table (Type III tests)
+## 
+## Response: log_rich
+##             Sum Sq Df  F value   Pr(&gt;F)    
+## (Intercept)   44.2  1 13776.11  &lt; 2e-16 ***
+## treat          0.1  1    28.04 0.000022 ***
+## time           2.2  2   344.75  &lt; 2e-16 ***
+## treat:time     0.0  2     3.84    0.036 *  
+## Residuals      0.1 23                      
+## ---
+## Signif. codes:  
+##   0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1  &#39; &#39; 1</pre>
+
+<ul class = 'build'>
+<li>Поскольку взаимодействие достоверно, факторы отдельно можно не тестировать. Проведем пост хок тест по взаимодействию, чтобы выяснить, какие именно группы различаются</li>
+</ul>
+
+<p><img src="10_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-10-1.png" width="384" style="display: block; margin: auto;" /></p></div>
+
+</article></slide><slide class=''><hgroup><h2>Пост хок тест</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'># 1. создаем переменную-взаимодействие
+dat$treat_time &lt;- interaction(dat$treat, dat$time)
+
+# 2. подбираем модель без intercept
+fit_inter &lt;- lm(log_rich ~ treat_time - 1, data = dat)
+
+# 3. делаем пост хок тест
+library(multcomp)
+dat_tukey &lt;- glht(fit_inter, linfct = mcp(treat_time = &quot;Tukey&quot;))
+summary(dat_tukey)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Смотрим на результаты пост хок теста</h2></hgroup><article  id="-----" class="smaller">
+
+<pre >## 
+##   Simultaneous Tests for General Linear Hypotheses
+## 
+## Multiple Comparisons of Means: Tukey Contrasts
+## 
+## 
+## Fit: lm(formula = log_rich ~ treat_time - 1, data = dat)
+## 
+## Linear Hypotheses:
+##                              Estimate Std. Error t value Pr(&gt;|t|)    
+## nutrient.2 - control.2 == 0    0.0504     0.0358    1.41    0.723    
+## control.4 - control.2 == 0     0.4633     0.0358   12.93   &lt;0.001 ***
+## nutrient.4 - control.2 == 0    0.6519     0.0358   18.19   &lt;0.001 ***
+## control.6 - control.2 == 0     0.6031     0.0380   15.86   &lt;0.001 ***
+## nutrient.6 - control.2 == 0    0.6997     0.0358   19.52   &lt;0.001 ***
+## control.4 - nutrient.2 == 0    0.4129     0.0358   11.52   &lt;0.001 ***
+## nutrient.4 - nutrient.2 == 0   0.6015     0.0358   16.78   &lt;0.001 ***
+## control.6 - nutrient.2 == 0    0.5527     0.0380   14.54   &lt;0.001 ***
+## nutrient.6 - nutrient.2 == 0   0.6493     0.0358   18.11   &lt;0.001 ***
+## nutrient.4 - control.4 == 0    0.1885     0.0358    5.26   &lt;0.001 ***
+## control.6 - control.4 == 0     0.1398     0.0380    3.68    0.014 *  
+## nutrient.6 - control.4 == 0    0.2364     0.0358    6.59   &lt;0.001 ***
+## control.6 - nutrient.4 == 0   -0.0488     0.0380   -1.28    0.791    
+## nutrient.6 - nutrient.4 == 0   0.0478     0.0358    1.33    0.763    
+## nutrient.6 - control.6 == 0    0.0966     0.0380    2.54    0.153    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## (Adjusted p values reported -- single-step method)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Данные для графиков</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>library(dplyr)
+dat_summary &lt;- dat %&gt;% 
+  group_by(treat, time) %&gt;% 
+  summarise(
+    .mean = mean(richness),
+    .sd = sd(richness),
+    .n = sum(!is.na(richness)),
+    .se = .sd/sqrt(.n),
+    lwr = .mean - qnorm(0.975) * .se,
+    upr = .mean + qnorm(0.975) * .se)
+dat_summary</pre>
+
+<pre >## Source: local data frame [6 x 8]
+## Groups: treat [?]
+## 
+##      treat   time .mean   .sd    .n   .se   lwr   upr
+##     &lt;fctr&gt; &lt;fctr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  control      2   5.8 1.095     5 0.490  4.84  6.76
+## 2  control      4  18.6 1.342     5 0.600 17.42 19.78
+## 3  control      6  26.0 0.816     4 0.408 25.20 26.80
+## 4 nutrient      2   6.6 0.894     5 0.400  5.82  7.38
+## 5 nutrient      4  29.6 5.413     5 2.421 24.86 34.34
+## 6 nutrient      6  33.0 5.000     5 2.236 28.62 37.38</pre>
+
+</article></slide><slide class=''><hgroup><h2>Графики для результатов: Столбчатый график</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>pos &lt;- position_dodge(width = 0.9)
+gg_barp &lt;- ggplot(data = dat_summary, aes(x = treat, y = .mean, 
+    ymin = lwr, ymax = upr, fill = time)) + geom_bar(stat = &quot;identity&quot;, 
+    position = pos) + geom_errorbar(width = 0.1, position = pos)
+gg_barp</pre>
+
+<p><img src="10_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Графики для результатов: Линии с точками</h2></hgroup><article  id="-----">
+
+<pre class = 'prettyprint lang-r'>gg_linep &lt;- ggplot(data = dat_summary, aes(x = treat, y = .mean, 
+    ymin = lwr, ymax = upr, colour = time)) + geom_point(size = 3, 
+    position = pos) + geom_line(aes(group = time), position = pos) + 
+    geom_errorbar(width = 0.1, position = pos)
+gg_linep</pre>
+
+<p><img src="10_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Какой график лучше выбрать?</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>library(gridExtra)
+grid.arrange(gg_barp, gg_linep, ncol = 2)</pre>
+
+<p><img src="10_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-14-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li>Должен быть максимум данных в минимуме чернил (Tufte, 1983)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Приводим понравившийся график в приличный вид</h2></hgroup><article  id="-----">
+
+<pre class = 'prettyprint lang-r'>gg_final &lt;- gg_linep + labs(x = &quot;Эксперимент&quot;, y = &quot;Число видов&quot;) + 
+    scale_x_discrete(labels = c(&quot;Контроль&quot;, &quot;Удобрения&quot;)) + 
+    scale_colour_brewer(name = &quot;Экспозиция&quot;, palette = &quot;Dark2&quot;, 
+        labels = c(&quot;2 месяца&quot;, &quot;4 месяца&quot;, &quot;6 месяцев&quot;))
+gg_final</pre>
+
+<p><img src="10_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Регрессия в матричном виде</h2></hgroup><article  id="---">
+
+</article></slide><slide class=''><hgroup><h2>Регрессия в матричном виде</h2></hgroup><article  id="----1">
+
+<p>Уравнение простой линейной регрессии:</p>
+
+<p>\[y _{i} = \beta _0 + \beta _1 x _i + \epsilon _{i}\]</p>
+
+<p>Здесь \(i = 1, ..., n\), т.е. порядковый номер наблюдения</p>
+
+<p>Если расписать эту формулу, получится по отдельному уравнению для каждого из наблюдений:</p>
+
+<p>\[\begin{align*}
+y &amp;_{1} = \beta _0 + \beta _1 x _1 + \epsilon _{1} \\
+y &amp;_{2} = \beta _0 + \beta _1 x _2 + \epsilon _{2} \\
+&amp;\vdots \\
+y &amp;_{n} = \beta _0 + \beta _1 x _n + \epsilon _{n}
+\end{align*}\]</p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article  id="section">
+
+<p>Эту систему уравнений</p>
+
+<p>\[\begin{align*}
+y &amp;_{1} = \beta _0 + \beta _1 x _1 + \epsilon _{1} \\
+y &amp;_{2} = \beta _0 + \beta _1 x _2 + \epsilon _{2} \\
+&amp;\vdots \\
+y &amp;_{n} = \beta _0 + \beta _1 x _n + \epsilon _{n}
+\end{align*}\]</p>
+
+<p>можно переписать в виде матриц:</p>
+
+<p>\[\left[\begin{array}{c}
+y_1 \\ y_2 \\ \vdots \\ y_n 
+\end{array}\right] = 
+\left[\begin{array}{cc}
+1 &amp; x_1 \\ 1 &amp; x_2 \\ \vdots &amp; \\ 1 &amp; x_n
+\end{array}\right] \cdot
+\left[\begin{array}{c}
+\beta _0 \\ \beta _1
+\end{array}\right] +
+\left[\begin{array}{c}
+\epsilon _1 \\ \epsilon _2 \\ \vdots \\ \epsilon _n
+\end{array}\right]
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article  id="section-1">
+
+<p>Для такой длинной формы записи матриц</p>
+
+<p>\[\left[\begin{array}{c}
+y_1 \\ y_2 \\ \vdots \\ y_n 
+\end{array}\right] = 
+\left[\begin{array}{cc}
+1 &amp; x_1 \\ 1 &amp; x_2 \\ \vdots &amp; \\ 1 &amp; x_n
+\end{array}\right] \cdot
+\left[\begin{array}{c}
+\beta _0 \\ \beta _1
+\end{array}\right] +
+\left[\begin{array}{c}
+\epsilon _1 \\ \epsilon _2 \\ \vdots \\ \epsilon _n
+\end{array}\right]
+\]</p>
+
+<p>есть сокращенная форма записи:</p>
+
+<p>\[Y = X \beta + \epsilon\]</p>
+
+<ul>
+<li>\(Y\) - матрица предсказанных значений, 1 столбец в <em>n</em> строк (<em>n</em> - число наблюдений)</li>
+<li>\(X\) - матрица независимых переменных с <em>n</em> строк, ее первый столбец содержит единицы, далее по столбцу для каждой из переменных в модели</li>
+<li>\(\beta\) - матрица коэффициентов линейной модели, столбец</li>
+<li>\(\epsilon\) - матрица остатков, 1 столбец в <em>n</em> строк</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Задание:</h2></hgroup><article >
+
+<p>В примере с влиянием удобрений на макрофауну:</p>
+
+<ul>
+<li>Какова будет размерность матрицы независимых переменных (сколько в ней строк и столбцов)?</li>
+<li>Сколько значений будет в матрице коэффициентов?</li>
+<li>Какова размерность матрицы ошибок?</li>
+</ul>
+
+<h3>Подсказка:</h3>
+
+<p>Для модели с одним предиктором матрицы будут выглядеть так</p>
+
+<p>\[\left[\begin{array}{c}
+y_1 \\ y_2 \\ \vdots \\ y_n 
+\end{array}\right] = 
+\left[\begin{array}{cc}
+1 &amp; x_1 \\ 1 &amp; x_2 \\ \vdots &amp; \\ 1 &amp; x_n
+\end{array}\right] \cdot
+\left[\begin{array}{c}
+\beta _0 \\ \beta _1
+\end{array}\right] +
+\left[\begin{array}{c}
+\epsilon _1 \\ \epsilon _2 \\ \vdots \\ \epsilon _n
+\end{array}\right]
+\]</p>
+
+<p>А для модели с несколькими предикторами?</p>
+
+</article></slide><slide class=''><hgroup><h2>Как закодировать дискретные предикторы?</h2></hgroup><article  id="---" class="smaller">
+
+<p>У нас два дискретных фактора: 3 времени экспозиции и 2 тритмента. Использована модель эффектов (contr.sum), поэтому переменные-болванки будут закодированы при помощи -1, 0 и 1, так, чтобы сумма кодов для возможных состояний одной переменной была равна нулю.</p>
+
+<p>Вот так будут закодированы уровни фактора &quot;удобрения&quot; с помощью одной переменной-болванки:</p>
+
+<pre class = 'prettyprint lang-r'>contr.sum(levels(dat$treat))</pre>
+
+<pre >##          [,1]
+## control     1
+## nutrient   -1</pre>
+
+<p>а так - уровни фактора &quot;время экспозиции&quot; с помощью двух переменных-болванок:</p>
+
+<pre class = 'prettyprint lang-r'>contr.sum(levels(dat$time))</pre>
+
+<pre >##   [,1] [,2]
+## 2    1    0
+## 4    0    1
+## 6   -1   -1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Матрица независимых переменных</h2></hgroup><article  id="--" class="smaller">
+
+<p>Матрица независимых переменных будет содержать интерсепт и 5 переменных болванок.<br/>- <code>(Intercept)</code> - 1,<br/>фактор &quot;удобрения&quot;:<br/>- <code>treat1</code> - опыт закодирован как +1, удобрения -1, (сумма кодов 0)<br/>фактор &quot;время&quot;:<br/>- <code>time1</code> - 2 мес. экспозиции закодировано как +1, 4мес - 0, 6мес - -1 (сумма кодов 0)<br/>- <code>time2</code> - 4 мес. экспозиции закодировано как +1, 2мес - 0, 6мес - -1 (сумма кодов 0)<br/>взаимодействие факторов:<br/>- <code>treat1:time1</code> - закодирована как произведение <code>treat1</code> и <code>time1</code> (и сумма кодов 0)<br/>- <code>treat1:time2</code> - закодирована как произведение <code>treat1</code> и <code>time2</code> (и сумма кодов 0)</p>
+
+<pre class = 'prettyprint lang-r'>X &lt;- model.matrix(fit)
+X</pre>
+
+<pre >##    (Intercept) treat1 time1 time2 treat1:time1 treat1:time2
+## 1            1      1     1     0            1            0
+## 2            1      1     1     0            1            0
+## 3            1      1     1     0            1            0
+## 4            1      1     1     0            1            0
+## 5            1      1     1     0            1            0
+## 6            1      1     0     1            0            1
+## 7            1      1     0     1            0            1
+## 8            1      1     0     1            0            1
+## 9            1      1     0     1            0            1
+## 10           1      1     0     1            0            1
+## 11           1      1    -1    -1           -1           -1
+## 12           1      1    -1    -1           -1           -1
+## 13           1      1    -1    -1           -1           -1
+## 14           1      1    -1    -1           -1           -1
+## 15           1     -1     1     0           -1            0
+## 16           1     -1     1     0           -1            0
+## 17           1     -1     1     0           -1            0
+## 18           1     -1     1     0           -1            0
+## 19           1     -1     1     0           -1            0
+## 20           1     -1     0     1            0           -1
+## 21           1     -1     0     1            0           -1
+## 22           1     -1     0     1            0           -1
+## 23           1     -1     0     1            0           -1
+## 24           1     -1     0     1            0           -1
+## 25           1     -1    -1    -1            1            1
+## 26           1     -1    -1    -1            1            1
+## 27           1     -1    -1    -1            1            1
+## 28           1     -1    -1    -1            1            1
+## 29           1     -1    -1    -1            1            1
+## attr(,&quot;assign&quot;)
+## [1] 0 1 2 2 3 3
+## attr(,&quot;contrasts&quot;)
+## attr(,&quot;contrasts&quot;)$treat
+##          [,1]
+## control     1
+## nutrient   -1
+## 
+## attr(,&quot;contrasts&quot;)$time
+##   [,1] [,2]
+## 2    1    0
+## 4    0    1
+## 6   -1   -1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Матрица коэффициентов линейной регрессии</h2></hgroup><article  id="---" class="smaller">
+
+<p>Всего будет 6 коэффициентов:<br/>- \(\beta_0\) - среднее число видов<br/>эффект фактора &quot;удобрения&quot;:<br/>- \(\beta_1\) - отличие среднего числа видов (в контроле &quot;+&quot;, в опыте &quot;-&quot;) от общего среднего эффект фактора &quot;время&quot;:<br/>- \(\beta_2\) - общее среднее минус среднее число видов после 2 мес.<br/>- \(\beta_3\) - общее среднее минус среднее число видов после 4 мес.<br/>поправка на взаимодействие факторов:<br/>- \(\beta_4\) - дополнительное отличие среднего числа видов (в контроле &quot;+&quot;, в опыте &quot;-&quot;) от общего среднего после 2 мес.<br/>- \(\beta_5\) - дополнительное отличие среднего числа видов (в контроле &quot;+&quot;, в опыте &quot;-&quot;) от общего среднего после 4 мес.</p>
+
+<pre class = 'prettyprint lang-r'>betas &lt;- coef(fit)
+betas</pre>
+
+<pre >##  (Intercept)       treat1        time1        time2 treat1:time1 
+##       1.2395      -0.0559      -0.3862       0.1462       0.0307 
+## treat1:time2 
+##      -0.0383</pre>
+
+</article></slide><slide class=''><hgroup><h2>Зная коэффициенты, можно вычислить средние значения в группах</h2></hgroup><article  id="-------" class="smaller">
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left">Коэффициенты</th>
+<th align="left">\(\beta_0\)</th>
+<th align="left">\(\beta_1\)</th>
+<th align="left">\(\beta_2\)</th>
+<th align="left">\(\beta_3\)</th>
+<th align="left">\(\beta_4\)</th>
+<th align="left">\(\beta_5\)</th>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">(Intercept)</td>
+<td align="left">treat1</td>
+<td align="left">time1</td>
+<td align="left">time2</td>
+<td align="left">treat1:time1</td>
+<td align="left">treat1:time2</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">1.24</td>
+<td align="left">-0.056</td>
+<td align="left">-0.386</td>
+<td align="left">0.146</td>
+<td align="left">0.031</td>
+<td align="left">-0.038</td>
+</tr>
+</table>
+
+<table class = 'rmdtable'>
+<col width="13%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="9%" />
+<tr class="header">
+<th align="left">Средние в группах</th>
+<th align="left">2m</th>
+<th align="left">4m</th>
+<th align="left">6m</th>
+<th align="left">Общие средние</th>
+</tr>
+<tr class="odd">
+<td align="left">control</td>
+<td align="left">\(\beta_0 + \beta_1 + \beta_2 + \beta_4\)</td>
+<td align="left">\(\beta_0 + \beta_1 + \beta_3 + \beta_5\)</td>
+<td align="left">\(\beta_0 + \beta_1 - \beta_2 - \beta_3 - \beta_4 - \beta_5\)</td>
+<td align="left">\(\mu_{c} = \beta_0 + \beta_1\)</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">0.828</td>
+<td align="left">1.291</td>
+<td align="left">1.431</td>
+<td align="left">1.184</td>
+</tr>
+<tr class="odd">
+<td align="left">treatment</td>
+<td align="left">\(\beta_0 - \beta_1 + \beta_2 - \beta_4\)</td>
+<td align="left">\(\beta_0 - \beta_1 + \beta_3 - \beta_5\)</td>
+<td align="left">\(\beta_0 - \beta_1 - \beta_2 - \beta_3 + \beta_4 + \beta_5\)</td>
+<td align="left">\(\mu_{tr} = \beta_0 - \beta_1\)</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">0.879</td>
+<td align="left">1.48</td>
+<td align="left">1.528</td>
+<td align="left">1.295</td>
+</tr>
+<tr class="odd">
+<td align="left">Общие средние</td>
+<td align="left">\(\mu_{2m} = \beta_0 + \beta_2\)</td>
+<td align="left">\(\mu_{4m} = \beta_0 + \beta_3\)</td>
+<td align="left">\(\mu_{6m} = \beta_0 - \beta_2 - \beta_3\)</td>
+<td align="left">\(\mu = \beta_0\)</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">0.853</td>
+<td align="left">1.386</td>
+<td align="left">1.48</td>
+<td align="left">1.24</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Предсказанные значения</h2></hgroup><article  id="-">
+
+<p>\(Y = \hat Y + \epsilon = X \beta + \epsilon\)</p>
+
+<p>\(\hat Y = X \beta\)</p>
+
+<pre class = 'prettyprint lang-r'>Yhat &lt;- X %*% betas
+# значения совпадают с вычисленными автоматически
+cbind(Yhat, fitted(fit))</pre>
+
+<pre >##     [,1]  [,2]
+## 1  0.828 0.828
+## 2  0.828 0.828
+## 3  0.828 0.828
+## 4  0.828 0.828
+## 5  0.828 0.828
+## 6  1.291 1.291
+## 7  1.291 1.291
+## 8  1.291 1.291
+## 9  1.291 1.291
+## 10 1.291 1.291
+## 11 1.431 1.431
+## 12 1.431 1.431
+## 13 1.431 1.431
+## 14 1.431 1.431
+## 15 0.879 0.879
+## 16 0.879 0.879
+## 17 0.879 0.879
+## 18 0.879 0.879
+## 19 0.879 0.879
+## 20 1.480 1.480
+## 21 1.480 1.480
+## 22 1.480 1.480
+## 23 1.480 1.480
+## 24 1.480 1.480
+## 25 1.528 1.528
+## 26 1.528 1.528
+## 27 1.528 1.528
+## 28 1.528 1.528
+## 29 1.528 1.528</pre>
+
+</article></slide><slide class=''><hgroup><h2>Стандартные ошибки предсказанных значений</h2></hgroup><article  id="---">
+
+<p>Стандартные ошибки предсказанных значений это корень из диагональных элементов матрицы X * cov(betas) * t(X)</p>
+
+<pre class = 'prettyprint lang-r'>SE &lt;- sqrt(diag(X %*% vcov(fit) %*% t(X)))
+# совпадают с вычисленными автоматически
+cbind(SE, predict(fit, se.fit = TRUE)$se)</pre>
+
+<pre >##        SE       
+## 1  0.0253 0.0253
+## 2  0.0253 0.0253
+## 3  0.0253 0.0253
+## 4  0.0253 0.0253
+## 5  0.0253 0.0253
+## 6  0.0253 0.0253
+## 7  0.0253 0.0253
+## 8  0.0253 0.0253
+## 9  0.0253 0.0253
+## 10 0.0253 0.0253
+## 11 0.0283 0.0283
+## 12 0.0283 0.0283
+## 13 0.0283 0.0283
+## 14 0.0283 0.0283
+## 15 0.0253 0.0253
+## 16 0.0253 0.0253
+## 17 0.0253 0.0253
+## 18 0.0253 0.0253
+## 19 0.0253 0.0253
+## 20 0.0253 0.0253
+## 21 0.0253 0.0253
+## 22 0.0253 0.0253
+## 23 0.0253 0.0253
+## 24 0.0253 0.0253
+## 25 0.0253 0.0253
+## 26 0.0253 0.0253
+## 27 0.0253 0.0253
+## 28 0.0253 0.0253
+## 29 0.0253 0.0253</pre>
+
+</article></slide><slide class=''><hgroup><h2>95% доверительный интервал</h2></hgroup><article  id="-">
+
+<p>Можем посчитать, зная предсказанные значения и их стандартные ошибки</p>
+
+<pre class = 'prettyprint lang-r'>Upr &lt;- Yhat + qnorm(0.975) * SE
+Lwr &lt;- Yhat - qnorm(0.975) * SE
+cbind(Lwr, Upr, predict(fit, interval = &quot;confidence&quot;))</pre>
+
+<pre >##                  fit   lwr   upr
+## 1  0.778 0.878 0.828 0.776 0.881
+## 2  0.778 0.878 0.828 0.776 0.881
+## 3  0.778 0.878 0.828 0.776 0.881
+## 4  0.778 0.878 0.828 0.776 0.881
+## 5  0.778 0.878 0.828 0.776 0.881
+## 6  1.242 1.341 1.291 1.239 1.344
+## 7  1.242 1.341 1.291 1.239 1.344
+## 8  1.242 1.341 1.291 1.239 1.344
+## 9  1.242 1.341 1.291 1.239 1.344
+## 10 1.242 1.341 1.291 1.239 1.344
+## 11 1.376 1.487 1.431 1.373 1.490
+## 12 1.376 1.487 1.431 1.373 1.490
+## 13 1.376 1.487 1.431 1.373 1.490
+## 14 1.376 1.487 1.431 1.373 1.490
+## 15 0.829 0.928 0.879 0.826 0.931
+## 16 0.829 0.928 0.879 0.826 0.931
+## 17 0.829 0.928 0.879 0.826 0.931
+## 18 0.829 0.928 0.879 0.826 0.931
+## 19 0.829 0.928 0.879 0.826 0.931
+## 20 1.430 1.530 1.480 1.428 1.532
+## 21 1.430 1.530 1.480 1.428 1.532
+## 22 1.430 1.530 1.480 1.428 1.532
+## 23 1.430 1.530 1.480 1.428 1.532
+## 24 1.430 1.530 1.480 1.428 1.532
+## 25 1.478 1.577 1.528 1.475 1.580
+## 26 1.478 1.577 1.528 1.475 1.580
+## 27 1.478 1.577 1.528 1.475 1.580
+## 28 1.478 1.577 1.528 1.475 1.580
+## 29 1.478 1.577 1.528 1.475 1.580</pre>
+
+</article></slide><slide class=''><hgroup><h2>Take home messages</h2></hgroup><article  id="take-home-messages">
+
+<ul>
+<li>Многофакторный дисперсионный анализ позволяет оценить взаимодействие факторов. Если оно значимо, то лучше воздержаться от интерпретации их индивидуальных эффектов</li>
+<li>Если численности групп равны - получаются одинаковые результаты с использованием I, II, III типы сумм квадратов</li>
+<li>В случае, если численности групп неравны (несбалансированные данные) по разному тестируется значимость факторов (I, II, III типы сумм квадратов)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Дополнительные ресурсы</h2></hgroup><article  id="-">
+
+<ul>
+<li>Quinn, Keough, 2002, pp. 221-250</li>
+<li>Logan, 2010, pp. 313-359</li>
+<li>Sokal, Rohlf, 1995, pp. 321-362</li>
+<li>Zar, 2010, pp. 246-266</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

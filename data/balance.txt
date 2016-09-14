@@ -1,0 +1,10 @@
+Story Name: Maintaining Balance
+http://lib.stat.cmu.edu/DASL/Stories/MaintainingBalance.html
+Story Topics: Psychology , Health
+Datafile Name: Balance
+Methods: Mann Whitney U test , Two sample t-test , Outlier
+Abstract: Is it harder to maintain your balance while you are concentrating? Nine elderly (6 men and 3 women) and eight young men were subjects in this experiment. Each subject stood barefoot on a "force platform" and was asked to maintain a stable upright position and to react as quickly as possible to an unpredictable noise by pressing a hand held button. The noise came randomly and the subject concentrated on reacting as quickly as possible. The platform automatically measured how much each subject swayed in millimeters in both the forward/backward and the side-to-side directions.
+
+Since we are interested in comparing the two groups, a two-sample t-test or a non-parametric test such as the Mann-Whitney U test is appropriate to test for differences. A pooled t-test may be appropriate.
+
+The data show some outliers, which affect the t-tests.

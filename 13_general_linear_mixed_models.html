@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>смешаные линейные модели</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'смешаные линейные модели',
+                        subtitle: 'Линейные модели, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: '13_general_linear_mixed_models_files/logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Марина Варфоломеева, Вадим Хайтов' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(13_general_linear_mixed_models_files/logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="13_general_linear_mixed_models_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Вы узнаете</h2></hgroup><article  id="-">
+
+<ul>
+<li>Что такое смешаные модели и когда они применяются</li>
+<li>Что такое фиксированные и случайные факторы</li>
+</ul>
+
+<h3>Вы сможете</h3>
+
+<ul>
+<li>Рассказать чем фиксированные факторы отличаются от случайных</li>
+<li>Привести примеры факторов, которые могут быть фиксированными или случайными в зависимости от задачи исследования</li>
+<li>Рассказать, что оценивает коэффициент внутриклассовой корреляции и вычислить его для случая с одним случайным фактором</li>
+<li>Подобрать смешаную линейную модель со случайным отрезком и случайным углом наклона в R при помощи методов максимального правдоподобия</li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Многоуровневые данные</h2></hgroup><article  id="-">
+
+</article></slide><slide class=''><hgroup><h2>Пример: Как время реакции людей зависит от бессонницы?</h2></hgroup><article  id="-------">
+
+<p>Данные из Belenky et al., 2003.<br/>В нулевой день эксперимента всем испытуемым давали поспать нормальное время. Начиная со следующей ночи давали спать по 3 часа.</p>
+
+<ul>
+<li><code>Reaction</code> - среднее время реакции в серии тестов в день наблюдения, мс</li>
+<li><code>Days</code> - число дней депривации сна</li>
+<li><code>Subject</code> - номер субъекта</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(lme4)
+data(sleepstudy)
+sl &lt;- sleepstudy
+head(sl, 3)</pre>
+
+<pre >##   Reaction Days Subject
+## 1      250    0     308
+## 2      259    1     308
+## 3      251    2     308</pre>
+
+</article></slide><slide class=''><hgroup><h2>Знакомство с данными</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>str(sl)</pre>
+
+<pre >## &#39;data.frame&#39;:    180 obs. of  3 variables:
+##  $ Reaction: num  250 259 251 321 357 ...
+##  $ Days    : num  0 1 2 3 4 5 6 7 8 9 ...
+##  $ Subject : Factor w/ 18 levels &quot;308&quot;,&quot;309&quot;,&quot;310&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...</pre>
+
+<pre class = 'prettyprint lang-r'># пропущенные значения
+sum(!complete.cases(sl))</pre>
+
+<pre >## [1] 0</pre>
+
+<pre class = 'prettyprint lang-r'># число субъектов
+length(unique(sl$Subject))</pre>
+
+<pre >## [1] 18</pre>
+
+</article></slide><slide class=''><hgroup><h2>Знакомство с данными (продолжение)</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'># сбалансирован ли объем выборки?
+table(sl$Subject)</pre>
+
+<pre >## 
+## 308 309 310 330 331 332 333 334 335 337 349 350 351 352 369 370 371 
+##  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10  10 
+## 372 
+##  10</pre>
+
+<pre class = 'prettyprint lang-r'>with(sl, table(Subject, Days))</pre>
+
+<pre >##        Days
+## Subject 0 1 2 3 4 5 6 7 8 9
+##     308 1 1 1 1 1 1 1 1 1 1
+##     309 1 1 1 1 1 1 1 1 1 1
+##     310 1 1 1 1 1 1 1 1 1 1
+##     330 1 1 1 1 1 1 1 1 1 1
+##     331 1 1 1 1 1 1 1 1 1 1
+##     332 1 1 1 1 1 1 1 1 1 1
+##     333 1 1 1 1 1 1 1 1 1 1
+##     334 1 1 1 1 1 1 1 1 1 1
+##     335 1 1 1 1 1 1 1 1 1 1
+##     337 1 1 1 1 1 1 1 1 1 1
+##     349 1 1 1 1 1 1 1 1 1 1
+##     350 1 1 1 1 1 1 1 1 1 1
+##     351 1 1 1 1 1 1 1 1 1 1
+##     352 1 1 1 1 1 1 1 1 1 1
+##     369 1 1 1 1 1 1 1 1 1 1
+##     370 1 1 1 1 1 1 1 1 1 1
+##     371 1 1 1 1 1 1 1 1 1 1
+##     372 1 1 1 1 1 1 1 1 1 1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Есть ли выбросы?</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>library(ggplot2)
+theme_set(theme_bw() + theme(legend.key = element_blank()))
+update_geom_defaults(&quot;point&quot;, list(shape = 19))
+# Есть ли наблюдения-выбросы? строим dot-plot
+ggplot(sl, aes(x = Reaction, y = 1:nrow(sl), colour = Subject)) + 
+  geom_point() + guides(colour = guide_legend(ncol = 2))</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /> &gt;- Субъектов с необычным временем реакции нет<br/>&gt;- Видно, что у разных субъектов время реакции различается. Есть быстрые, есть медленные. Межиндивидуальную изменчивость нельзя игнорировать.</p>
+
+</article></slide><slide class=''><hgroup><h2>Что делать с разными субъектами?</h2></hgroup><article  id="----">
+
+<p>Неправильные варианты:</p>
+
+<ul>
+<li>игнорировать структуру данных, не учитывать группирующий фактор</li>
+<li>учитывать группирующий фактор как обычно</li>
+</ul>
+
+<p>Правильный вариант</p>
+
+<ul>
+<li>подобрать смешаную модель (в которой есть фиксированные и случайные факторы)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Неправильный вариант 1. Не учитываем группирующий фактор.</h2></hgroup><article  id="--1.----.">
+
+<p>\(Reaction_{i} = \beta_0 + \beta_1 Days_{i} + \epsilon_{i}\)</p>
+
+<p>\(\epsilon_i \sim N(0, \sigma^2)\)<br/>\(i = 1, 2, ..., 180\) &#8211; общее число наблюдений</p>
+
+<p>В матричном виде \(\mathbf{Reaction} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\epsilon}\)</p>
+
+<pre class = 'prettyprint lang-r'>wrong1 &lt;- lm(Reaction ~ Days, data = sl)</pre>
+
+<div class="columns-2">
+<p>Если мы не учитываем группирующий фактор, все будет &quot;очень достоверно&quot; из-за низких стандартных ошибок.<br/>Но в этом случае условие независимости будет нарушено, поэтому все не так как кажется.</p>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-6-1.png" width="432" style="display: block; margin: auto;" /></p></div>
+
+</article></slide><slide class=''><hgroup><h2>Неправильный вариант 2. Группирующий фактор как фиксированный.</h2></hgroup><article  id="--2.----.">
+
+<p>\(Reaction_{ij} = \beta_0 + \beta_1 Days_{j} + \beta_{2}Subject_{i = 2} + ... + \beta_{2}Subject_{i = 18} + \epsilon_{ij}\)</p>
+
+<p>\(\epsilon_ij \sim N(0, \sigma^2)\) - остатки от регрессии<br/>\(i = 1, 2, ..., 18\) - субъект<br/>\(j = 1, 2, ..., 10\) - день</p>
+
+<p>В матричном виде \(\mathbf{Reaction} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\epsilon}\)</p>
+
+<pre class = 'prettyprint lang-r'>wrong2 &lt;- lm(Reaction ~ Days + Subject, data = sl)</pre>
+
+<p>Если мы учитываем группирующий фактор как обычно (как <strong>фиксированный фактор</strong>), придется оценивать слишком много параметров (18 для уровней группирующего фактора, 1 для <code>Days</code>, \(\epsilon\) &#8212; всего 20).<br/>При этом у нас всего 180 наблюдений. Чтобы получить удовлетворительную мощность, нужно минимум 10&#8211;20 наблюдений на каждый параметр (Harrell, 2013) &#8212; у нас 9.</p>
+
+</article></slide><slide class=''><hgroup><h2>Что нам делать с этим множеством прямых?</h2></hgroup><article  id="------">
+
+<pre class = 'prettyprint lang-r'>wrong2_diag &lt;- fortify(wrong2)
+ggplot(wrong2_diag, aes(x = Days, colour = Subject)) +
+  geom_line(aes(y = .fitted, group = Subject)) +
+  geom_point(data = sl, aes(y = Reaction)) +
+  guides(colour = guide_legend(ncol = 2))</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li>Нас не интересует, как различается время реакции каждого конкретного субъекта. Можем попытаться вместо подбора отдельных интерсептов, оценить разброс их значений.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Можно посмотреть на группирующий фактор иначе!</h2></hgroup><article  id="-----">
+
+<p>Нам не важны конкретные значения на разных уровнях фактора. Мы можем представить, что эффект фактора &#8212; случайная величина. Мы можем оценить дисперсию между уровнями группирующего фактора.</p>
+
+<p>Такие факторы называются <strong>случайными факторами</strong>, а модели с такими факторами называются <strong>смешаными моделями</strong>:</p>
+
+<ul>
+<li><p>Общие смешаные модели (general linear mixed models) &#8212; нормальное распределение зависимой переменной</p></li>
+<li><p>Обобщенные смешаные модели (generalized linear mixed models) &#8212; другие формы распределений зависимой переменной</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Фиксированные и случайные факторы</h2></hgroup><article  id="---">
+
+<table class = 'rmdtable'>
+<col width="13%" />
+<col width="13%" />
+<col width="13%" />
+<tr class="header">
+<th align="left">Свойства</th>
+<th align="left">Фиксированные факторы</th>
+<th align="left">Случайные факторы</th>
+</tr>
+<tr class="odd">
+<td align="left">Уровни фактора</td>
+<td align="left">фиксированные, заранее определенные и потенциально воспроизводимые уровни</td>
+<td align="left">случайная выборка из всех возможных уровней</td>
+</tr>
+<tr class="even">
+<td align="left">Используются для тестирования гипотез</td>
+<td align="left">о средних значениях отклика между уровнями фактора<br />\(H _{0}: μ _1 = μ _2 = · · · = μ _i = μ\)</td>
+<td align="left">о дисперсии отклика между уровнями фактора<br />\(H _{0}: \sigma_{\alpha}^2 = 0\)</td>
+</tr>
+<tr class="odd">
+<td align="left">Выводы можно экстраполировать</td>
+<td align="left">только на уровни из анализа</td>
+<td align="left">на все возможные уровни</td>
+</tr>
+<tr class="even">
+<td align="left">Число уровней фактора</td>
+<td align="left"><strong>Осторожно!</strong> Если уровней фактора слишком много, то нужно подбирать слишком много коэффициентов - должно быть много данных</td>
+<td align="left"><strong>Важно!</strong> Для точной оценки \(\sigma\) нужно нужно много уровней фактора - не менее 5</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Примеры фиксированных и случайных факторов</h2></hgroup><article  id="----">
+
+<p><strong>Фиксированные факторы</strong></p>
+
+<ul>
+<li>Пол</li>
+<li>Низина/вершина</li>
+<li>Илистый/песчаный грунт</li>
+<li>Тень/свет</li>
+<li>Опыт/контроль</li>
+</ul>
+
+<p><strong>Случайные факторы</strong></p>
+
+<ul>
+<li>Субъект, особь или площадка (если есть несколько измерений)</li>
+<li>Выводок</li>
+<li>Блок, делянка на участке</li>
+<li>Аквариум в лаб. эксперименте</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Какого типа эти факторы? От чего это зависит?</h2></hgroup><article  id="-------">
+
+<ul>
+<li><p>Несколько произвольно выбранных градаций плотности моллюсков в полевом эксперименте, где плотностью манипулировали.</p></li>
+<li><p>Фактор размер червяка (маленький, средний, большой) в выборке червей.</p></li>
+<li><p>Деление губы Чупа на зоны с разной степенью распреснения.</p></li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>смешаные линейные модели</h2></hgroup><article  id="--">
+
+</article></slide><slide class=''><hgroup><h2>смешаная линейная модель в общем виде</h2></hgroup><article  id="-----">
+
+<p>\[Y_i = X _i \times \boldsymbol{\beta} + Z_i \times b _i + \boldsymbol{\epsilon} _i\]</p>
+
+<p>\(\mathbf{b} _i \sim N(0, \mathbf{D})\) - случайные эффекты нормально распределены со средним 0 и дисперсией \(d^2\)</p>
+
+<p>\(\boldsymbol{\epsilon} _i \sim N(0, \boldsymbol{\sigma})\) - остатки модели нормально распределены со средним 0 и матрицей ковариаций \(\boldsymbol{\sigma}\)</p>
+
+<p>\(\mathbf{X} _i \times \boldsymbol{\beta}\) - фиксированная часть модели</p>
+
+<p>\(\mathbf{Z}_i \times \mathbf{b} _i\) - случайная часть модели</p>
+
+</article></slide><slide class=''><hgroup><h2>В примере модель со случайным отрезком можно записать так:</h2></hgroup><article  id="--------" class="smaller">
+
+<p>\(Reaction_{ij} = \beta_0 + \beta_1 Days_{ij} + b_i + \epsilon_{ij}\)</p>
+
+<p>\(b_{i} \sim N(0, d^2)\) - случайный эффект субъекта (intercept)<br/>\(\epsilon_{ij} \sim N(0, \boldsymbol{\sigma})\) - остатки модели<br/>\(i = 1, 2, ..., 18\) - субъекты<br/>\(j = 1, 2, ..., 10\) - дни</p>
+
+<p>Для каждого субъекта \(i\) в матричном виде это записывается:</p>
+
+<p>\[ \left( \begin{array}{c} Reaction _{i1} \\ Reaction _{i2} \\ \vdots \\ Reaction _{i10} \end{array} \right)
+= \left(\begin{array}{cc}
+1 &amp; Days _{i1} \\ 1 &amp; Days _{i2} \\ \vdots \\ 1 &amp; Days _{i10}
+\end{array} \right)
+\times
+\left( \begin{array}{c}
+\beta _0 \\ \beta _1
+\end{array} \right) + 
+\left( \begin{array}{c} 1 \\ 1 \\ \vdots \\ 1 \end{array} \right)
+\times b _{i} + 
+\left( \begin{array}{c} \epsilon _{i1} \\ \epsilon _{i2}\\ \vdots \\ \epsilon _{i10} \end{array} \right)\]</p>
+
+<p>что можно записать сокращенно так:</p>
+
+<p>\[\mathbf{Reaction} _i = \mathbf{X} _i \times \boldsymbol{\beta} + \mathbf{Z} _i \times \mathbf{b} _i + \boldsymbol{\epsilon}_i\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Подбор смешаных моделей в R</h2></hgroup><article  id="----r" class="smaller">
+
+<p>Самые популярные пакеты - <code>nlme</code> (старый, иногда медленный, стабильный, хорошо документированный) и <code>lme4</code> (новый, быстрый, не такой стабильный, хуже документированный). Есть много других.</p>
+
+<table class = 'rmdtable'>
+<col width="18%" />
+<col width="18%" />
+<col width="18%" />
+<col width="18%" />
+<col width="18%" />
+<tr class="header">
+<th align="left">Функция</th>
+<th align="left"><code>lme()</code><br />из <code>nlme</code></th>
+<th align="left"><code>lmer()</code><br />из <code>lme4</code></th>
+<th align="left"><code>glmer()</code><br />из <code>lme4</code></th>
+<th align="left"><code>glmmPQL()</code><br />из <code>MASS</code></th>
+</tr>
+<tr class="odd">
+<td align="left">Распределение отклика</td>
+<td align="left">нормальное</td>
+<td align="left">нормальное</td>
+<td align="left">биномиальное, пуассоновское,<br />гамма, квази-&#8230;<br /><br /></td>
+<td align="left">биномиальное, пуассоновское,<br />гамма, квази-&#8230;,<br /><strong>отр. биномиальное</strong></td>
+</tr>
+<tr class="even">
+<td align="left">Метод оценивания</td>
+<td align="left">ML, REML</td>
+<td align="left">ML, REML</td>
+<td align="left">ML, REML</td>
+<td align="left">PQL</td>
+</tr>
+<tr class="odd">
+<td align="left">Гетерогенность дисперсий</td>
+<td align="left">+</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">-</td>
+</tr>
+<tr class="even">
+<td align="left">Корреляционные структуры</td>
+<td align="left">+</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">+</td>
+</tr>
+<tr class="odd">
+<td align="left">Доверительная вероятность<br />(p-value)</td>
+<td align="left">+</td>
+<td align="left">-</td>
+<td align="left">-</td>
+<td align="left">+</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Синтаксис для смешаных моделей в R</h2></hgroup><article  id="-----r">
+
+<p><strong>Фиксированная часть модели</strong> задается обычной двухсторонней формулой</p>
+
+<p><code>Y ~ 1 + X1 + ... + Xn</code></p>
+
+<p><strong>Случайная часть модели</strong> - односторонняя формула. До вертикальной черты &#8212; перечислены факторы, влияющие на случайный угол наклона. После вертикальной черты &#8212; факторы, влияющие на случайный intercept.</p>
+
+<p><code>~ 1 + X1 + ... + Xn |A</code></p>
+
+<p>Вложенные друг в друга факторы указываются от крупного к мелкому через &quot;/&quot;</p>
+
+<p><code>~ 1 + X1 + ... + Xn |A/B/C</code></p>
+
+<p>Детали синтаксиса разных функций отличаются (см. следующий слайд с примерами формул)</p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article  id="section" class="flexbox vcenter smaller">
+
+<table class = 'rmdtable'>
+<col width="18%" />
+<col width="18%" />
+<col width="18%" />
+<tr class="header">
+<th align="left">Факторы</th>
+<th align="left"><code>lme()</code> из <code>nlme</code></th>
+<th align="left"><code>lmer()</code> из <code>lme4</code></th>
+</tr>
+<tr class="odd">
+<td align="left">А &#8211; случ. intercept</td>
+<td align="left"><code>lme(fixed=Y~1,random=~1|A,data=dt)</code></td>
+<td align="left"><code>lmer(Y~1+(1|A),data=dt)</code></td>
+</tr>
+<tr class="even">
+<td align="left">A &#8211; случ. intercept, X &#8211; фикс.</td>
+<td align="left"><code>lme(fixed=Y~X,random=~1|A,data=dt)</code></td>
+<td align="left"><code>lmer(Y~X+(1|A),data=dt)</code></td>
+</tr>
+<tr class="odd">
+<td align="left">A &#8211; случ. intercept и угол накл. X</td>
+<td align="left"><code>lme(fixed=Y~X,random=~1+X|A, data=dt)</code></td>
+<td align="left"><code>lmer(Y~X+(1+X|A), data=dt)</code></td>
+</tr>
+<tr class="even">
+<td align="left">A &#8211; случ. intercept, A вложен в фикс.Х</td>
+<td align="left"><code>nlme(fixed=Y~X,random=~1|X/A, data=dt)</code></td>
+<td align="left"><code>lmer(Y~X+(1|A:X), data=dt)</code></td>
+</tr>
+<tr class="odd">
+<td align="left">A и В &#8211; случ. intercept, A и B независимы (crossed effects), X &#8211; фикс.</td>
+<td align="left"></td>
+<td align="left"><code>lmer(Y~X+(1|A)+(1|B), data=dt)</code></td>
+</tr>
+<tr class="even">
+<td align="left">A и В &#8211; случ. intercept, B вложен в А (nested effects), уровни B повт. в группах по A, X &#8211; фикс.</td>
+<td align="left"><code>lme(fixed=Y~X, random=~1|A/B, data=dt)</code></td>
+<td align="left"><code>lmer(Y~X+(1|A/B), data=dt)</code><br /><code>lmer(Y~X+(1|A)+(1|A:B), data=dt)</code></td>
+</tr>
+<tr class="odd">
+<td align="left">A и В &#8211; случ. intercept, B вложен в А (nested random effects), все уровни B уникальны, X &#8211; фикс.</td>
+<td align="left"><code>lme(fixed=Y~X,random=~1|A/B, data=dt)</code></td>
+<td align="left"><code>lmer(Y~X+(1|A)+(1|B), data=dt)</code></td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Подберем модель со случайным отрезком с помощью <code>lme()</code> из пакета <code>nlme</code></h2></hgroup><article  id="-------lme---nlme">
+
+<pre class = 'prettyprint lang-r'>detach(&quot;package:lme4&quot;)  # выгружаем lme4, чтобы не было конфликтов
+library(nlme)
+M1 &lt;- lme(Reaction ~ Days, random = ~1 | Subject, data = sl)</pre>
+
+</article></slide><slide class=''><hgroup><h2>1. Анализ остатков. Все ли в порядке с моделью?</h2></hgroup><article  id="-.------">
+
+<p>Нужно построить серию диагностических графиков.</p>
+
+<ol>
+<li>График остатков от предсказанных значений</li>
+<li>График остатков от ковариат в модели</li>
+<li>График остатков от ковариат не вошедших в модель (нет ли других нужных переменных?), если есть</li>
+<li>График остатков от времени, если есть</li>
+<li>График остатков от координат проб, если есть</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>1) График остатков от предсказанных значений</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'># plot(M1)
+sl$.stdresid &lt;- resid(M1, type = &quot;pearson&quot;)
+sl$.fitted &lt;- fitted(M1)
+ggplot(sl) + geom_point(aes(x = .fitted, y = .stdresid, colour = Subject))</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li>Есть большие остатки, гетерогенность дисперсий</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>2) График остатков от ковариат в модели</h2></hgroup><article  id="-----" class="smaller">
+
+<pre class = 'prettyprint lang-r'>p &lt;- ggplot(data = sl, aes(y = .stdresid))
+library(gridExtra)
+grid.arrange(
+  p + geom_point(aes(x = Days, colour = Subject)),
+  p + geom_boxplot(aes(x = Subject)),
+  ncol = 2)</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-11-1.png" width="960" style="display: block; margin: auto;" /> &gt; - Большой остаток у наблюдения 332 субъекта &gt; - Нелинейный паттерн &gt; - Гетерогенность дисперсий &gt; - Пока оставим все как есть</p>
+
+</article></slide><slide class=''><hgroup><h2>2. Проверяем, какие из фиксированных факторов влияют одним из трех вариантов:</h2></hgroup><article  id="---------">
+
+<p>(а) По значениям t-(или -z) статистики (по REML оценке)<br/>(б) F-критерий - приблизительный результат (REML оценка)<br/>(в) likelihood ratio test или AIC (ML оценка)<br/>- Либо попарное сравнение вложенных моделей при помощи likelihood ratio test - Либо сравнение моделей по AIC</p>
+
+</article></slide><slide class=''><hgroup><h2>2(а) По значениям t-(или -z) статистики (по REML оценке)</h2></hgroup><article  id="---t---z---reml-">
+
+<p>Дает приблизительный результат; годится для факторов, если не больше 2 уровней</p>
+
+<pre class = 'prettyprint lang-r'>summary(M1)</pre>
+
+<pre >## Linear mixed-effects model fit by REML
+##  Data: sl 
+##    AIC  BIC logLik
+##   1794 1807   -893
+## 
+## Random effects:
+##  Formula: ~1 | Subject
+##         (Intercept) Residual
+## StdDev:        37.1       31
+## 
+## Fixed effects: Reaction ~ Days 
+##             Value Std.Error  DF t-value p-value
+## (Intercept) 251.4      9.75 161    25.8       0
+## Days         10.5      0.80 161    13.0       0
+##  Correlation: 
+##      (Intr)
+## Days -0.371
+## 
+## Standardized Within-Group Residuals:
+##     Min      Q1     Med      Q3     Max 
+## -3.2257 -0.5529  0.0109  0.5188  4.2506 
+## 
+## Number of Observations: 180
+## Number of Groups: 18</pre>
+
+</article></slide><slide class=''><hgroup><h2>2(б) F-критерий - приблизительный результат (REML оценка)</h2></hgroup><article  id="-f------reml-">
+
+<p>Зависит от порядка включения предикторов в модель (Type I SS, sequential); годится если один предиктор, либо внимательно интерпретировать.</p>
+
+<pre class = 'prettyprint lang-r'>anova(M1)</pre>
+
+<pre >##             numDF denDF F-value p-value
+## (Intercept)     1   161    1088  &lt;.0001
+## Days            1   161     169  &lt;.0001</pre>
+
+<ul class = 'build'>
+<li>Вывод: Время реакции зависит от продолжительности бессонницы</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>2(в1) Попарное сравнение вложенных моделей при помощи likelihood ratio test</h2></hgroup><article  id="1-------likelihood-ratio-test">
+
+<p>Дает более точные выводы, чем F и t(z)</p>
+
+<pre class = 'prettyprint lang-r'>M1.ml &lt;- lme(Reaction ~ Days, random = ~1 | Subject, data = sl, method = &quot;ML&quot;)
+M2.ml &lt;- update(M1.ml, . ~ . - Days)
+anova(M1.ml, M2.ml)</pre>
+
+<pre >##       Model df  AIC  BIC logLik   Test L.Ratio p-value
+## M1.ml     1  4 1802 1815   -897                       
+## M2.ml     2  3 1917 1926   -955 1 vs 2     116  &lt;.0001</pre>
+
+<p>df теста - это разница df сравниваемых моделей = 4 - 3 = 1</p>
+
+<ul class = 'build'>
+<li>Время реакции меняется в зависимости от продолжительности бессонницы (L = 116, df = 1, p &lt; 0.01)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>2(в2) Сравнение моделей по AIC</h2></hgroup><article  id="2----aic">
+
+<pre class = 'prettyprint lang-r'>AIC(M1.ml, M2.ml)</pre>
+
+<pre >##       df  AIC
+## M1.ml  4 1802
+## M2.ml  3 1917</pre>
+
+<ul class = 'build'>
+<li>Т.к. AIC меньше у модели с <code>Days</code>, можем написать:</li>
+</ul>
+
+<ul class = 'build'>
+<li>Продолжительность бессонницы влияет на время реакции (AIC)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>3. Представление результатов</h2></hgroup><article  id="-">
+
+<p>Для представления результатов переподбираем модель заново, используя Restricted Maximum Likelihood.</p>
+
+<p>REML оценка параметров более точна</p>
+
+<pre class = 'prettyprint lang-r'>MFinal1 &lt;- lme(Reaction ~ Days, random = ~1 | Subject, method = &quot;REML&quot;, 
+    data = sl)</pre>
+
+<p>Для проверки финальной модели необходимо провести анализ остатков (те же графики, что и в п.1). Поскольку модель не изменилась, не привожу их здесь</p>
+
+</article></slide><slide class=''><hgroup><h2>Теперь разберемся с допущениями модели</h2></hgroup><article  id="----" class="smaller">
+
+<p>\[\mathbf{Reaction} _i = \mathbf{X} _i \times \boldsymbol{\beta} + \mathbf{Z} _i \times \mathbf{b} _i + \boldsymbol{\epsilon}_i\]</p>
+
+<p>\(\mathbf{b} _i \sim N(0, \mathbf{D})\) - случайные эффекты \(b _i\) нормально распределены со средним 0 и матрицей ковариаций \(\mathbf{D}\)</p>
+
+<p>\(\boldsymbol{\epsilon} _i \sim N(0, \boldsymbol{\sigma} _i)\) - остатки модели нормально распределены со средним 0 и матрицей ковариаций \(\boldsymbol{\sigma} _i\)</p>
+
+<p>Матрица ковариаций остатков выглядит так: \[\mathbf{\sigma} _i = \sigma^2 \times 
+\left( \begin{array}{cccc}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; \cdots &amp; 0 \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; \cdots &amp; 1
+\end{array} \right)\]</p>
+
+<p>Т.е. остатки независимы друг от друга (вне диагонали стоят нули, т.е. ковариация разных остатков 0).</p>
+
+<p>В то же время, отдельные значения переменной-отклика \(Y _i\) уже не будут независимы друг от друга при добавлении случайных эффектов - см. ниже</p>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article  id="section-1" class="smaller">
+
+<p>Можно показать, что \(Y _i\) нормально распределена \(Y _i \sim N(\mathbf{X} _i \times \boldsymbol{\beta}, Cov(\mathbf{Y_i}) )\)</p>
+
+<p>\(Cov(Y_i) = \mathbf{V} _i = \mathbf{Z} _i × \mathbf{D} × \mathbf{Z&#39;} _i + \mathbf{\sigma} _i\) - матрица ковариаций зависимой переменной<br/>\(\mathbf{D}\) - матрица ковариаций случайных эффектов.</p>
+
+<p>Т.е. <strong>добавление случайных эффектов приводит к изменению ковариационной матрицы</strong> \(Cov(Y_i)\)</p>
+
+<p>Для модели со случайным intercept:</p>
+
+<p>\[Cov(Y_i) = \left( \begin{array}{c} 1 \\ 1 \\ \vdots \\ 1 \end{array}\right)
+\times d^2
+\times \left( \begin{array}{c} 1 &amp; 1 &amp; \cdots &amp; 1 \end{array}\right) +
+\sigma^2
+\times
+\left( \begin{array}{cccc}
+1 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; \cdots &amp; 0 \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; \cdots &amp; 1
+\end{array} \right) =\]</p>
+
+<p>\[
+= \left( \begin{array}{cccc}
+\sigma^2 + d^2 &amp; d^2 &amp; \cdots &amp; d^2 \\
+d^2 &amp; \sigma^2 + d^2 &amp; \cdots &amp; d^2 \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+d^2 &amp; d^2 &amp; d^2 &amp; \sigma^2 + d^2
+\end{array} \right)
+\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Индуцированная корреляция - следствие включения в модель случайных эффектов</h2></hgroup><article  id="---------">
+
+<p>\[Cov(Y_i) =
+\left( \begin{array}{cccc}
+\sigma^2 + d^2 &amp; d^2 &amp; \cdots &amp; d^2 \\
+d^2 &amp; \sigma^2 + d^2 &amp; \cdots &amp; d^2 \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+d^2 &amp; d^2 &amp; d^2 &amp; \sigma^2 + d^2
+\end{array} \right)
+\]</p>
+
+<p>\(d^2\) - ковариация между наблюдениями одного субъекта; \(\sigma^2 + d^2\) - дисперсия</p>
+
+<p>Т.е. корреляция между наблюдениями одного субъекта \(d^2 / (\sigma^2 + d^2)\)</p>
+
+<h3>Коэффициент внутриклассовой корреляции \(d^2 / (\sigma^2 + d^2)\)</h3>
+
+<p>Способ измерить, насколько коррелируют друг с другом наблюдения из одной и той же группы случайного фактора. Если он высок, то можно брать меньше проб в группе (и больше групп, если нужно)</p>
+
+</article></slide><slide class=''><hgroup><h2>Вычисляем внутриклассовую корреляцию</h2></hgroup><article  id="--">
+
+<p>\(sigma_{Subject}^2 / (sigma_{Subject}^2 + sigma^2)\)</p>
+
+<pre class = 'prettyprint lang-r'>MFinal1</pre>
+
+<pre >В результатах
+Random effects:
+ Formula: ~1 | Subject
+        (Intercept) Residual
+StdDev:    37.12383 30.99123</pre>
+
+<pre class = 'prettyprint lang-r'># Внутриклассовая корреляция
+37.12383^2/(37.12383^2 + 30.99123^2)</pre>
+
+<pre >## [1] 0.589</pre>
+
+<ul class = 'build'>
+<li>Значения времени реакции одного субъекта похожи, эффект субъекта нельзя игнорировать в анализе</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>График предсказанных значений для результатов</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'># 1) Новый датафрейм, для которого будем предсказывать
+library(dplyr)
+minmax &lt;- sl %&gt;% group_by(Subject) %&gt;% summarise(mDays = min(Days), MDays = max(Days))
+new_data &lt;- minmax %&gt;% group_by(Subject) %&gt;% do(data.frame(Days = seq(.$mDays, 
+    .$MDays, length = 10)))
+
+# 2) Матрица линейной модели
+X &lt;- model.matrix(~Days, data = new_data)
+
+# 3) Вычисляем предсказанные значения одним из двух способов level = 0
+# - для фиксированных эффектов (т.е. без учета субъекта)
+new_data$.fitted &lt;- predict(MFinal1, new_data, level = 0)
+# или то же самое при помощи матриц
+betas = fixef(MFinal1)
+new_data$.fitted &lt;- X %*% betas
+
+# 4) Вычисляем стандартные ошибки предсказанных значений это квадратный
+# корень из диагональных элементов матрицы ковариаций предсказанных
+# значений X * cov(BETA) * t(X)
+new_data$.se &lt;- sqrt(diag(X %*% vcov(MFinal1) %*% t(X)))</pre>
+
+</article></slide><slide class=''><hgroup><h2>1-й вариант. График с предсказаниями по фиксированной части модели</h2></hgroup><article  id="-.-------" class="smaller">
+
+<pre class = 'prettyprint lang-r'>ggplot(new_data) + geom_ribbon(alpha = 0.2, aes(x = Days, y = .fitted, 
+    ymin = .fitted - 1.98 * .se, ymax = .fitted + 1.98 * .se)) + 
+    geom_point(data = sl, aes(x = Days, y = Reaction))</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>2-й вариант. График с предсказаниями для индивидуальных уровней случайного фактора</h2></hgroup><article  id="-.--------" class="smaller">
+
+<pre class = 'prettyprint lang-r'># beta_0 + beta * Days + случайный эффект субъекта
+new_data$.fitted1 &lt;- predict(MFinal1, new_data, level = 1)
+ggplot(new_data, aes(x = Days, y = .fitted1, group = Subject)) + 
+    geom_ribbon(aes(fill = Subject, ymin = .fitted1 - 1.98 * 
+        .se, ymax = .fitted1 + 1.98 * .se), alpha = 0.5) + geom_line() + 
+    geom_point(data = sl, aes(x = Days, y = Reaction))</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-21-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<pre class = 'prettyprint lang-r'># попробуйте добавить facet_wrap(~Subject)</pre>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>смешаные модели со случайным интерсептом и углом наклона</h2></hgroup><article  id="-------">
+
+</article></slide><slide class=''><hgroup><h2>смешаная модель со случайным интерсептом и углом наклона</h2></hgroup><article  id="-------">
+
+<p>На графике индивидуальных эффектов было видно, что измерения для разных субъектов, возможно, идут непараллельными линиями. Усложним модель &#8212; добавим случайные изменения угла наклона для каждого из субъектов</p>
+
+<pre class = 'prettyprint lang-r'>MS1 &lt;- lme(Reaction ~ Days, random = ~1 + Days | Subject, data = sl)</pre>
+
+<p>Дальнейшие действия по прежнему плану: - Анализ остатков - Проверка влияния факторов + подбор оптимальной модели - Визуализация предсказаний</p>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article >
+
+<p>Проверьте получившуюся модель MS1</p>
+
+<p>Проведите самостоятельно:</p>
+
+<ul>
+<li>Анализ остатков</li>
+<li>Проверку влияния факторов + подбор оптимальной модели</li>
+<li>Визуализацию предсказаний</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>1) График остатков от предсказанных значений</h2></hgroup><article  id="-----1">
+
+<pre class = 'prettyprint lang-r'># plot(M1)
+sl$.stdresid1 &lt;- resid(MS1, type = &quot;pearson&quot;)
+sl$.fitted1 &lt;- fitted(MS1)
+ggplot(sl) + geom_point(aes(x = .fitted1, y = .stdresid1, colour = Subject))</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li>Есть большие остатки, гетерогенность дисперсий</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>2) График остатков от ковариат в модели</h2></hgroup><article  id="------1" class="smaller">
+
+<pre class = 'prettyprint lang-r'>p &lt;- ggplot(data = sl, aes(y = .stdresid1))
+grid.arrange(
+  p + geom_point(aes(x = Days, colour = Subject)),
+  p + geom_boxplot(aes(x = Subject)),
+  ncol = 2)</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-24-1.png" width="960" style="display: block; margin: auto;" /> &gt; - Большой остаток у наблюдения 332 субъекта &gt; - Нелинейный паттерн &gt; - Гетерогенность дисперсий</p>
+
+</article></slide><slide class=''><hgroup><h2>2. Проверяем, какие из фиксированных факторов влияют при помощи likelihood ratio test</h2></hgroup><article  id="--------likelihood-ratio-test">
+
+<pre class = 'prettyprint lang-r'>MS1.ml &lt;- lme(Reaction ~ Days, random = ~1 + Days | Subject, data = sl, 
+    method = &quot;ML&quot;)
+MS2.ml &lt;- update(MS1.ml, random = ~1 | Subject)
+MS3.ml &lt;- update(MS2.ml, . ~ . - Days)
+anova(MS1.ml, MS2.ml, MS3.ml)</pre>
+
+<pre >##        Model df  AIC  BIC logLik   Test L.Ratio p-value
+## MS1.ml     1  6 1764 1783   -876                       
+## MS2.ml     2  4 1802 1815   -897 1 vs 2    42.1  &lt;.0001
+## MS3.ml     3  3 1917 1926   -955 2 vs 3   116.5  &lt;.0001</pre>
+
+<ul class = 'build'>
+<li>Время реакции меняется в зависимости от продолжительности бессонницы (L = 116, df = 1, p &lt; 0.01). Скорость изменений зависит от субъекта (L = 42, df = 2)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>3. Представление результатов</h2></hgroup><article  id="--1">
+
+<p>Для представления результатов переподбираем модель заново, используя Restricted Maximum Likelihood.</p>
+
+<p>REML оценка параметров более точна</p>
+
+<pre class = 'prettyprint lang-r'>MSFinal &lt;- lme(Reaction ~ Days, random = ~1 + Days | Subject, method = &quot;REML&quot;, 
+    data = sl)</pre>
+
+<pre class = 'prettyprint lang-r'># 1) Новый датафрейм, для которого будем предсказывать
+library(dplyr)
+minmax &lt;- sl %&gt;% group_by(Subject) %&gt;% summarise(mDays = min(Days), MDays = max(Days))
+new_data &lt;- minmax %&gt;% group_by(Subject) %&gt;% do(data.frame(Days = seq(.$mDays, 
+    .$MDays, length = 10)))
+# 2) Матрица линейной модели
+X &lt;- model.matrix(~Days, data = new_data)
+# 3) Предсказанные значения
+betas = fixef(MSFinal)
+new_data$.fitted &lt;- X %*% betas
+# 4) Стандартные ошибки предсказанных значений
+new_data$.se &lt;- sqrt(diag(X %*% vcov(MSFinal) %*% t(X)))</pre>
+
+</article></slide><slide class=''><hgroup><h2>1-й вариант. График с предсказаниями по фиксированной части модели</h2></hgroup><article  id="-.--------1" class="smaller">
+
+<pre class = 'prettyprint lang-r'>ggplot(new_data) + geom_ribbon(alpha = 0.2, aes(x = Days, y = .fitted, 
+    ymin = .fitted - 1.98 * .se, ymax = .fitted + 1.98 * .se)) + 
+    geom_point(data = sl, aes(x = Days, y = Reaction))</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>2-й вариант. График с предсказаниями для индивидуальных уровней случайного фактора</h2></hgroup><article  id="-.---------1" class="smaller">
+
+<pre class = 'prettyprint lang-r'># beta_0 + beta * Days + случайный эффект субъекта
+new_data$.fitted1 &lt;- predict(MSFinal, new_data, level = 1)
+ggplot(new_data, aes(x = Days, y = .fitted1, group = Subject)) + 
+    geom_ribbon(aes(fill = Subject, ymin = .fitted1 - 1.98 * 
+        .se, ymax = .fitted1 + 1.98 * .se), alpha = 0.5) + geom_line() + 
+    geom_point(data = sl, aes(x = Days, y = Reaction))</pre>
+
+<p><img src="13_general_linear_mixed_models_files/figure-html/unnamed-chunk-29-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<pre class = 'prettyprint lang-r'># попробуйте добавить facet_wrap(~Subject)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Take home messages</h2></hgroup><article  id="take-home-messages">
+
+<ul>
+<li>Смешаные модели включают случайные и фиксированные факторы</li>
+<li>Градации фиксированных факторов заранее определены, а выводы можно экстраполировать только на такие уровни, которые были задействованы в анализе. Тестируется гипотеза о значении средних</li>
+<li>Градации случайных факторов - выборка из возможных уровней, а выводы можно экстраполировать на другие уровни. Тестируется гипотеза о дисперсии между группами по фактору.</li>
+<li>Коэффициент внутриклассовой корреляции оценивает, насколько коррелируют друг с другом наблюдения из одной и той же группы случайного фактора</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Дополнительные ресурсы</h2></hgroup><article  id="-">
+
+<ul>
+<li>Crawley, M.J. (2007). The R Book (Wiley).</li>
+<li>Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer).</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

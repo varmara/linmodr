@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Построение моделей при нестабильности дисперсии остатков</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Построение моделей при нестабильности дисперсии остатков',
+                        subtitle: 'Линейные модели, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: '14_modelling_variance_structure_files/logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Вадим Хайтов, Марина Варфоломеева' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(14_modelling_variance_structure_files/logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="14_modelling_variance_structure_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Вы узнаете</h2></hgroup><article  id="-">
+
+<ul>
+<li>Как можно смоделировать &quot;поведение&quot; дисперсии</li>
+</ul>
+
+<h3>Вы сможете</h3>
+
+<ul>
+<li>Построить модели для данных, демонстрирующих высокую степень гетерогености дисперсии</li>
+<li>Подобрать оптимальную модель, учитывающую ковариаты дисперсии</li>
+<li>Построить смешанную модель учитывающую не только группирующие (случайные) факторы, но и гетерогенность дисперсии.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>В начале курса мы записывали &quot;обычную&quot; регрессионную модель в таком виде</h2></hgroup><article  id="----------">
+
+<p>\[y_i = \beta_0 + \beta_1x_i + \epsilon_i\]</p>
+
+<p>Фиксированная часть модели: \(y_i = \beta_0 + \beta_1x_i\)<br/>Случайная часть модели: \(\epsilon_i\)<br/><br> <strong>Важное ограничивающее условие метода:</strong> \(\epsilon \sim N(0, \sigma^2)\)</p>
+
+</article></slide><slide class=''><hgroup><h2>Теория смешанных моделей расширяет наши представления о случайной части модели</h2></hgroup><article  id="---------">
+
+<p><img src="images/model_structure_Zuur.png" width="800" height="300" ></p>
+
+<p>из Zuur et al. 2009</p>
+
+</article></slide><slide class=''><hgroup><h2>Модели на языке матриц</h2></hgroup><article  id="---" class="smaller">
+
+<p>Простая линейная модель \[y_i = \mathbf X_i\mathbf\beta + \epsilon_i\]</p>
+
+<p>\[\epsilon_i \sim N(0, \mathbf\sigma^2_i)\]</p>
+
+<p>Смешанная линейная модель с группирующими факторами</p>
+
+<p>\[y_i = \mathbf X_i\mathbf\beta + \mathbf Z_i\mathbf b_i +  \epsilon_i\] \[\epsilon \sim N(0, \Sigma_i)\] \[b_i \sim N(0, \mathbf\Psi)\]</p>
+
+<p>Расширенная смешанная линейная модель \[y_i = \mathbf X_i\mathbf\beta + \mathbf Z_i\mathbf b_i +  \epsilon_i\] \[\epsilon \sim N(0, \sigma^2 \times \mathbf\Lambda_i)\] \[b_i \sim N(0, \mathbf\Psi)\]</p>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Моделирование гетерогенности дисперсии</h2></hgroup><article  id="--">
+
+</article></slide><slide class=''><hgroup><h2>Способствуют ли взрослые мидии притоку молоди?</h2></hgroup><article  id="-----" class="smaller">
+
+<p>Даные взяты из работы Khaitov, 2013</p>
+
+<div class="columns-2">
+<pre class = 'prettyprint lang-r'>myt &lt;- read.table(&quot;data/myt.csv&quot;, sep = &quot;;&quot;, header = T)
+head(myt, 12)</pre>
+
+<pre >##    Year Bank Sample Recruits Small Large
+## 1  1997 vor2      1        0    12    25
+## 2  1997 vor2      2        0    23    27
+## 3  1997 vor2      3        0    17    36
+## 4  1997 vor2      4        0    17    27
+## 5  1997 vor2      5        0    30    25
+## 6  1997 vor2      6        0    12    27
+## 7  1999 vor2      1       12    12    41
+## 8  1999 vor2      2        2    16    38
+## 9  1999 vor2      3        1    13    49
+## 10 1999 vor2      4        6    19    52
+## 11 1999 vor2      5        1     7    31
+## 12 1999 vor2      6        2     9    34</pre>
+
+<p><img src="images/mussel_bed.png" width="400" height="400" ></p></div>
+
+</article></slide><slide class=''><hgroup><h2>В качестве зависимой перменной будем анализировать \(\sqrt{N_{recruits}}\)</h2></hgroup><article  id="------sqrtn_recruits">
+
+<pre class = 'prettyprint lang-r'>myt$Sq_Recruits &lt;- sqrt(myt$Recruits)
+
+myt$fYear &lt;- factor(myt$Year)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Строим обычную регрессионную модель</h2></hgroup><article  id="---" class="smaller">
+
+<pre class = 'prettyprint lang-r'>mod_formula &lt;- formula(Sq_Recruits ~ Large + fYear + Bank + Large:fYear + 
+    Large:Bank)
+
+M1_lm &lt;- lm(mod_formula, data = myt)
+
+anova(M1_lm)</pre>
+
+<pre >## Analysis of Variance Table
+## 
+## Response: Sq_Recruits
+##              Df Sum Sq Mean Sq F value  Pr(&gt;F)    
+## Large         1    481     481   87.41 &lt; 2e-16 ***
+## fYear        13   2189     168   30.59 &lt; 2e-16 ***
+## Bank          2    344     172   31.27 1.2e-12 ***
+## Large:fYear  13    228      18    3.18 0.00021 ***
+## Large:Bank    2      2       1    0.14 0.86594    
+## Residuals   217   1194       6                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+<p>Можем ли мы доверять этим результатам?</p>
+
+</article></slide><slide class=''><hgroup><h2>Проведем диагностику данной модели</h2></hgroup><article  id="---">
+
+<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Мы не можем доверять величинам уровня значимости! Нарушается условие применимости линейных моделей, основанных на нормальном распределении остатков с неизменной дисперсией.</p>
+
+</article></slide><slide class=''><hgroup><h2>Ковариата дисперсии (Variance covariate)</h2></hgroup><article  id="--variance-covariate" class="smaller">
+
+<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Видно, что дисперсия остатков убывает по мере увеличения значения переменной <code>Large</code> и меняется год от года</p>
+
+<p>Переменные <code>Large</code> и <code>fYear</code> являются ковариатами дисперсии</p>
+
+</article></slide><slide class=''><hgroup><h2>Ковариата дисперсии (Variance covariate)</h2></hgroup><article  id="--variance-covariate-1">
+
+<p>Новая модель будет включен еще один компонент \[\epsilon \sim N(0, \sigma^2 \times f(VC))\]</p>
+
+<p>\(VC\) - ковариата дисперсии<br/>\(f(VC)\) - функция, вводящая попаравку, стабилизирующую дисперсию <br> В зависимости от формы функции \(f(VC)\) мы получим разную структуру дисперсии в модели</p>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Различные формы структуры дисперсии</h2></hgroup><article  id="---">
+
+</article></slide><slide class=''><hgroup><h2>Для дальнейших вычислений необходимо использовать функцию <code>gls</code> из пакета <code>nlme</code></h2></hgroup><article  id="------gls---nlme">
+
+<pre class = 'prettyprint lang-r'>library(nlme)
+M1_gls &lt;- gls(mod_formula, data = myt)</pre>
+
+<p>Эта функция дает результаты полностью идентичные результатам функции <code>lm()</code></p>
+
+<pre class = 'prettyprint lang-r'>anova(M1_gls)</pre>
+
+<pre >## Denom. DF: 217 
+##             numDF F-value p-value
+## (Intercept)     1    1408  &lt;.0001
+## Large           1      87  &lt;.0001
+## fYear          13      31  &lt;.0001
+## Bank            2      31  &lt;.0001
+## Large:fYear    13       3  0.0002
+## Large:Bank      2       0  0.8659</pre>
+
+</article></slide><slide class=''><hgroup><h2>Фиксированная структура дисперсии</h2></hgroup><article  id="--">
+
+<p>Предполагается, что дисперсия изменяется пропорционально значениям ковариаты дисперсии</p>
+
+<p>\[\epsilon_i \sim N(0, \sigma^2 \times VC_i)\]</p>
+
+<p>В данном случае нет небходимости в подборе неизвестных параметров для функции \(f(VC)\)</p>
+
+<pre class = 'prettyprint lang-r'>M2_gls &lt;- gls(mod_formula, data = myt, weights = varFixed(~Large))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Сравним две модели</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>AIC(M1_gls, M2_gls)</pre>
+
+<pre >##        df  AIC
+## M1_gls 33 1228
+## M2_gls 33 1290</pre>
+
+<p>НО! Дисперсия явно убывала по мере увеличения значений перменной <code>Large</code></p>
+
+</article></slide><slide class=''><hgroup><h2>Разные дисперсии для разных уровней категориальных предикторов</h2></hgroup><article  id="------">
+
+<p>\[\epsilon_{i,j} \sim N(0, \sigma^2_j)\]</p>
+
+<p>При построении моделей с такой структурой дисперсии подбирается M-1 новых параметров, где M - количество уровней категориального предиктора.</p>
+
+<pre class = 'prettyprint lang-r'>M3_gls &lt;- gls(mod_formula, data = myt, weights = varIdent(form = ~1 | fYear))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Сравнение моделей</h2></hgroup><article  id="-">
+
+<p><strong>Важно!</strong> Модели <code>M1_gls</code> и <code>M3_gls</code> вложенные</p>
+
+<p><code>M1_gls:</code> \(\sigma^2_1 = \sigma^2_2 = ... = \sigma^2_m\) <br> <code>M3_gls:</code> \(k_1\sigma^2_1 = k_2\sigma^2_2 = ... = k_m\sigma^2_m\)</p>
+
+<pre class = 'prettyprint lang-r'>anova(M1_gls, M3_gls)</pre>
+
+<pre >##        Model df  AIC  BIC logLik   Test L.Ratio p-value
+## M1_gls     1 33 1228 1340   -581                       
+## M3_gls     2 46 1131 1287   -520 1 vs 2     123  &lt;.0001</pre>
+
+<p>Модель <code>M3_gls</code> лучше!</p>
+
+</article></slide><slide class=''><hgroup><h2>У нас два категориальных предиктора</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>M3_gls2 &lt;- gls(mod_formula, data = myt, weights = varIdent(form = ~1 | 
+    Bank))
+
+anova(M1_gls, M3_gls2)</pre>
+
+<pre >##         Model df  AIC  BIC logLik   Test L.Ratio p-value
+## M1_gls      1 33 1228 1340   -581                       
+## M3_gls2     2 35 1216 1334   -573 1 vs 2    16.5  0.0003</pre>
+
+</article></slide><slide class=''><hgroup><h2>Что произошло в результате работы функции <code>varIdent()</code>?</h2></hgroup><article  id="------varident">
+
+<pre class = 'prettyprint lang-r'>summary(M3_gls)</pre>
+
+<h3>Часть вывода <code>summary(M3_gls)</code></h3>
+
+<pre>
+Variance function:    
+ Structure: Different standard deviations per stratum     
+ Formula: ~1 | fYear     
+ Parameter estimates:     
+ 1997  1999  2000  2001  2002  2003  2004  2005  2006  2007  2008      
+ 1.00  2.62  4.39  3.47  2.84  5.85  4.93  3.21  2.95  3.87  7.98      
+ 2009  2010  2011     
+ 9.26  5.97 13.59     
+ </pre>
+
+</article></slide><slide class=''><hgroup><h2>Степенная зависимость дисперсии от ковариаты</h2></hgroup><article  id="----">
+
+<p>\[\epsilon_{i,j} \sim N(0, \sigma^2 \times |VC|^{2\delta})\]</p>
+
+<p>Параметр \(\delta\) неизвестен и требует оценки</p>
+
+<p>Если \(\delta = 0\), то струкутра дисперсии будет аналогична структуре диcперсии в &quot;обычной&quot; регрессионной модели, где \(\epsilon \sim N(0, \sigma^2)\)</p>
+
+<p><strong>Важно!</strong> Если значения ковариаты дисперсии могут принимать значение равное нулю, то такая форма струкутры дисперсии неопределена и использоваться не может.</p>
+
+<pre class = 'prettyprint lang-r'>M4_gls &lt;- gls(mod_formula, data = myt, weights = varPower(form = ~Large))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Степенная зависимость дисперсии от ковариаты</h2></hgroup><article  id="-----1">
+
+<p>Оценка параметра \(\delta\)</p>
+
+<pre class = 'prettyprint lang-r'>M4_gls$modelStruct</pre>
+
+<pre >## varStruct  parameters:
+##  power 
+## -0.214</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article >
+
+<p>Степенная зависимость дисперсии от ковариаты может учитывать и взаимодействие ковариаты дисперсии с категориальными предикторами <br> <br> ### Напишите код, с помощью которого в модели будет учтена степенная зависимость дисперсии от переменной <code>Large</code>, но разная для каждого уровня фактора <code>fYear</code>. Аналогичный код напишите для фактора <code>Bank</code></p>
+
+<p><em>Hint</em> Изучите справку по функции <code>varPower()</code></p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article >
+
+<pre class = 'prettyprint lang-r'>M5_gls &lt;- gls(mod_formula, data = myt, weights = varPower(form = ~Large | 
+    fYear))
+M6_gls &lt;- gls(mod_formula, data = myt, weights = varPower(form = ~Large | 
+    Bank))</pre>
+
+<pre class = 'prettyprint lang-r'>M5_gls$modelStruct</pre>
+
+<pre >## varStruct  parameters:
+##    1997    1999    2000    2001    2002    2003    2004    2005 
+## -0.4236 -0.3033 -0.1106 -0.1966 -0.2512 -0.0680 -0.1480 -0.2494 
+##    2006    2007    2008    2009    2010    2011 
+## -0.2805 -0.1650  0.0359  0.0860 -0.0536  0.1860</pre>
+
+<pre class = 'prettyprint lang-r'>M6_gls$modelStruct</pre>
+
+<pre >## varStruct  parameters:
+##    vor2    vor4    vor5 
+## -0.1980 -0.0488 -0.2299</pre>
+
+</article></slide><slide class=''><hgroup><h2>Экспоненциальная зависимость дисперсии от ковариаты</h2></hgroup><article  id="----">
+
+<p>\[\epsilon_{i,j} \sim N(0, \sigma^2 \times e^{2\delta \times VC_i})\]</p>
+
+<p>Эта форма структуры дисперсии может применяться для случаев, когда \(VC = 0\) <br> <br> Если \(\delta = 0\), то структура дисперсии будет аналогична струкуте диспесии в &quot;обычной&quot; регрессионной модели, то есть \(\epsilon_{i,j} \sim N(0, \sigma^2)\)</p>
+
+<pre class = 'prettyprint lang-r'>M7_gls &lt;- gls(mod_formula, data = myt, weights = varExp(form = ~Large))
+M8_gls &lt;- gls(mod_formula, data = myt, weights = varExp(form = ~Large | 
+    fYear))
+M9_gls &lt;- gls(mod_formula, data = myt, weights = varExp(form = ~Large | 
+    Bank))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Экспоненциальная зависимость дисперсии от ковариаты</h2></hgroup><article  id="-----1" class="smaller">
+
+<p>Оцененные параметры</p>
+
+<pre class = 'prettyprint lang-r'>M7_gls$modelStruct</pre>
+
+<pre >## varStruct  parameters:
+## expon 
+## -0.02</pre>
+
+<pre class = 'prettyprint lang-r'>M8_gls$modelStruct</pre>
+
+<pre >## varStruct  parameters:
+##     1997     1999     2000     2001     2002     2003     2004 
+## -0.03093 -0.02296 -0.00946 -0.01591 -0.01679 -0.00395 -0.01906 
+##     2005     2006     2007     2008     2009     2010     2011 
+## -0.02190 -0.02417 -0.01310  0.00743  0.00939 -0.00347  0.02475</pre>
+
+<pre class = 'prettyprint lang-r'>M9_gls$modelStruct</pre>
+
+<pre >## varStruct  parameters:
+##     vor2     vor4     vor5 
+## -0.02360 -0.00896 -0.02477</pre>
+
+</article></slide><slide class=''><hgroup><h2>Усложненная степенная зависимость дисперсии от ковариаты</h2></hgroup><article  id="-----">
+
+<p>\[\epsilon_{i,j} \sim N(0, \sigma^2 \times (\delta_1 + |VC|^{2\delta_2})^2)\]</p>
+
+<h3>Впорос:</h3>
+
+<p>При каких значениях параметров функции \(f(VC)\) cтруктура дисперсии будет аналогична структуре дисперсии в &quot;обычной&quot; регрессионной модели?</p>
+
+</article></slide><slide class=''><hgroup><h2>Ответ</h2></hgroup><article >
+
+<p>При \(\delta_1=0\) и \(\delta_2=0\) выражение \(\epsilon_{i,j} \sim N(0,\sigma^2 \times (0 + |VC|^{0})\) будет эквивалентно \(\epsilon_{i,j} \sim N(0, \sigma^2)\)</p>
+
+</article></slide><slide class=''><hgroup><h2>Усложненная степенная зависимость дисперсии от ковариаты</h2></hgroup><article  id="------1">
+
+<pre class = 'prettyprint lang-r'>M10_gls &lt;- gls(mod_formula, data = myt, weights = varConstPower(form = ~Large))
+# M11_gls &lt;-gls(mod_formula, data = myt, weights = varConstPower(form =
+# ~ Large|fYear))
+M12_gls &lt;- gls(mod_formula, data = myt, weights = varConstPower(form = ~Large | 
+    Bank))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Оцененные параметры</h2></hgroup><article  id="-">
+
+<pre class = 'prettyprint lang-r'>M10_gls$modelStruct</pre>
+
+<pre >## varStruct  parameters:
+##   const   power 
+## -17.027  -0.214</pre>
+
+<pre class = 'prettyprint lang-r'>M12_gls$modelStruct</pre>
+
+<pre >## varStruct  parameters:
+## const.vor2 const.vor4 const.vor5 power.vor2 power.vor4 power.vor5 
+##    -1.3195   -17.2718    -1.9165    -0.2939     0.0127    -0.2608</pre>
+
+</article></slide><slide class=''><hgroup><h2>Комбинированная структура дисперсии</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>M13_gls &lt;- gls(mod_formula, data = myt, weights = varComb(varIdent(form = ~fYear), 
+    varPower(form = ~Large)))
+M14_gls &lt;- gls(mod_formula, data = myt, weights = varComb(varIdent(form = ~Bank), 
+    varPower(form = ~Large)))
+M15_gls &lt;- gls(mod_formula, data = myt, weights = varComb(varIdent(form = ~fYear), 
+    varExp(form = ~Large)))
+M16_gls &lt;- gls(mod_formula, data = myt, weights = varComb(varIdent(form = ~Bank), 
+    varExp(form = ~Large)))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article  id="-1">
+
+<h3>Найдите модель с наилучшей структурой дисперсии</h3>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-1">
+
+<pre class = 'prettyprint lang-r'>AICs &lt;- AIC(M1_gls, M2_gls, M3_gls, M4_gls, M5_gls, M6_gls, M7_gls, M8_gls, 
+    M9_gls, M10_gls, M12_gls, M13_gls, M14_gls, M15_gls, M16_gls)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-2">
+
+<pre class = 'prettyprint lang-r'>AICs[AICs$AIC == min(AICs$AIC), ]</pre>
+
+<pre >##        df  AIC
+## M5_gls 47 1131</pre>
+
+<pre class = 'prettyprint lang-r'>M5_gls$call</pre>
+
+<pre >## gls(model = mod_formula, data = myt, weights = varPower(form = ~Large | 
+##     fYear))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Диагностика модели с оптимальной структурой дисперсии</h2></hgroup><article  id="-----">
+
+<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Диагностика модели с оптимальной структурой дисперсии</h2></hgroup><article  id="------1">
+
+<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Диагностика модели с оптимальной структурой дисперсии</h2></hgroup><article  id="------2">
+
+<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Диагностика модели с оптимальной структурой дисперсии</h2></hgroup><article  id="------3">
+
+<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Можно ли упростить модель?</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>M5_gls_ML &lt;- update(M5_gls, method = &quot;ML&quot;)
+# С какого-то момента перестал работать drop1() drop1(M5_gls_ML, test =
+# &#39;Chi&#39;)
+M5_gls_ML_a &lt;- update(M5_gls_ML, . ~ . - Large:fYear)
+M5_gls_ML_b &lt;- update(M5_gls_ML, . ~ . - Large:Bank)
+anova(M5_gls_ML, M5_gls_ML_a)</pre>
+
+<pre >##             Model df  AIC  BIC logLik   Test L.Ratio p-value
+## M5_gls_ML       1 47 1044 1210   -475                       
+## M5_gls_ML_a     2 34 1048 1168   -490 1 vs 2      30  0.0047</pre>
+
+<pre class = 'prettyprint lang-r'>anova(M5_gls_ML, M5_gls_ML_b)</pre>
+
+<pre >##             Model df  AIC  BIC logLik   Test L.Ratio p-value
+## M5_gls_ML       1 47 1044 1210   -475                       
+## M5_gls_ML_b     2 45 1050 1208   -480 1 vs 2    9.68  0.0079</pre>
+
+<p>Эту модель упростить нельзя!<br/>То есть, изменение структуры дисперсии заставляет формулировать иные биологические выводы.</p>
+
+</article></slide><slide class=''><hgroup><h2>Структура дисперсии может иметь определенный биологический смысл</h2></hgroup><article  id="------">
+
+<pre class = 'prettyprint lang-r'>qplot(x = c(1997, 1999:2011), y = as.vector(unlist(M5_gls$modelStruct))) + 
+    xlab(&quot;Годы&quot;) + ylab(&quot;Delta&quot;)</pre>
+
+<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<ul class = 'build'>
+<li>В большинстве случаев параметр \(\delta\) &lt; 0</li>
+<li>чем больше обилие взрослых мидий, тем меньше варьирует обилие молоди</li>
+<li>Есть какая-то многолетняя динамика влияния обилия взрослых на &quot;пятнистость&quot; распределения молоди</li>
+</ul>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Моделирование структуры дисперсии при наличии группирующих (случайных) факторов</h2></hgroup><article  id="-------">
+
+</article></slide><slide class=''><hgroup><h2>Рост крыс при разной диете</h2></hgroup><article  id="----">
+
+<p>Пример взят из книги Pinheiro &amp; Bates, 2000 (Hand and Crowder (1996))</p>
+
+<p>Три группы крыс, содержались при разных условиях кормления 64 дня. Каждую крысу взвешивали с определнной периодичностью.</p>
+
+<pre class = 'prettyprint lang-r'>data(&quot;BodyWeight&quot;)
+
+bw &lt;- as.data.frame(BodyWeight)
+
+head(bw, 14)</pre>
+
+<pre >##    weight Time Rat Diet
+## 1     240    1   1    1
+## 2     250    8   1    1
+## 3     255   15   1    1
+## 4     260   22   1    1
+## 5     262   29   1    1
+## 6     258   36   1    1
+## 7     266   43   1    1
+## 8     266   44   1    1
+## 9     265   50   1    1
+## 10    272   57   1    1
+## 11    278   64   1    1
+## 12    225    1   2    1
+## 13    230    8   2    1
+## 14    230   15   2    1</pre>
+
+<h3>Задание:</h3>
+
+<p>Постройте модель, которая дала бы ответ на вопрос: Изменяется ли характер роста крыс в зависимости от типа диеты?</p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-3">
+
+<pre class = 'prettyprint lang-r'>M1 &lt;- gls(weight ~ Time * Diet, data = bw)</pre>
+
+<p>Все ли хорошо?</p>
+
+<ul class = 'build'>
+<li><strong>Важно!</strong> Строить простую линейную модель в данном случае <em>некорректо</em>!</li>
+</ul>
+
+<ul class = 'build'>
+<li>Дизайн эксперимента изначально включает случайный фактор. Здесь мы имеем дело с повторными наблюдениями одного и того же объекта.<br/></li>
+<li>Однако мы рассмотрим <code>M1</code> для демонстрации того, что происходит если не учитывать этой осбенности экспериментального дизайна.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Ризультаты для неправильной модели</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>anova(M1)</pre>
+
+<pre >## Denom. DF: 170 
+##             numDF F-value p-value
+## (Intercept)     1   22268  &lt;.0001
+## Time            1      20  &lt;.0001
+## Diet            2    1114  &lt;.0001
+## Time:Diet       2       2    0.17</pre>
+
+</article></slide><slide class=''><hgroup><h2>Случайные факторы</h2></hgroup><article  id="-">
+
+<p><strong>Важно!</strong> в этом эксперименте присутсвует случайный (группирующий) фактор <code>Rat</code>, который необходимо учесть в модели</p>
+
+<pre class = 'prettyprint lang-r'>M2 &lt;- lme(weight ~ Time * Diet, data = bw, random = ~1 | Rat)
+M3 &lt;- lme(weight ~ Time * Diet, data = bw, random = ~1 + Time | Rat)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Какую из моделей выбрать?</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>AIC(M1, M2, M3)</pre>
+
+<pre >##    df  AIC
+## M1  7 1739
+## M2  8 1248
+## M3 10 1172</pre>
+
+</article></slide><slide class=''><hgroup><h2>Пытаемся ответить на вопрос</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>anova(M3)</pre>
+
+<pre >##             numDF denDF F-value p-value
+## (Intercept)     1   157    1713  &lt;.0001
+## Time            1   157      83  &lt;.0001
+## Diet            2    13      85  &lt;.0001
+## Time:Diet       2   157       8  0.0007</pre>
+
+</article></slide><slide class=''><hgroup><h2>Рассеяние остатков в модели</h2></hgroup><article  id="---">
+
+<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Моделируем структуру дисперсии</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>M3_1 &lt;- update(M3, weights = varIdent(form = ~1 | Diet))
+
+M3_2 &lt;- update(M3, weights = varPower(form = ~Time))
+
+M3_3 &lt;- update(M3, weights = varPower(form = ~Time | Diet))
+
+M3_4 &lt;- update(M3, weights = varExp(form = ~Time))
+
+M3_5 &lt;- update(M3, weights = varExp(form = ~Time | Diet))
+
+M3_6 &lt;- update(M3, weights = varComb(varExp(form = ~Time), varIdent(form = ~1 | 
+    Diet)))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Выбираем лучшую модель</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>AIC(M3, M3_1, M3_2, M3_3, M3_4, M3_5, M3_6)</pre>
+
+<pre >##      df  AIC
+## M3   10 1172
+## M3_1 12 1164
+## M3_2 11 1173
+## M3_3 13 1158
+## M3_4 11 1174
+## M3_5 13 1155
+## M3_6 13 1165</pre>
+
+</article></slide><slide class=''><hgroup><h2>Отвечаем на вопрос</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>anova(M3_5)</pre>
+
+<pre >##             numDF denDF F-value p-value
+## (Intercept)     1   157    1705  &lt;.0001
+## Time            1   157      83  &lt;.0001
+## Diet            2    13      85  &lt;.0001
+## Time:Diet       2   157       9  0.0003</pre>
+
+</article></slide><slide class=''><hgroup><h2>Смотрим на предсказания модели</h2></hgroup><article  id="---" class="smaller">
+
+<pre class = 'prettyprint lang-r'>MyData &lt;- expand.grid(Time = 1:64, Diet = factor(1:3))
+
+
+MyData$Predicted &lt;- predict(M3_5, newdata = MyData, level = 0)
+
+ggplot(MyData, aes(x = Time, y = Predicted, color = Diet)) + geom_line(size = 1.5) + 
+    geom_point(data = bw, aes(x = Time, y = weight), position = position_jitter())</pre>
+
+<p><img src="14_modelling_variance_structure_files/figure-html/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Summary</h2></hgroup><article  id="summary">
+
+<p>Проблему гетерогенности дисперсии можно решить двумя способами:<br/>1.Преобразование перменных<br/>2.Введение в модель той или иной структуры дисперсии, учитывающей тот или иной набор ковариат дисперсии.</p>
+
+</article></slide><slide class=''><hgroup><h2>Что почитать</h2></hgroup><article  id="-">
+
+<ul>
+<li><p>Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. - Statistics for biology and health. Springer, New York, NY.</p></li>
+<li><p>Pinheiro J, Bates D (2000) Mixed effects models in S and S-Plus. Springer-Verlag, New York, USA</p></li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

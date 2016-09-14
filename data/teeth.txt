@@ -1,0 +1,9 @@
+teeth.csv; teeth.xlsx
+A FRAGMENT (two doses and only one delivery method) of ToothGrowth dataset from R {datasets}
+The Effect of Vitamin C on Tooth Growth in Guinea Pigs
+The response is the length of odontoblasts (teeth) in each of 10 guinea pigs to Vitamin C (2 mg) delivered using orange juice (OJ) or ascorbic acid (VC).
+Source
+C. I. Bliss (1952) The Statistics of Bioassay. Academic Press.
+References
+McNeil, D. R. (1977) Interactive Data Analysis. New York: Wiley.
+

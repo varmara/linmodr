@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Линейные модели с непрерывными и дискретными предикторами</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Линейные модели с непрерывными и дискретными предикторами',
+                        subtitle: 'Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: '08_linear_models_with_continuous_and_discreet_predictors_files/logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Марина Варфоломеева, Вадим Хайтов' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(08_linear_models_with_continuous_and_discreet_predictors_files/logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="08_linear_models_with_continuous_and_discreet_predictors_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Мы рассмотрим</h2></hgroup><article  id="-">
+
+<ul>
+<li>Линейные модели c непрерывными и дискретными предикторами</li>
+<li>Простейший экспериментальный план, требующий анализа ковариации (ANCOVA)</li>
+</ul>
+
+<h3>Вы сможете</h3>
+
+<ul>
+<li>Написать на языке R код, необходимый для подгонки линейной модели, включающей дискретные и непрерывные предикторы, а так же их взаимодействие</li>
+<li>Дать трактовку коэффициентам такой линейной модели</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Пример: Клевер и тысячелистник</h2></hgroup><article  id="---">
+
+<p>Тысячелистник <em>Achillea millefolium</em> часто растет как сорняк на полях вместе с клевером <em>Trifolium repens</em>. Зависит ли урожай клевера от плотности тысячелистника?</p>
+
+<pre class = 'prettyprint lang-r'>clover &lt;- read.delim(&quot;data/clover.csv&quot;)
+names(clover)</pre>
+
+<pre >## [1] &quot;Area&quot;         &quot;Clover.yield&quot; &quot;Yarrow.stems&quot;</pre>
+
+<pre class = 'prettyprint lang-r'># Для удобства переименуем переменные
+names(clover) &lt;- c(&quot;Plot&quot;, &quot;Clover&quot;, &quot;Yarrow&quot;)</pre>
+
+<ul>
+<li>Plot - участок (A, B, C)</li>
+<li>Clover - количество семян клевера (г/кв.м)</li>
+<li>Yarrow - плотность тысячелистника (число цветущих стеблей на кв.м)</li>
+</ul>
+
+<div class=".footnote">
+из кн. Saville, Wood, 1991</div>
+
+</article></slide><slide class=''><hgroup><h2>Посмотрим внимательно на данные</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>nrow(clover)</pre>
+
+<pre >## [1] 30</pre>
+
+<pre class = 'prettyprint lang-r'># есть ли пропущенные значения?
+any(is.na(clover))</pre>
+
+<pre >## [1] FALSE</pre>
+
+<pre class = 'prettyprint lang-r'># как закодирована переменная Plot?
+class(clover$Plot) # это фактор</pre>
+
+<pre >## [1] &quot;factor&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>levels(clover$Plot) # уровни этого фактора</pre>
+
+<pre >## [1] &quot;A&quot; &quot;B&quot; &quot;C&quot;</pre>
+
+<pre class = 'prettyprint lang-r'># # Если вы открывали xlsx файл при помощи read_excel, 
+# # то фактор вам придется сделать самостоятельно
+# clover$Plot &lt;- factor(clover$Plot)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Сколько площадок собрали с каждого из участков?</h2></hgroup><article  id="------">
+
+<pre class = 'prettyprint lang-r'>table(clover$Plot)</pre>
+
+<pre >## 
+##  A  B  C 
+## 10 10 10</pre>
+
+</article></slide><slide class=''><hgroup><h2>Построим график зависимости урожайности клевера от плотности тысячелистника</h2></hgroup><article  id="-------">
+
+<pre class = 'prettyprint lang-r'>library(ggplot2)
+theme_set(theme_bw(base_size = 14)+ theme(legend.key = element_blank()))
+gg_cl &lt;- ggplot(data = clover, aes(y = Clover, x = Yarrow)) + 
+  geom_point() +
+  labs(x = &quot;Плотность тысячелистника, цветоносов/кв.м&quot;,
+       y = &quot;Урожайность клевера, г/кв.м&quot;)
+gg_cl + geom_smooth(method = &quot;lm&quot;)</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Не зная про несколько участков, мы бы просто подобрали обычную линейную регрессию</h2></hgroup><article  id="-----------">
+
+<pre class = 'prettyprint lang-r'>M1 &lt;- lm(Clover ~ Yarrow, data = clover)
+summary(M1)</pre>
+
+<pre >## 
+## Call:
+## lm(formula = Clover ~ Yarrow, data = clover)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -30.09 -11.01  -2.18  10.58  38.92 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  57.4913     4.3873    13.1  1.8e-13 ***
+## Yarrow       -0.1086     0.0194    -5.6  5.4e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 16.5 on 28 degrees of freedom
+## Multiple R-squared:  0.529,  Adjusted R-squared:  0.512 
+## F-statistic: 31.4 on 1 and 28 DF,  p-value: 0.00000536</pre>
+
+</article></slide><slide class=''><hgroup><h2>Запишем уравнение этой линейной регрессии</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>coef(M1) #Коэффициенты модели</pre>
+
+<pre >## (Intercept)      Yarrow 
+##      57.491      -0.109</pre>
+
+<p>Уравнение:</p>
+
+<p>Clover = 57.49 - 0.11Yarrow</p>
+
+<p>Трактовка коэффциентов:</p>
+
+<ul>
+<li>\(b_0 =\) 57.491 - интерсепт. Это урожайность клевера, если нет тысячелистника</li>
+<li>\(b_1 =\) -0.109 - угол наклона. Он показывает на столько уменьшается урожайность клевера при увеличении плотности тысячелистника на 1 цветонос на кв.м</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Но мы знаем, что было несколько участков</h2></hgroup><article  id="------">
+
+<p>Хорошо бы проверить, различается ли между участками зависимость урожайности клевера от плотности тысячелистника.</p>
+
+<pre class = 'prettyprint lang-r'>gg_cl + aes(colour = Plot) + labs(colour = &quot;Участок&quot;)</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Дискретные предикторы тоже можно включать в линейные модели.</h2></hgroup><article  id="-------.">
+
+<p>Кодируем дискретный предиктор (фактор) при помощи числовых переменных-болванок (dummy variables) и можем пользоваться регрессией</p>
+
+<p>Переменных болванок нужно на одну меньше, чем число уровней фактора</p>
+
+<p>Для каждого из объектов каждая из болванок принимает значение 1 для своего уровня фактора</p>
+
+</article></slide><slide class=''><hgroup><h2>Пробуем вручную создавать переменные-болванки</h2></hgroup><article  id="----">
+
+<p>R может все сделать автоматически, но давайте попробуем вручную создать переменные-болванки и сравнить результаты с автоматическим способом.</p>
+
+<p>В примере с клевером понадобится 2 переменных болванки</p>
+
+<pre class = 'prettyprint lang-r'>clover$Plot_B &lt;- as.numeric(clover$Plot == &quot;B&quot;)
+clover$Plot_C &lt;- as.numeric(clover$Plot == &quot;C&quot;)</pre>
+
+<p>Почему нам не нужна отдельная переменная-болванка для участка A?</p>
+
+</article></slide><slide class=''><hgroup><h2>Почему нам не нужна отдельная переменная-болванка для участка A?</h2></hgroup><article  id="---------a" class="smaller">
+
+<p>Потому что, если площадка с участка А, то <code>Plot_B</code> и <code>Plot_C</code> будут равны 0</p>
+
+<pre class = 'prettyprint lang-r'>clover[, c(&quot;Plot&quot;, &quot;Plot_B&quot;, &quot;Plot_C&quot;)]</pre>
+
+<div class="columns-2">
+<pre >##    Plot Plot_B Plot_C
+## 1     A      0      0
+## 2     A      0      0
+## 3     A      0      0
+## 4     A      0      0
+## 5     A      0      0
+## 6     A      0      0
+## 7     A      0      0
+## 8     A      0      0
+## 9     A      0      0
+## 10    A      0      0
+## 11    B      1      0
+## 12    B      1      0
+## 13    B      1      0
+## 14    B      1      0
+## 15    B      1      0
+## 16    B      1      0
+## 17    B      1      0
+## 18    B      1      0
+## 19    B      1      0
+## 20    B      1      0
+## 21    C      0      1
+## 22    C      0      1
+## 23    C      0      1
+## 24    C      0      1
+## 25    C      0      1
+## 26    C      0      1
+## 27    C      0      1
+## 28    C      0      1
+## 29    C      0      1
+## 30    C      0      1</pre></div>
+
+</article></slide><slide class=''><hgroup><h2>Подбираем параметры линейной модели</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>M2_dummy &lt;- lm(Clover ~ Yarrow + Plot_B + Plot_C, data = clover)</pre>
+
+<h3>На самом деле, мы можем сразу подобрать нужную модель с дискретным предиктором. В ручном создании болванок нет необходимости.</h3>
+
+<pre class = 'prettyprint lang-r'>M2 &lt;- lm(Clover ~ Yarrow + Plot, data = clover)</pre>
+
+<p>Значения коэффициентов получатся одинаковые</p>
+
+<pre class = 'prettyprint lang-r'>coef(M2)</pre>
+
+<pre >## (Intercept)      Yarrow       PlotB       PlotC 
+##      57.577      -0.109       0.320      -0.543</pre>
+
+<pre class = 'prettyprint lang-r'>coef(M2_dummy)</pre>
+
+<pre >## (Intercept)      Yarrow      Plot_B      Plot_C 
+##      57.577      -0.109       0.320      -0.543</pre>
+
+</article></slide><slide class=''><hgroup><h2>Смотрим на результаты линейной модели</h2></hgroup><article  id="----" class="smaller">
+
+<h3>Внимание! Эта модель описывает три <strong>параллельные линии</strong> для каждого из уровней фактора Участок, поскольку не включает взаимодействие факторов</h3>
+
+<pre class = 'prettyprint lang-r'>summary(M2)</pre>
+
+<pre >## 
+## Call:
+## lm(formula = Clover ~ Yarrow + Plot, data = clover)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -30.50 -10.54  -2.58  10.91  38.84 
+## 
+## Coefficients:
+##             Estimate Std. Error t value     Pr(&gt;|t|)    
+## (Intercept)  57.5772     6.3371    9.09 0.0000000015 ***
+## Yarrow       -0.1086     0.0201   -5.40 0.0000116947 ***
+## PlotB         0.3205     7.6534    0.04         0.97    
+## PlotC        -0.5432     7.6527   -0.07         0.94    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 17.1 on 26 degrees of freedom
+## Multiple R-squared:  0.529,  Adjusted R-squared:  0.474 
+## F-statistic: 9.73 on 3 and 26 DF,  p-value: 0.000177</pre>
+
+</article></slide><slide class=''><hgroup><h2>Попробуем записать уравнение модели, где появился дискретный предиктор</h2></hgroup><article  id="-------" class="smaller">
+
+<pre class = 'prettyprint lang-r'>coef(M2)</pre>
+
+<pre >## (Intercept)      Yarrow       PlotB       PlotC 
+##      57.577      -0.109       0.320      -0.543</pre>
+
+<p>Уравнение:</p>
+
+<p>Clover = 57.58 - 0.11Yarrow + 0.32PlotB - 0.54PlotC</p>
+
+<p>Трактовка коэффциентов:</p>
+
+<ul>
+<li>\(b_0 =\) 57.58 - интерцепт, урожайность клевера <strong>на базовом уровне (на участке A)</strong>, если нет тысячелистника</li>
+</ul>
+
+<p>Общий угол наклона:</p>
+
+<ul>
+<li>\(b_1 =\) -0.11 - на столько уменьшается урожайность клевера на любом участке при увеличении плотности тысячелистника на 1 цветонос на кв.м</li>
+</ul>
+
+<p>Поправки для интерцепта:</p>
+
+<ul>
+<li>\(b_2 =\) 0.32 - отличие урожайности клевера <strong>на участке B от участка A</strong></li>
+<li>\(b_3 =\) -0.54 - отличие урожайности клевера <strong>на участке C от участка A</strong></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Давайте запишем отдельные уравнения для каждого типа участков</h2></hgroup><article  id="-------">
+
+<p>Общее уравнение модели с параллельными линиями:</p>
+
+<p>Clover = 57.58 - 0.11Yarrow + 0.32PlotB - 0.54PlotC</p>
+
+<p>Для участка A:</p>
+
+<p>Clover = 57.58 - 0.11 Yarrow</p>
+
+<p>Для участка B:</p>
+
+<p>Clover = (57.58 + 0.32) - 0.11 Yarrow = 57.9 - 0.11 Yarrow</p>
+
+<p>Для участка C:</p>
+
+<p>Clover = (57.58 - 0.54) - 0.11 Yarrow = 57.04 - 0.11 Yarrow</p>
+
+</article></slide><slide class=''><hgroup><h2>Базовый уровень</h2></hgroup><article  id="-">
+
+<p>Уровень дискретного предиктора, для записи которого мы не использовали отдельную переменную-болванку, называется базовым.</p>
+
+<p>Интерцепт в уравнении регрессии описывает среднее значение предиктора на базовом уровне.</p>
+
+<p>В R базовым уровнем считается первый уровень фактора</p>
+
+<pre class = 'prettyprint lang-r'>levels(clover$Plot)</pre>
+
+<pre >## [1] &quot;A&quot; &quot;B&quot; &quot;C&quot;</pre>
+
+<p>В данном случае это уровень &quot;A&quot;</p>
+
+</article></slide><slide class=''><hgroup><h2>Что произойдет с моделью, если мы изменим базовый уровень?</h2></hgroup><article  id="--------" class="smaller">
+
+<pre class = 'prettyprint lang-r'>clover$Plot &lt;- relevel(clover$Plot, ref = &quot;C&quot;)
+levels(clover$Plot) # Теперь первым идет &quot;C&quot;</pre>
+
+<pre >## [1] &quot;C&quot; &quot;A&quot; &quot;B&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>M2_C &lt;- lm(Clover ~ Yarrow + Plot, data = clover)
+summary(M2_C)</pre>
+
+<pre >## 
+## Call:
+## lm(formula = Clover ~ Yarrow + Plot, data = clover)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -30.50 -10.54  -2.58  10.91  38.84 
+## 
+## Coefficients:
+##             Estimate Std. Error t value     Pr(&gt;|t|)    
+## (Intercept)  57.0340     6.2853    9.07 0.0000000015 ***
+## Yarrow       -0.1086     0.0201   -5.40 0.0000116947 ***
+## PlotA         0.5432     7.6527    0.07         0.94    
+## PlotB         0.8637     7.6559    0.11         0.91    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 17.1 on 26 degrees of freedom
+## Multiple R-squared:  0.529,  Adjusted R-squared:  0.474 
+## F-statistic: 9.73 on 3 and 26 DF,  p-value: 0.000177</pre>
+
+</article></slide><slide class=''><hgroup><h2>Изменился ли смысл модели от смены уровней? Нет!</h2></hgroup><article  id="-------" class="smaller">
+
+<div class="columns-2">
+<pre class = 'prettyprint lang-r'>coef(M2)</pre>
+
+<pre >## (Intercept)      Yarrow       PlotB       PlotC 
+##      57.577      -0.109       0.320      -0.543</pre>
+
+<p>Clover = 57.58 - 0.11Yarrow + 0.32PlotB - 0.54PlotC</p>
+
+<p>Трактовка коэффциентов:<br/>- \(b_0 =\) 57.58 - интерцепт, урожайность клевера <strong>на базовом уровне (на участке A)</strong>, если нет тысячелистника</p>
+
+<p>Общий угол наклона:<br/>- \(b_1 =\) -0.11 - на столько уменьшается урожайность клевера на любом участке при увеличении плотности тысячелистника на 1 цветонос на кв.м</p>
+
+<p>Поправки для интерцепта:<br/>- \(b_2 =\) 0.32 - отличие урожайности клевера <strong>на участке B от участка A</strong> - \(b_3 =\) -0.54 - отличие урожайности клевера <strong>на участке C от участка A</strong></p>
+
+<pre class = 'prettyprint lang-r'>coef(M2_C)</pre>
+
+<pre >## (Intercept)      Yarrow       PlotA       PlotB 
+##      57.034      -0.109       0.543       0.864</pre>
+
+<p>Clover = 57.03 - 0.11Yarrow + 0.54PlotA + 0.86PlotB</p>
+
+<p>Трактовка коэффциентов:<br/>- \(b_0 =\) 57.03 - интерцепт, урожайность клевера <strong>на базовом уровне (на участке С)</strong>, если нет тысячелистника</p>
+
+<p>Общий угол наклона:<br/>- \(b_1 =\) -0.11 - на столько уменьшается урожайность клевера на любом участке при увеличении плотности тысячелистника на 1 цветонос на кв.м</p>
+
+<p>Поправки для интерцепта:<br/>- \(b_2 =\) 0.54 - отличие урожайности клевера <strong>на участке A от участка C</strong> - \(b_3 =\) 0.86 - отличие урожайности клевера <strong>на участке B от участка C</strong></p></div>
+
+</article></slide><slide class=''><hgroup><h2>Изменился ли смысл модели от смены уровней?</h2></hgroup><article  id="------" class="smaller">
+
+<h3>Даже уравнения для каждой из прямых остались прежними в пределах ошибки округления</h3>
+
+<div class="columns-2">
+<p>Общее уравнение модели с параллельными линиями:</p>
+
+<p>Clover = 57.58 - 0.11Yarrow + 0.32PlotB - 0.54PlotC</p>
+
+<p>Для участка A:</p>
+
+<p>Clover = 57.58 - 0.11 Yarrow</br></br></p>
+
+<p>Для участка B:</p>
+
+<p>Clover = (57.58 + 0.32) - 0.11 Yarrow =<br/>= 57.9 - 0.11 Yarrow</p>
+
+<p>Для участка C:</p>
+
+<p>Clover = (57.58 - 0.54) - 0.11 Yarrow =<br/>= 57.04 - 0.11 Yarrow</p>
+
+<p>Общее уравнение модели с параллельными линиями:</p>
+
+<p>Clover = 57.03 - 0.11Yarrow + 0.54PlotA + 0.86PlotB</p>
+
+<p>Для участка A:</p>
+
+<p>Clover = (57.03 + 0.54) - 0.11 Yarrow =<br/>= 57.57 - 0.11 Yarrow</p>
+
+<p>Для участка B:</p>
+
+<p>Clover = (57.03 + 0.86) - 0.11 Yarrow =<br/>= 57.89 - 0.11 Yarrow</p>
+
+<p>Для участка C:</p>
+
+<p>Clover = 57.03 - 0.11 Yarrow</p></div>
+
+</article></slide><slide class=''><hgroup><h2>График модели с одинаковыми углами наклона</h2></hgroup><article  id="-----" class="smaller">
+
+<p>Нужны исходные данные с предсказанными значениями и стандартными ошибками. При этом хорошо бы, чтобы диапазоны предикторов для каждого из уровней дискретной переменной соответствовали реальным значениям.</p>
+
+<p>Решение средствами пакета <code>plyr</code>:</p>
+
+<pre class = 'prettyprint lang-r'>library(plyr)
+# делим датафрейм на части по переменной Plot
+# по каждой из частей считаем при помощи summarise
+# последовательность от мин. до макс. значения Yarrow
+my_df &lt;- plyr::ddply(clover, .(Plot),
+    summarise,
+    Yarrow = seq(min(Yarrow),  max(Yarrow), length = 10))
+# Считаем предсказанные значения и стандартные ошибки
+M2_pred &lt;- predict(M2, newdata = my_df, se.fit = TRUE)
+# Добавляем их в датафрейм
+my_df$Clover &lt;- M2_pred$fit
+my_df$SE &lt;- M2_pred$se.fit</pre>
+
+</article></slide><slide class=''><hgroup><h2>Самостоятельно попробуйте разобрать, как сделать тот же самый исходный датафрейм в пакете dplyr</h2></hgroup><article  id="------------dplyr">
+
+<pre class = 'prettyprint lang-r'># Выгружаем plyr, потому что dplyr конфликтует с plyr
+detach(&quot;package:plyr&quot;, unload=TRUE)
+library(dplyr)
+# Разбиваем clover на группы по переменной Plot 
+# и считаем минимум и максимум Yarrow
+minmax &lt;- clover %&gt;% group_by(Plot) %&gt;%
+  summarise(mYarrow = min(Yarrow),
+  MYarrow = max(Yarrow))
+# Pазбиваем minmax по переменной Plot создаем датафрейм, 
+# где Yarrow - это последовательность от минимума до максимума для данного Plot,
+# снимаем группировку,
+# добавляем предсказанные значения и стандартные ошибки
+my_df &lt;- minmax %&gt;% group_by(Plot) %&gt;% 
+  do(data.frame(Yarrow = seq(.$mYarrow, .$MYarrow, length = 10))) %&gt;% 
+  ungroup %&gt;% 
+  mutate(Clover = predict(M2, newdata = .),
+    SE = predict(M2, newdata = ., se.fit = TRUE)$&#39;se.fit&#39;)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Строим график с параллельными прямыми</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>gg_cl_parallel &lt;- ggplot(data = my_df, aes(y = Clover, x = Yarrow, colour = Plot, fill = Plot)) + 
+  geom_line() + 
+  geom_ribbon(aes(ymax = Clover + 1.98 * SE, 
+                  ymin = Clover - 1.98 * SE),
+              alpha = 0.3, colour = NA) +
+    geom_point(data = clover) +
+  labs(colour = &quot;Участок&quot;, fill = &quot;Участок&quot;, 
+       x = &quot;Плотность тысячелистника, цветоносов/кв.м&quot;,
+       y = &quot;Урожайность клевера, г/кв.м&quot;)
+gg_cl_parallel</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Добавим отдельные панели</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>gg_cl_parallel + facet_wrap(~ Plot)</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Но может быть линии на самом деле не параллельны?</h2></hgroup><article  id="--------" class="smaller">
+
+<h3>Мы должны были начать с этой, полной, модели!!!</h3>
+
+<p>Чтобы проверить, одинаковы ли зависимости для каждого из участков, нам нужно подобрать модель со взаимодействием и протестировать его значимость.</p>
+
+<pre class = 'prettyprint lang-r'># вернем уровни на место в прежнем порядке
+clover$Plot &lt;- factor(clover$Plot, levels = c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;), labels = c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;)) 
+M3 &lt;- lm(Clover ~ Yarrow * Plot, data = clover)
+coef(M3)</pre>
+
+<pre >##  (Intercept)       Yarrow        PlotB        PlotC Yarrow:PlotB Yarrow:PlotC 
+##     55.21877     -0.09426      0.60566      8.08139     -0.00226     -0.05379</pre>
+
+<p>Общее уравнение:<br/>Clover = 55.219 - 0.094Yarrow + 0.606PlotB + 8.081PlotC - 0.002Yarrow:PlotB - 0.054Yarrow:PlotC</p>
+
+<p>Трактовка коэффциентов:<br/>- \(b_0 =\) 55.219 - урожайность клевера, если нет тысячелистника (на участке A, а для других - с учетом поправки)<br/>- \(b_1 =\) -0.094 - угол наклона прямой (для участка А, а для других - с учетом поправок)</p>
+
+<div class="columns-2">
+<p>Поправки интерсепта:<br/>- \(b_2 =\) 0.606 - для участка B<br/>- \(b_3 =\) 8.081 - для участка C</p>
+
+<p>Поправки угла наклона:<br/>- \(b_4 =\) -0.002 - для участка B<br/>- \(b_5 =\) -0.054 - для участка C</p></div>
+
+</article></slide><slide class=''><hgroup><h2>Чтобы лучше понять смысл коэффициентов, давайте запишем отдельные уравнения для каждого типа участков</h2></hgroup><article  id="------------">
+
+<p>Общее уравнение модели с разными углами наклона:</p>
+
+<p>Clover = 55.219 - 0.094Yarrow + 0.606PlotB + 8.081PlotC - 0.002Yarrow:PlotB - 0.054Yarrow:PlotC</p>
+
+<p>Для участка A:</p>
+
+<p>Clover = 55.219 - 0.094 Yarrow</p>
+
+<p>Для участка B:</p>
+
+<p>Clover = (55.219 + 0.606) + (- 0.094 - 0.002) Yarrow = 55.825 - 0.096 Yarrow</p>
+
+<p>Для участка C:</p>
+
+<p>Clover = (55.219 + 8.081) + (- 0.094 - 0.054) Yarrow = 63.3 - 0.148 Yarrow</p>
+
+</article></slide><slide class=''><hgroup><h2>График с разными углами наклона</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>gg_cl + aes(colour = Plot, fill = Plot) + 
+  geom_smooth(method = &quot;lm&quot;, alpha = 0.2) +
+  labs(colour = &quot;Участок&quot;, fill = &quot;Участок&quot;)</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Проверяем условия применимости</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>library(car)
+op &lt;- par(mfrow = c(1, 3), cex = 1)
+qqPlot(M3)
+plot(M3, which = 3)
+plot(M3, which = 4)
+par(op)</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-34-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<p>Есть подозрение на гетерогенность дисперсий</p>
+
+</article></slide><slide class=''><hgroup><h2>Проверим остатки на гетерогенность дисперсий тестом Бройша-Пагана</h2></hgroup><article  id="-------">
+
+<pre class = 'prettyprint lang-r'>library(lmtest)
+bptest(M3)</pre>
+
+<pre >## 
+##  studentized Breusch-Pagan test
+## 
+## data:  M3
+## BP = 9, df = 5, p-value = 0.1</pre>
+
+<p>Все в порядке, можно продолжать</p>
+
+</article></slide><slide class=''><hgroup><h2>Как проверить, действительно ли различается урожайность между участками?</h2></hgroup><article  id="-------">
+
+<h3>1 способ:</h3>
+
+<p>При помощи частного F-критерия можно сравнить полную и уменьшенную модель</p>
+
+<p>На первом этапе пробуем удалить только взаимодействие</p>
+
+<pre class = 'prettyprint lang-r'>drop1(M3, test = &quot;F&quot;)</pre>
+
+<pre >## Single term deletions
+## 
+## Model:
+## Clover ~ Yarrow * Plot
+##             Df Sum of Sq  RSS AIC F value Pr(&gt;F)
+## &lt;none&gt;                   7237 177               
+## Yarrow:Plot  2       375 7612 174    0.62   0.55</pre>
+
+<p>При удалении взаимодействия модель не ухудшается. Взаимодействие можно не учитывать</p>
+
+</article></slide><slide class=''><hgroup><h2>Как проверить, действительно ли различается урожайность между участками?</h2></hgroup><article  id="--------1">
+
+<h3>1 способ (продолжение):</h3>
+
+<p>Подбираем модель без взаимодействия. На самом деле, мы это уже делали. Это M2</p>
+
+<pre class = 'prettyprint lang-r'># M2 &lt;- lm(Clover ~ Yarrow + Plot, data = clover)
+drop1(M2, test = &quot;F&quot;)</pre>
+
+<pre >## Single term deletions
+## 
+## Model:
+## Clover ~ Yarrow + Plot
+##        Df Sum of Sq   RSS AIC F value   Pr(&gt;F)    
+## &lt;none&gt;               7612 174                     
+## Yarrow  1      8541 16153 195   29.17 0.000012 ***
+## Plot    2         4  7616 170    0.01     0.99    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+<p>При удалении Plot модель не ухудшается - выкидываем Plot</p>
+
+</article></slide><slide class=''><hgroup><h2>Как проверить, действительно ли различается урожайность между участками?</h2></hgroup><article  id="--------2">
+
+<h3>1 способ (продолжение):</h3>
+
+<p>Подбираем модель без Plot На самом деле, мы это уже делали. Это M1</p>
+
+<pre class = 'prettyprint lang-r'># M1 &lt;- lm(Clover ~ Yarrow, data = clover)
+drop1(M1, test = &quot;F&quot;)</pre>
+
+<pre >## Single term deletions
+## 
+## Model:
+## Clover ~ Yarrow
+##        Df Sum of Sq   RSS AIC F value    Pr(&gt;F)    
+## &lt;none&gt;               7616 170                      
+## Yarrow  1      8538 16154 191    31.4 0.0000054 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+<p>Из этой модели уже ничего не выкинуть</p>
+
+</article></slide><slide class=''><hgroup><h2>Как проверить, действительно ли различается урожайность между участками?</h2></hgroup><article  id="--------3">
+
+<h3>2 способ:</h3>
+
+<p>Можно провести дисперсионный анализ одним из способов (подробнее в следующей лекции)</p>
+
+<pre class = 'prettyprint lang-r'># anova(M3)        # способ А
+# summary(aov(M3)) # способ Б
+library(car)     # способ В
+Anova(M3)</pre>
+
+<pre >## Anova Table (Type II tests)
+## 
+## Response: Clover
+##             Sum Sq Df F value   Pr(&gt;F)    
+## Yarrow        8541  1   28.32 0.000018 ***
+## Plot             4  2    0.01     0.99    
+## Yarrow:Plot    375  2    0.62     0.55    
+## Residuals     7237 24                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+</article></slide><slide class=''><hgroup><h2>После подбора финальной модели нужно еще раз проверить условия применимости</h2></hgroup><article  id="---------">
+
+<pre class = 'prettyprint lang-r'>op &lt;- par(mfrow = c(1, 3), cex = 1)
+qqPlot(M1)
+plot(M1, which = 3)
+plot(M1, which = 4)
+par(op)</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-40-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<p>Есть подозрение на гетерогенность дисперсий</p>
+
+</article></slide><slide class=''><hgroup><h2>Проверим остатки на гетерогенность дисперсий тестом Бройша-Пагана</h2></hgroup><article  id="--------1">
+
+<pre class = 'prettyprint lang-r'>bptest(M1)</pre>
+
+<pre >## 
+##  studentized Breusch-Pagan test
+## 
+## data:  M1
+## BP = 3, df = 1, p-value = 0.06</pre>
+
+<p>На грани. Если рассуждать формально, то можно продолжать.</p>
+
+<p>Модель M1 - финальная</p>
+
+<pre class = 'prettyprint lang-r'>coef(M1)</pre>
+
+<pre >## (Intercept)      Yarrow 
+##      57.491      -0.109</pre>
+
+<p>Clover = 57.49 - 0.11Yarrow</p>
+
+</article></slide><slide class=''><hgroup><h2>Пример: Козы и глисты</h2></hgroup><article  id="---">
+
+<p>Как влияет на прирост массы коз интенсивность профилактики паразитарных заболеваний?</p>
+
+<p>Известно, что у легких животных привес больше, поэтому мы должны учитывать в модели не только способ обработки от глистов, но и влияние начального веса.</p>
+
+<div class="columns-2">
+<ul>
+<li>Treatment - обработка от глистов (стандартная, интенсивная)</li>
+<li>Weightgain - привес, кг</li>
+<li>Initial.wt - начальный вес, кг</li>
+</ul>
+
+<p><img src="images/Goat-by-Jennifer-C.-Flickr.jpg" width="300" height="300"><br/>Goat by Jennifer C. <a href='https://flic.kr/p/fjU4J9' title=''>on Flickr</a></p></div>
+
+<div class=".footnote">
+Пример из библиотеки данных<br/><a href='http://www.statlab.uni-heidelberg.de/data/ancova/goats.story.html' title=''>http://www.statlab.uni-heidelberg.de/data/ancova/goats.story.html</a></div>
+
+</article></slide><slide class=''><hgroup><h2>Читаем и знакомимся с данными</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>goat &lt;- read.delim(&quot;data/goats.csv&quot;)
+str(goat)</pre>
+
+<pre >## &#39;data.frame&#39;:    40 obs. of  3 variables:
+##  $ Treatment : Factor w/ 2 levels &quot;intensive&quot;,&quot;standard&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ Weightgain: int  5 3 8 7 6 4 8 6 7 5 ...
+##  $ Initial.wt: int  21 24 21 22 23 26 22 23 24 20 ...</pre>
+
+<pre class = 'prettyprint lang-r'># переименуем переменные для краткости
+colnames(goat) &lt;- c(&quot;treat&quot;, &quot;wt&quot;, &quot;init&quot;)
+any(is.na(goat))</pre>
+
+<pre >## [1] FALSE</pre>
+
+<pre class = 'prettyprint lang-r'>table(goat$treat)</pre>
+
+<pre >## 
+## intensive  standard 
+##        20        20</pre>
+
+</article></slide><slide class=''><hgroup><h2>Проверим порядок уровней фактора</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'>levels(goat$treat)</pre>
+
+<pre >## [1] &quot;intensive&quot; &quot;standard&quot;</pre>
+
+<p>Хорошо бы поменять их местами для удобства интерпретации</p>
+
+<pre class = 'prettyprint lang-r'>goat$treat &lt;- relevel(goat$treat, ref = &quot;standard&quot;)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article >
+
+<ol>
+<li>Подберите модель, описывающую зависимость между увеличением веса коз и способом прфилактической обработки животных.</li>
+<li>Проверьте условия применимости этой модели</li>
+<li>Попробуйте сократить модель, чтобы она стала оптимальной.</li>
+<li>Проверьте условия применимости финальной модели.</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article >
+
+<p>Необходимо учитывать ковариату - начальный вес, кроме того, нужно проверить, нет ли взаимодействия способа обработки от глистов и начального веса</p>
+
+<pre class = 'prettyprint lang-r'>MG1 &lt;- lm(wt ~ treat * init, data = goat)</pre>
+
+<p>Формула модели со взаимодействием выглядит в сокращенном виде так:</p>
+
+<p>wt ~ treat * init</p>
+
+<p>а в полном виде то же самое выглядит так:</p>
+
+<p>wt ~ treat + init + treat:init</p>
+
+</article></slide><slide class=''><hgroup><h2>График модели со взаимодействием</h2></hgroup><article  id="---">
+
+<p>Похоже, что взаимодействие не будет достоверным. Если это и вправду так, то этот график нам больше не понадобится.</p>
+
+<pre class = 'prettyprint lang-r'>gg_g &lt;- ggplot(data = goat, aes(y = wt, x = init, colour = treat)) + 
+  geom_point()  +
+  labs(x = &quot;Начальный вес, кг&quot;,
+       y = &quot;Привес, кг&quot;) +
+  scale_colour_discrete(&quot;Способ обработки&quot;, breaks = c(&quot;intensive&quot;, &quot;standard&quot;), labels = c(&quot;Интенсивный&quot;, &quot;Стандартный&quot;))
+gg_g + geom_smooth(method = &quot;lm&quot;)</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Проверяем условия применимости</h2></hgroup><article  id="---1">
+
+<pre class = 'prettyprint lang-r'>op &lt;- par(mfrow = c(1, 3), cex = 1)
+qqPlot(MG1)
+plot(MG1, which = 3)
+plot(MG1, which = 4)
+par(op)</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-51-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<p>Все хорошо</p>
+
+</article></slide><slide class=''><hgroup><h2>Выбор оптимальной модели</h2></hgroup><article  id="--">
+
+<p>Пробуем удалить взаимодействие</p>
+
+<pre class = 'prettyprint lang-r'>drop1(MG1, test = &quot;F&quot;)</pre>
+
+<pre >## Single term deletions
+## 
+## Model:
+## wt ~ treat * init
+##            Df Sum of Sq  RSS  AIC F value Pr(&gt;F)
+## &lt;none&gt;                  96.5 43.2               
+## treat:init  1     0.342 96.9 41.4    0.13   0.72</pre>
+
+<p>Можно удалять</p>
+
+</article></slide><slide class=''><hgroup><h2>Удаляем взаимодействие и пробуем упростить дальше</h2></hgroup><article  id="-----">
+
+<pre class = 'prettyprint lang-r'>MG2 &lt;- update(MG1, .~. - treat:init)
+drop1(MG2, test = &quot;F&quot;)</pre>
+
+<pre >## Single term deletions
+## 
+## Model:
+## wt ~ treat + init
+##        Df Sum of Sq   RSS  AIC F value   Pr(&gt;F)    
+## &lt;none&gt;               96.9 41.4                     
+## treat   1      16.0 112.9 45.5    6.11    0.018 *  
+## init    1      58.6 155.5 58.3   22.40 0.000032 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+<p>Дальше упростить не получится. Вот наша оптимальная модель</p>
+
+</article></slide><slide class=''><hgroup><h2>Проверяем условия применимости финальной модели</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>op &lt;- par(mfrow = c(1, 3), cex = 1)
+qqPlot(MG2)
+plot(MG2, which = 3)
+plot(MG2, which = 4)
+par(op)</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-54-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<p>Все в порядке</p>
+
+</article></slide><slide class=''><hgroup><h2>Проверяем значимость коэффициентов</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>summary(MG2)</pre>
+
+<pre >## 
+## Call:
+## lm(formula = wt ~ treat + init, data = goat)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -2.972 -1.242 -0.034  0.988  3.223 
+## 
+## Coefficients:
+##                Estimate Std. Error t value     Pr(&gt;|t|)    
+## (Intercept)     13.7017     1.7599    7.79 0.0000000026 ***
+## treatintensive   1.2649     0.5117    2.47        0.018 *  
+## init            -0.3514     0.0742   -4.73 0.0000320779 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.62 on 37 degrees of freedom
+## Multiple R-squared:  0.438,  Adjusted R-squared:  0.408 
+## F-statistic: 14.4 on 2 and 37 DF,  p-value: 0.0000233</pre>
+
+</article></slide><slide class=''><hgroup><h2>Записываем уравнение модели</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'>coef(MG2)</pre>
+
+<pre >##    (Intercept) treatintensive           init 
+##         13.702          1.265         -0.351</pre>
+
+<p>Уравнение:</p>
+
+<p>wt = 13.70 + 1.26treatintensive - 0.35init</p>
+
+<p>Привес коз при интенсивной обработке от глистов на 1.26 кг выше, чем при стандартном методе обработки (t-тест, p &lt; 0.05)</p>
+
+</article></slide><slide class=''><hgroup><h2>Данные для графика с параллельными прямыми</h2></hgroup><article  id="-----">
+
+<p>Решение средствами пакета <code>plyr</code>:</p>
+
+<pre class = 'prettyprint lang-r'># делим датафрейм на части по переменной treat
+# по каждой из частей считаем
+# последовательность от мин. до макс. значения Yarrow
+my_df &lt;- plyr::ddply(goat, .(treat),
+    summarise,
+    init = seq(min(init),  max(init), length = 10))
+# Считаем предсказанные значения и стандартные ошибки
+MG2_pred &lt;- predict(MG2, newdata = my_df, se.fit = TRUE)
+# Добавляем их в датафрейм
+my_df$wt &lt;- MG2_pred$fit
+my_df$SE &lt;- MG2_pred$se.fit</pre>
+
+</article></slide><slide class=''><hgroup><h2>Самостоятельно попробуйте разобрать, как сделать тот же самый исходный датафрейм в пакете dplyr</h2></hgroup><article  id="------------dplyr-1">
+
+<pre class = 'prettyprint lang-r'>library(dplyr)
+my_df &lt;- goat %&gt;% 
+  group_by(treat) %&gt;%
+  summarise(min_init = min(init),
+  max_init = max(init)) %&gt;% group_by(treat) %&gt;% 
+  do(data.frame(init = seq(.$min_init, .$max_init, length = 10))) %&gt;% 
+  ungroup %&gt;% 
+  mutate(wt = predict(MG2, newdata = .),
+    SE = predict(MG2, newdata = ., se.fit = TRUE)$&#39;se.fit&#39;)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Строим график</h2></hgroup><article  id="-">
+
+<pre class = 'prettyprint lang-r'>gg_g_parallel &lt;- 
+  ggplot(data = my_df, aes(y = wt, x = init, fill = treat, colour = treat)) + 
+  geom_line() + 
+  geom_ribbon(alpha = 0.3, 
+              aes(ymax = wt + 1.98 * SE, 
+                  ymin = wt - 1.98 * SE), colour = NA) +
+  geom_point(data = goat)
+gg_g_parallel</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-60-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Подписываем оси</h2></hgroup><article  id="-">
+
+<pre class = 'prettyprint lang-r'>gg_g_parallel + 
+  labs(x = &quot;Начальный вес, кг&quot;, y = &quot;Привес, кг&quot;) +
+  scale_colour_discrete(&quot;Способ обработки&quot;, breaks = c(&quot;intensive&quot;, &quot;standard&quot;), 
+                        labels = c(&quot;Интенсивный&quot;, &quot;Стандартный&quot;)) +
+  scale_fill_discrete(&quot;Способ обработки&quot;, breaks = c(&quot;intensive&quot;, &quot;standard&quot;), 
+                      labels = c(&quot;Интенсивный&quot;, &quot;Стандартный&quot;))</pre>
+
+<p><img src="08_linear_models_with_continuous_and_discreet_predictors_files/figure-html/unnamed-chunk-61-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Take home messages</h2></hgroup><article  id="take-home-messages">
+
+<ul>
+<li>Коэффициенты регрессии при дискретных предикторах позволяют сопоставить средние значения для каждого уровня фактора со средним значением для базового уровня.</li>
+<li>При изменении базового уровня, коэффициенты изменятся, но суть модели останется той же.</li>
+<li>В одной модели можно объединить как непрерывные, так и дискретные предикторы.</li>
+<li>При анализе экспериметальных данных, включение в анализ некоторых ковариат может помочь лучше увидеть закономерности.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Что почитать</h2></hgroup><article  id="-">
+
+<ul>
+<li>Quinn G.P., Keough M.J. (2002) Experimental design and data analysis for biologists, <code>Chapter 12</code>.</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

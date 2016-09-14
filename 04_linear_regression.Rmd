@@ -1,0 +1,745 @@
+---
+title: Линейная регрессия
+author: Вадим Хайтов, Марина Варфоломеева
+output:
+  ioslides_presentation:
+    css: my_styles.css
+    widescreen: yes
+subtitle: Линейные модели, дисперсионный и регрессионный анализ с использованием R
+---
+
+
+## Мы рассмотрим 
+
+- Базовые идеи корреляционного анализа
+- Проблему двух статистических подходов: "Тестирование гипотез vs. построение моделей"
+- Разнообразие статистических моделей
+- Основы регрессионного анализа
+
+### Вы сможете
+
++ Оценить взаимосвязь между измеренными величинами
++ Объяснить что такое линейная модель
++ Формализовать запись модели в виде уравнения
++ Подобрать модель линейной регрессии
++ Протестировать гипотезы о наличии зависимости при помощи t-критерия или F-критерия
++ Оценить предсказательную силу модели 
+
+```{r setup, include = FALSE, cache = FALSE}
+#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
+# to configure markdown parsing
+options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
+#------
+# output options
+options(width = 70, scipen = 6, digits = 3)
+
+# to render cyrillics in plots use cairo pdf
+options(device = function(file, width = 7, height = 7, ...) {
+  cairo_pdf(tempfile(), width = width, height = height, ...)
+  })
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3)
+```
+
+# Знакомимся с даными
+
+## Пример: IQ и размеры мозга {.flexbox .vcenter}
+
+<div class="columns-2"> 
+Зависит ли уровень интеллекта от размера головного мозга? (Willerman et al. 1991)
+
+- Было исследовано 20 девушек и 20 молодых людей 
+- У каждого индивида измеряли: вес, рост, размер головного мозга (количество пикселей на изображении ЯМР сканера)
+- Уровень интеллекта измеряли с помощью IQ тестов
+
+Пример взят из работы: Willerman, L., Schultz, R., Rutledge, J. N., and Bigler, E. (1991), "In Vivo Brain Size and Intelligence," Intelligence, 15, 223-228.  
+Данные представлены в библиотеке *"The Data and Story Library"* 
+http://lib.stat.cmu.edu/DASL/  
+
+<img src="images/MRI.png" width="500" height="500" >   
+
+</div>
+
+## Знакомство с данными
+
+Посмотрим на датасет
+
+```{r}
+brain <- read.csv("data/IQ_brain.csv", header = TRUE)
+head(brain)
+```
+
+Есть ли пропущенные значения?
+
+```{r}
+sum(!complete.cases(brain))
+```
+
+## Где пропущенные значения? {.smaller}
+
+Где именно?
+
+```{r}
+sapply(brain, function(x) sum(is.na(x)))
+```
+
+Что это за случаи?
+
+```{r}
+brain[!complete.cases(brain), ]
+```
+
+Каков объем выборки
+
+```{r}
+nrow(brain) ## Это без учета пропущенных значений
+```
+
+# Корреляционный анализ
+
+## Вспомним: _Сила и направление связи между величинами_
+
+```{r, warning=FALSE, echo = FALSE, fig.align='center', fig.height=4, fig.width=8, message=FALSE}
+library (ggplot2)
+library (gridExtra)
+x <- rnorm(100, 10, 5)
+y1 <- 5*x + rnorm(100, 0, 5)
+pl_pos_cor <- ggplot(data.frame(x = x, y = y1), aes(x = x, y = y)) + geom_point() + xlab("First variable") + ylab("Second variable") + ggtitle("Positive correlation")
+
+y2 <- -5*x + rnorm(100, 0, 5)
+pl_neg_cor <- ggplot(data.frame(x = x, y = y2), aes(x = x, y = y)) + geom_point() + xlab("First variable") + ylab("Second variable") + ggtitle("Negative correlation")
+
+y3 <- 0*x + rnorm(100, 0, 5)
+pl_zero_cor <- ggplot(data.frame(x = x, y = y3), aes(x = x, y = y)) + geom_point() + xlab("First variable") + ylab("Second variable") + ggtitle("No correlation")
+
+grid.arrange(pl_pos_cor, pl_neg_cor, pl_zero_cor, ncol = 3)
+
+```
+
+## Коэффициенты корреляции и условия их применимости   
+
+Коэффициент | Фукция | Особенности примененения
+|-------------|--------------------------------|-------------|
+Коэф. Пирсона | `cor(x,y,method="pearson")` | Оценивает связь двух нормально распределенных величин. Выявляет только лиейную составляющую взамосвязи.
+Ранговые коэффициенты (коэф. Спирмена, Кэндалла) | `cor(x,y,method="spirman")`<br>`cor(x,y,method="kendall")`   | Не зависят от формы распределения. Могут оценивать связь для любых монотонных зависимостей. 
+
+
+## Оценка достоверности коэффициентов корреляции
+
+>- Коэффициент корреляции - это статистика, значение которой описывает степень взаимосвязи двух сопряженных переменных. Следовательно применима логика статистического критерия. 
+>- Нулевая гипотеза $H_0: r=0$
+>- Бывают двусторонние $H_a: r\ne 0$ и односторонние критерии $H_a: r>0$ или $H_a: r<0$
+>- Ошибка коэффициента Пирсона: $SE_r=\sqrt{\frac{1-r^2}{n-2}}$
+>- Стандартизованная величина $t=\frac{r}{SE_r}$ подчиняется распределению Стьюдента с парметром $df = n-2$
+>- Для ранговых коэффициентов существует проблема "совпадающих рангов" (tied ranks), что приводит к приблизительной оценке $r$ и приблизительной оценке уровня значимости. 
+>- Достоверность коэффициента кореляции можно оценить пермутационным методом
+
+
+## Задание
+
++ Определите силу и направление связи между всеми парами исследованных признаков
++ Постройте точечную диаграмму, отражающую взаимосвязь между результатами IQ-теста (PIQ) и размером головного мозга (MRINACount)
++ Оцените достоверность значения коэффициента корреляции Пирсона между этими двумя перменными 
+
+*Hint 1*: Обратите внимание на то, что в датафрейме есть пропущенные значения. Изучите, как работают c `NA` функуции, вычисляющие коэффициенты корреляции. 
+
+*Hint 2* Для построения точечной диаграммы вам понадобится `geom_point()`
+
+## Решение {.smaller}
+
+```{r, size=2, tidy=TRUE}
+cor(brain[,2:6], use = "pairwise.complete.obs")
+
+cor.test(brain$PIQ, brain$MRINACount, method = "pearson", alternative = "two.sided")
+```
+
+## Решение {.smaller}
+
+```{r pl-brain, tidy=TRUE}
+pl_brain <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + geom_point() + xlab("Brain size") + ylab("IQ test")
+```
+```{r, fig.align='center'}
+pl_brain
+```
+
+##   Два подхода к исследованию: <br> Тестирование гипотезы <br>VS<br> Построение модели 
+
++ Проведя корреляционный анализ, мы лишь ответили на вопрос "Существет ли достоверная связь между величинами?"
+
++ Сможем ли мы, используя это знание, _предсказть_ значения одной величины, исходя из знаний другой? 
+
+## Тестирование гипотезы VS построение модели 
+
+- Простейший пример  
+- Между путем, пройденным автомобилем, и временем, проведенным в движении, несомнено есть связь. Хватает ли нам этого знания?   
+- Для расчета величины пути в зависимости от времени необходимо построить модель: $S=Vt$, где $S$ - зависимая величина, $t$ - независимая переменная, $V$ - параметр модели.
+- Зная параметр модели (скорость) и значение независимой переменной (время), мы можем рассчитать (*cмоделировать*) величину пройденного пути
+
+
+# Какие бывают модели?
+
+## Линейные и нелинейные модели
+<br>
+
+Линейные модели 
+$$y = b_0 + b_1x$$ <br> $$y = b_0 + b_1x_1 + b_2x_2$$ 
+Нелинейные модели 
+$$y = b_0 + b_1^x$$ <br>  $$y = b_0^{b_1x_1+b_2x_2}$$ 
+
+## Простые и многокомпонентные (множественные) модели
+
++ Простая модель
+ $$y = b_0 + b_1x$$ 
+
++ Множественная модель
+ $$y = b_0 + b_1x_1 + b_2x_2 + b_3x_3 + ... + b_nx_n$$ 
+
+
+## Детерминистские и стохастические модели
+
+<div class="columns-2">
+```{r,echo=FALSE, fig.height=4, fig.width=4, warning=FALSE }
+x <- 1:20
+y <- 2 + 5*x
+ggplot(data.frame(x=x, y=y), aes(x=x, y=y)) + geom_point(size=4)  + geom_abline(slope=5, intercept = 2) + ylim(0, 100)
+```
+Модель: $у_i = 2 + 5x_i$    
+Два парметра: угловой коэффициент (slope) $b_1=5$; свободный член (intercept) $b_0=2$
+Чему равен $y$ при $x=10$?
+
+
+```{r,echo=FALSE, fig.height=4, fig.width=4, warning=FALSE}
+x <- 1:20
+y <- 2 + 5*x + rnorm(20,0, 20)
+ggplot(data.frame(x=x, y=y), aes(x=x, y=y)) + geom_point(size=4)  + geom_abline(slope=5, intercept = 2)  + ylim(0,100)
+
+```
+Модель: $у = 2 + 5x + \epsilon$    
+Появляется дополнительный член $\epsilon_i$ 
+Он вводит в модель влияние неучтенных моделью факторов. 
+Обычно считают, что $\epsilon \in N(0, \sigma^2)$ 
+
+</div>
+
+
+## Модели с дискретными предикторами
+
+```{r , echo=FALSE}
+set.seed(1234)
+x <- data.frame(labels = c(rep("Level 1", 10), rep( "Level 2", 10), rep("Level 3", 10)), response = c(rnorm(10, 5, 1), rnorm(10, 10, 1), rnorm(10, 15, 1))) 
+
+ggplot(x, aes(x=labels, y=response)) + geom_boxplot()+ geom_point(color="blue", size=4) + xlab(" ")
+
+```
+
+Модель для данного примера имеет такой вид     
+$response = 4.6 + 5.3I_{Level2} + 9.9 I_{Level3}$
+
+$I_{i}$ - dummy variable   
+
+
+## Модель для зависимости величины IQ от размера головного мозга
+
+Какая из линий "лучше" описывает облако точек?
+
+```{r, echo=FALSE, fig.align='center', fig.height= 5, fig.width=7}
+library(ggplot2)
+
+pl_1 <- pl_brain + geom_smooth(method = "lm", se = FALSE, size=2) + geom_abline(slope = 0.00008, intercept = 35, color="green", size = 2) + geom_abline(slope = 0.00014, intercept =1.7, color="red", size=2) 
+
+grid.arrange (pl_brain, pl_1, ncol=2)
+
+```
+
+
+
+
+# Найти оптимальную модель позволяет регрессионный анализ
+<div  align="left">
+
+"Essentially, all models are wrong,     
+but some are useful"     
+(Georg E. P. Box) 
+
+</div>
+
+## Происхождение термина "регрессия"
+
+<div class="columns-2">
+
+
+<img src="images/Galton.png" width="220" height="299" >
+
+
+Френсис Галтон (Francis Galton)
+
+
+"the Stature of the adult offspring … [is] … more mediocre than the
+stature of their Parents" (цит. по `Legendre & Legendre, 1998`)
+
+Рост _регрессирует_ (возвращается) к популяционной средней     
+Угловой коэффициент в зависимости роста потомков от роста родителей- _коэффциент регресси_
+
+
+</div>
+
+
+
+## Подбор линии регрессии проводится с помощью двух методов 
+
+>- С помощью метода наименьших квадратов (Ordinary Least Squares) - используется для простых линейных моделей
+<br>
+
+>- Через подбор функции максимального правдоподобия (Maximum Likelihood) - используется для подгонки сложных линейных и нелинейных моделей.
+
+
+## Кратко о методе макcимального правдоподобия 
+
+<img src="images/Zuur.png" width="600" height="500" >
+
+<div class = "footnote">
+(из кн. Zuur et al., 2009, стр. 19)  
+</div>
+
+
+
+## Метод наименьших квадратов
+
+<div class="columns-2">
+<img src="images/OLS.png" width="500" height="400" >
+
+<div class = "footnote">
+(из кн. Quinn, Keough, 2002, стр. 85)     
+</div>
+
+
+Остатки (Residuals):            
+$$e_i = y_i - \hat{y_i}$$
+
+Линия регрессии (подобраная модель) - это та линия, у которой $\sum{e_i}^2$ минимальна.
+
+
+
+## Подбор модели методом наменьших квадратов с помощью функци `lm()`  
+`fit <- lm(formula, data)`
+
+Модель записывается в виде формулы  
+
+Mодель | Формула
+|-------------|-------------|  
+Простая линейная регресся <br>$\hat{y_i}=b_0 + b_1x_i$ | `Y ~ X` <br> `Y ~ 1 + X` <br> `Y ~ X + 1`  
+Простая линейная регрессия <br> (без $b_0$, "no intercept") <br> $\hat{y_i}=b_1x_i$ | `Y ~ -1 + X` <br> `Y ~ X - 1`  
+Уменьшенная простая линейная регрессия <br> $\hat{y_i}=b_0$ | `Y ~ 1` <br> `Y ~ 1 - X`  
+Множественная линейная регрессия <br> $\hat{y_i}=b_0 + b_1x_i +b_2x_2$ | `Y ~ X1 + X2`  
+
+
+
+## Подбор модели методом наменьших квадратов с помощью функци `lm()` {.smaller}
+`fit <- lm(formula, data)`
+
+Элементы формул для записи множественных моделей
+
+Элемент формулы | Значение 
+|-------------|-------------| 
+`:` | Взаимодействие предикторов <br> `Y ~ X1 + X2 + X1:X2`
+`*` | Обзначает полную схему взаимодействий <br>  `Y ~ X1 * X2 * X3` <br> аналогично <br> `Y ~ X1 + X2 + X3+ X1:X2 + X1:X3 + X2:X3 + X1:X2:X3` 
+`.` | `Y ~ .` <br> В правой части формулы записываются все переменные из датафрейма, кроме `Y` 
+
+
+## Подберем модель, наилучшим образом описывающую зависимость результатов IQ-теста от размера головного мозга
+
+```{r brain-mod}
+brain_model <- lm(PIQ ~ MRINACount, data = brain)
+brain_model
+```
+
+
+## Как трактовать значения параметров регрессионной модели?
+
+```{r, echo=FALSE, warning=FALSE, fig.align='center',fig.width=9, fig.height=5}
+n=100
+x <- rnorm(n, 10, 5)
+y1 <- 5*x + 50 + rnorm(n, 0, 2)
+y2 <- -5*x + 50 + rnorm(n, 0, 2)
+y3 <- 0*x + 50 + rnorm(n, 0, 2)
+label <- c(rep("Positive slope",n), rep("Negative slope", n), rep("Zero slope", n))
+df1 <- data.frame(x = rep(x, 3), y = c(y1, y2, y3), label = label)
+df1a <- data.frame(intercept = c(50, 50, 50), slope = c(-5,0,5))
+pl_1 <- ggplot(data = df1, aes(x = x, y = y, color = label)) + geom_point() + xlab("Independent (X)") + ylab("Dependent (Y)") + xlim(0, 25) + guides(color=F) + geom_abline(data = df1a, aes(intercept = intercept, slope = slope), size=1) + ggtitle("Constant intercepts \n Different slopes")
+
+x <- rnorm(n, 10, 5)
+y1 <- 5*x + 0 + rnorm(n, 0, 2)
+y2 <- 5*x + 30 + rnorm(n, 0, 2)
+y3 <- 5*x + 60 + rnorm(n, 0, 2)
+label <- c(rep("Intercept = 0",n), rep("Intercept = 30", n), rep("Intercept = 60", n))
+df2 <- data.frame(x = rep(x, 3), y = c(y1, y2, y3), label = label)
+df2a <- data.frame(intercept=c(30, 0, 60), slope=c(5, 5, 5))
+pl_2 <- ggplot(df2, aes(x = x, y = y, color=label)) + geom_point() + xlab("Independent (X)") + ylab("Dependent (Y)") + xlim(0, 25) + guides(color=F) + geom_abline(data = df2a, aes(intercept = intercept, slope = slope), size=1) + ggtitle("Different intercepts \n Constant slopes")
+
+
+x <- rnorm(n, 10, 5)
+y1 <- 0*x + 0 + rnorm(n, 0, 2)
+y2 <- 0*x + 30 + rnorm(n, 0, 2)
+y3 <- 0*x + 60 + rnorm(n, 0, 2)
+label <- c(rep("Intercept = 0",n), rep("Intercept = 30", n), rep("Intercept = 60", n))
+df3 <- data.frame(x = rep(x, 3), y = c(y1, y2, y3), label = label)
+df3a <- data.frame(intercept = c(30, 0, 60), slope = c(0, 0, 0))
+pl_3 <- ggplot(data = df3, aes(x = x, y = y, color=label)) + geom_point() + xlab("Independent (X)") + ylab("Dependent (Y)") + xlim(0, 25) + guides(color=F) + geom_abline(data = df3a, aes(intercept = intercept, slope = slope), size=1) + ggtitle("Different intercepts \n Zero slopes")
+
+grid.arrange(pl_1, pl_2, pl_3, nrow=1)
+
+```
+
+
+## Как трактовать значения параметров регрессионной модели?
+
+>- Угловой коэффициент (_slope_) показывает на сколько _единиц_ изменяется предсказанное значение $\hat{y}$ при изменении на _одну единицу_ значения предиктора ($x$)
+
+>- Свободный член (_intercept_) - величина во многих случаях не имеющая "смысла", просто поправочный коэффициент, без которого нельзя вычислить $\hat{y}$. _NB!_ В некоторых линейных моделях он имеет смысл, например, значения $\hat{y}$ при $x = 0$. 
+
+>- Остатки (_residuals_) - характеризуют влияние неучтенных моделью факторов.
+
+## Вопросы: 
+1. Чему равны угловой коэффициент и свободный член полученной модели `brain_model`?       
+2. Какое значеие IQ-теста предсказывает модель для человека с объемом  мозга равным 900000         
+3. Чему равно значение остатка от модели для человека с порядковым номером 10?    
+
+## Ответы {.smaller}
+```{r}
+coefficients(brain_model) [1]
+coefficients(brain_model) [2]
+
+coefficients(brain_model) [1] + coefficients(brain_model) [2] * 900000
+
+brain$PIQ[10] - fitted(brain_model)[10]
+residuals(brain_model)[10]
+
+```
+
+
+## Углубляемся в анализ модели: функция `summary()`
+```{r}
+summary(brain_model)
+
+```
+
+
+## Что означают следующие величины?
+
+`Estimate`  
+`Std. Error`   
+`t value`  
+`Pr(>|t|)`   
+
+
+## Оценки параметров регрессионной модели
+
+Параметр | Оценка      | Стандартная ошибка   
+|-------------|--------------------|-------------|   
+$\beta_1$ <br> Slope| $b _1 = \frac {\sum _{i=1}^{n} {[(x _i - \bar {x})(y _i - \bar {y})]}}{\sum _{i=1}^{n} {(x _i - \bar x)^2}}$<br> или проще <br> $b_0 = r\frac{sd_y}{sd_x}$ | $SE _{b _1} = \sqrt{\frac{MS _e}{\sum _{i=1}^{n} {(x _i - \bar {x})^2}}}$   
+$\beta_0$ <br> Intercept | $b_0 = \bar y - b_1 \bar{x}$  | $SE _{b _0} = \sqrt{MS _e [\frac{1}{n} + \frac{\bar x}{\sum _{i=1}^{n} {(x _i - \bar x)^2}}]}$   
+$\epsilon _i$ | $e_i = y_i - \hat {y_i}$ | $\approx \sqrt{MS_e}$   
+
+
+
+## Для чего нужны стандартные ошибки?
+>- Они нужны, поскольку мы _оцениваем_ параметры по _выборке_
+>- Они позволяют построить доверительные интервалы для параметров
+>- Их используют в статистических тестах
+
+
+## Графическое представление результатов {.columns-2}
+
+```{r, fig.height=5, fig.width=5}
+pl_brain + geom_smooth(method="lm") 
+```
+
+<br>
+<br>
+<br>
+Доверительная зона регрессии. В ней с 95% вероятностью лежит регрессионная прямая, описывающая связь в генеральной совокупности. <br>
+Возникает из-за неопределенности оценок коэффициентов регрессии, вследствие выборочного характера оценок.           
+
+
+## Симулированный пример
+
+Линии регресси, полученные для 100 выборок (по 20 объектов в каждой), взятых из одной и той же генеральной совокупности 
+```{r, echo=FALSE, fig.align='center', fig.height=5}
+pop_x <- rnorm(1000, 10, 3)
+pop_y <- 10 + 10*pop_x + rnorm(1000, 0, 20)
+population <- data.frame(x=pop_x, y=pop_y)
+samp_coef <- data.frame(b0 = rep(NA, 100), b1=rep(NA, 100))
+for(i in 1:100) {
+  samp_num <- sample(1:1000, 20)
+  samp <- population[samp_num, ]
+  fit <- lm(y~x, data=samp)
+  samp_coef$b0[i] <- coef(fit)[1]
+  samp_coef$b1[i] <- coef(fit)[2]
+  
+ }
+
+ggplot(population, aes(x=x, y=y)) + geom_point(alpha=0.3, color="yellow")+ geom_abline(aes(intercept=b0, slope=b1), data=samp_coef) + geom_abline(aes(intercept=10, slope=10), color="blue", size=2)
+```
+
+
+
+## Доверительные интервалы для коэффициентов уравнения регрессии
+
+```{r}
+coef(brain_model)
+
+confint(brain_model)
+```
+
+## Для разных $\alpha$ можно построить разные доверительные интервалы
+
+```{r , echo=FALSE, fig.align='center', fig.height=5, fig.width=9}
+pl_alpha1 <- pl_brain + geom_smooth(method="lm", level=0.8) + ggtitle(bquote(alpha==0.2))
+
+pl_alpha2 <- pl_brain + geom_smooth(method="lm", level=0.95) + ggtitle(bquote(alpha==0.05))
+
+pl_alpha3 <- pl_brain + geom_smooth(method="lm", level=0.999) + ggtitle(bquote(alpha==0.01))
+
+
+grid.arrange(pl_alpha1, pl_alpha2, pl_alpha3, ncol=3)
+
+```
+
+## Важно!
+
+Если коэффициенты уравнения регресси - лишь приблизительные оценки параметров, то предсказать значения зависимой переменной можно только _с нeкоторой вероятностью_.           
+
+## Какое значение IQ можно ожидать у человека с размером головного мозга 900000?
+
+```{r, tidy=TRUE}
+newdata <- data.frame(MRINACount = 900000)
+
+predict(brain_model, newdata, interval = "prediction", 
+        level = 0.95, se = TRUE)$fit
+
+```
+
+>- При размере мозга 900000 среднее значение IQ будет, с вероятностью 95%, находиться в интервале от 67 до 153.
+
+
+
+## Отражаем на графике область значений, в которую попадут 95% предсказанных величин IQ
+
+Подготавливаем данные
+
+```{r , warning=FALSE}
+brain_predicted <- predict(brain_model, interval="prediction")
+brain_predicted <- data.frame(brain, brain_predicted)
+head(brain_predicted)
+```
+
+
+## Отражаем на графике область значений, в которую попадут 95% предсказанных величин IQ
+
+```{r pl-predict, echo=FALSE, fig.align='center', fig.height=5}
+pl_brain + 
+
+# 1) Линия регрессии и ее дов. интервал
+# Если мы указываем fill внутри aes() и задаем фиксированное значение - появится соотв. легенда с названием.
+# alpha - задает прозрачность
+  geom_smooth(method = "lm", aes(fill = "Conf.interval"), alpha = 0.4) +
+# 2) Интервал предсказаний создаем при помощи геома ribbon ("лента")
+# Данные берем из другого датафрейма - из brain_predicted
+# ymin и ymax - эстетики геома ribbon, которые задают нижний и верхний край ленты в точках с заданным x (x = MRINACount было задано в ggplot() при создании pl_brain, поэтому сейчас его указывать не обязательно)
+  geom_ribbon(data = brain_predicted,  aes(ymin = lwr, ymax = upr, fill = "Conf. area for prediction"), alpha = 0.2) +
+
+# 3) Вручную настраиваем цвета заливки при помощи шкалы fill_manual.
+# Ее аргумент name - название соотв. легенды, values - вектор цветов
+  scale_fill_manual(name = "Intervals", values = c("green", "gray")) +
+
+# 4) Название графика
+  ggtitle("Confidence interval \n and confidence area for prediction")
+```
+
+## Код для этого графика  {.smaller}
+
+Ранее вы уже создали график
+
+```{r pl-brain, eval=FALSE, tidy = TRUE}
+```
+
+Теперь его можно дополнить так:
+
+```{r  pl-predict, eval=FALSE, tidy=TRUE}
+```
+
+
+## Важно!
+
+<dev class="columns-2">
+*Модель "работает" только в том диапазоне значений независимой переменной ($x$), для которой она построена (интерполяция). Экстраполяцию надо применять с большой осторожностью.*
+
+```{r, fig.align='center', fig.height=5, fig.width=9, echo=FALSE}
+pl_brain + 
+  geom_ribbon(data=brain_predicted, aes(y=fit, ymin=lwr, ymax=upr, fill = "Conf. area for prediction"), alpha=0.2) + 
+  geom_smooth(method="lm", aes(fill="Conf.interval"), alpha=0.4) + 
+  scale_fill_manual("Intervals", values = c("green", "gray")) + 
+  ggtitle("Confidence interval \n and confidence area for prediction")+ xlim(600000, 1300000) + geom_text(label="Interpolation", aes(x=950000, y=100)) + geom_text(label="Extrapolation", aes(x=700000, y=70)) +
+geom_text(label="Extrapolation", aes(x=1200000, y=70))
+
+``` 
+
+</dev>
+
+
+## Итак, что означают следующие величины?
+
+>- `Estimate` 
+>- Оценки праметров регрессионной модели 
+>- `Std. Error`   
+>- Стандартная ошибка для оценок    
+>- Осталось решить, что такое `t value`, `Pr(>|t|)`
+
+
+## Тестирование гипотез с помощью линейных моделей
+ 
+### Два равноправных способа
+>- Проверка достоверности оценок коэффициента $b_1$ (t-критерий). 
+>- Оценка соотношения описанной и остаточной дисперсии (F-критерий). 
+
+## Тестирование гипотез с помощью t-критерия  
+
+Зависимость есть, если $\beta_1 \ne 0$ 
+
+Нулевая гипотеза $H_0: \beta = 0$
+
+Тестируем гипотезу 
+
+$$t=\frac{b_1-0}{SE_{b_1}}$$
+
+Число степеней свободы: $df=n-2$     
+>- Итак,           
+>- `t value` - Значение t-критерия          
+>- `Pr(>|t|)` - Уровень значимости         
+
+
+## Зависит ли IQ от размера головного мозга? {.smaller}
+$PIQ = 1.744 + 0.0001202 MRINACount$
+
+```{r}
+summary(brain_model)
+```
+
+## Тестирование гипотез с помощью F-критерия {.smaller .columns-2}  
+
+*Объясненная дисперсия зависимой перменной*  
+$SS_{Regression}=\sum{(\hat{y}-\bar{y})^2}$   
+$df_{Regression} = 1$   
+$MS_{Regression} =\frac{SS_{Regression}}{df}$ 
+<br><br>
+*Остаточная дисперсия завсимой переменной*   
+$SS_{Residual}=\sum{(\hat{y}-y_i)^2}$   
+$df_{Residual} = n-2$   
+$MS_{Residual} =\frac{SS_{Residual}}{df_{Residual}}$   
+<br><br>
+*Полная дисперсия зависимой переменной*  
+$SS_{Total}=\sum{(\bar{y}-y_i)^2}$   
+$df_{Total} = n-1$   
+$MS_{Total} =\frac{SS_{Total}}{df_{Total}}$   
+
+
+```{r ,echo=FALSE, fig.height=6, fig.width=5}
+
+pl_exp <- pl_brain + geom_smooth(method="lm", se=F, size=1.3) + geom_abline(aes(intercept=mean(PIQ), slope=0), size=1.3) + geom_text(label="Mean IQ", aes(x=1050000, y=(mean(PIQ)-6)), size = 5) + geom_segment(data=brain_predicted, aes(x=MRINACount, y=mean(PIQ), xend=MRINACount, yend=fit)) + ggtitle("Explained variation")
+
+pl_res <- pl_brain + geom_smooth(method="lm", se=F, size=1.3) + geom_segment(data=brain_predicted, aes(x=MRINACount, y=PIQ, xend=MRINACount, yend=fit)) + ggtitle("Residual variation")
+
+pl_tot <-pl_brain + geom_abline(aes(intercept=mean(PIQ), slope=0), size=1.3) + geom_text(label="Mean IQ", aes(x=1050000, y=(mean(PIQ)-6)), size = 5) + geom_segment(data=brain_predicted, aes(x=MRINACount, y=PIQ, xend=MRINACount, yend=mean(PIQ))) + ggtitle("Total variation")
+
+
+grid.arrange(pl_exp, pl_res, pl_tot, nrow=3)
+```
+
+
+
+## F критерий
+
+<div class="columns-2">
+
+Если зависимости нет, то <br> $MS _{Regression} = MS_{Residual}$
+
+ $$ F= \frac{MS _{Regression}}{MS_{Residual}}$$
+
+Логика та же, что и с t-критерием  
+
+
+```{r, echo=FALSE, fig.width=5}
+f <- seq(-0.2,10,1)
+ggplot(data.frame(f=f, p=df(f, 1, 38)), aes(x=f, y=p)) + geom_line(size=1.3) + ggtitle("F-distribution") + xlab("F") + geom_vline(xintercept=c(6.686), color="red",) + geom_hline(yintercept=0) + xlim(-0.2,10)
+```
+
+Форма F-распределения зависит от двух параметров 
+$df_{Regression} = 1$ и $df_{Residual} = n-2$
+
+<div>
+
+
+## Оценка качества подгонки модели с помощью коэффициента детерминации
+
+### В чем различие между этми двумя моделями?
+
+```{r, echo=FALSE, fig.align='center', fig.height=5}
+x <- rnorm(100, 20, 5)
+y1 <- 10 * x + 5 + rnorm(100, 0, 5)
+y2 <- 10 * x + 5 + rnorm(100, 0, 40)
+d <- data.frame(x=x, y1=y1)
+pl_R1 <- ggplot(d, aes(x=x, y=y1)) + geom_point() + geom_smooth(method="lm", se=F) 
+pl_R2 <- ggplot(d, aes(x=x, y=y2)) + geom_point() + geom_smooth(method="lm", se=F) 
+grid.arrange (pl_R1, pl_R2)
+```
+
+## Оценка качества подгонки модели с помощью коэффициента детерминации
+
+Коэффициент детерминации описывает какую долю дисперсии зависимой переменной объясняет модель
+
+>- $$R^2 = \frac{SS_{Regression}}{SS_{Total}}$$
+>- $$0< R^2 < 1$$
+>- $$R^2 = r^2$$
+
+
+## Еще раз смотрим на результаты регрессионного анализа зависимости IQ от размеров мозга
+
+```{r}
+summary(brain_model)
+```
+
+## Adjusted R-squared - скорректированный коэффициет детерминации
+
+Применяется если необходимо сравнить две модели с разным количеством параметров  
+
+$$ R^2_{adj} = 1- (1-R^2)\frac{n-1}{n-k}$$
+
+$k$ - количество параметров в модели   
+
+Вводится штраф за каждый новый параметр
+
+## Как записываются результаты регрессионного анлиза в тексте статьи?
+
+Мы показали, что связь между результатами теста на IQ описывается моделью вида
+<br>
+IQ = 1.74 + 0.00012 MRINACount ($F_{1,38}$ = 6.686, p = 0.0136, $R^2$ = 0.149)
+<br>
+<br>
+
+
+
+## Summary
+> - Модель простой линейной регрессии $y _i = \beta _0 + \beta _1 x _i + \epsilon _i$
+- Параметры модели оцениваются на основе выборки
+- В оценке коэффициентов регрессии и предсказанных значений существует неопределенность: необходимо вычислять доверительный интервал. 
+- Доверительные интервалы можно расчитать, зная стандартные ошибки.  
+- Гипотезы о наличии зависимости можно тестировать при помощи t- или F-теста. $(H _0: \beta _1 = 0$)
+- Качество подгонки модели можно оценить при помощи коэффициента детерминации $(R^2)$
+
+## Что почитать
+
+- Гланц, 1999, стр. 221-244
+- [Open Intro to Statistics](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/OpenIntroStatSecond.pdf): [Chapter 7. Introduction to linear regression](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/oiStat2_07.pdf), pp. 315-353.  
+- Quinn, Keough, 2002, pp. 78-110
+

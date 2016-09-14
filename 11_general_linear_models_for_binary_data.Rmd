@@ -1,0 +1,600 @@
+---
+title: Регрессионный анализ для бинарных данных
+subtitle: Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015
+author: Вадим Хайтов, Марина Варфоломеева
+presenters: [{
+    name: 'Firstname Lastname',
+    company: 'Job Title, Google',
+    }]
+output:
+  ioslides_presentation:
+    widescreen: true
+    css: my_styles.css
+    logo: Linmod_logo.png
+---
+
+
+```{r setup, include = FALSE, cache = FALSE}
+#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
+# to conimages markdown parsing
+options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
+#------
+# output options
+options(width = 70, scipen = 6, digits = 3)
+
+# to render cyrillics in plots use cairo pdf
+options(device = function(file, width = 7, height = 7, ...) {
+  cairo_pdf(tempfile(), width = width, height = height, ...)
+  })
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3)
+```
+
+
+## Мы рассмотрим 
++ Регрессионный анализ для бинарных зависимых переменных
+
+### Вы сможете
++ Построить логистическую регрессионную модель, подобранную методом максимального правдоподобия
++ Дать трактовку параметрам логистической регрессионной модели 
++ Провести анализ девиансы, основанный на логистичской регрессии
+
+
+## Бинарные данные - очень распространенный тип зависимых переменных
+
++ Вид есть - вида нет
++ Кто-то в результате эксперимента выжил или умер
++ Пойманное животное заражено паразитами или здорово
++ Комнда выиграла или проиграла 
+
+и т.д.
+
+## На каком острове лучше искать ящериц? {.columns-2}
+
+Пример взят из книги Quinn & Keugh (2002)
+
+Оригинальная работа Polis et al. (1998)
+```{r}
+liz <- read.csv("data/polis.csv")
+head(liz)
+```
+
+<img src="images/esher.jpg" width="500" height="500" >  
+
+## Зависит ли встречаемость ящериц от размера острова? {.smaller}
+*Зависимая переменная*: PA - (есть ящерицы "1" - нет ящериц "0")   
+*Предиктор*  - PARATIO (отношение периметра к площади)
+
+<div class = 'columns-2'>
+Обычную линейную регрессию подобрать можно,  
+```{r, echo=FALSE}
+fit <- lm(PA ~ PARATIO, data = liz)
+summary(fit)
+```
+
+**но она категорически не годится**
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=4, fig.height=4.2, fig.align='right'}
+library(ggplot2)
+
+ggplot(liz, aes(x=PARATIO, y=PA)) + geom_point() + geom_smooth(method="lm", se=FALSE)
+```
+
+</div>
+
+## Эти данные лучше описывает логистическая кривая {.columns-2}
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=5, fig.height=5}
+
+ggplot(liz, aes(x=PARATIO, y=PA)) + geom_smooth(method="glm", method.args = list(family="binomial"), se=FALSE, size = 2) + ylab("Предсказанная вероятность встречи") + geom_point()
+```
+
+Логистическая кривая описывается такой формулой
+
+$$ \pi(x) = \frac{e^{\beta_0+\beta_1x}}{1+e^{\beta_0+\beta_1x}} $$
+
+
+## Зависимую величину можно преобразовать в более удобную для моделирования форму 
+
+> 1. Дискретный резульат: 1 или 0
+> 2. Дискретные данные можно преобразовать в форму оценки вероятности события: $\pi = \frac{N_i}{N_{total}}$ варьирует от 0 до 1
+> 3. Вероятность события можно выразить в форме шансов (odds): $odds=\frac{\pi}{1-\pi}$ варьируют от 0 до $+\infty$. *NB: Если шансы > 1, то вероятность события, что $y_i=1$ выше, чем вероятность события $y_i = 0$.  Если шансы < 1, то наоборот*.
+> 4. Шансы преобразуются в _Логиты_ (logit):  $ln(odds)=\ln(\frac{\pi}{1-\pi})$ варьируют от  $-\infty$ до $+\infty$. Логиты гораздо удобнее для построения моделей.
+
+
+## Логистическая модель после логит-преобразования становится линейной
+
+$$ g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})=\beta_0 + \beta_1x$$
+
+Остается только подобрать параметры этой линейной модели: $\beta_0$ (интерсепт) и $\beta_1$ (угловой кэффициент)    
+
+## Метод максимального правдоподобия
+
+Если остатки не подчиняется нормальному распределению, то метод наименьших квадратов не работает. В этом случае применяют _Метод максимального правдоподбия_
+
+В результате итеративных процедур происходит подбор таких значений коэффициентов, при которых правдоподобие - вероятность получения имеющегося у нас набора данных - оказывается максимальным, при условии страведливости данной модели.
+
+$$ Lik(x_1, ..., x_n) = \Pi^n _{i = 1}f(x_i; \theta)$$
+
+где $f(x; \theta)$ - функция распределения с параметрами $\theta$
+
+
+## Правдоподобие для биномиального распределения
+
+### Функция правдоподобия
+
+Для случая биномиального распределения $x \in Bin(n, \pi)$ функция правдоподобия имеет следующий вид:
+
+$$Lik(\pi|x) = \frac{n!}{(n-x)!x!}\pi^x(1-\pi)^{n-x}$$
+
+отбросив константу, получаем:
+
+$$Lik(\pi|x) \propto \pi^x(1-\pi)^{n-x}$$
+
+### Логарифм правдоподобия
+
+Удобнее работать с логарифмом функции правдоподобия - $logLik$ - его легче максимизировать. В случае биномиального распределения он выглядит так:
+
+$$logLik(\pi|x) = x log(\pi) + (n-x)log(1-\pi)$$
+
+## Подберем модель  {.smaller}
+
+```{r}
+liz_model <- glm(PA ~ PARATIO , family="binomial", data = liz)
+summary(liz_model)
+```
+
+## {.smaller} 
+### `summary()` для модели, подобранной методом максимального правдоподобия
+
+```{r, echo=FALSE}
+summary(liz_model)
+```
+
+Есть уже знакомые термины: `Estimate`, `Std. Error`, `AIC`  
+Появились новые термины: `z value`, `Pr(>|z|)`, `Null deviance`, `Residual deviance`
+
+
+## "z value"" и "Pr(>z)"
+
+z - это величина критерия Вальда (_Wald statistic_) - аналог t-критерия
+
+Используется для проверки $H_0: \beta_1=0$
+
+$$z=\frac{\beta_1}{SE_{\beta_1}}$$
+
+Сравнивают со стандартным нормальным распределением (z-рaспределение)
+
+Дает надежные оценки p-value при больших выборках
+
+## Null deviance и Residual deviance {.smaller}
+
+**"Насыщенная" модель** - модель, подразумевающая, что каждая из n точек имеет свой собственный параметр, следовательно надо подобрать n параметров. Вероятность существования данных для такой модели равна 1. 
+$$logLik_{satur}=0$$
+$$df_{saturated} = n - npar_{saturated}  = n - n = 0$$
+
+**"Нулевая" модель** - модель, подразумевающая, что для описания всех точек надо подобрать только 1 параметр. $g(x) = \beta_0$.  $$logLik_{nul} \ne 0$$
+$$df_{null} = n - npar_{null} = n - 1$$
+
+**"Предложенная" модель** - модель, подобранная в нашем анализе $g(x) = \beta_0 + \beta_1x$
+$$logLik_{prop} \ne 0$$
+$$df_{proposed} = n - npar_{proposed}$$
+
+## Null deviance и Residual deviance
+
+**Девианса** - это оценка отклонения логарифма максимального правдоподобия одной модели от логарифма максимального правдоподобия другой модели 
+
+**Остаточная девианса**:   
+$Dev_{resid} = 2(logLik_{satur} - logLik_{prop})=-2logLik_{prop}$    
+**Нулевая девианса**:   
+$Dev_{nul} = 2(logLik_{satur} - logLik_{nul})=-2logLik_{nul}$   
+
+Проверим
+```{r}
+(Dev_resid <- -2*as.numeric(logLik(liz_model))) #Остаточная девианса
+
+(Dev_nul <- -2*as.numeric(logLik(update(liz_model, ~-PARATIO)))) #Нулевая девианса
+```
+
+
+## Анализ девиансы
+
+**По соотношению нулевой девиансы и остаточной девиансы можно понять насколько статистически значима модель**
+
+В основе анализа девиансы лежит критерий $G^2$
+
+$$ G^2 = -2(logLik_{nul} - logLik_{prop})$$
+
+```{r}
+(G2 <- Dev_nul - Dev_resid)
+```
+
+Вспомним: 
+$$ LRT = 2ln(Lik_1/Lik_2) = 2(logLik_1 - logLlik_2)$$
+
+> Тест $G^2$ - это частный случай теста отношения правдоподобий (Likelihood Ratio Test)
+
+## Свойства критерия $G^2$
+
+>- $G^2$ - это девианса полной и редуцированной модели  
+>- $G^2$ - аналог частного F критерия в обычном регрессионном анализе  
+>- $G^2$ - подчиняется $\chi^2$ распределению (с параметом df = 1) если нулевая модель и предложенная модель не отличаются друг от друга.
+>- $G^2$ можно использовать для проверки гипотезы о равенстве нулевой и остаточной девианс.
+
+## Задание
+
+Вычислите вручную значение критерия $G^2$ для модели, описывающей встречаемость ящериц (`liz_model`) и оцените уровень значимости для него 
+
+$$ G^2 = -2(logLik_{nul} - logLik_{prop})$$
+
+## Решение
+
+```{r}
+#Остаточная девианса
+Dev_resid <- -2*as.numeric(logLik(liz_model)) 
+
+#Нулевая девианса
+Dev_nul <- -2*as.numeric(logLik(update(liz_model, ~-PARATIO)))
+
+# Значение критерия 
+(G2 <- Dev_nul - Dev_resid)
+
+(p_value <- 1 - pchisq(G2, df = 1))
+
+```
+
+
+## Решение с помощью функции `anova()`
+
+```{r}
+anova(liz_model, test="Chi")
+
+
+```
+
+# Интерпретация коэффициентов логистической регрессии
+
+## Как трактовать коэффициенты подобранной модели?
+
+$$ g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})=\beta_0 + \beta_1x$$
+
+```{r}
+coef(liz_model)
+```
+
+$\beta_0$ - не имеет особого смысла, просто поправочный коэффициент
+
+$\beta_1$ - _на сколько_ единиц изменяется логарифм величины шансов (odds), если значение предиктора изменяется на единицу
+
+Трактовать такую величину неудобно и трудно
+
+## Немного алгебры
+
+посмотрим как изменится $g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})$ при изменении предиктора на 1
+
+$$g(x+1) - g(x) = ln(odds_{x+1}) - ln(odds_x)  = ln(\frac{odds_{x+1}}{odds_x})$$
+
+Задание: завершите алгебраическое преобразование
+
+
+
+## Решение
+
+$$ln(\frac{odds_{x+1}}{odds_x}) = \beta_0 + \beta_1(x+1) - \beta_0 - \beta_1x = \beta_1$$
+
+$$ln(\frac{odds_{x+1}}{odds_x}) = \beta_1$$
+
+$$\frac{odds_{x+1}}{odds_x} = e^{\beta_1}$$
+
+
+## Полученная величина имеет определенный смысл 
+
+```{r}
+exp(coef(liz_model)[2])
+```
+
+_Во сколько_ раз изменяются шансы встретить ящерицу при увеличении отношения периметра острова к его площади на одну единицу. *NB: Отношение периметра к площади тем больше, чем меньше остров*.
+
+Шансы изменяются в `r exp(coef(liz_model)[2])` раза. То есть, чем больше отношение  периметра к площади, тем меньше шансов встретить ящерицу. Значит, чем больше остров, тем больше шансов встретить ящерицу
+
+
+
+## Подобранные коэффициенты позволяют построить логистическую кривую {.smaller .columns-2}
+
+
+```{r, fig.height=5,fig.width=4.5,  echo=FALSE, fig.align='left'}
+ggplot(liz, aes(x=PARATIO, y=PA)) + geom_point() + geom_smooth(method="glm", method.args = list(family="binomial"), se=TRUE, size = 2) + ylab("Вероятность встречи ящериц") + annotate("text", x=40, y=0.75, parse=TRUE, label = "pi == frac(e ^ {beta[0]+beta[1] %.% x}, 1 + e ^ {beta[0]+beta[1] %.% x})", size = 10)
+```
+
+Cерая область - доверительный интервал для логистической регрессии
+
+Доверительные интервалы для коэффициентов:
+```{r, warning=FALSE, message=FALSE}
+confint(liz_model) # для логитов
+exp(confint(liz_model)) # для отношения шансов 
+
+```
+
+
+##Задание: 
+Постройте график логистической ререссии для модели `liz_model`  без использования `geom_smooth()`
+
+Hint 1: Используйте функцию `predict()`, изучите значения параметра "type"
+
+Hint 2: Для вызова справки напишите `predict.glm()`
+
+Hint 3: Создайте датафрейм MyData с переменной `PARATIO`, изменяющейся от минимального до максимального значения `PARATIO`
+
+## Решение {.smaller .columns-2}
+
+```{r, fig.height=5, fig.width=4.5, fig.align='right'}
+MyData <- data.frame(PARATIO = 
+        seq(min(liz$PARATIO), max(liz$PARATIO)))
+
+MyData$Predicted <- predict(liz_model, 
+                            newdata = MyData, 
+                            type = "response")
+
+ggplot(MyData, aes(x = PARATIO, y = Predicted)) + 
+  geom_line(size=2, color = "blue") + 
+  xlab("Отношение периметра к площади") + 
+  ylab ("Вероятность") + 
+  ggtitle("Вероятность встречи ящериц")
+
+```
+
+#За кулисами вычислений
+
+## Применим матричную алгебру для вычисления предсказанных значений и доверительного интервала для линии регрессии 
+
+```{r}
+# Создаем искуственный набор данных
+MyData <- data.frame(PARATIO = seq(min(liz$PARATIO), max(liz$PARATIO)))
+
+# Формируем модельную матрицу для искуственно созданных данных
+X <- model.matrix( ~ PARATIO, data = MyData)
+
+```
+
+## Извлекаем характеристики подобранной модели и получаем предсказанные значения
+
+```{r}
+# Вычисляем параметры подобранной модели и ее матрицу ковариаций
+betas    <- coef(liz_model) # Векор коэффицентов
+Covbetas <- vcov(liz_model) # Ковариационная матрица
+
+# Вычисляем предсказанные значения, перемножая модельную матрицу на вектор 
+# коэффициентов
+MyData$eta <- X %*% betas
+```
+
+## Получаем предсказанные значения
+
+
+```{r}
+# Переводим предсказанные значения из логитов в вероятности
+MyData$Pi  <- exp(MyData$eta) / (1 + exp(MyData$eta))
+
+```
+
+## Вычисляем границы доверительного интервала
+
+```{r}
+# Вычисляем стандартные отшибки путем перемножения матриц
+  MyData$se <- sqrt(diag(X %*% Covbetas %*% t(X)))
+
+# Вычисляем доверительные интервалы
+MyData$CiUp  <- exp(MyData$eta + 1.96 *MyData$se) / 
+  (1 + exp(MyData$eta  + 1.96 *MyData$se))
+
+MyData$CiLow  <- exp(MyData$eta - 1.96 *MyData$se) / 
+  (1 + exp(MyData$eta  - 1.96 *MyData$se))
+
+
+```
+
+## Строим график {.columns-2} 
+
+```{r, fig.height=5, fig.width=4.5, fig.align='right'}
+ggplot(MyData, aes(x = PARATIO, y = Pi)) + 
+  geom_line(aes(x = PARATIO, y = CiUp), 
+            linetype = 2, size = 1) + 
+  geom_line(aes(x = PARATIO, y = CiLow), 
+            linetype = 2, size = 1) + 
+  geom_line(color = "blue", size=2) + 
+  ylab("Вероятность встречи")
+```
+
+
+
+# Множественная логистическая регрессия
+
+
+## От чего зависит уровень смертности пациентов, выписанных из реанимации? {.smaller}
+
+Данные, полученные на основе изучения 200 историй болезни пациентов одного из американских госпиталей        
+
+<div class="columns-2">
+
+- STA: Статус (0 = Выжил, 1 = умер)  
+- AGE: Возраст  
+- SEX: Пол  
+- RACE: Раса  
+- SER: Тип мероприятий в реанимации (0 = Medical, 1 = Surgical)  
+- CAN: Присутствует ли онкология? (0 = No, 1 = Yes)  
+- CRN: Присутсвует ли почечная недостаточность (0 = No, 1 = Yes)  
+- INF: Возможность инфекции (0 = No, 1 = Yes)  
+- CPR: CPR prior to ICU admission (0 = No, 1 = Yes)  
+- SYS: Давление во время поступления в реанимацию (in mm Hg)  
+- HRA: Пульс (beats/min)
+
+<p />
+
+- PRE: Была ли госпитализация в предыдущие 6 месяцев (0 = No, 1 = Yes)  
+- TYP: Тип госпитализации (0 = Elective, 1 = Emergency)  
+- FRA: Присутствие переломов (0 = No, 1 = Yes)  
+- PO2: Концентрация кислорода в крови (0 = >60, 1 = ²60)  
+- PH: Уровень кислотности крови (0 = ³7.25, 1 < 7.25)  
+- PCO: Концентрция углекислого газа в крови (0 = ²45, 1 = > 45)  
+- BIC: Bicarbonate from initial blood gases (0 = ³18, 1 = < 18)  
+- CRE: Уровень креатина (0 = ²2.0, 1 = > 2.0)  
+- LOC: Уровень сознания пациента при реанимации (0 = no coma or stupor, 1= deep stupor, 2 = coma)  
+
+</div>
+
+## Смотрим на данные {.smaller}
+
+```{r}
+surviv <- read.table("data/ICU.csv", header=TRUE, sep=";")
+head(surviv)
+```
+
+##Сделаем факторами те дискретные предикторы, которые обозначенны цифрами
+```{r}
+surviv$PO2 <- factor(surviv$PO2)
+surviv$PH <- factor(surviv$PH)
+surviv$PCO <- factor(surviv$PCO)
+surviv$BIC <- factor(surviv$BIC)
+surviv$CRE <- factor(surviv$CRE)
+surviv$LOC <- factor(surviv$LOC)
+```
+
+
+
+## Строим модель {.smaller}
+```{r, warning=FALSE}
+M1 <- glm(STA ~ ., family = "binomial", data = surviv)
+summary(M1)
+```
+
+
+##Задание
+Проведите анализ девиансы для данной модели
+
+
+##Решение {.smaller}
+```{r}
+anova(M1, test = "Chi")
+
+```
+
+##Упростим модель с помощью функции `step()`
+
+```{r, eval = FALSE}
+
+step(M1, direction = "backward")
+
+```
+
+
+##Рассмотрим финальную модель {.smaller}
+```{r}
+M2 <- glm(formula = STA ~ AGE + CAN + SYS + TYP + PH + PCO + LOC, family = "binomial",   data = surviv)
+
+# M2 вложена в M1 следовательно их можно сравнить тестом отношения правдоподобий
+anova(M1, M2, test = "Chi")
+```
+
+
+## Вопрос 
+Во сколько раз изменяется отношение шансов на выживание при условии, что пациент онкологический больной (при прочих равных условиях)?
+
+
+## Решение
+
+```{r}
+exp(coef(M2)[3])
+```
+
+##Визуализируем предсказания модели
+
+```{r, echo=FALSE, fig.height=6, fig.width=8}
+MyData = expand.grid(AGE = seq(min(surviv$AGE), max(surviv$AGE), 1), CAN = levels(surviv$CAN),  SYS = seq(min(surviv$SYS), max(surviv$SYS), 10),  TYP =  "Emergency", PH = "1", PCO = "1", LOC ="1") 
+
+MyData$Predicted <- predict(M2, newdata = MyData, type = "response")
+
+
+
+ggplot(MyData, aes(x=SYS, y = Predicted, color = AGE, group = AGE)) + geom_line() + facet_grid(~ CAN, labeller = label_both) + scale_color_gradient(low = "green",  high = "red") + labs(label = list(x = "Давление в момент реанимации (SYS)", y = "Вероятность гибели", color = "Возраст", title = "Предсказания модели"))
+
+
+```
+
+
+## Диагностика модели {.smaller}
+
+```{r, message=FALSE}
+M2_diag <- data.frame(.fitted = predict(M2), 
+    .pears_resid = residuals(M2, type = "pearson"))
+
+ggplot(M2_diag, aes(x = .fitted, y = .pears_resid)) + 
+  geom_point() + geom_smooth(se = FALSE)
+```
+
+Явного паттерна в остатках нет, но есть другая проблема
+
+## Zero inflation   
+
+```{r, echo=FALSE, message=FALSE}
+ggplot(M2_diag, aes(x = .pears_resid)) + geom_histogram(fill = "blue", color = "black", binwidth = 0.2) + geom_vline(aes(xintercept = 0), size = 1.2)
+```
+
+Преобладают отрицательные остатки.  
+Это связано с проблемой, называемой _"zero inflation"_, - в зависимой переменной слишком много нулей.
+
+##Сколько должно быть нулей? {.smaller .columns-2}
+
+
+```{r, tidy=FALSE}
+#Формируем искусственный набор данных
+MyData = expand.grid(
+  AGE = seq(min(surviv$AGE), 
+            max(surviv$AGE), 1), 
+  CAN = levels(surviv$CAN),
+  SYS = seq(min(surviv$SYS), 
+            max(surviv$SYS), 10),  
+  TYP =  levels(surviv$TYP), 
+  PH = levels(surviv$PH), 
+  PCO = levels(surviv$PCO), 
+  LOC =levels(surviv$LOC)
+  )
+
+# Предсказываем для этих данных вероятности 
+# гибели в соответствии с моделью M2
+Predicted <-predict(M2, newdata = MyData, 
+                    type ="response") 
+
+# Вычисляем долю нулей, ожидаемую 
+# в соответствии с биномиальным 
+# распределением
+Zero_perc <- sum((1-Predicted))/
+  (sum((1-Predicted)) + 
+    sum((Predicted))) * 100
+```
+
+Нулей долно быть `r round(Zero_perc)` %
+
+А в наших данных доля нулей составляет `r mean(surviv$STA==0)*100 ` %.
+
+Это больше, чем должно быть в соответсивии с биномиальным распределением.
+
+**Нужна более сложная модель!** 
+
+<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+
+
+## Summary
+
+>- При построении модели для бинарной зависимой перменной применяется логистическая регрессия.   
+>- При построении такой модели 1 и 0 в перменной отклика заменяются логитами.
+>- Угловые коэффициенты подобранной логистической регрессии говорят о том, во сколько раз изменяется соотношение шансов события при увеличении предиктора на единицу.   
+>- Оценить статистическую значимость модели можно с помощью анализа девиансы.
+
+
+## Что почитать
++ Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014.
++ Quinn G.P., Keough M.J. (2002) Experimental design and data analysis for biologists, pp. 92-98, 111-130
++ Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. - Statistics for biology and health. Springer, New York, NY. 
+
+

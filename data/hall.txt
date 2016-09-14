@@ -1,0 +1,20 @@
+##############################################################################
+#     									     #
+#	Legend of formats and contents for data files to 		     #
+#	accompany "Design and Analysis for Biologists" by 		     #
+#	G. Quinn & M. Keough, 2002					     #
+#									     #
+#	-------------------------------------------------------------	     #
+#	Used in Tab 9-15a, Tab 9-16					     #
+#									     #
+##############################################################################
+
+Format of the files: (Tab 9-15a, Tab 9-16)
+	* hall.xls (Microsoft Excel)
+	* hall.csv (comma delimeted ascii text file)
+
+File contents:
+	* TREAT - treatment (control=no nutrients added, nutrient=N and P added)
+	* TIME - time after deployment (2=two months, 4=four months, 6=six months) that observations were collected
+	* RICHNESS - species richness of macroinvertebrates
+----------------------------------------------------------------------------------------

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Линейные модели с дискретными предикторами</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Линейные модели с дискретными предикторами',
+                        subtitle: 'Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: '09_anova_files/logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Марина Варфоломеева, Вадим Хайтов' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(09_anova_files/logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="09_anova_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Мы рассмотрим</h2></hgroup><article  id="-">
+
+<h3>Вы сможете</h3>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Дисперсионный анализ</h2></hgroup><article  id="-">
+
+</article></slide><slide class=''><hgroup><h2>Модель однофакторного дисперсионного анализа</h2></hgroup><article  id="---">
+
+<p>\[y _{ij} = \mu + \alpha _i + \epsilon _{ij}\]</p>
+
+<p>\(\alpha\) - фактор с <em>i</em> = 1, &#8230;, <em>I</em> группами<br/>\(\mu\) - общее среднее<br/><em>j</em> = 1, &#8230;, \(J _i\) - число наблюдений на каждом из уровней фактора</p>
+
+<p>Чтобы можно было найти параметры такой модели, приходится вводить ограничения одним из способов:</p>
+
+<table class = 'rmdtable'>
+<col width="6%" />
+<col width="6%" />
+<col width="8%" />
+<tr class="header">
+<th align="left">\(\mu = 0\)</th>
+<th align="left">\(\alpha_1 = 0\)</th>
+<th align="left">\(\sum_i{J_i\alpha_i} = 0\)</th>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">Модель фиктивных переменных</br>Dummy (indicator) coding = treatment parametrization = reference cell model</td>
+<td align="left">Модель эффектов</br>Deviation (effects) coding = Sum to zero parametrization</td>
+</tr>
+<tr class="even">
+<td align="left"></td>
+<td align="left">по-умолчанию используется в R</td>
+<td align="left">часто используется для объяснения в книгах и в др. программах</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
+<td align="left">contr.treatment</td>
+<td align="left">contr.sum</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Модель эффектов, contr.sum</h2></hgroup><article  id="--contr.sum">
+
+<p>При условии, что \(\sum_i{J_i\alpha_i} = 0\), значения зависимой переменной в группах можно описать как отклонения от общего среднего.</p>
+
+<p>\[y _{ij} = \mu + \alpha _i + \epsilon _{ij}\]</p>
+
+<p>Из чего складываются средние значения в группах по фактору?</p>
+
+<table class = 'rmdtable'>
+<tr class="header">
+<th align="left">Группа</th>
+<th align="left">Общее среднее</th>
+<th align="left">Эффект для данного уровня</th>
+<th align="left"><small>Случайная изменчивость</small></th>
+</tr>
+<tr class="odd">
+<td align="left">A1</td>
+<td align="left">\(\mu\)</td>
+<td align="left">\(\alpha _1\)</td>
+<td align="left">\(\epsilon _{1j}\)</td>
+</tr>
+<tr class="even">
+<td align="left">A2</td>
+<td align="left">\(\mu\)</td>
+<td align="left">\(\alpha _2\)</td>
+<td align="left">\(\epsilon _{2j}\)</td>
+</tr>
+<tr class="odd">
+<td align="left">&#8230;</td>
+<td align="left">&#8230;</td>
+<td align="left">&#8230;</td>
+<td align="left">&#8230;</td>
+</tr>
+<tr class="even">
+<td align="left">Ai</td>
+<td align="left">\(\mu\)</td>
+<td align="left">\(\alpha _i\)</td>
+<td align="left">\(\epsilon _{ij}\)</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>contr.treatment</h2></hgroup><article  id="contr.treatment">
+
+<p>Модель \(y _{ij} = \mu + \alpha _i + \epsilon _{ij}\), если \(\alpha_1 = 0\) примет уже знакомую нам форму</p>
+
+<p>\[y _{ij} = \beta _0 + \beta _1 x _1 + ... + \beta _i x _{i-1} + \epsilon _{ij}\]</p>
+
+<p>Коэффициенты линейной модели обозначают отклонения от базового уровня</p>
+
+<table class = 'rmdtable'>
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<tr class="header">
+<th align="left">Группа</th>
+<th align="left">Среднее на базовом уровне</th>
+<th align="left">Эффект для данного уровня</th>
+<th align="left"><small>Случайная изменчивость</small></th>
+</tr>
+<tr class="odd">
+<td align="left">A1</td>
+<td align="left">\(\beta_0\)</td>
+<td align="left"></td>
+<td align="left">\(\epsilon _{1j}\)</td>
+</tr>
+<tr class="even">
+<td align="left">A2</td>
+<td align="left">\(\beta_0\)</td>
+<td align="left">\(beta_1\)</td>
+<td align="left">\(\epsilon _{2j}\)</td>
+</tr>
+<tr class="odd">
+<td align="left">&#8230;</td>
+<td align="left">&#8230;</td>
+<td align="left">&#8230;</td>
+<td align="left">&#8230;</td>
+</tr>
+<tr class="even">
+<td align="left">Ai</td>
+<td align="left">\(\beta_0\)</td>
+<td align="left">\(beta_{i-1}\)</td>
+<td align="left">\(\epsilon _{ij}\)</td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Пример: яйца кукушек</h2></hgroup><article  id="--">
+
+<ul>
+<li><code>species</code> - вид птиц-хозяев (фактор)</li>
+<li><code>length</code> - длина яиц кукушек в гнездах хозяев (зависимая переменная)</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(DAAG)
+data(&quot;cuckoos&quot;)
+# Положим данные в переменную с коротким названием, чтобы меньше печатать
+cu &lt;- cuckoos
+head(cu, 3)</pre>
+
+<pre >##   length breadth      species id
+## 1   21.7    16.1 meadow.pipit 21
+## 2   22.6    17.0 meadow.pipit 22
+## 3   20.9    16.2 meadow.pipit 23</pre>
+
+<div class="footnote">
+Данные: Latter, 1902; источник: Tippett, 1931</div>
+
+</article></slide><slide class=''><hgroup><h2>Исследуем данные</h2></hgroup><article  id="-">
+
+<pre class = 'prettyprint lang-r'># Пропущенных значений нет
+sum(is.na(cu))</pre>
+
+<pre >## [1] 0</pre>
+
+<pre class = 'prettyprint lang-r'># Данные не сбалансированы - размеры групп разные.
+table(cu$species)</pre>
+
+<pre >## 
+## hedge.sparrow  meadow.pipit  pied.wagtail         robin    tree.pipit 
+##            14            45            15            16            15 
+##          wren 
+##            15</pre>
+
+</article></slide><slide class=''><hgroup><h2>Изменим названия уровней фактора, чтобы было легче понять о каких птицах речь</h2></hgroup><article  id="-----------">
+
+<pre class = 'prettyprint lang-r'>levels(cu$species)</pre>
+
+<pre >## [1] &quot;hedge.sparrow&quot; &quot;meadow.pipit&quot;  &quot;pied.wagtail&quot;  &quot;robin&quot;        
+## [5] &quot;tree.pipit&quot;    &quot;wren&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>levels(cu$species) &lt;- c(&quot;лес_зав&quot;, &quot;луг_кон&quot;, &quot;бел_тряс&quot;, 
+                        &quot;малин&quot;, &quot;лес_кон&quot;, &quot;крапив&quot;)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание: Постройте график</h2></hgroup><article  id="--">
+
+<p>Постройте график зависимости размера яиц кукушек от вида птиц-хозяев, в гнездах которых были обнаружены яйца. Какой геом лучше подойдет для изображения (<code>geom_point</code>, <code>geom_boxplot</code>)?</p>
+
+<p>Раскрасьте график в зависимости от вида птиц-хозяев (используйте эстетики <code>fill</code> или <code>colour</code> - чем отличаются результаты?)</p>
+
+<h3>Дополнительное задание:</h3>
+
+<p>Попробуйте сменить палитру раскраски, используя <code>scale_colour_brewer</code> (варианты можно посмотреть в справке в подразделе примеров или в интернете <a href='http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/#palettes-color-brewer%20)' title=''>Colors (ggplot2): раздел RColorBrewer palette chart</a></p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article >
+
+<pre class = 'prettyprint lang-r'>library(ggplot2)
+theme_set(theme_bw(base_size = 16) + 
+            theme(legend.key = element_blank()))
+# основа для графика без геомов
+gg_cu &lt;- ggplot(data = cu, aes(x = species, y = length))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Точечные графики</h2></hgroup><article  id="-">
+
+<p>В данном случае точечные графики не очень удачны, даже если мы вносим небольшую случайную погрешность в координаты по дискретной оси \(x\) (<code>position = position_jitter(width = 0.2)</code>)</p>
+
+<pre class = 'prettyprint lang-r'>gg_cu + geom_point(aes(colour = species))
+gg_cu + geom_point(aes(colour = species), 
+                   position = position_jitter(width = 0.2))</pre>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-5-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Боксплоты</h2></hgroup><article >
+
+<pre class = 'prettyprint lang-r'>gg_cu + geom_boxplot(aes(colour = species))
+gg_cu + geom_boxplot(aes(fill = species))</pre>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-7-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Хорошо бы поменять порядок уровней</h2></hgroup><article  id="----">
+
+<p>Сейчас боксы расположены в беспорядке. Упорядочим их по убыванию средней длины яиц. Для этого</p>
+
+<ol>
+<li>при помощи функции reorder() упорядочиваем по возрастанию средней длины яиц<br/></li>
+<li>меняем порядок уровней на противоположный.</li>
+</ol>
+
+<pre class = 'prettyprint lang-r'># упорядочим по значению среднего в группах (сначала по возрастанию, потом наоборот)
+cu$species &lt;- reorder(cu$species, cu$length, FUN = mean)
+cu$species &lt;- factor(cu$species, levels = rev(levels(cu$species)))</pre>
+
+</article></slide><slide class=''><hgroup><h2>График с новым порядком уровней</h2></hgroup><article  id="----">
+
+<p>Поскольку изменив порядок уровней мы внесли изменения в исходные данные, придется полностью обновить график (т.к.<code>ggplot()</code> хранит данные внутри графика).</p>
+
+<pre class = 'prettyprint lang-r'>gg_box &lt;- ggplot(data = cu, aes(x = species, y = length)) + 
+  geom_boxplot(aes(fill = species))
+gg_box</pre>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Понравившийся график, если понадобится, можно в любой момент довести до ума, а остальные удалить</h2></hgroup><article  id="-------------" class="smaller">
+
+<pre class = 'prettyprint lang-r'>gg_box + labs(x = &quot;Вид хозяев&quot;, y = &quot;Длина яиц кукушек, мм&quot;) + 
+  # Другая палитра заливки
+  scale_fill_brewer(name = &quot;Вид \nхозяев&quot;, palette = &quot;Dark2&quot;) + 
+  # Названия видов
+  scale_x_discrete(labels = c(&quot;Лесная\nзавирушка&quot;, &quot;Лесной\nконек&quot;,
+&quot;Белая\nтрясогузка&quot;, &quot;Малиновка&quot;, &quot;Луговой\nконек&quot;, &quot;Крапивник&quot;)) + 
+  # Положение легенды, формат подписей по оси х
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = &quot;none&quot;)</pre>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Задание:</h2></hgroup><article >
+
+<ul>
+<li><p>Сколько переменных-болванок нужно, чтобы записать модель зависимости длины яиц кукушек от вида птиц-хозяев?</p></li>
+<li><p>Подберите линейную модель зависимости длины яиц кукушек в гнездах от вида птиц-хозяев</p></li>
+<li><p>Проверьте условия применимости дисперсионного анализа</p></li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Решение:</h2></hgroup><article  id="-1">
+
+<h3>Сколько переменных-болванок нужно, чтобы записать модель зависимости длины яиц кукушек от вида птиц-хозяев?</h3>
+
+<ul>
+<li>5 переменных-болванок (т.к. 6 уровней у фактора species - <code>levels(cu$species)</code>, уровень лес_зав будет базовым, и для его кодирования не нужна отдельная переменная).</li>
+</ul>
+
+<p>Вот так бы они выглядели, если бы нужно было создавать их вручную.</p>
+
+<pre class = 'prettyprint lang-r'>levels(cu$species)</pre>
+
+<pre >## [1] &quot;лес_зав&quot;  &quot;лес_кон&quot;  &quot;бел_тряс&quot; &quot;малин&quot;    &quot;луг_кон&quot;  &quot;крапив&quot;</pre>
+
+<pre class = 'prettyprint lang-r'>(gr1 &lt;- as.numeric(cu$species == &quot;лес_кон&quot;))</pre>
+
+<pre >##   [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+##  [33] 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0
+##  [65] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+##  [97] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</pre>
+
+<pre class = 'prettyprint lang-r'>gr2 &lt;- as.numeric(cu$species == &quot;бел_тряс&quot;)
+gr3 &lt;- as.numeric(cu$species == &quot;малин&quot;)
+gr4 &lt;- as.numeric(cu$species == &quot;луг_кон&quot;)
+gr5 &lt;- as.numeric(cu$species == &quot;крапив&quot;)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Условия примененимости дисперсионного анализа:</h2></hgroup><article  id="---">
+
+<ul>
+<li>Случайность и независимость групп и наблюдений внутри групп</li>
+<li>Нормальное распределение остатков</li>
+<li>Гомогенность дисперсий остатков</li>
+</ul>
+
+<h3>Другие ограничения:</h3>
+
+<ul>
+<li>Лучше работает, если размеры групп примерно одинаковы (т.наз. сбалансированный дисперсионный комплекс)</li>
+<li>Устойчив к отклонениям от нормального распределения (при равных объемах групп или при больших выборках)</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Решение:</h2></hgroup><article  id="-2">
+
+<pre class = 'prettyprint lang-r'>mod &lt;- lm(length ~ species, data = cu)
+### Проверяем условия применимости
+library(car)
+op &lt;- par(mfrow = c(1, 3))
+qqPlot(mod)
+plot(mod, which = 1)
+plot(mod, which = 3)</pre>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-12-1.png" width="960" style="display: block; margin: auto;" /></p>
+
+<pre class = 'prettyprint lang-r'>par(op)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Решение:</h2></hgroup><article  id="-3">
+
+<pre class = 'prettyprint lang-r'>library(lmtest)
+bptest(mod)</pre>
+
+<pre >## 
+##  studentized Breusch-Pagan test
+## 
+## data:  mod
+## BP = 3, df = 5, p-value = 0.7</pre>
+
+</article></slide><slide class=''><hgroup><h2>Коэффициенты линейной модели</h2></hgroup><article  id="--">
+
+<p>Влияет ли вид птиц-хозяев на длину яиц кукушек? Было бы удобнее, если бы ответ был из одного числа, вместо пачки коэффициентов. Дисперсионный анализ позволит оценить влияние каждого из факторов.</p>
+
+<pre class = 'prettyprint lang-r'>summary(mod)</pre>
+
+<pre >## 
+## Call:
+## lm(formula = length ~ species, data = cu)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2.6933 -0.3933 -0.0143  0.5083  2.1067 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value    Pr(&gt;|t|)    
+## (Intercept)      23.1143     0.2419   95.54     &lt; 2e-16 ***
+## speciesлес_кон   -0.0343     0.3364   -0.10      0.9190    
+## speciesбел_тряс  -0.2276     0.3364   -0.68      0.5000    
+## speciesмалин     -0.5580     0.3313   -1.68      0.0948 .  
+## speciesлуг_кон   -0.8210     0.2770   -2.96      0.0037 ** 
+## speciesкрапив    -1.9943     0.3364   -5.93 0.000000033 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.905 on 114 degrees of freedom
+## Multiple R-squared:  0.314,  Adjusted R-squared:  0.284 
+## F-statistic: 10.4 on 5 and 114 DF,  p-value: 0.0000000285</pre>
+
+</article></slide><slide class=''><hgroup><h2>Структура общей изменчивости</h2></hgroup><article  id="--" class="smaller">
+
+<p>Общая изменчивость (SSt) = Факторная (SSx) + Случайная (SSe)</p>
+
+<p>Если выборки из одной совокупности, то Факторная изменчивость = Случайная изменчивость</p>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-15-1.png" width="1008" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Таблица дисперсионного анализа</h2></hgroup><article  id="--" class="smaller">
+
+<p>Гипотезы:<br/>\(H _0: MS _x = MS _e\), \(H _A: MS _x ≠ MS _e\)</p>
+
+<table class = 'rmdtable'>
+<col width="31%" />
+<col width="13%" />
+<col width="9%" />
+<col width="27%" />
+<col width="8%" />
+<tr class="header">
+<th align="left">Источник изменчивости</th>
+<th align="left">Суммы квадратов отклонений,<br /><br /> SS</th>
+<th align="left">Число степеней свободы,<br /><br /> df</th>
+<th align="left">Средний квадрат отклонений<br />(дисперсия),<br /> MS</th>
+<th align="left"><br /><br /><br /> F</th>
+</tr>
+<tr class="odd">
+<td align="left">Название фактора</td>
+<td align="left">\[SS _x = \sum{(\bar y - \hat y _i)^2}\]</td>
+<td align="left">\[df _x = a - 1\]</td>
+<td align="left">\[MS _x = \frac{SS _x}{df _x}\]</td>
+<td align="left">\[F _{df _r, df _e} = \frac{MS _r}{MS _e}\]</td>
+</tr>
+<tr class="even">
+<td align="left">Случайная</td>
+<td align="left">\[SS _e = \sum{(y _i - \hat y _i)^2}\]</td>
+<td align="left">\[df _e = N - a\]</td>
+<td align="left">\[MS _e = \frac{SS _e}{df _e}\]</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Общая</td>
+<td align="left">\[SS _t = \sum {(\bar y - y _i)^2}\]</td>
+<td align="left">\[df _t = N - 1\]</td>
+<td align="left"></td>
+</tr>
+</table>
+
+</article></slide><slide class=''><hgroup><h2>Делаем дисперсионный анализ в R</h2></hgroup><article  id="----r">
+
+<p>В R есть много функций для дисперсионного анализа. Мы рекомендуем <code>Anova()</code> из пакета <code>car</code></p>
+
+<pre class = 'prettyprint lang-r'>cu_anova &lt;- Anova(mod)
+cu_anova</pre>
+
+<pre >## Anova Table (Type II tests)
+## 
+## Response: length
+##           Sum Sq  Df F value      Pr(&gt;F)    
+## species     42.8   5    10.4 0.000000029 ***
+## Residuals   93.4 114                        
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+<ul class = 'build'>
+<li>Длина яиц кукушек в гнездах разных птиц-хозяев достоверно различается (\(F _{5,114} = 10.45\), \(p &lt; 0.01\)).</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Как понять, какие именно группы различаются</h2></hgroup><article  id="-----">
+
+<p>Дисперсионный анализ говорит нам только есть ли влияние фактора, но не говорит, какие именно группы различаются.</p>
+
+<p>Коэффициенты линейной модели в summary(mod) содержат лишь часть ответа - сравнение средних значених всех групп со средним на базовом уровне.</p>
+
+<p>Если нас интересуют другие возможные попарные сравнения, нужно сделать пост хок тест.</p>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Пост-хок тесты</h2></hgroup><article  id="--">
+
+</article></slide><slide class=''><hgroup><h2>Post-hoc тесты</h2></hgroup><article  id="post-hoc-">
+
+<p>Пост-хок тесты - попарные сравнения средних <strong>после того, как дисперсионный анализ показал, что влияние фактора достоверно</strong></p>
+
+<h3>Свойства post-hoc тестов:</h3>
+
+<ul>
+<li><strong>Применяются, только если влияние фактора значимо</strong></li>
+<li>Делают поправку для снижения вероятности ошибки I рода \(\alpha\), (но не слишком большую, чтобы не снизилась мощность, и чтобы не возросла вероятность ошибки II рода \(\beta\))</li>
+<li>Учитывают величину различий между средними</li>
+<li>Учитывают количество сравниваемых пар</li>
+<li>Различаются по степени консервативности (тест Тьюки - разумный компромисс)</li>
+<li>Работают лучше при равных объемах групп, при гомогенности дисперсий</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Пост-хок тест Тьюки в R</h2></hgroup><article  id="-----r">
+
+<ul>
+<li><code>glht()</code> - &quot;general linear hypotheses testing&quot;</li>
+<li><p><code>linfct</code> - аргумент, задающий гипотезу для тестирования</p></li>
+<li><code>mcp()</code> - функция, чтобы задавать множественные сравнения (обычные пост-хоки)</li>
+<li><p><code>species</code> = &quot;Tukey&quot; - тест Тьюки по фактору <code>species</code></p></li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(multcomp)
+cu_ph &lt;- glht(mod, linfct = mcp(species = &quot;Tukey&quot;))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Результаты попарных сравнений (тест Тьюки)</h2></hgroup><article  id="----">
+
+<p>Таблица результатов пост хок теста практически нечитабельна. Лучше построить график.</p>
+
+<pre class = 'prettyprint lang-r'>summary(cu_ph)</pre>
+
+<pre >## 
+##   Simultaneous Tests for General Linear Hypotheses
+## 
+## Multiple Comparisons of Means: Tukey Contrasts
+## 
+## 
+## Fit: lm(formula = length ~ species, data = cu)
+## 
+## Linear Hypotheses:
+##                         Estimate Std. Error t value Pr(&gt;|t|)    
+## лес_кон - лес_зав == 0   -0.0343     0.3364   -0.10    1.000    
+## бел_тряс - лес_зав == 0  -0.2276     0.3364   -0.68    0.984    
+## малин - лес_зав == 0     -0.5580     0.3313   -1.68    0.538    
+## луг_кон - лес_зав == 0   -0.8210     0.2770   -2.96    0.041 *  
+## крапив - лес_зав == 0    -1.9943     0.3364   -5.93   &lt;0.001 ***
+## бел_тряс - лес_кон == 0  -0.1933     0.3305   -0.58    0.992    
+## малин - лес_кон == 0     -0.5237     0.3253   -1.61    0.587    
+## луг_кон - лес_кон == 0   -0.7867     0.2699   -2.91    0.047 *  
+## крапив - лес_кон == 0    -1.9600     0.3305   -5.93   &lt;0.001 ***
+## малин - бел_тряс == 0    -0.3304     0.3253   -1.02    0.909    
+## луг_кон - бел_тряс == 0  -0.5933     0.2699   -2.20    0.241    
+## крапив - бел_тряс == 0   -1.7667     0.3305   -5.34   &lt;0.001 ***
+## луг_кон - малин == 0     -0.2629     0.2635   -1.00    0.915    
+## крапив - малин == 0      -1.4363     0.3253   -4.41   &lt;0.001 ***
+## крапив - луг_кон == 0    -1.1733     0.2699   -4.35   &lt;0.001 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## (Adjusted p values reported -- single-step method)</pre>
+
+<ul class = 'build'>
+<li>Размер яиц кукушек в гнездах крапивника достоверно меньше, чем в гнездах лугового конька (тест Тьюки, \(p &lt; 0.01\)). Размер яиц кукушек в гнездах лесной завирушки, белой трясогузки, малиновки и лесного конька не различается, но яйца в гнездах этих видов крупнее, чем у лугового конька или крапивника (тест Тьюки, от \(p &lt; 0.01\) до 0.05).</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Таблица с описательной статистикой по группам</h2></hgroup><article  id="-----" class="smaller">
+
+<p>Пакет <code>dplyr</code>:</p>
+
+<ul>
+<li><code>%&gt;%</code> оператор, перенаправляет значение слева в функцию справа в качестве исходных данных</li>
+<li><code>group_by</code> дальнейшие вычисления идут по группам, заданным ее аргументами</li>
+<li><code>summarise</code> описывает группу строк значениями, вычисленным по формуле или нескольким</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>library(dplyr)
+cu_summary &lt;- cu %&gt;% 
+  group_by(species) %&gt;%
+  summarise(.n = n(),
+            .mean = mean(length), 
+            .sd = sd(length))
+cu_summary</pre>
+
+<pre >## # A tibble: 6 × 4
+##    species    .n .mean   .sd
+##     &lt;fctr&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  лес_зав    14  23.1 1.049
+## 2  лес_кон    15  23.1 0.880
+## 3 бел_тряс    15  22.9 1.072
+## 4    малин    16  22.6 0.682
+## 5  луг_кон    45  22.3 0.920
+## 6   крапив    15  21.1 0.754</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article  id="-1">
+
+<p>Дополните код, чтобы одновременно рассчитывать доверительные интервалы к средним значениям.</p>
+
+<pre class = 'prettyprint lang-r'>library(dplyr)
+cu_summary &lt;- cu %&gt;% 
+  group_by(species) %&gt;%
+  summarise(.n = n(),
+            .mean = mean(length), 
+            .sd = sd(length))
+cu_summary</pre>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-4">
+
+<pre class = 'prettyprint lang-r'>cu_summary &lt;- cu %&gt;% 
+  group_by(species) %&gt;%
+  summarise(.n = n(),
+            .mean = mean(length), 
+            .sd = sd(length),
+            .se = .sd/sqrt(.n),
+            lwr = .mean - qnorm(0.025) * .se,
+            upr = .mean + qnorm(0.025) * .se
+            )
+cu_summary</pre>
+
+<pre >## # A tibble: 6 × 7
+##    species    .n .mean   .sd   .se   lwr   upr
+##     &lt;fctr&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1  лес_зав    14  23.1 1.049 0.280  23.7  22.6
+## 2  лес_кон    15  23.1 0.880 0.227  23.5  22.6
+## 3 бел_тряс    15  22.9 1.072 0.277  23.4  22.3
+## 4    малин    16  22.6 0.682 0.171  22.9  22.2
+## 5  луг_кон    45  22.3 0.920 0.137  22.6  22.0
+## 6   крапив    15  21.1 0.754 0.195  21.5  20.7</pre>
+
+</article></slide><slide class=''><hgroup><h2>Столбчатый график можно использовать для представления результатов</h2></hgroup><article  id="------">
+
+<pre class = 'prettyprint lang-r'>gg_means &lt;- ggplot(cu_summary, aes(x = species, y = .mean)) + 
+  geom_bar(stat = &quot;identity&quot;, fill = &quot;steelblue&quot;, width = 0.5) + 
+  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.2) +
+  labs(x = &quot;Вид птиц-хозяев&quot;, y = &quot;Длина яиц кукушек, мм&quot;)
+gg_means</pre>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Можно привести результаты пост-хок теста на столбчатом графике</h2></hgroup><article  id="--------">
+
+<p>Достоверно различающиеся по пост-хок тесту группы обозначим разными буквами</p>
+
+<pre class = 'prettyprint lang-r'>gg_means_coded &lt;- gg_means + 
+  geom_text(aes(y = 1.6,  label = c(&quot;A&quot;, &quot;A&quot;, &quot;AB&quot;, &quot;AB&quot;, &quot;B&quot;, &quot;C&quot;)), 
+            colour = &quot;white&quot;, size = 7)
+gg_means_coded</pre>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Если не нравится, как висят столбцы,<br />можно настроить развертку оси \(y\)</h2></hgroup><article  id="----------y">
+
+<pre class = 'prettyprint lang-r'>gg_means_coded + scale_y_continuous(expand = c(0, 0), 
+        limits = c(0, max(cu$length) + 1))</pre>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>И наконец, можно переименовать уровни фактора species прямо внутри графика</h2></hgroup><article  id="------species---">
+
+<pre class = 'prettyprint lang-r'>gg_means_coded + 
+  scale_y_continuous(expand = c(0,0), limits = c(0, max(cu$length) + 1)) +
+  scale_x_discrete(labels = c(&quot;Лесная\nзавирушка&quot;, &quot;Лесной\nконек&quot;,
+&quot;Белая\nтрясогузка&quot;, &quot;Малиновка&quot;, &quot;Луговой\nконек&quot;, &quot;Крапивник&quot;))</pre>
+
+<p><img src="09_anova_files/figure-html/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Сохраняем таблицу дисперсионного анализа в файл</h2></hgroup><article  id="-----">
+
+<pre class = 'prettyprint lang-r'># 1) в csv
+write.table(file = &quot;cuckoos_res.csv&quot;, x = cuckoos_anova, sep = &quot;\t&quot;)
+
+# 2) в xls или xlsx с помощью XLConnect
+# library(XLConnect) 
+# writeWorksheetToFile(data = cuckoos_anova, file = &quot;cuckoos_res.xls&quot;, 
+# sheet = &quot;anova_table&quot;)
+
+# 3) отправляем в буфер обмена (только Windows) для вставки в Word-Excel
+write.table(file = &quot;clipboard&quot;, x = cuckoos_anova, sep = &quot;\t&quot;)</pre>
+
+<p>После этого, таблицу нужно отредактировать:</p>
+
+<ul>
+<li>округлить числа до разумного небольшого числа значащих цифр после точки</li>
+<li>округлить значения доверительных вероятностей <em>p</em> или заменить их на сравнения с критич. уровнями значимости (<em>p</em> &lt; 0.01, <em>p</em> &lt; 0.05 или &quot;не значимо&quot;)</li>
+<li>изменить названия факторов на те, которые будут использоваться в отчете/публикации</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Take home messages</h2></hgroup><article  id="take-home-messages">
+
+<ul>
+<li>Дисперсионный анализ - линейная модель с дискретными предикторами, существует в нескольких параметризациях, которые отличаются трактовками коэффициентов</li>
+<li>При помощи дисперсионного анализа можно проверить гипотезу о равенстве средних значений в группах</li>
+<li>Условия применимости дисперсионного анализа
+
+<ul>
+<li>Случайность и независимость групп и наблюдений внутри групп</li>
+<li>Нормальное распределение в группах</li>
+<li>Гомогенность дисперсий в группах</li>
+</ul></li>
+<li>При множественных попарных сравнениях увеличивается вероятность ошибки первого рода, поэтому нужно вносить поправку для уровня значимости</li>
+<li>Post hoc тесты - это попарные сравнения после дисперсионного анализа, которые позволяют сказать, какие именно средние различаются</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Дополнительные ресурсы</h2></hgroup><article  id="-">
+
+<ul>
+<li>Quinn, Keough, 2002, pp. 173-207</li>
+<li>Logan, 2010, pp. 254 - 282</li>
+<li><a href='http://www.openintro.org/stat/' title=''>Open Intro to Statistics</a>, pp.236-246</li>
+<li>Sokal, Rohlf, 1995, pp. 179-260</li>
+<li>Zar, 2010, pp. 189-207</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>

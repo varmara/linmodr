@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Регрессионный анализ для бинарных данных</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/fonts/fonts.css">
+
+  <link rel="stylesheet" media="all" href="site_libs/ioslides-13.5.1/theme/css/default.css">
+  <link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="site_libs/ioslides-13.5.1/theme/css/phone.css">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Регрессионный анализ для бинарных данных',
+                        subtitle: 'Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                        favIcon: '11_general_linear_models_for_binary_data_files/logo.png',
+              },
+
+      // Author information
+      presenters: [
+            {
+        name:  'Вадим Хайтов, Марина Варфоломеева' ,
+        company: '',
+        gplus: '',
+        twitter: '',
+        www: '',
+        github: ''
+      },
+            ]
+    };
+  </script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+
+    slides > slide:not(.nobackground):before {
+      font-size: 12pt;
+      content: "";
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      background: url(11_general_linear_models_for_binary_data_files/logo.png) no-repeat 0 50%;
+      -webkit-background-size: 30px 30px;
+      -moz-background-size: 30px 30px;
+      -o-background-size: 30px 30px;
+      background-size: 30px 30px;
+      padding-left: 40px;
+      height: 30px;
+      line-height: 1.9;
+    }
+  </style>
+
+  <link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides class="layout-widescreen">
+
+  <slide class="title-slide segue nobackground">
+        <aside class="gdbar"><img src="11_general_linear_models_for_binary_data_files/logo.png"></aside>
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+          </hgroup>
+  </slide>
+
+<slide class=''><hgroup><h2>Мы рассмотрим</h2></hgroup><article  id="-">
+
+<ul>
+<li>Регрессионный анализ для бинарных зависимых переменных</li>
+</ul>
+
+<h3>Вы сможете</h3>
+
+<ul>
+<li>Построить логистическую регрессионную модель, подобранную методом максимального правдоподобия</li>
+<li>Дать трактовку параметрам логистической регрессионной модели</li>
+<li>Провести анализ девиансы, основанный на логистичской регрессии</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Бинарные данные - очень распространенный тип зависимых переменных</h2></hgroup><article  id="--------">
+
+<ul>
+<li>Вид есть - вида нет</li>
+<li>Кто-то в результате эксперимента выжил или умер</li>
+<li>Пойманное животное заражено паразитами или здорово</li>
+<li>Комнда выиграла или проиграла</li>
+</ul>
+
+<p>и т.д.</p>
+
+</article></slide><slide class=''><hgroup><h2>На каком острове лучше искать ящериц?</h2></hgroup><article  id="-----" class="columns-2">
+
+<p>Пример взят из книги Quinn &amp; Keugh (2002)</p>
+
+<p>Оригинальная работа Polis et al. (1998)</p>
+
+<pre class = 'prettyprint lang-r'>liz &lt;- read.csv(&quot;data/polis.csv&quot;)
+head(liz)</pre>
+
+<pre >##     X.ISLAND PARATIO UTA PA PREDICT
+## 1       Bota   15.41   P  1   0.555
+## 2     Cabeza    5.63   P  1   0.915
+## 3    Cerraja   25.92   P  1   0.111
+## 4 Coronadito   15.17   A  0   0.568
+## 5     Flecha   13.04   P  1   0.678
+## 6   Gemelose   18.85   A  0   0.370</pre>
+
+<p><img src="images/esher.jpg" width="500" height="500" ></p>
+
+</article></slide><slide class=''><hgroup><h2>Зависит ли встречаемость ящериц от размера острова?</h2></hgroup><article  id="------" class="smaller">
+
+<p><em>Зависимая переменная</em>: PA - (есть ящерицы &quot;1&quot; - нет ящериц &quot;0&quot;)<br/><em>Предиктор</em> - PARATIO (отношение периметра к площади)</p>
+
+<div class="columns-2">
+<p>Обычную линейную регрессию подобрать можно,</p>
+
+<pre >## 
+## Call:
+## lm(formula = PA ~ PARATIO, data = liz)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -0.649 -0.445  0.178  0.264  0.605 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.86881    0.14088    6.17  0.00001 ***
+## PARATIO     -0.01828    0.00557   -3.28   0.0044 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.413 on 17 degrees of freedom
+## Multiple R-squared:  0.388,  Adjusted R-squared:  0.352 
+## F-statistic: 10.8 on 1 and 17 DF,  p-value: 0.00438</pre>
+
+<p><strong>но она категорически не годится</strong></p>
+
+<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-3-1.png" width="384" style="display: block; margin: auto 0 auto auto;" /></p></div>
+
+</article></slide><slide class=''><hgroup><h2>Эти данные лучше описывает логистическая кривая</h2></hgroup><article  id="-----" class="columns-2">
+
+<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-4-1.png" width="480" style="display: block; margin: auto;" /></p>
+
+<p>Логистическая кривая описывается такой формулой</p>
+
+<p>\[ \pi(x) = \frac{e^{\beta_0+\beta_1x}}{1+e^{\beta_0+\beta_1x}} \]</p>
+
+</article></slide><slide class=''><hgroup><h2>Зависимую величину можно преобразовать в более удобную для моделирования форму</h2></hgroup><article  id="---------">
+
+<ol class = 'build'>
+<li>Дискретный резульат: 1 или 0</li>
+<li>Дискретные данные можно преобразовать в форму оценки вероятности события: \(\pi = \frac{N_i}{N_{total}}\) варьирует от 0 до 1</li>
+<li>Вероятность события можно выразить в форме шансов (odds): \(odds=\frac{\pi}{1-\pi}\) варьируют от 0 до \(+\infty\). <em>NB: Если шансы &gt; 1, то вероятность события, что \(y_i=1\) выше, чем вероятность события \(y_i = 0\). Если шансы &lt; 1, то наоборот</em>.</li>
+<li>Шансы преобразуются в <em>Логиты</em> (logit): \(ln(odds)=\ln(\frac{\pi}{1-\pi})\) варьируют от \(-\infty\) до \(+\infty\). Логиты гораздо удобнее для построения моделей.</li>
+</ol>
+
+</article></slide><slide class=''><hgroup><h2>Логистическая модель после логит-преобразования становится линейной</h2></hgroup><article  id="------">
+
+<p>\[ g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})=\beta_0 + \beta_1x\]</p>
+
+<p>Остается только подобрать параметры этой линейной модели: \(\beta_0\) (интерсепт) и \(\beta_1\) (угловой кэффициент)</p>
+
+</article></slide><slide class=''><hgroup><h2>Метод максимального правдоподобия</h2></hgroup><article  id="--">
+
+<p>Если остатки не подчиняется нормальному распределению, то метод наименьших квадратов не работает. В этом случае применяют <em>Метод максимального правдоподбия</em></p>
+
+<p>В результате итеративных процедур происходит подбор таких значений коэффициентов, при которых правдоподобие - вероятность получения имеющегося у нас набора данных - оказывается максимальным, при условии страведливости данной модели.</p>
+
+<p>\[ Lik(x_1, ..., x_n) = \Pi^n _{i = 1}f(x_i; \theta)\]</p>
+
+<p>где \(f(x; \theta)\) - функция распределения с параметрами \(\theta\)</p>
+
+</article></slide><slide class=''><hgroup><h2>Правдоподобие для биномиального распределения</h2></hgroup><article  id="---">
+
+<h3>Функция правдоподобия</h3>
+
+<p>Для случая биномиального распределения \(x \in Bin(n, \pi)\) функция правдоподобия имеет следующий вид:</p>
+
+<p>\[Lik(\pi|x) = \frac{n!}{(n-x)!x!}\pi^x(1-\pi)^{n-x}\]</p>
+
+<p>отбросив константу, получаем:</p>
+
+<p>\[Lik(\pi|x) \propto \pi^x(1-\pi)^{n-x}\]</p>
+
+<h3>Логарифм правдоподобия</h3>
+
+<p>Удобнее работать с логарифмом функции правдоподобия - \(logLik\) - его легче максимизировать. В случае биномиального распределения он выглядит так:</p>
+
+<p>\[logLik(\pi|x) = x log(\pi) + (n-x)log(1-\pi)\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Подберем модель</h2></hgroup><article  id="-" class="smaller">
+
+<pre class = 'prettyprint lang-r'>liz_model &lt;- glm(PA ~ PARATIO , family=&quot;binomial&quot;, data = liz)
+summary(liz_model)</pre>
+
+<pre >## 
+## Call:
+## glm(formula = PA ~ PARATIO, family = &quot;binomial&quot;, data = liz)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -1.607  -0.638   0.237   0.433   2.099  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept)    3.606      1.695    2.13    0.033 *
+## PARATIO       -0.220      0.101   -2.18    0.029 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 26.287  on 18  degrees of freedom
+## Residual deviance: 14.221  on 17  degrees of freedom
+## AIC: 18.22
+## 
+## Number of Fisher Scoring iterations: 6</pre>
+
+</article></slide><slide class=''><hgroup><h2></h2></hgroup><article  id="section" class="smaller">
+
+<h3><code>summary()</code> для модели, подобранной методом максимального правдоподобия</h3>
+
+<pre >## 
+## Call:
+## glm(formula = PA ~ PARATIO, family = &quot;binomial&quot;, data = liz)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -1.607  -0.638   0.237   0.433   2.099  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept)    3.606      1.695    2.13    0.033 *
+## PARATIO       -0.220      0.101   -2.18    0.029 *
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 26.287  on 18  degrees of freedom
+## Residual deviance: 14.221  on 17  degrees of freedom
+## AIC: 18.22
+## 
+## Number of Fisher Scoring iterations: 6</pre>
+
+<p>Есть уже знакомые термины: <code>Estimate</code>, <code>Std. Error</code>, <code>AIC</code><br/>Появились новые термины: <code>z value</code>, <code>Pr(&gt;|z|)</code>, <code>Null deviance</code>, <code>Residual deviance</code></p>
+
+</article></slide><slide class=''><hgroup><h2>&quot;z value&quot;&quot; и &quot;Pr(&gt;z)&quot;</h2></hgroup><article  id="z-value--prz">
+
+<p>z - это величина критерия Вальда (<em>Wald statistic</em>) - аналог t-критерия</p>
+
+<p>Используется для проверки \(H_0: \beta_1=0\)</p>
+
+<p>\[z=\frac{\beta_1}{SE_{\beta_1}}\]</p>
+
+<p>Сравнивают со стандартным нормальным распределением (z-рaспределение)</p>
+
+<p>Дает надежные оценки p-value при больших выборках</p>
+
+</article></slide><slide class=''><hgroup><h2>Null deviance и Residual deviance</h2></hgroup><article  id="null-deviance--residual-deviance" class="smaller">
+
+<p><strong>&quot;Насыщенная&quot; модель</strong> - модель, подразумевающая, что каждая из n точек имеет свой собственный параметр, следовательно надо подобрать n параметров. Вероятность существования данных для такой модели равна 1. \[logLik_{satur}=0\] \[df_{saturated} = n - npar_{saturated}  = n - n = 0\]</p>
+
+<p><strong>&quot;Нулевая&quot; модель</strong> - модель, подразумевающая, что для описания всех точек надо подобрать только 1 параметр. \(g(x) = \beta_0\). \[logLik_{nul} \ne 0\] \[df_{null} = n - npar_{null} = n - 1\]</p>
+
+<p><strong>&quot;Предложенная&quot; модель</strong> - модель, подобранная в нашем анализе \(g(x) = \beta_0 + \beta_1x\) \[logLik_{prop} \ne 0\] \[df_{proposed} = n - npar_{proposed}\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Null deviance и Residual deviance</h2></hgroup><article  id="null-deviance--residual-deviance-1">
+
+<p><strong>Девианса</strong> - это оценка отклонения логарифма максимального правдоподобия одной модели от логарифма максимального правдоподобия другой модели</p>
+
+<p><strong>Остаточная девианса</strong>:<br/>\(Dev_{resid} = 2(logLik_{satur} - logLik_{prop})=-2logLik_{prop}\)<br/><strong>Нулевая девианса</strong>:<br/>\(Dev_{nul} = 2(logLik_{satur} - logLik_{nul})=-2logLik_{nul}\)</p>
+
+<p>Проверим</p>
+
+<pre class = 'prettyprint lang-r'>(Dev_resid &lt;- -2*as.numeric(logLik(liz_model))) #Остаточная девианса</pre>
+
+<pre >## [1] 14.2</pre>
+
+<pre class = 'prettyprint lang-r'>(Dev_nul &lt;- -2*as.numeric(logLik(update(liz_model, ~-PARATIO)))) #Нулевая девианса</pre>
+
+<pre >## [1] 26.3</pre>
+
+</article></slide><slide class=''><hgroup><h2>Анализ девиансы</h2></hgroup><article  id="-">
+
+<p><strong>По соотношению нулевой девиансы и остаточной девиансы можно понять насколько статистически значима модель</strong></p>
+
+<p>В основе анализа девиансы лежит критерий \(G^2\)</p>
+
+<p>\[ G^2 = -2(logLik_{nul} - logLik_{prop})\]</p>
+
+<pre class = 'prettyprint lang-r'>(G2 &lt;- Dev_nul - Dev_resid)</pre>
+
+<pre >## [1] 12.1</pre>
+
+<p>Вспомним: \[ LRT = 2ln(Lik_1/Lik_2) = 2(logLik_1 - logLlik_2)\]</p>
+
+<blockquote>
+<p>Тест \(G^2\) - это частный случай теста отношения правдоподобий (Likelihood Ratio Test)</p>
+</blockquote>
+
+</article></slide><slide class=''><hgroup><h2>Свойства критерия \(G^2\)</h2></hgroup><article  id="--g2">
+
+<ul class = 'build'>
+<li>\(G^2\) - это девианса полной и редуцированной модели<br/></li>
+<li>\(G^2\) - аналог частного F критерия в обычном регрессионном анализе<br/></li>
+<li>\(G^2\) - подчиняется \(\chi^2\) распределению (с параметом df = 1) если нулевая модель и предложенная модель не отличаются друг от друга.</li>
+<li>\(G^2\) можно использовать для проверки гипотезы о равенстве нулевой и остаточной девианс.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article >
+
+<p>Вычислите вручную значение критерия \(G^2\) для модели, описывающей встречаемость ящериц (<code>liz_model</code>) и оцените уровень значимости для него</p>
+
+<p>\[ G^2 = -2(logLik_{nul} - logLik_{prop})\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article >
+
+<pre class = 'prettyprint lang-r'>#Остаточная девианса
+Dev_resid &lt;- -2*as.numeric(logLik(liz_model)) 
+
+#Нулевая девианса
+Dev_nul &lt;- -2*as.numeric(logLik(update(liz_model, ~-PARATIO)))
+
+# Значение критерия 
+(G2 &lt;- Dev_nul - Dev_resid)</pre>
+
+<pre >## [1] 12.1</pre>
+
+<pre class = 'prettyprint lang-r'>(p_value &lt;- 1 - pchisq(G2, df = 1))</pre>
+
+<pre >## [1] 0.000513</pre>
+
+</article></slide><slide class=''><hgroup><h2>Решение с помощью функции <code>anova()</code></h2></hgroup><article  id="----anova">
+
+<pre class = 'prettyprint lang-r'>anova(liz_model, test=&quot;Chi&quot;)</pre>
+
+<pre >## Analysis of Deviance Table
+## 
+## Model: binomial, link: logit
+## 
+## Response: PA
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##         Df Deviance Resid. Df Resid. Dev Pr(&gt;Chi)    
+## NULL                       18       26.3             
+## PARATIO  1     12.1        17       14.2  0.00051 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Интерпретация коэффициентов логистической регрессии</h2></hgroup><article  id="---">
+
+</article></slide><slide class=''><hgroup><h2>Как трактовать коэффициенты подобранной модели?</h2></hgroup><article  id="----">
+
+<p>\[ g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})=\beta_0 + \beta_1x\]</p>
+
+<pre class = 'prettyprint lang-r'>coef(liz_model)</pre>
+
+<pre >## (Intercept)     PARATIO 
+##        3.61       -0.22</pre>
+
+<p>\(\beta_0\) - не имеет особого смысла, просто поправочный коэффициент</p>
+
+<p>\(\beta_1\) - <em>на сколько</em> единиц изменяется логарифм величины шансов (odds), если значение предиктора изменяется на единицу</p>
+
+<p>Трактовать такую величину неудобно и трудно</p>
+
+</article></slide><slide class=''><hgroup><h2>Немного алгебры</h2></hgroup><article  id="-">
+
+<p>посмотрим как изменится \(g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})\) при изменении предиктора на 1</p>
+
+<p>\[g(x+1) - g(x) = ln(odds_{x+1}) - ln(odds_x)  = ln(\frac{odds_{x+1}}{odds_x})\]</p>
+
+<p>Задание: завершите алгебраическое преобразование</p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-1">
+
+<p>\[ln(\frac{odds_{x+1}}{odds_x}) = \beta_0 + \beta_1(x+1) - \beta_0 - \beta_1x = \beta_1\]</p>
+
+<p>\[ln(\frac{odds_{x+1}}{odds_x}) = \beta_1\]</p>
+
+<p>\[\frac{odds_{x+1}}{odds_x} = e^{\beta_1}\]</p>
+
+</article></slide><slide class=''><hgroup><h2>Полученная величина имеет определенный смысл</h2></hgroup><article  id="----">
+
+<pre class = 'prettyprint lang-r'>exp(coef(liz_model)[2])</pre>
+
+<pre >## PARATIO 
+##   0.803</pre>
+
+<p><em>Во сколько</em> раз изменяются шансы встретить ящерицу при увеличении отношения периметра острова к его площади на одну единицу. <em>NB: Отношение периметра к площади тем больше, чем меньше остров</em>.</p>
+
+<p>Шансы изменяются в 0.803 раза. То есть, чем больше отношение периметра к площади, тем меньше шансов встретить ящерицу. Значит, чем больше остров, тем больше шансов встретить ящерицу</p>
+
+</article></slide><slide class=''><hgroup><h2>Подобранные коэффициенты позволяют построить логистическую кривую</h2></hgroup><article  id="-----" class="smaller columns-2">
+
+<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-13-1.png" width="432" style="display: block; margin: auto auto auto 0;" /></p>
+
+<p>Cерая область - доверительный интервал для логистической регрессии</p>
+
+<p>Доверительные интервалы для коэффициентов:</p>
+
+<pre class = 'prettyprint lang-r'>confint(liz_model) # для логитов</pre>
+
+<pre >##              2.5 %  97.5 %
+## (Intercept)  1.006  8.0421
+## PARATIO     -0.485 -0.0665</pre>
+
+<pre class = 'prettyprint lang-r'>exp(confint(liz_model)) # для отношения шансов </pre>
+
+<pre >##             2.5 %   97.5 %
+## (Intercept) 2.734 3109.275
+## PARATIO     0.616    0.936</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание:</h2></hgroup><article  id="-1">
+
+<p>Постройте график логистической ререссии для модели <code>liz_model</code> без использования <code>geom_smooth()</code></p>
+
+<p>Hint 1: Используйте функцию <code>predict()</code>, изучите значения параметра &quot;type&quot;</p>
+
+<p>Hint 2: Для вызова справки напишите <code>predict.glm()</code></p>
+
+<p>Hint 3: Создайте датафрейм MyData с переменной <code>PARATIO</code>, изменяющейся от минимального до максимального значения <code>PARATIO</code></p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-2" class="smaller columns-2">
+
+<pre class = 'prettyprint lang-r'>MyData &lt;- data.frame(PARATIO = 
+        seq(min(liz$PARATIO), max(liz$PARATIO)))
+
+MyData$Predicted &lt;- predict(liz_model, 
+                            newdata = MyData, 
+                            type = &quot;response&quot;)
+
+ggplot(MyData, aes(x = PARATIO, y = Predicted)) + 
+  geom_line(size=2, color = &quot;blue&quot;) + 
+  xlab(&quot;Отношение периметра к площади&quot;) + 
+  ylab (&quot;Вероятность&quot;) + 
+  ggtitle(&quot;Вероятность встречи ящериц&quot;)</pre>
+
+<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-15-1.png" width="432" style="display: block; margin: auto 0 auto auto;" /></p>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>За кулисами вычислений</h2></hgroup><article  id="--">
+
+</article></slide><slide class=''><hgroup><h2>Применим матричную алгебру для вычисления предсказанных значений и доверительного интервала для линии регрессии</h2></hgroup><article  id="------------">
+
+<pre class = 'prettyprint lang-r'># Создаем искуственный набор данных
+MyData &lt;- data.frame(PARATIO = seq(min(liz$PARATIO), max(liz$PARATIO)))
+
+# Формируем модельную матрицу для искуственно созданных данных
+X &lt;- model.matrix( ~ PARATIO, data = MyData)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Извлекаем характеристики подобранной модели и получаем предсказанные значения</h2></hgroup><article  id="-------">
+
+<pre class = 'prettyprint lang-r'># Вычисляем параметры подобранной модели и ее матрицу ковариаций
+betas    &lt;- coef(liz_model) # Векор коэффицентов
+Covbetas &lt;- vcov(liz_model) # Ковариационная матрица
+
+# Вычисляем предсказанные значения, перемножая модельную матрицу на вектор 
+# коэффициентов
+MyData$eta &lt;- X %*% betas</pre>
+
+</article></slide><slide class=''><hgroup><h2>Получаем предсказанные значения</h2></hgroup><article  id="--">
+
+<pre class = 'prettyprint lang-r'># Переводим предсказанные значения из логитов в вероятности
+MyData$Pi  &lt;- exp(MyData$eta) / (1 + exp(MyData$eta))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Вычисляем границы доверительного интервала</h2></hgroup><article  id="---">
+
+<pre class = 'prettyprint lang-r'># Вычисляем стандартные отшибки путем перемножения матриц
+  MyData$se &lt;- sqrt(diag(X %*% Covbetas %*% t(X)))
+
+# Вычисляем доверительные интервалы
+MyData$CiUp  &lt;- exp(MyData$eta + 1.96 *MyData$se) / 
+  (1 + exp(MyData$eta  + 1.96 *MyData$se))
+
+MyData$CiLow  &lt;- exp(MyData$eta - 1.96 *MyData$se) / 
+  (1 + exp(MyData$eta  - 1.96 *MyData$se))</pre>
+
+</article></slide><slide class=''><hgroup><h2>Строим график</h2></hgroup><article  id="-" class="columns-2">
+
+<pre class = 'prettyprint lang-r'>ggplot(MyData, aes(x = PARATIO, y = Pi)) + 
+  geom_line(aes(x = PARATIO, y = CiUp), 
+            linetype = 2, size = 1) + 
+  geom_line(aes(x = PARATIO, y = CiLow), 
+            linetype = 2, size = 1) + 
+  geom_line(color = &quot;blue&quot;, size=2) + 
+  ylab(&quot;Вероятность встречи&quot;)</pre>
+
+<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-20-1.png" width="432" style="display: block; margin: auto 0 auto auto;" /></p>
+
+</article></slide><slide class='segue dark nobackground level1'><hgroup class = 'auto-fadein'><h2>Множественная логистическая регрессия</h2></hgroup><article  id="--">
+
+</article></slide><slide class=''><hgroup><h2>От чего зависит уровень смертности пациентов, выписанных из реанимации?</h2></hgroup><article  id="--------" class="smaller">
+
+<p>Данные, полученные на основе изучения 200 историй болезни пациентов одного из американских госпиталей</p>
+
+<div class="columns-2">
+
+
+<ul>
+<li>STA: Статус (0 = Выжил, 1 = умер)<br/></li>
+<li>AGE: Возраст<br/></li>
+<li>SEX: Пол<br/></li>
+<li>RACE: Раса<br/></li>
+<li>SER: Тип мероприятий в реанимации (0 = Medical, 1 = Surgical)<br/></li>
+<li>CAN: Присутствует ли онкология? (0 = No, 1 = Yes)<br/></li>
+<li>CRN: Присутсвует ли почечная недостаточность (0 = No, 1 = Yes)<br/></li>
+<li>INF: Возможность инфекции (0 = No, 1 = Yes)<br/></li>
+<li>CPR: CPR prior to ICU admission (0 = No, 1 = Yes)<br/></li>
+<li>SYS: Давление во время поступления в реанимацию (in mm Hg)<br/></li>
+<li>HRA: Пульс (beats/min)</li>
+</ul>
+
+<p />
+
+<ul>
+<li>PRE: Была ли госпитализация в предыдущие 6 месяцев (0 = No, 1 = Yes)<br/></li>
+<li>TYP: Тип госпитализации (0 = Elective, 1 = Emergency)<br/></li>
+<li>FRA: Присутствие переломов (0 = No, 1 = Yes)<br/></li>
+<li>PO2: Концентрация кислорода в крови (0 = &gt;60, 1 = ²60)<br/></li>
+<li>PH: Уровень кислотности крови (0 = ³7.25, 1 &lt; 7.25)<br/></li>
+<li>PCO: Концентрция углекислого газа в крови (0 = ²45, 1 = &gt; 45)<br/></li>
+<li>BIC: Bicarbonate from initial blood gases (0 = ³18, 1 = &lt; 18)<br/></li>
+<li>CRE: Уровень креатина (0 = ²2.0, 1 = &gt; 2.0)<br/></li>
+<li>LOC: Уровень сознания пациента при реанимации (0 = no coma or stupor, 1= deep stupor, 2 = coma)</li>
+</ul>
+
+</div>
+
+</article></slide><slide class=''><hgroup><h2>Смотрим на данные</h2></hgroup><article  id="--" class="smaller">
+
+<pre class = 'prettyprint lang-r'>surviv &lt;- read.table(&quot;data/ICU.csv&quot;, header=TRUE, sep=&quot;;&quot;)
+head(surviv)</pre>
+
+<pre >##   STA AGE    SEX   RAC      SER CAN CRN INF CPR SYS HRA PRE       TYP
+## 1   0  27 Female White  Medical  No  No Yes  No 142  88  No Emergency
+## 2   0  59   Male White  Medical  No  No  No  No 112  80 Yes Emergency
+## 3   0  77   Male White Surgical  No  No  No  No 100  70  No  Elective
+## 4   0  54   Male White  Medical  No  No Yes  No 142 103  No Emergency
+## 5   0  87 Female White Surgical  No  No Yes  No 110 154 Yes Emergency
+## 6   0  69   Male White  Medical  No  No Yes  No 110 132  No Emergency
+##   FRA PO2 PH PCO BIC CRE LOC
+## 1  No   1  1   1   1   1   1
+## 2  No   1  1   1   1   1   1
+## 3  No   1  1   1   1   1   1
+## 4 Yes   1  1   1   1   1   1
+## 5  No   1  1   1   1   1   1
+## 6  No   2  1   1   2   1   1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Сделаем факторами те дискретные предикторы, которые обозначенны цифрами</h2></hgroup><article  id="-------">
+
+<pre class = 'prettyprint lang-r'>surviv$PO2 &lt;- factor(surviv$PO2)
+surviv$PH &lt;- factor(surviv$PH)
+surviv$PCO &lt;- factor(surviv$PCO)
+surviv$BIC &lt;- factor(surviv$BIC)
+surviv$CRE &lt;- factor(surviv$CRE)
+surviv$LOC &lt;- factor(surviv$LOC)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Строим модель</h2></hgroup><article  id="-" class="smaller">
+
+<pre class = 'prettyprint lang-r'>M1 &lt;- glm(STA ~ ., family = &quot;binomial&quot;, data = surviv)
+summary(M1)</pre>
+
+<pre >## 
+## Call:
+## glm(formula = STA ~ ., family = &quot;binomial&quot;, data = surviv)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.5052  -0.5372  -0.1787  -0.0002   3.0171  
+## 
+## Coefficients:
+##                Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)   -22.44426 1314.00889   -0.02   0.9864   
+## AGE             0.05645    0.01848    3.05   0.0023 **
+## SEXMale         0.72146    0.54600    1.32   0.1864   
+## RACOther       16.75746 1314.00721    0.01   0.9898   
+## RACWhite       16.17455 1314.00665    0.01   0.9902   
+## SERSurgical    -0.67386    0.62894   -1.07   0.2840   
+## CANYes          3.48260    1.12114    3.11   0.0019 **
+## CRNYes          0.11914    0.84488    0.14   0.8879   
+## INFYes         -0.10812    0.55570   -0.19   0.8457   
+## CPRYes          1.03223    0.99008    1.04   0.2971   
+## SYS            -0.02084    0.00944   -2.21   0.0273 * 
+## HRA            -0.00292    0.01032   -0.28   0.7776   
+## PREYes          1.27950    0.70215    1.82   0.0684 . 
+## TYPEmergency    3.74788    1.34222    2.79   0.0052 **
+## FRAYes          1.64945    1.09334    1.51   0.1314   
+## PO22           -0.67651    0.94017   -0.72   0.4718   
+## PH2             1.77098    1.21243    1.46   0.1441   
+## PCO2           -2.08358    1.16463   -1.79   0.0736 . 
+## BIC2           -0.26235    0.89668   -0.29   0.7698   
+## CRE2            0.10040    1.13073    0.09   0.9292   
+## LOC2           37.70527 2486.66692    0.02   0.9879   
+## LOC3            3.45837    1.34154    2.58   0.0099 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 200.16  on 199  degrees of freedom
+## Residual deviance: 112.17  on 178  degrees of freedom
+## AIC: 156.2
+## 
+## Number of Fisher Scoring iterations: 17</pre>
+
+</article></slide><slide class=''><hgroup><h2>Задание</h2></hgroup><article  id="-2">
+
+<p>Проведите анализ девиансы для данной модели</p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-3" class="smaller">
+
+<pre class = 'prettyprint lang-r'>anova(M1, test = &quot;Chi&quot;)</pre>
+
+<pre >## Analysis of Deviance Table
+## 
+## Model: binomial, link: logit
+## 
+## Response: STA
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##      Df Deviance Resid. Df Resid. Dev     Pr(&gt;Chi)    
+## NULL                   199        200                 
+## AGE   1      7.9       198        192      0.00507 ** 
+## SEX   1      0.0       197        192      0.97572    
+## RAC   2      1.3       195        191      0.53364    
+## SER   1      8.3       194        183      0.00392 ** 
+## CAN   1      0.7       193        182      0.39726    
+## CRN   1      2.6       192        179      0.10559    
+## INF   1      2.0       191        177      0.15391    
+## CPR   1      3.9       190        173      0.04777 *  
+## SYS   1      5.7       189        168      0.01741 *  
+## HRA   1      0.8       188        167      0.37537    
+## PRE   1      0.9       187        166      0.33955    
+## TYP   1     12.8       186        153      0.00035 ***
+## FRA   1      0.5       185        153      0.48914    
+## PO2   1      0.0       184        153      0.87152    
+## PH    1      0.0       183        153      0.90183    
+## PCO   1      1.3       182        152      0.25312    
+## BIC   1      0.1       181        151      0.78999    
+## CRE   1      0.2       180        151      0.63282    
+## LOC   2     39.0       178        112 0.0000000034 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</pre>
+
+</article></slide><slide class=''><hgroup><h2>Упростим модель с помощью функции <code>step()</code></h2></hgroup><article  id="-----step">
+
+<pre class = 'prettyprint lang-r'>step(M1, direction = &quot;backward&quot;)</pre>
+
+</article></slide><slide class=''><hgroup><h2>Рассмотрим финальную модель</h2></hgroup><article  id="--" class="smaller">
+
+<pre class = 'prettyprint lang-r'>M2 &lt;- glm(formula = STA ~ AGE + CAN + SYS + TYP + PH + PCO + LOC, family = &quot;binomial&quot;,   data = surviv)
+
+# M2 вложена в M1 следовательно их можно сравнить тестом отношения правдоподобий
+anova(M1, M2, test = &quot;Chi&quot;)</pre>
+
+<pre >## Analysis of Deviance Table
+## 
+## Model 1: STA ~ AGE + SEX + RAC + SER + CAN + CRN + INF + CPR + SYS + HRA + 
+##     PRE + TYP + FRA + PO2 + PH + PCO + BIC + CRE + LOC
+## Model 2: STA ~ AGE + CAN + SYS + TYP + PH + PCO + LOC
+##   Resid. Df Resid. Dev  Df Deviance Pr(&gt;Chi)
+## 1       178        112                      
+## 2       191        123 -13    -11.1      0.6</pre>
+
+</article></slide><slide class=''><hgroup><h2>Вопрос</h2></hgroup><article >
+
+<p>Во сколько раз изменяется отношение шансов на выживание при условии, что пациент онкологический больной (при прочих равных условиях)?</p>
+
+</article></slide><slide class=''><hgroup><h2>Решение</h2></hgroup><article  id="-4">
+
+<pre class = 'prettyprint lang-r'>exp(coef(M2)[3])</pre>
+
+<pre >## CANYes 
+##   15.7</pre>
+
+</article></slide><slide class=''><hgroup><h2>Визуализируем предсказания модели</h2></hgroup><article  id="--">
+
+<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-28-1.png" width="768" style="display: block; margin: auto;" /></p>
+
+</article></slide><slide class=''><hgroup><h2>Диагностика модели</h2></hgroup><article  id="-" class="smaller">
+
+<pre class = 'prettyprint lang-r'>M2_diag &lt;- data.frame(.fitted = predict(M2), 
+    .pears_resid = residuals(M2, type = &quot;pearson&quot;))
+
+ggplot(M2_diag, aes(x = .fitted, y = .pears_resid)) + 
+  geom_point() + geom_smooth(se = FALSE)</pre>
+
+<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Явного паттерна в остатках нет, но есть другая проблема</p>
+
+</article></slide><slide class=''><hgroup><h2>Zero inflation</h2></hgroup><article  id="zero-inflation">
+
+<p><img src="11_general_linear_models_for_binary_data_files/figure-html/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /></p>
+
+<p>Преобладают отрицательные остатки.<br/>Это связано с проблемой, называемой <em>&quot;zero inflation&quot;</em>, - в зависимой переменной слишком много нулей.</p>
+
+</article></slide><slide class=''><hgroup><h2>Сколько должно быть нулей?</h2></hgroup><article  id="---" class="smaller columns-2">
+
+<pre class = 'prettyprint lang-r'>#Формируем искусственный набор данных
+MyData = expand.grid(
+  AGE = seq(min(surviv$AGE), 
+            max(surviv$AGE), 1), 
+  CAN = levels(surviv$CAN),
+  SYS = seq(min(surviv$SYS), 
+            max(surviv$SYS), 10),  
+  TYP =  levels(surviv$TYP), 
+  PH = levels(surviv$PH), 
+  PCO = levels(surviv$PCO), 
+  LOC =levels(surviv$LOC)
+  )
+
+# Предсказываем для этих данных вероятности 
+# гибели в соответствии с моделью M2
+Predicted &lt;-predict(M2, newdata = MyData, 
+                    type =&quot;response&quot;) 
+
+# Вычисляем долю нулей, ожидаемую 
+# в соответствии с биномиальным 
+# распределением
+Zero_perc &lt;- sum((1-Predicted))/
+  (sum((1-Predicted)) + 
+    sum((Predicted))) * 100</pre>
+
+<p>Нулей долно быть 41 %</p>
+
+<p>А в наших данных доля нулей составляет 80 %.</p>
+
+<p>Это больше, чем должно быть в соответсивии с биномиальным распределением.</p>
+
+<p><strong>Нужна более сложная модель!</strong></p>
+
+<p><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /></p>
+
+</article></slide><slide class=''><hgroup><h2>Summary</h2></hgroup><article  id="summary">
+
+<ul class = 'build'>
+<li>При построении модели для бинарной зависимой перменной применяется логистическая регрессия.<br/></li>
+<li>При построении такой модели 1 и 0 в перменной отклика заменяются логитами.</li>
+<li>Угловые коэффициенты подобранной логистической регрессии говорят о том, во сколько раз изменяется соотношение шансов события при увеличении предиктора на единицу.<br/></li>
+<li>Оценить статистическую значимость модели можно с помощью анализа девиансы.</li>
+</ul>
+
+</article></slide><slide class=''><hgroup><h2>Что почитать</h2></hgroup><article  id="-">
+
+<ul>
+<li>Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014.</li>
+<li>Quinn G.P., Keough M.J. (2002) Experimental design and data analysis for biologists, pp. 92-98, 111-130</li>
+<li>Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. - Statistics for biology and health. Springer, New York, NY.</li>
+</ul></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<script src="site_libs/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/prettify.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/hammer.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-controller.js"></script>
+<script src="site_libs/ioslides-13.5.1/js/slide-deck.js"></script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
