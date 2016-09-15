@@ -13,6 +13,12 @@ title: Линейные модели, дисперсионный и регрес
 - [код R](02_code_hypothesis_testing.R)
 - [pdf](02_hypothesis_testing.pdf)
 
+```
+install.packages("ggplot2")
+```
+
+[Домашнее задание №1 --- Тестирование гипотез](hw/hw1_t-test-cholest.zip) (выберите себе один из вариантов)
+
 ### 3.Анализ мощности 
 
 - [html](03_power.html)
