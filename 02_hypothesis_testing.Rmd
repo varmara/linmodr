@@ -1,7 +1,7 @@
 ---
 title: "Тестирование статистических гипотез"
 author: "Марина Варфоломеева, Вадим Хайтов"
-subtitle: Линейные модели...
+subtitle: "Линейные модели..."
 output:
   ioslides_presentation:
     css: assets/my_styles.css
