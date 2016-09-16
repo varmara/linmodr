@@ -48,7 +48,7 @@ Sigma <- 2
 x <- seq(from = 0, to = 20, by = 0.1)
 y <- dnorm(x = x, mean = Mu, sd = Sigma)
 Norm <- data.frame(x, y)
-ggplot(data = Norm, aes(x=x, y=y)) + geom_line(color="steelblue", size=2) + geom_vline (aes(xintercept = Mu)) + labs(title = "Normal distribution", x = "Values", y = "Probability")
+ggplot(data = Norm, aes(x=x, y=y)) + geom_line(color="steelblue", size=2) + geom_vline (xintercept = Mu) + labs(title = "Normal distribution", x = "Values", y = "Probability")
 ```
 
 ![Гаусс](images/Gauss.png)
@@ -76,7 +76,7 @@ $$p= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$
 set.seed(38)
 X <- rnorm(n = 10000, mean = 50, sd = 7) # создаем вектор из 10000 значений нормально распределенной величины
 Mu <- mean(X)
-gg_population <- ggplot(data = data.frame(X), aes(x = X)) + geom_histogram(binwidth = 2, fill = "steelblue", color = "black") + labs(title = "Population") + xlim(30, 70) + geom_vline(aes(xintercept = Mu), colour = "red", size = 1) 
+gg_population <- ggplot(data = data.frame(X), aes(x = X)) + geom_histogram(binwidth = 2, fill = "steelblue", color = "black") + labs(title = "Population") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) 
 gg_population
 ```
 
@@ -86,7 +86,7 @@ gg_population
 i_1 <- sample(x = 10000, 20)
 sample_1 <- X[i_1]
 Mu_1 <- mean(sample_1)
-gg_sample_1 <- ggplot(data = data.frame(X = sample_1), aes(x = X)) + geom_histogram(binwidth = 1, fill = "steelblue", color = "black") + labs(title = "Sample 1") + xlim(30, 70) + geom_vline(aes(xintercept = Mu), colour = "red", size = 1) + geom_vline(aes(xintercept = Mu_1), colour = "red", size = 1, linetype = "dashed")
+gg_sample_1 <- ggplot(data = data.frame(X = sample_1), aes(x = X)) + geom_histogram(binwidth = 1, fill = "steelblue", color = "black") + labs(title = "Sample 1") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) + geom_vline(xintercept = Mu_1, colour = "red", size = 1, linetype = "dashed")
 gg_sample_1
 # mean(sample_1)
 # sd(sample_1)
@@ -108,7 +108,7 @@ $$SD=\sqrt{\frac{\sum{(x_i - \bar{x})^2}}{n-1}}$$
 i_2 <- sample(x = 10000, 50)
 sample_2 <- X[i_2]
 Mu_2 <- mean(sample_2)
-gg_sample_2 <- ggplot(data = data.frame(X = sample_2), aes(x = X)) + geom_histogram(binwidth = 1, fill = "steelblue", color = "black") + labs(title = "Sample 2") + xlim(30, 70) + geom_vline(aes(xintercept = Mu), colour = "red", size = 1) + geom_vline(aes(xintercept = Mu_2), colour = "red", size = 1, linetype = "dashed")
+gg_sample_2 <- ggplot(data = data.frame(X = sample_2), aes(x = X)) + geom_histogram(binwidth = 1, fill = "steelblue", color = "black") + labs(title = "Sample 2") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) + geom_vline(xintercept = Mu_2, colour = "red", size = 1, linetype = "dashed")
 
 library(gridExtra)
 grid.arrange(gg_population, gg_sample_1, gg_sample_2, ncol = 1, heights = c(1, 1, 1))
@@ -136,7 +136,7 @@ for (smpl in 1:100) {
 **Среднее значение выборочных средних стремится к среднему в генеральной совокупности**
 
 ```{r echo=FALSE, purl=FALSE, warning=FALSE}
-gg_means <- ggplot(data = data.frame(means = my_means), aes(x = means)) + geom_histogram(binwidth=1, fill="steelblue", color="black") + labs(title = "100 sample means, N = 5") + xlim(30, 70) + geom_vline(aes(xintercept = Mu), colour = "red", size = 1) + geom_vline(aes(xintercept = mean(my_means)), colour = "red", size = 1, linetype = "dashed")
+gg_means <- ggplot(data = data.frame(means = my_means), aes(x = means)) + geom_histogram(binwidth=1, fill="steelblue", color="black") + labs(title = "100 sample means, N = 5") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) + geom_vline(xintercept = mean(my_means), colour = "red", size = 1, linetype = "dashed")
 gg_means
 ```
 
@@ -155,7 +155,7 @@ for (smpl in 1:100) {
   mu_i <- mean(X[i])
   my_means_30[smpl] <- mu_i
 }
-gg_means_30 <- ggplot(data = data.frame(means = my_means_30), aes(x = means)) + geom_histogram(binwidth=1, fill="steelblue", color="black") + labs(title = "100 sample means, N = 30") + xlim(30, 70) + geom_vline(aes(xintercept = Mu), colour = "red", size = 1) + geom_vline(aes(xintercept = mean(my_means_30)), colour = "red", size = 1, linetype = "dashed")
+gg_means_30 <- ggplot(data = data.frame(means = my_means_30), aes(x = means)) + geom_histogram(binwidth=1, fill="steelblue", color="black") + labs(title = "100 sample means, N = 30") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) + geom_vline(xintercept = mean(my_means_30), colour = "red", size = 1, linetype = "dashed")
 grid.arrange(gg_population, gg_means, gg_means_30, ncol = 1)
 ```
 
@@ -198,9 +198,9 @@ SD <- sd(Xi)
 Zi <- (Xi - Mu) / SD
 Z <- data.frame(Xi, Zi)
 
-gg_sample <- ggplot(data = Z, aes(x = Xi)) + geom_histogram(binwidth = 2, fill = "steelblue", color = "black") + labs(title = "Normal Distribution, \nmu = 50, sd = 7") + geom_vline(aes(xintercept = mean(Xi)), colour = "red", size = 1)
+gg_sample <- ggplot(data = Z, aes(x = Xi)) + geom_histogram(binwidth = 2, fill = "steelblue", color = "black") + labs(title = "Normal Distribution, \nmu = 50, sd = 7") + geom_vline(xintercept = mean(Xi), colour = "red", size = 1)
 
-gg_z <- ggplot(data = Z, aes(x = Zi)) + geom_histogram(binwidth = 0.3, fill = "steelblue", color = "black") + labs(title = "Standard Normal Distribution, \nmu = 0, sd = 1") + geom_vline(aes(xintercept = mean(Zi)), colour = "red", size = 1)
+gg_z <- ggplot(data = Z, aes(x = Zi)) + geom_histogram(binwidth = 0.3, fill = "steelblue", color = "black") + labs(title = "Standard Normal Distribution, \nmu = 0, sd = 1") + geom_vline(xintercept = mean(Zi), colour = "red", size = 1)
 
 grid.arrange(gg_sample, gg_z, ncol = 1)
 ```
@@ -246,7 +246,7 @@ $$SE_d = \sqrt{\frac{sd_1^2(n_1-1) +sd_2^2(n_2-1)}{n_1+n_2-2}(\frac{1}{n_1} + \f
 ```{r, echo=FALSE, purl=FALSE}
 t <- seq(-10,10,0.1)
 pt <- dt(t, 4)
-ggplot(data.frame(t=t, pt=pt), aes(x=t, y=pt)) + geom_line(size=2) + geom_vline(aes(xintercept = 0)) + xlab("Standardized difference between means") + ylab("Probability")
+ggplot(data.frame(t=t, pt=pt), aes(x=t, y=pt)) + geom_line(size=2) + geom_vline(xintercept = 0) + xlab("Standardized difference between means") + ylab("Probability")
 ```
 
 Форма этого распределения зависит только от одного параметра 
@@ -299,17 +299,13 @@ gg_t_our <- ggplot(t_dist, aes(x = t)) +
   geom_histogram(binwidth = 0.1, fill = "steelblue", color = "black") + 
   geom_line(aes(x = seq(-5, 4.99, 0.01), 
                 y = dt(seq(-5, 4.99, 0.01), 18) * 100), size = 1) + 
-  geom_vline(aes(xintercept = -2), linetype = 5, size = 1) + 
-  geom_vline(aes(xintercept = 2), linetype = 5, size = 1) + 
+  geom_vline(xintercept = -2, linetype = 5, size = 1) + 
+  geom_vline(xintercept = 2, linetype = 5, size = 1) + 
   labs(title = "Manually constructed t-distribution") + 
   xlim(-5, 5) + ylim(0, 60) + 
-  geom_histogram(aes(x = t_dist$t_exeeded),
+  geom_histogram(x = t_dist$t_exeeded,
                  binwidth = 0.1, fill = "red", color = "black")
 gg_t_our
-
-# График распределения, полученного с помощью tr()
-# gg_t_r <- ggplot(data.frame(t=t_samp_2), aes(x=t)) + geom_histogram(binwidth=0.1, fill="steelblue", color="black") + geom_line(aes(x=seq(-5,4.99,0.01), y=dt(seq(-5,4.99,0.01), 18)*100), size=1) + geom_vline(aes(xintercept = c(-2,2)), linetype=5, size=1) + ggtitle("'Professional' t-distribution, obtained by rt()") + xlim(-5,5)+ ylim(0, 60)
-# gg_t_r
 ```
 
 ## Для оценки интересующей нас вероятности, нам надо понять сколько раз из 1000 мы встретим величину больше 2 (или меньше -2)      
@@ -483,8 +479,8 @@ mean_f <- mean(df_height$height[f_female])
 ```{r}
 gg_height <- ggplot(df_height, aes(x = height, fill = gender)) + 
   geom_histogram(binwidth = 3, colour = "grey40", position = "dodge") +
-  geom_vline(aes(xintercept = mean_f), colour = "red", size = 1) +
-  geom_vline(aes(xintercept = mean_m), colour = "blue", size = 1, linetype = "dashed")
+  geom_vline(xintercept = mean_f, colour = "red", size = 1) +
+  geom_vline(xintercept = mean_m, colour = "blue", size = 1, linetype = "dashed")
 gg_height
 ```
 
@@ -695,7 +691,7 @@ df_perm$less <- df_perm$d_p < d_initial
 ```{r, gg-dperm-pl, echo=FALSE, purl=FALSE, fig.height=7, fig.width=8, cache=FALSE}
 dperm_pl <- ggplot(df_perm, aes(x = d_p, fill = less)) + 
   geom_histogram (binwidth = 0.05, colour = "black") +
-  geom_vline(aes(xintercept = d_initial), linetype = 2) +
+  geom_vline(xintercept = d_initial, linetype = 2) +
   labs(x = "Permutational d-values", y = "Count",
        fill = "d < d_initial")
 dperm_pl
@@ -713,7 +709,9 @@ dperm_pl
 $$p_{perm}= \frac{N _{d _{perm} >= d}}{N _{perm}}$$
 
 ```{r}
-p_perm <- length(dperm[dperm >= d_initial] ) / Nperm
+# Два эквивалентных способа
+sum(dperm >= d_initial) / Nperm
+(p_perm <- mean(dperm >= d_initial))
 ```
 
 Итак, мы получили уровень значимости $p_{perm}$ = `r p_perm` 

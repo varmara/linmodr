@@ -1,3 +1,4 @@
+# https://varmara.github.io/linmodr-course/02_code_hypothesis_testing.R
 #' title: "Тестирование статистических гипотез"
 #' author: "Марина Варфоломеева, Вадим Хайтов"
 
@@ -10,13 +11,13 @@ male <- rnorm(n = 100, mean = 130, sd = 5)
 female <- rnorm(n = 100, mean = 129, sd = 5)
 gender <- c(rep("M", 100), rep("F", 100))
 # Сохраняем выборки в датафрейме для удобства
-df_height <- data.frame(gender = factor(gender),
-                        height = c(male, female))
-
+df_height <- data.frame(
+  gender = factor(gender),
+  height = c(male, female))
 
 library(ggplot2)
-ggplot(df_height, aes(x = height)) +
-  geom_histogram(binwidth = 5, colour = "grey40")
+ggplot(data = df_height, aes(x = height)) +
+  geom_histogram(binwidth = 5, colour = "grey80")
 
 
 #' ## Изменим ширину интервалов гистограммы
@@ -26,9 +27,9 @@ ggplot(df_height, aes(x = height)) +
 #' ## Изменим оформление (тему) графика
 
 # # На один раз
-# ggplot(df_height, aes(x = height)) +
-#   geom_histogram(binwidth = 2, colour = "grey40") +
-#   theme_classic()
+ggplot(df_height, aes(x = height)) +
+  geom_histogram(binwidth = 2, colour = "grey40") +
+  theme_bw()
 
 # # Или до конца сессии
 theme_set(theme_bw())
@@ -52,8 +53,8 @@ mean_f <- mean(df_height$height[f_female])
 #' ## Добавим линии, обозначающие средние значения
 gg_height <- ggplot(df_height, aes(x = height, fill = gender)) +
   geom_histogram(binwidth = 3, colour = "grey40", position = "dodge") +
-  geom_vline(aes(xintercept = mean_f), colour = "red", size = 1) +
-  geom_vline(aes(xintercept = mean_m), colour = "blue", size = 1, linetype = "dashed")
+  geom_vline(xintercept = mean_f, colour = "red", size = 1) +
+  geom_vline(xintercept = mean_m, colour = "blue", size = 1, linetype = "dashed")
 gg_height
 
 
@@ -69,6 +70,9 @@ t_height <- t.test(height ~ gender, data = df_height)
 t_height
 
 #' ### Вопрос: Вероятность какого события отражает уровень значимости p=`r t_height$p.value`?
+
+sd_m <- sd(df_height$height[f_male])
+sd_f <- sd(df_height$height[f_female])
 
 #' Сравним при помощи пермутаций две выборки, описывающие рост мальчиков и девочек (`male` и `female`)
 head(male)
@@ -86,7 +90,7 @@ for (i in 1:(Nperm - 1))    # Повторяем 9999 раз
   ord <- sample(x = 1:200, size = 200)   # задаем новый порядок значений
   f <- BOX[ord[1:100]]      # первые 100 перемешанных значений
   m <- BOX [ord[101:200]]   # следующие 100 перемешанных значений
-  dperm[i] = abs(mean(m) - mean(f))  # считаем пермутационную статистику
+  dperm[i] <- abs(mean(m) - mean(f))  # считаем пермутационную статистику
 }
 
 head(dperm)
@@ -106,9 +110,13 @@ df_perm$less <- df_perm$d_p < d_initial
 #' ## Получаем распределение статистики $d_{perm}$
 #' ## Задание: Постройте график самостоятельно
 
+ggplot(data = df_perm, aes(x = d_p, fill = less)) +
+  geom_histogram(binwidth = 0.08, colour = "black") +
+  geom_vline(xintercept = d_initial, colour = "red")
 
 
+names(df_perm)
 
 #' ## Расчитаем величину уровня значимости
-p_perm <- length(dperm[dperm >= d_initial] ) / Nperm
-
+p_perm <- sum(dperm >= d_initial) / Nperm
+mean(dperm >= d_initial)
