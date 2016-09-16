@@ -265,11 +265,17 @@ div.tocify {
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li><a href="index.html">Начало</a></li>
+        <li><a href="index.html">О курсе</a></li>
         <li><a href="lectures.html">Презентации и данные</a></li>
-        <li><a href="supplement.html">Дополнительные материалы</a></li>
-        <li><a href="resources.html">Ссылки и ресурсы</a></li>
-        <li><a href="coding_practices.html">Правила хорошего кода</a></li>
+        <li><a href="evaluation_criteria.html">Критерии оценки домашних заданий</a></li>
+        <li class="dropdown">
+          <a href="appendix" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Полезности<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+             <li><a href="supplement.html">Дополнительные темы</a></li>
+             <li><a href="resources.html">Ссылки и ресурсы</a></li>
+             <li><a href="coding_practices.html">Правила хорошего кода</a></li>
+          </ul>
+        </li>
       </ul>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -309,17 +315,18 @@ div.tocify {
 <h2>Оценки</h2>
 <p>Качество отчета оценивается по анкете. Оценки за каждый из пунктов: 1/3 балла - да, все, что нужно; 1/6 балла - да, но не все, что нужно; 0 - нет/ничего. За 6 выполненных заданий можно набрать <span class="math inline">\(1/3 \times 15 \times 6 = 30\)</span> баллов, плюс еще 6 дополнительных, если задание сдано в срок.</p>
 <p>Анкета для оценки заданий составлена по мотивам критериев оценки от <a href="http://www.biostat.jhsph.edu/~jleek/research.html">Джеффа Лика</a> в курсе Data Analysis на <a href="http:/coursera.org">Coursera</a>.</p>
-<div id="-----" class="section level3">
-<h3>Анкета, по которой оценивается домашнее задание</h3>
+</div>
+<div id="-----" class="section level2">
+<h2>Анкета, по которой оценивается домашнее задание</h2>
 <p>Оценка ХХ + ХХ = XX из 5 возможных баллов</p>
-<div id="a.---." class="section level4">
-<h4>A. Самостоятельность выполнения задания.</h4>
+<div id="a.---." class="section level3">
+<h3>A. Самостоятельность выполнения задания.</h3>
 <ol style="list-style-type: decimal">
 <li>Самостоятельно ли написан текст домашнего задания? В случае обнаружения явных заимствований или не оформленных цитат все баллы “сгорают”</li>
 </ol>
 </div>
-<div id="b.-----" class="section level4">
-<h4>B. Описание анализа данных и результатов</h4>
+<div id="b.-----" class="section level3">
+<h3>B. Описание анализа данных и результатов</h3>
 <ol style="list-style-type: decimal">
 <li>Есть ли в отчете разделы (Введение, Материалы и методы, Результаты и Обсуждение, Выводы, Список литературы) и соответствует ли их содержание заголовкам?</li>
 <li>Описаны ли в тексте вопросы, на которые нужно дать ответ или гипотезы, которые нужно проверить?</li>
@@ -333,20 +340,19 @@ div.tocify {
 <li>Есть ли в тексте пронумерованные ссылки на рисунки и таблицы?</li>
 </ol>
 </div>
-<div id="c.----" class="section level4">
-<h4>C. Рисунки, таблицы и подписи</h4>
+<div id="c.----" class="section level3">
+<h3>C. Рисунки, таблицы и подписи</h3>
 <ol style="list-style-type: decimal">
 <li>Достаточно ли подписи к рисунку/таблице, чтобы можно было понять его в отрыве от основного текста?</li>
 <li>Подписаны ли на рисунке оси, достаточно ли велик шрифт, чтобы его было удобно читать?</li>
 </ol>
 </div>
-<div id="d.-r-" class="section level4">
-<h4>D. R-код</h4>
+<div id="d.-r-" class="section level3">
+<h3>D. R-код</h3>
 <ol style="list-style-type: decimal">
 <li>Разделен ли код на логические блоки примечаниями?</li>
 <li>Можно ли воспроизвести анализ при помощи приложенного кода?</li>
 </ol>
-</div>
 </div>
 </div>
 
