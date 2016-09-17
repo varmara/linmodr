@@ -15,6 +15,7 @@ install.packages("ggplot2")
 - Презентация [html](02_hypothesis_testing.html) |  [pdf](02_hypothesis_testing.pdf)
 - [код R](02_code_hypothesis_testing.R)
 - [Домашнее задание №1 --- Тестирование гипотез](hw/hw1_t-test-cholest.zip) (выберите себе один из вариантов)
+- [Примеры вопросов следующего теста](test_handouts/02-ttest-handout-test1.pdf) (в следующем тесте будет 4 вопроса из этих 10)
 
 ## 3.Простая линейная регрессия 
 
