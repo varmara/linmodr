@@ -434,7 +434,7 @@ Pop$T10 <- as.vector( Lesl %*% (Pop$T9 ))
 
 ## Демографическая струкутра в момент времени $t+1$ 
 
-```{r, echo=FALSE, message=FALSE, fig.width=6}
+```{r, echo=FALSE, message=FALSE, fig.width=6, fig.height=6}
 library(ggplot2)
 library(reshape)
 Pop2 <- melt(Pop)
@@ -508,26 +508,39 @@ t(B) %*% B
 ```
 
 
+##Определитель матрицы
+Определитель матрицы - это некоторое число.
+По значению этого числа можно *опредилить* есть ли у матрицы некоторые свойства (например, обратима ли матрицв).  
+Определитель бывает только у квадратных матриц.   
+Матрицы, имеющие определитель равный нулю, называются *сингулярными* матрицами.
+
+```{r}
+det(B)
+```
 
 
 
+```{r}
+BB <- t(B) %*% B
+det(BB)
+```
 
-##Обращение (инверсия) матриц {.smaller .columns-2}
+
+
+##Обращение (инверсия) матриц 
 
 В матричной алгебре нет процедуры деления. Вместо нее используют обращение матриц.
 
 $$
 \textbf{X}^{-1}\textbf{X} = \textbf{I}
 $$
+Произведение инверсии матрицы и исходной матрицы дает единичную матрицу
 
 
-Обратить можно только такую матрицу, у которой определитель не равен нулю $$|\textbf{X}| \ne 0$$
+##Обращение (инверсия) матриц 
+Только квадратные матрицы, имеющие определитель неравный нулю, могут иметь обратную матрицу. 
 
-Матрицы, у которых определитель $|\textbf{X}| = 0$ называются *сингулярными* матрицами они не могут быть инвертированы.
-
-**Важное свойство**: Только квадратные матрицы имеют одну единственную обратную матрицу. 
-
-Поэтому для квадратных матриц справедливо $\textbf{X} \textbf{X}^{-1} = \textbf{X}^{-1} \textbf{X}$
+Поэтому для квадратных матриц  справедливо $\textbf{X} \textbf{X}^{-1} = \textbf{X}^{-1} \textbf{X}$
 
 ##Решение в среде R
 Создадим матрицу
@@ -603,6 +616,14 @@ $$
 ##Задание 
 Решите приведенную систему уравнений с использованием матричной алгебры 
 
+$$
+\begin{cases}
+1x + 2y + 3z = 2\\  
+4x + 5y + 6z = 4 \\  
+7x + 8y + 10z = 10   
+\end{cases}
+$$
+
 
 
 ##Решение
@@ -618,8 +639,9 @@ solve(Coef) %*% Val
 ```
 
 
-##Подбор параметров линейной регрессии
+#Подбор параметров линейной регрессии методом наименьших квадратов с использованием матричной алгебры
 
+##Линейная регрессия в матричном виде
 
 При подборе коэффициентов методом нименьших квадратов нам надо решить следующее матричное уравнение:
 $$
@@ -635,6 +657,10 @@ $\textbf{X}$ - модельная матрица  $\begin{pmatrix} 1 & x_1  \\ 1 & x_2 \\ \vdots
 
 $\pmb{\beta}$  - вектор коэффициентов модели
 
+
+
+
+
 ##Решение этого уравнения   
 
 Умножим обе части уравнения на транспонированную матрицу $\textbf{X}'$  
@@ -648,137 +674,169 @@ $$
 \pmb{\beta} = [\textbf{X}'\textbf{X}]^{-1}[\textbf{X}'\textbf{y}]
 $$
 
-##Подбор коэффициентов линейной регрессии вручную
-Подбираем коэффициенты с помощью фунции `lm()`
+
+##Подбираем коэффициенты с помощью фунции `lm()`
 ```{r}
 data(cars)
 Mod <- lm(dist ~ speed, data = cars)
 coefficients(Mod)
 ```
 
-Подбираем коэффициенты вручную
-
+##Графическое отражение, построенное с помощью `geom_smooth()`
 ```{r}
-X <- data.frame(Int = 1, x = cars$speed)
-X <- as.matrix(X)
+library(ggplot2)
+theme_set(theme_bw())
+ggplot(cars, aes(x = speed, y = dist)) + geom_point() + geom_smooth(method = "lm")
 
-y <- cars$dist
-solve(t(X) %*% X) %*% (t(X) %*%y)
-
-d <- solve(t(X) %*% X)
 ```
 
 
-#Сингулярное разложение матриц (Singular value decomposition)
 
-##Теорема Экарта-Янга {.smaller}
-Любую прямоугольную матрицу $\textbf{Y}$ можно представить в виде произведения трех матриц: 
+##Вычисление коэффициентов линейной регрессии вручную
+
+Находим вектор коэффициентов на основе уравнения $\pmb{\beta} = [\textbf{X}'\textbf{X}]^{-1}[\textbf{X}'\textbf{y}]$
+
+```{r}
+X <- model.matrix(~speed, data = cars)
+Y <- cars$dist
+betas <- solve(t(X) %*% X) %*% (t(X) %*% Y)
+betas
+
+```
+
+
+##Вычисление вариационно-ковариационной матрицы 
+Подобранные параметры - это оценки некоторых параметров, описывающих связь между зависимой перменной и предиктором в популяции.   
+
+Варьирование параметров описывает *вриацонно-ковариационная матрица*.    
+
+В среде `R`, если модель задана, например, с помощью функции `lm()`, эта матрица вычисляется так   
+```{r}
+vcov(Mod)
+```
+
+##Вычисление вариационо-ковариационной матрицы вручную
 
 $$
-\textbf{Y}_{n \times p} = \textbf{U}_{n \times p} \textbf{D}_{p \times p} \textbf{V}'_{p \times p} 
+\textbf{V}(\pmb{\beta}) = s^2[\textbf{X}'\textbf{X}]^{-1}
+$$
+где
+
+$$
+s^2 = \frac{\sum\limits_{\substack{i=1}}^n e_i^2}{n-k}
 $$
 
-То есть можно найти три "вспомогательных" матрицы, через котрые можно выразить любую другую матрицу. 
+$\sum\limits_{\substack{i=1}}^n e_i^2$ - сумма квадратов остатков   
+$n$ - объем выборки   
+$k$ - число параметров в модели
 
-Здесь    
+##Вычисление вариационо-ковариационной матрицы вручную
+Вычисляем $\sum\limits_{\substack{i=1}}^n e_i^2$   
 
-$\textbf{Y}_{n \times p}$ - любая прямоугольная матрица $\begin{pmatrix}a_{11} & a_{12} & \cdots & a_{1c} \\ a_{21} & a_{22} & \cdots & a_{2p} \\  \vdots & \vdots & \ddots & \vdots \\ a_{r1} & a_{n2} & \cdots & a_{np} \end{pmatrix}$   
-
-$\textbf{D}_{p \times p}$ - диагональная матрица $\begin{pmatrix} d_{11} & 0 & \cdots & 0 \\ 0 & d_{22} & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & d_{pp} \end{pmatrix}$
-
-По главной диагонали располагаются "особые" числа, называющиеся **сингулярными числами**. Сингулярные числа ранжируются от большего к меньшему.
-
-$\textbf{U}_{n \times p}$ и $\textbf{V}_{p \times p}$ - левая и правая матрицы сингулярных векторов.
-
-## Сингулярное разложение матрицы средствами R
 ```{r}
-set.seed(12345)
-B <- matrix(round(runif(50, 1, 5))  , byrow = T, ncol=5) #Некоторая матрица
-SVD <- svd(B) #Сингулярное Разложение матрицы B с помощью функции svd()
-V <- SVD$v #"Вспомогательная" матрица - левые сингулярные вектора
-D <- SVD$d #Вектор сингулярных чисел
-U <- SVD$u #"Вспомогательная" матрица - правые сингулярные вектора 
+predict_values <- X %*% betas
 
+resid_values <- cars$dist - predict_values
 
+s2 <- sum(resid_values^2)/(length(resid_values) - length(betas))
+
+s2
 ```
 
-Вычислим $\textbf{V} \textbf{D} \textbf{U}'$
+##Вычисление вариационо-ковариационной матрицы вручную
+Вычисляем вариационно-ковариационную матрицу
+
+$$
+\textbf{V}(\pmb{\beta}) = s^2[\textbf{X}'\textbf{X}]^{-1}
+$$
 
 ```{r}
-U %*% diag(D) %*% t(V) 
-```
-
-## Задание
-
-Вычислите матрицу, которая получится при использовании только 1 и 2 сингулярного числа для матрицы $\textbf{B}$, использованной на предыдущем слайде.
-
-
-##Решение
-```{r}
-U[,1:2] %*% diag(D[1:2]) %*% t(V[,1:2]) 
-
+covbetas <- s2 * solve(t(X) %*% X)
+covbetas
 ```
 
 
-##Важное свойство сингулярных чисел
+##Применение матричной алгебры для построения графиков регрессионных моделей 
 
-Если вычислить матрицу на основе не всех, а части сингулярных чисел, то новая матрица будет подобна исходной матрице.
+Шаг 1. Формируем искусственный датасет со всеми возможными значениями предиктора
+
+```{r}
+MyData <- data.frame(speed = seq(min(cars$speed), max(cars$speed)))
+head(MyData)
+```
+
+##Применение матричной алгебры для построения графиков регрессионных моделей 
+
+Шаг 2. Формируем модельную матрицу для искусственно созданных данных
+
+```{r}
+X <- model.matrix( ~ speed, data = MyData)
+head(X)
+
+```
+
+##Применение матричной алгебры для построения графиков регрессионных моделей 
+
+Шаг 3. Вычисляем предсказанные значения для искусственно созданных данных
+```{r}
+MyData$predicted <- X %*% betas
+```
+
+
+##Применение матричной алгебры для построения графиков регрессионных моделей 
+
+Шаг 5. Вычисляем границы доверительных интервалов
+
+```{r}
+# Вычисляем стандартные отшибки путем перемножения матриц
+  MyData$se <- sqrt(diag(X %*% covbetas %*% t(X)))
+
+# Вычисляем доверительные интервалы
+MyData$CiUp  <- MyData$predicted + 1.96 *MyData$se
+
+MyData$CiLow  <- MyData$predicted - 1.96 *MyData$se
+
+```
+
+##Применение матричной алгебры для построения графиков регрессионных моделей  {.smaller .columns-2} 
+
+Шаг 6. Строим график
+
+```{r, fig.height=5, fig.width=4.5, fig.align='right'}
+ggplot(MyData, aes(x = speed, y = predicted)) + 
+  geom_line(aes(x = speed, y = CiUp), 
+            linetype = 2, size = 1) + 
+  geom_line(aes(x = speed, y = CiLow), 
+            linetype = 2, size = 1)+ 
+  geom_abline(slope = betas[2], intercept = betas[1], 
+              color = "blue", size=2) +
+  geom_point(data = cars, aes(x = speed, y = dist)) +
+  ylab("dist")
+
+  
+```
+
+
+
+
+##Сравним результаты 
 
 
 ```{r, echo=FALSE}
-library(ggplot2)
-Dat <- data.frame(Init = rep(as.vector(B), 4), SingValue = rep(2:5, each = length(as.vector(B))), Calc = c(as.vector((U[,1:2] %*% diag(D[1:2]) %*% t(V[,1:2]))), as.vector((U[,1:3] %*% diag(D[1:3]) %*% t(V[,1:3]))), as.vector((U[,1:4] %*% diag(D[1:4]) %*% t(V[,1:4]))), as.vector((U[,1:5] %*% diag(D[1:5]) %*% t(V[,1:5]))))) 
+library(gridExtra)
+Pl_gg <- ggplot(cars, aes(x = speed, y = dist)) + geom_point() + geom_smooth(method = "lm") 
+Pl_hand <-ggplot(MyData, aes(x = speed, y = predicted)) +   geom_line(aes(x = speed, y = CiUp), linetype = 2, size = 0.5) + geom_line(aes(x = speed, y = CiLow), linetype = 2, size = 0.5) + geom_abline(slope = betas[2], intercept = betas[1], color = "blue", size=1) + geom_point(data = cars, aes(x = speed, y = dist)) + ylab("dist")
 
-ggplot(Dat, aes(x = Init, y = Calc)) + geom_point(size = 2) + labs(x = "значения в исходной матрицы", y = "значения в редуцированной матрице") + facet_wrap(~SingValue) + geom_abline(slope = 1)  
-
-```
-
-
-## Применение свойства сингулярных чисел в сжатии изображений
-Пример взят из курса лекций "Data Analysis" by Jeffrey Leek (https://github.com/jtleek/dataanalysis/tree/master/week3)
-
-```{r,echo=FALSE}
-load("data/face.rda")
-gg_face <- function(x) {
-  library(reshape)
-  library(ggplot2)
-    rotate <- function(x) t(apply(x, 2, rev))
-  dd <- rotate(x)
-  ddd <- melt(dd)
-  ggplot(ddd, aes(X1, X2)) + geom_tile(aes(fill = value)) + scale_fill_gradient(low = "darkblue",   high =  "white" )
-}
-gg_face(faceData)
+grid.arrange(Pl_gg, Pl_hand, ncol = 2)
 
 ```
 
-## Произведем сингулярное разложение матрицы `faceData` {.smaller}
 
-```{r}
-SVD_face <- svd(faceData)
-
-U <- SVD_face$u
-D <- SVD_face$d
-V <- SVD_face$v
-
-reduction <- function(x) U[,1:x] %*% diag(D[1:x]) %*% t(V[, 1:x])
-
-gg_face(reduction(4))
-```
-
-##Применение SVD в биологических исследованиях
-
-SVD - это метод, на котором основаны разные типы анализа, связанные со снижением размерности: PCA, CCA.
-
-О них в следующей лекции
-
-##Summary
-- Матричная алгебра позволяет решать самые разные типы задач.
-- Матричные методы лежат в основе очень многих типов анализа.
-- В основе многих методов снижения размерности лежит SVD.
+# Not The End
+![alt text](images/matrix2.jpg)
 
 ##Что почитать
 * Legendre P., Legendre L. (2012) Numerical ecology. Second english edition. Elsevier, Amsterdam. Глава 2. Matrix algebra: a summary.
 
-# Not The End
-![alt text](images/matrix.jpg)
+
 
