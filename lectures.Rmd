@@ -21,13 +21,20 @@ install.packages("ggplot2")
 
 - Презентация [html](03_LM.html) | [pdf]
 - [код R](03_code_LM.R)
-- Данные
+- Данные:
+    - [IQ_brain.csv](data/IQ_brain.csv)
 
 ## 4. Регрессия в матричном виде
 
+```{r eval=FALSE}
+install.packages("reshape2")
+```
 - Презентация [html](04_Introduction_to_matrix_algebra.html) | [pdf]
 - [код R](04_code_Introduction_to_matrix_algebra.R)
-- Данные
+- Данные:
+    - [IQ_brain.csv](data/IQ_brain.csv)
+- [Домашнее задание №2 --- Линейная регрессия]
+- [Примеры вопросов следующего теста](test_handouts/03-regr-handout-test1.pdf)
 
 
 ## 5.Проверка условий применимости регрессионных моделей 

@@ -1,13 +1,12 @@
 ---
 title: "Линейная регрессия"
+subtitle: "Линейные модели..."
 author: "Вадим Хайтов, Марина Варфоломеева"
-subtitle: Линейные модели 2016
 output:
   ioslides_presentation:
     css: assets/my_styles.css
     logo: assets/Linmod_logo.png
     widescreen: yes
-  beamer_presentation: default
 ---
 
 

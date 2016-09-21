@@ -1,16 +1,12 @@
 ---
 title: "Краткое введение в мир матричной алгебры"
-subtitle: Линейные модели 2016
-author: Вадим Хайтов, Марина Варфоломеева
-presenters: [{
-    name: 'Вадим Хайтов',
-    company: 'Каф. Зоологии беспозвоночных, СПбГУ',
-    }]
+subtitle: "Линейные модели..."
+author: "Вадим Хайтов, Марина Варфоломеева"
 output:
   ioslides_presentation:
-    widescreen: true
     css: assets/my_styles.css
     logo: assets/Linmod_logo.png
+    widescreen: yes
 ---
 
 ## Вы сможете

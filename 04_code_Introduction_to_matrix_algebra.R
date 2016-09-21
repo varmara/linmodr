@@ -1,8 +1,7 @@
-######################################
-#Краткое введение в матричную алгебру
-#Линейные модели на R
-#Вадим Хайтов, Марина Варфоломеева
-######################################
+# ---
+# title: "Краткое введение в мир матричной алгебры"
+# subtitle: "Линейные модели..."
+# author: "Вадим Хайтов, Марина Варфоломеева"
 
 #Создаем матрицу из вектора
 
@@ -76,7 +75,7 @@ Pop$T9 <- as.vector( Lesl %*% (Pop$T8 ))
 Pop$T10 <- as.vector( Lesl %*% (Pop$T9 ))
 
 library(ggplot2)
-library(reshape)
+library(reshape2)
 Pop2 <- melt(Pop)
 ggplot(Pop2, aes(x=Age, y = value)) + geom_bar(stat = "identity") + facet_wrap(~variable, ncol = 2)
 

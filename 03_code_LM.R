@@ -1,9 +1,7 @@
-######################################
-#Введение в регрессионый анализ
-#Линейные модели на R
-#Вадим Хайтов, Марина Варфоломеева
-######################################
-
+# ---
+# title: "Линейная регрессия"
+# subtitle: "Линейные модели..."
+# author: "Вадим Хайтов, Марина Варфоломеева"
 
 ## Читаем данные
 brain <- read.csv("data/IQ_brain.csv", header = TRUE)
@@ -20,7 +18,7 @@ brain[!complete.cases(brain), ]
 
 #Вычисление матрицы корреляций
 
-
+library(ggplot2)
 ## Строим график
 pl_brain <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + geom_point() +   xlab("Brain size") + ylab("IQ test")
 pl_brain
