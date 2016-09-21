@@ -19,7 +19,7 @@ install.packages("ggplot2")
 
 ## 3.Простая линейная регрессия 
 
-- Презентация [html](03_LM.html) | [pdf]
+- Презентация [html](03_LM.html) | [pdf](03_LM.pdf)
 - [код R](03_code_LM.R)
 - Данные:
     - [IQ_brain.csv](data/IQ_brain.csv)
@@ -29,7 +29,7 @@ install.packages("ggplot2")
 ```{r eval=FALSE}
 install.packages("reshape2")
 ```
-- Презентация [html](04_Introduction_to_matrix_algebra.html) | [pdf]
+- Презентация [html](04_Introduction_to_matrix_algebra.html) | [pdf](04_Introduction_to_matrix_algebra.pdf)
 - [код R](04_code_Introduction_to_matrix_algebra.R)
 - Данные:
     - [IQ_brain.csv](data/IQ_brain.csv)
