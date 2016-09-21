@@ -33,7 +33,7 @@ install.packages("reshape2")
 - [код R](04_code_Introduction_to_matrix_algebra.R)
 - Данные:
     - [IQ_brain.csv](data/IQ_brain.csv)
-- [Домашнее задание №2 --- Линейная регрессия]
+- [Домашнее задание №2 --- Линейная регрессия, часть 1](hw/hw2_lin-regr-crabs.zip)
 - [Примеры вопросов следующего теста](test_handouts/03-regr-handout-test1.pdf)
 
 
