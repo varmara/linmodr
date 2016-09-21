@@ -117,6 +117,7 @@ $$ \textbf {F} =
 \end{pmatrix}
 $$
 
+
 ##Квадратные матрицы (square matrices) {.smaller}
 
 Треугольные матрицы (triangular matrices)
@@ -176,12 +177,10 @@ matrix(1:12, ncol = 3)
 ```
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl = FALSE}
 diag(rep(1,5))
 
 ```
-
-
 
 #Операции с матрицами
 
@@ -201,18 +200,18 @@ B
 ```
 
 ##Сложение матриц
-```{r}
+```{r, purl = FALSE}
 A + 4
 
 ```
 
-```{r}
+```{r, purl = FALSE}
 A + A
 
 ```
 
 Но! Нельзя складывать матрицы разных размеров
-```{r, eval=FALSE}
+```{r, eval=FALSE, purl = FALSE}
 A + B
 
 ```
@@ -220,7 +219,7 @@ A + B
 ##Биологическое приложение
 Предположим, что мы подсчитывали двумя разными методами крупных и мелких животных  трех  видов в одних и тех же пробах
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, purl = T}
 Large <- data.frame(Sp1 = round(rnorm(5, 10, 2)), Sp2 = round(rnorm(5, 10, 3)), Sp3 = round(rnorm(5, 10, 2))) 
 
 rownames(Large) <- c("Sample1", "Sample2", "Sample3", "Sample4", "Sample5" )
@@ -231,7 +230,7 @@ rownames(Small) <- c("Sample1", "Sample2", "Sample3", "Sample4", "Sample5" )
 
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, purl = FALSE}
 Large
 Small
 
@@ -240,7 +239,7 @@ Small
 ##Биологическое приложение
 
 Общее обилие 
-```{r}
+```{r, purl = T}
 Large + Small
 
 ```
@@ -248,14 +247,14 @@ Large + Small
 
 ##Простое умножение 
 Умножение на число
-```{r}
+```{r, purl = FALSE}
 A * 4
 
 ```
 
 Простое умножение матрицы на вектор возможно только если число элементов в векторе равно числу строк в матрице
 
-```{r}
+```{r, purl = FALSE}
 A * c(10, 11, 12, 13)
 ```
 
@@ -264,13 +263,13 @@ A * c(10, 11, 12, 13)
 
 ##Биологическое применение
 Допустим, учет организмов в части описаний проходил не на всей выборке, а лишь в ее части.
-```{r}
+```{r, purl = T}
 Rpocessed_portion <- c(1, 1, 1/2, 1/3, 1/4)
 Processed_Factor <- 1/Rpocessed_portion
 
 ```
 
-```{r}
+```{r, purl = T}
 Small * Processed_Factor
 
 ```
@@ -442,6 +441,18 @@ ggplot(Pop2, aes(x=Age, y = value)) + geom_bar(stat = "identity") + facet_wrap(~
 
 ```
 
+## Вычисление корреляций через произведение матриц
+Используем известные нам данные по размеру головного мозга
+```{r}
+brain <- read.csv("data/IQ_brain.csv", header = TRUE)
+br <- brain[complete.cases(brain), -1]
+br <- as.matrix(br)
+br_scaled <- scale(br) #Стандартизуем знчения
+
+cor_matrix <- t(br_scaled) %*% br_scaled / (nrow(br_scaled) - 1) 
+
+cor_matrix
+```
 
 ##Некоторые свойства произведения матриц
 1) Если существует произведение матриц $\textbf{BC}$, то не обязательно существует $\textbf{CB}$
@@ -508,11 +519,15 @@ t(B) %*% B
 ```
 
 
+
 ##Определитель матрицы
-Определитель матрицы - это некоторое число.
-По значению этого числа можно *опредилить* есть ли у матрицы некоторые свойства (например, обратима ли матрицв).  
+Определитель матрицы - это некоторое число.   
+
+По значению этого числа можно *опредилить* есть ли у матрицы некоторые свойства (например, обратима ли матрица).  
+
 Определитель бывает только у квадратных матриц.   
-Матрицы, имеющие определитель равный нулю, называются *сингулярными* матрицами.
+
+Матрицы, имеющие определитель равный нулю, называются *сингулярными* матрицами.  
 
 ```{r}
 det(B)
@@ -524,6 +539,8 @@ det(B)
 BB <- t(B) %*% B
 det(BB)
 ```
+
+
 
 
 
@@ -561,13 +578,15 @@ solve(X)
 
 ```
 
-По определению $\textbf{X}^{-1}\textbf{X} = \textbf{I}$
+По определению, $\textbf{X}^{-1}\textbf{X} = \textbf{I}$
 ```{r}
 round(solve(X) %*% X )
 ```
 
 
-##Примнение обратных матриц {.smaller}
+#Примнение обращенных матриц 
+
+##Решение систем линейных уравнений{.smaller}
 
 Простейший случай использования обратных матриц - решение систем линейных уравнений
 $$
@@ -639,6 +658,8 @@ solve(Coef) %*% Val
 ```
 
 
+
+
 #Подбор параметров линейной регрессии методом наименьших квадратов с использованием матричной алгебры
 
 ##Линейная регрессия в матричном виде
@@ -706,7 +727,7 @@ betas
 
 
 ##Вычисление вариационно-ковариационной матрицы 
-Подобранные параметры - это оценки некоторых параметров, описывающих связь между зависимой перменной и предиктором в популяции.   
+Подобранные параметры - это лишь _оценки_ некоторых параметров, описывающих связь между зависимой перменной и предиктором в популяции.    
 
 Варьирование параметров описывает *вриацонно-ковариационная матрица*.    
 
@@ -714,6 +735,8 @@ betas
 ```{r}
 vcov(Mod)
 ```
+
+
 
 ##Вычисление вариационо-ковариационной матрицы вручную
 
@@ -802,7 +825,21 @@ MyData$CiLow  <- MyData$predicted - 1.96 *MyData$se
 
 Шаг 6. Строим график
 
-```{r, fig.height=5, fig.width=4.5, fig.align='right'}
+```{r, fig.height=5, fig.width=4, fig.align='left', echo=FALSE}
+ggplot(MyData, aes(x = speed, y = predicted)) + 
+  geom_line(aes(x = speed, y = CiUp), 
+            linetype = 2, size = 1) + 
+  geom_line(aes(x = speed, y = CiLow), 
+            linetype = 2, size = 1)+ 
+  geom_abline(slope = betas[2], intercept = betas[1], 
+              color = "blue", size=2) +
+  geom_point(data = cars, aes(x = speed, y = dist)) +
+  ylab("dist")
+
+  
+```
+
+```{r, fig.height=5, fig.width=4.5, fig.align='right', eval=FALSE}
 ggplot(MyData, aes(x = speed, y = predicted)) + 
   geom_line(aes(x = speed, y = CiUp), 
             linetype = 2, size = 1) + 
@@ -822,7 +859,7 @@ ggplot(MyData, aes(x = speed, y = predicted)) +
 ##Сравним результаты 
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.height=6}
 library(gridExtra)
 Pl_gg <- ggplot(cars, aes(x = speed, y = dist)) + geom_point() + geom_smooth(method = "lm") 
 Pl_hand <-ggplot(MyData, aes(x = speed, y = predicted)) +   geom_line(aes(x = speed, y = CiUp), linetype = 2, size = 0.5) + geom_line(aes(x = speed, y = CiLow), linetype = 2, size = 0.5) + geom_abline(slope = betas[2], intercept = betas[1], color = "blue", size=1) + geom_point(data = cars, aes(x = speed, y = dist)) + ylab("dist")
@@ -833,7 +870,7 @@ grid.arrange(Pl_gg, Pl_hand, ncol = 2)
 
 
 # Not The End
-![alt text](images/matrix2.jpg)
+![](images/matrix2.jpg)
 
 ##Что почитать
 * Legendre P., Legendre L. (2012) Numerical ecology. Second english edition. Elsevier, Amsterdam. Глава 2. Matrix algebra: a summary.
