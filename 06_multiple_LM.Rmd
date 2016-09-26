@@ -1,7 +1,7 @@
 ---
 title: "Множественная регрессия"
 subtitle    : "Линейные модели..."
-author: Вадим Хайтов, Марина Варфоломеева
+author: Марина Варфоломеева, Вадим Хайтов
 output:
   ioslides_presentation:
     widescreen: yes
