@@ -326,14 +326,24 @@ p1 <- sum(t_samp_1 > 2 | t_samp_1 < -2)/length(t_samp_1)
 ## Для строгой оценки этой вероятности оценивают долю площади под кривой, описывающей   распределение (кривая плотности вероятности).
   
 ```{r echo=FALSE, purl=FALSE}
-dt_limit1 <- function(x, t_kr=2, df=18) {
-y <- dt(x, df)
-y[x < -t_kr | x > t_kr] <- NA
-return(y)
+t_df <- data.frame(t = seq(-5, 5, length.out = 100))
+
+dt_limit <- function(x, alph = 0.05, df = df, sides = 2) {
+  if(sides == 1) alph <- alph
+  if(sides == 2) alph <- alph/2
+  t_cr <- abs(qt(alph, df))
+  y <- dt(x, df)
+  y[!(x < -t_cr | x > t_cr)] <- NA
+  return(y)
 }
 
-pl_t <- ggplot(data.frame(x=c(-6, 6)), aes(x=x))
-pl_t + stat_function(fun=dt, args=list(df=18), geom="area", fill="steelblue", alpha=1) + stat_function(fun=dt_limit1, args=list(df=18), geom="area", fill="lightgray", alpha=1)+ stat_function(fun=dt, args=list(df=18), size=1.1) + geom_text(aes(x=c(-2, 2), y=-0.01), label=c("-2","2")) + xlab("t-values") + ylab("Probability")
+gg_t <- ggplot(data = t_df, aes(x = t)) +
+  stat_function(fun=dt, args=list(df=18), size = 1, geom="line", colour="steelblue") + 
+    labs(x = "Стандартизованная разница средних", 
+       y = "Вероятность", 
+       title = "t-распределение, df = 18")
+
+gg_t
 ```
 
 Для заданной границы $t>2$ ($t<-2$) это будет отношение закрашенной площади под кривой к общей площади   
@@ -341,14 +351,13 @@ pl_t + stat_function(fun=dt, args=list(df=18), geom="area", fill="steelblue", al
 ## Но можно поставить вопрос иначе | Где находится значение t, которое отделяет 95% площади под кривой?
 
 ```{r gg-t, echo=FALSE, purl=FALSE}
-dt_limit1 <- function(x, t_kr=1.96, df=18) {
-y <- dt(x, df)
-y[x < -t_kr | x > t_kr] <- NA
-return(y)
-}
-
-gg_t <- ggplot(data.frame(x=c(-6, 6)), aes(x=x))
-gg_t + stat_function(fun=dt, args=list(df=18), geom="area", fill="steelblue", alpha=1) + stat_function(fun=dt_limit1, args=list(df=18), geom="area", fill="lightgray", alpha=1)+ stat_function(fun=dt, args=list(df=18), size=1.1) + geom_text(x=-4, y=0.1, label="Values, \nout of 95%") + geom_text(x=4, y=0.1, label="Values, \nout of 95%") + geom_text(x=0, y=0.1, label="Values \n inside of 95% ") + geom_point(aes(x=c(-1.96, 1.96), y=0), size=4) + xlab("t-values") + ylab("Probability")
+gg_t + 
+  stat_function(fun=dt_limit1, args=list(alph = 0.025, df=18), geom="area", fill="red", alpha = 0.5) + 
+  stat_function(fun=dt, args=list(df=18), geom="line", colour="steelblue") + 
+  geom_text(x=-4, y=0.1, label= "Редкие значения") + 
+  geom_text(x=4, y=0.1, label= "Редкие значения") + 
+  geom_text(x=0, y=0.1, label= "Обычные значения") + 
+  labs(title = "t-распределение, df = 18, alpha = 0.05")
 ```
 
 Значения t, которые входят в область 95% - с высокой вероятностью (95%) можно получить, если выборки из одной генеральной совокупности. 
@@ -362,7 +371,7 @@ gg_t + stat_function(fun=dt, args=list(df=18), geom="area", fill="steelblue", al
 
 Иными словами, если $t > t _{crit}$, то вероятность получить такую стандартизированную разницу средних двух выборок из одной совокупности очень низка ($p < 0.05$). 
 
-> - Теперь у на есть инструмент для проверки статистических гипотез - __статистический критерий__, или __статистический тест__
+> - Теперь у нас есть инструмент для проверки статистических гипотез - __статистический критерий__, или __статистический тест__
 
 # ЧАСТЬ 2. Тестирование статистических гипотез
 
