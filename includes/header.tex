@@ -4,21 +4,28 @@
 \defaultfontfeatures{Ligatures={TeX},Renderer=Basic,Scale=0.75}  %% свойства шрифтов по умолчанию
 \setmainfont[Ligatures={TeX,Historic}]{Times New Roman} %% задаёт основной шрифт документа
 \setsansfont[Ligatures={TeX,Historic}]{Verdana} %% задаёт шрифт без засечек
-\setmonofont{Courier New}
+\setmonofont[Scale=0.7]{DejaVu Sans Mono}
 
 \linespread{0.75}
 
 \definecolor{links}{HTML}{2A1B81}
 \hypersetup{colorlinks=true,linkcolor=,urlcolor=links,pdfview=FitH,pdfpagelayout=SinglePage, unicode=true,breaklinks=true}
 
+% links format
 \usepackage{hyperref}
 \usepackage[labelformat=empty]{caption}
 
+% decrease text margins
+\setbeamersize{text margin left = 8pt, text margin right = 16pt}
+
+\newcommand{\columnsbegin}{\begin{columns}}
+\newcommand{\columnsend}{\end{columns}}
+
 \usepackage{graphics}
 
-% subfigures
-\usepackage{subcaption}
-\usepackage{wrapfig}
+% % subfigures
+% \usepackage{subcaption}
+% \usepackage{wrapfig}
 
 %\addto{\captionsrussian}{\renewcommand*{\figurename}{рис.}}
 

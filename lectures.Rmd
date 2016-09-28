@@ -43,9 +43,8 @@ install.packages("reshape2")
 install.packages(c("gridExtra", "car", "ISwR"))
 ```
 
-
 - Презентация [pdf](05_model_validation.pdf)
-- [код R] 
+- [код R](05_code_model_validation.R)
 - Данные:
     - [IQ_brain.csv](data/IQ_brain.csv)
 
