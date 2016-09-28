@@ -19,6 +19,10 @@ install.packages("ggplot2")
 
 ## 3.Простая линейная регрессия 
 
+```{r eval=FALSE}
+install.packages("reshape2", "gridExtra")
+```
+
 - Презентация [html](03_LM.html) | [pdf](03_LM.pdf)
 - [код R](03_code_LM.R)
 - Данные:
@@ -26,9 +30,6 @@ install.packages("ggplot2")
 
 ## 4. Регрессия в матричном виде
 
-```{r eval=FALSE}
-install.packages("reshape2")
-```
 - Презентация [html](04_Introduction_to_matrix_algebra.html) | [pdf](04_Introduction_to_matrix_algebra.pdf)
 - [код R](04_code_Introduction_to_matrix_algebra.R)
 - Данные:
@@ -40,7 +41,7 @@ install.packages("reshape2")
 ## 5.Проверка условий применимости регрессионных моделей 
 
 ```{r eval=FALSE}
-install.packages(c("gridExtra", "car", "ISwR"))
+install.packages(c("gridExtra", "car", "ISwR", "gridExtra"))
 ```
 
 - Презентация [pdf](05_model_validation.pdf)
@@ -50,11 +51,10 @@ install.packages(c("gridExtra", "car", "ISwR"))
 
 ## 6.Множественная линейная регрессия 
 
-- Презентация [pdf]
-<!-- (06_multiple_LM.html) -->
-- [код R]
-<!-- (06_code_multiple_LM.R) -->
-- Данные
+- Презентация [pdf](06_multiple_LM.pdf)
+- [код R](06_code_multiple_LM.R)
+- Данные:
+    - [loyn.csv](data/loyn.csv)
 
 ## 7.Сравнение линейных моделей 
 
