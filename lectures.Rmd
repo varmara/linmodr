@@ -20,7 +20,7 @@ install.packages("ggplot2")
 ## 3.Простая линейная регрессия 
 
 ```{r eval=FALSE}
-install.packages("reshape2", "gridExtra")
+install.packages(c("reshape2", "gridExtra", "car"))
 ```
 
 - Презентация [html](03_LM.html) | [pdf](03_LM.pdf)
@@ -41,7 +41,7 @@ install.packages("reshape2", "gridExtra")
 ## 5.Проверка условий применимости регрессионных моделей 
 
 ```{r eval=FALSE}
-install.packages(c("gridExtra", "car", "ISwR", "gridExtra"))
+install.packages(c("downloader", "ISwR"))
 ```
 
 - Презентация [pdf](05_model_validation.pdf)
