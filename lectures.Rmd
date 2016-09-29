@@ -56,6 +56,9 @@ install.packages(c("downloader", "ISwR"))
 - Данные:
     - [loyn.csv](data/loyn.csv)
 
+- [Домашнее задание №3 --- Линейная регрессия, часть 2](hw/hw3_lin-regr-crabs-assump.zip) 
+- [Примеры вопросов следующего теста](test_handouts/04-multregr-handout-test1.pdf)
+
 ## 7.Сравнение линейных моделей 
 
 - Презентация [html](07_model_selection.html) | [pdf]
