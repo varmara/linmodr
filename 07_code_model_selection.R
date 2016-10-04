@@ -1,117 +1,176 @@
-# title: Сравнение линейных моделей
-# subtitle: Линейные модели, дисперсионный и регрессионный анализ с использованием R, осень 2015
-# author: Марина Варфоломеева, Вадим Хайтов
 
-## Пример: птицы в лесах Австралии
-# От каких характеристик лесного участка зависит обилие птиц в лесах юго-западной Виктории, Австралия (Loyn, 1987)
-# Переменных много, мы хотим из них выбрать __оптимальный небольшой__ набор.
+# title: "Сравнение линейных моделей"
+# subtitle    : "Линейные модели..."
+# author: Вадим Хайтов, Марина Варфоломеева
 
-## Вспомним, что мы знаем про эту модель с прошлого раза
-birds <- read.csv("loyn.csv")
+# install.packages("caret")
+
+## Читаем данные
+birds <- read.csv("data/loyn.csv")
+
 M <- lm(ABUND ~ ., data = birds)
+
 library(car)
+
 vif(M) # есть колинеарные предикторы
 # GRAZE - избыточный предиктор, удаляем
+
 M1 <- update(M, .~. - GRAZE)
+
 vif(M1)
 
 summary(M1)
 
-## Частный F-критерий, 1 способ: `anova(модель_1, модель_2)`
-# Вручную выполняем все действия
+## Сравниваем две вложенные модели
+
 M2 <- update(M1, . ~ . - AREA)
 anova(M1, M2)
 
+## Более простой способ
 
-
-
-
-
-
-
-
-##  Частный F-критерий, 2 способ: `drop1()`
 drop1(M1, test = "F")
+# Нужно убрать AREA
+# Убрали AREA
+M2 <- update(M1, . ~ . - AREA)
+drop1(M2, test = "F")
+# Нужно убрать LDIST
+
+# Убрали LDIST
+M3 <- update(M2, . ~ . - LDIST)
+drop1(M3, test = "F")
+# Больше ничего убрать не получается
+
+summary(M3)
 
 
+## Подбираем параметры модели методом максимального правдоподобия
+
+# Создаем симулированные данные
+xy <- data.frame(X = rep(1:10, 3))
+xy$Y <- 10*xy$X + rnorm(30, 0, 10)
+
+# Подбираем модель
+Mod <- lm(Y ~ X, data = xy)
+Mod_glm <- glm(Y ~ X, data = xy)
+
+coefficients(Mod)
+
+##
+coefficients(Mod_glm)
+
+## Значение logLik
+logLik(Mod_glm)
 
 
+# Вычисляем руками значение функции максимального правдоподобия для побобранной модели
+##
+xy$predicted <- predict(Mod) # Предсказанные моделью значения
+
+SD <- summary(Mod)$sigma # Оценка дисперсии
+
+xy$Prob <- dnorm(xy$Y, mean = xy$predicted, sd = SD) # Вероятности для каждой точки
+
+xy$LogProb <- log(xy$Prob) # Логарифм вероятностей
+
+sum(xy$LogProb) # Логарифм произведения, равный сумме логарифмов
 
 
-
-
-
-
-
-
-# Тесты отношения правдоподобий
-# Переподберем нашу полную модель при помощи метода максимального правдоподобия
+## Подбираем параметры модели методом максимальноо правдоподобия
 GLM1 <- glm(ABUND ~ . - GRAZE, data = birds)
 
-# Тест отношения правдоподобий можно сделать с помощью тех же функций, что и частный F-критерий:
-# - по-одному `anova(mod1, mod2, test = "Chisq")`
-# - все сразу `drop1(mod1, test = "Chisq")`
 
-### Задание: Подберите оптимальную модель при помощи тестов отношения правдоподобий
+drop1(GLM1, test = "Chisq")
+# Нужно убрать AREA
 
+# Убираем AREA
+GLM2 <- update(GLM1, . ~ . - AREA)
+drop1(GLM2, test = "Chisq")
+# Нужно убрать LDIST
 
+# Убираем LDIST
+GLM3 <- update(GLM2, . ~ . - LDIST)
+drop1(GLM3, test = "Chisq")
+# Больше ничего убрать не получается
 
+summary(GLM3)
 
+## AIC для моделей
+AIC(GLM1, GLM2, GLM3, k=2)
+# По AIC лучшая модель GLM3
 
-
-
-
-
-
-# Информационные критерии
-### Рассчитаем AIC для наших моделей
-
-AIC(GLM1, GLM2, GLM3)
-
-
-
-# Сравнение предсказательной силы моделей
-## Кросс-валидация
+#Кросс-валидация
 
 library(caret)
-set.seed(233)
-# Кросс-валидация, 5-кратная в д.сл.
+
+SEED <- 233
+
+set.seed(SEED)
+
+# Кросс-валидация, 5-кратная
 train_control <- trainControl(method = "cv", number = 5)
 
 f1 <- ABUND ~ AREA + YRISOL + DIST + LDIST + ALT
+
 MCV1 <- train(f1, data = birds, trControl = train_control, method = "lm")
 
 MCV1$resample # результаты на разных фолдах
+
 MCV1$results # итоговая статистика
 
-
-## Задание:
-# Рассчитайте при помощи кросс-валидации $RMSE$ для моделей
+## Меняем структуру модели
 f2 <- ABUND ~ YRISOL + DIST + LDIST + ALT
+
 f3 <- ABUND ~ YRISOL + DIST + ALT
 
-## Решение
+set.seed(SEED)
 
+MCV2 <- train(f2, data = birds, trControl = train_control, method = "lm")
 
+f3 <- ABUND ~ YRISOL + DIST + ALT
 
+set.seed(SEED)
 
+MCV3 <- train(f3, data = birds, trControl = train_control, method = "lm")
 
-
+# Сравниваем три модели
+c(
+MCV1$results$RMSE,
+MCV2$results$RMSE,
+MCV3$results$RMSE
+)
+# самая лучшая модель та, у котоой RMSE минимальна
 
 
 
 # Бутстреп
-## Можем повторить всю процедуру оценки качества модели другим методом - бутстрепом
-train_control <- trainControl(method = "boot", number = 100)
+train_control <- trainControl(method = "boot")
+
+f1 <- ABUND ~ AREA + YRISOL + DIST + LDIST + ALT
+
+MCV1 <- train(f1, data = birds, trControl = train_control, method = "lm")
 
 
+MCV1$results # итоговая статистика
 
+## Меняем структуру модели
+f2 <- ABUND ~ YRISOL + DIST + LDIST + ALT
 
+f3 <- ABUND ~ YRISOL + DIST + ALT
 
+set.seed(SEED)
 
+MCV2 <- train(f2, data = birds, trControl = train_control, method = "lm")
 
+f3 <- ABUND ~ YRISOL + DIST + ALT
 
+set.seed(SEED)
 
+MCV3 <- train(f3, data = birds, trControl = train_control, method = "lm")
 
-
-
+# Сравниваем три модели
+c(
+  MCV1$results$RMSE,
+  MCV2$results$RMSE,
+  MCV3$results$RMSE
+)
+# самая лучшая модель та, у котоой RMSE минимальна
