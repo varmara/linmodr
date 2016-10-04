@@ -8,16 +8,8 @@
 matrix(1:12, ncol = 3)
 
 # Единичная матрица
-diag(1:10)
+diag(rep(1,5))
 
-
-A <- matrix(1:12, ncol=3)
-
-t(A)
-
-A + t(A)
-
-A + 10
 
 # Создаем искусственный датасет для демонстрации сложения матриц
 Large <- data.frame(Sp1 = round(rnorm(5, 10, 2)), Sp2 = round(rnorm(5, 10, 3)), Sp3 = round(rnorm(5, 10, 2)))
@@ -34,13 +26,6 @@ Small
 
 Large + Small
 
-B <- A * 10
-
-A * B
-
-A * 1:3
-
-
 
 ##Скалярное произведеине
 
@@ -52,17 +37,13 @@ Small * Processed_Factor
 #Матричное произведение двух вектров
 N <- c(20, 40, 32, 45, 80, 50, 10)
 Fert <- c( 0,  0,   1,   2,   2,   0,   0)
-Fert * t(N)
 
-(N) %*% (Fert)
+t(N) %*% (Fert)
 
 #Матричные произведения
 
-C <- matrix(1:20, ncol = 4) 
 
-A %*% C
 
-C %*% A
 
 ## Демографическая модель с использованием матриц Лесли
 
@@ -110,30 +91,8 @@ cor_matrix <- t(br_scaled) %*% br_scaled / (nrow(br_scaled) - 1)
 
 cor_matrix
 
-cor(br)
-
-A %*% t(A)
-
-det(t(A) %*% A)
-
-
-
-t(C %*% A)
-
-t(C) %*% t(A)
-
-
-
 # Решение систем линейных уравнений с помощью матричной алгебры
-D <- matrix(c(1:8, 10), ncol=3, byrow = T)
 
-det(D)
-
-round(solve(D) %*% D)
-
-S <- c(2, 4, 10)
-
-solve(D) %*% S 
 
 
 
@@ -148,7 +107,7 @@ coefficients(Mod)
 
 library(ggplot2)
 theme_set(theme_bw())
-ggplot(cars, aes(x = speed, y = dist)) + geom_point() + geom_smooth(method = "lm", fill = "red")
+ggplot(cars, aes(x = speed, y = dist)) + geom_point() + geom_smooth(method = "lm")
 
 
 ##Строим линию регрессии вручную
@@ -160,10 +119,6 @@ betas
 
 
 predict_values <- X %*% betas
-
-fitted(Mod)
-resid(Mod)
-vcov(Mod)
 
 resid_values <- cars$dist - predict_values
 
@@ -187,9 +142,6 @@ MyData$se <- sqrt(diag(X %*% covbetas %*% t(X)))
 MyData$CiUp  <- MyData$predicted + 1.96 *MyData$se
 
 MyData$CiLow  <- MyData$predicted - 1.96 *MyData$se
-
-
-
 
 ggplot(MyData, aes(x = speed, y = predicted)) +
   geom_line(aes(x = speed, y = CiUp),
