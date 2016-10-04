@@ -14,7 +14,7 @@ output:
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, cache = TRUE)
 ```
 
 ```{r libs-funs, echo=FALSE}
@@ -50,191 +50,230 @@ lm_equation <- function(fit, strict = TRUE, rnd = 2){
 + Написать на языке R код, необходимый для подгонки линейной модели, включающей дискретные и непрерывные предикторы, а так же их взаимодействие
 + Дать трактовку коэффициентам такой линейной модели
 
-## Пример: Клевер и тысячелистник
 
-Тысячелистник _Achillea millefolium_ часто растет как сорняк на полях вместе с клевером _Trifolium repens_. Зависит ли урожай клевера от плотности тысячелистника?
 
-```{r}
-clover <- read.delim("data/clover.csv")
-names(clover)
-# Для удобства переименуем переменные
-names(clover) <- c("Plot", "Clover", "Yarrow")
-```
 
-- Plot - участок (A, B, C)
-- Clover - количество семян клевера (г/кв.м)
-- Yarrow - плотность тысячелистника (число цветущих стеблей на кв.м)
+## Пример: птицы в лесах Австралии
 
-<div class=.footnote>из кн. Saville, Wood, 1991</div>
+<div class="columns-2">
 
-## Посмотрим внимательно на данные
+![forest in Victoria, Australia](images/vict_m.jpg)
+<small>Mystic Forest - Warburton, Victoria by ¡kuba! on flickr</small>
 
-```{r}
-nrow(clover)
-# есть ли пропущенные значения?
-any(is.na(clover))
-# как закодирована переменная Plot?
-class(clover$Plot) # это фактор
-levels(clover$Plot) # уровни этого фактора
-# # Если вы открывали xlsx файл при помощи read_excel, 
-# # то фактор вам придется сделать самостоятельно
-# clover$Plot <- factor(clover$Plot)
-```
 
-## Сколько площадок собрали с каждого из участков?
+<small>
 
-```{r}
-table(clover$Plot)
-```
+56 лесных участков:
 
-## Построим график зависимости урожайности клевера от плотности тысячелистника
+- ABUND - обилие птиц
+- AREA - площадь участка
+- YRISOL - год изоляции участка
+- DIST - расстояние до ближайшего леса
+- LDIST - расстояние до ближайшего большого леса
+- GRAZE - пастбищная нагрузка (1-5)
+- ALT - высота над уровнем моря
+
+</small>
+
+Эти данные мы уже анализировали, но предположим, что в фокусе нашего исследования зависимость обилия птиц (ABUND) от пастбищной нагрузки (GRAZE) и других ковариат. 
+
+</div>
+
+## Дискретный фактор
+Переменная `GRAZE` по своей природе дискретна: балльная оценка с небольшим числом уровней
 
 ```{r}
-library(ggplot2)
-theme_set(theme_bw(base_size = 14)+ theme(legend.key = element_blank()))
-gg_cl <- ggplot(data = clover, aes(y = Clover, x = Yarrow)) + 
-  geom_point() +
-  labs(x = "Плотность тысячелистника, цветоносов/кв.м",
-       y = "Урожайность клевера, г/кв.м")
-gg_cl + geom_smooth(method = "lm")
+BD <- read.csv("data/loyn.csv")
+BD$fGRAZE <- factor(BD$GRAZE)
 ```
 
-## Не зная про несколько участков, мы бы просто подобрали обычную линейную регрессию
+##Сбалансированная ли выборка по значениям дискретного фактора
 
 ```{r}
-M1 <- lm(Clover ~ Yarrow, data = clover)
-summary(M1)
+table(BD$fGRAZE)
 ```
+Все более или менее ОК
 
-## Запишем уравнение этой линейной регрессии
+
+
+## Есть ли наблюдения-выбросы? 
+Строим dot-plot
 
 ```{r}
-coef(M1) #Коэффициенты модели
+# "пустой график"
+dot <- ggplot(data = BD, aes(y = 1:nrow(BD))) + geom_point()
+
 ```
 
-Уравнение:
-
-```{r, echo=FALSE, results='asis'}
-lm_equation(M1, strict = FALSE)
-```
-
-Трактовка коэффциентов:
-
-- $b_0 =$ `r coef(M1)[1]` - интерсепт. Это урожайность клевера, если нет тысячелистника
-- $b_1 =$ `r coef(M1)[2]` - угол наклона. Он показывает на столько уменьшается урожайность клевера при увеличении плотности тысячелистника на 1 цветонос на кв.м
-
-## Но мы знаем, что было несколько участков
-
-Хорошо бы проверить, различается ли между участками зависимость урожайности клевера от плотности тысячелистника.
+## Есть ли наблюдения-выбросы? 
+Строим dot-plot
 
 ```{r}
-gg_cl + aes(colour = Plot) + labs(colour = "Участок")
+dot1 <- dot + aes(x = ABUND)
+dot2 <- dot + aes(x = AREA)
+dot3 <- dot + aes(x = YRISOL)
+dot4 <- dot + aes(x = DIST)
+dot5 <- dot + aes(x = LDIST)
+dot6 <- dot + aes(x = ALT)
 ```
 
-## Дискретные предикторы тоже можно включать в линейные модели.
+## Есть ли наблюдения-выбросы? 
+Строим dot-plot
+```{r, fig.height=5}
+grid.arrange(dot1, dot2, dot3, dot4, dot5, dot6, ncol = 3)
+```
 
-Кодируем дискретный предиктор (фактор) при помощи числовых переменных-болванок (dummy variables) и можем пользоваться регрессией
+## Преобразование предикторов
+Ситуацию с отскакивающими точками можно исправить   
+```{r}
+BD$LOGAREA  <- log10(BD$AREA)
+BD$LOGDIST  <- log10(BD$DIST)
+BD$LOGLDIST <- log10(BD$LDIST)
+
+```
+
+
+
+
+## Проверяем на мультиколлинеарность
+
+<small>
+
+```{r}
+library(car)
+M0 <- lm(ABUND ~ LOGAREA + LOGDIST + LOGLDIST + YRISOL + ALT + fGRAZE, data = BD)
+
+vif(M0)
+```
+</small>
+
+## Проверяем на мультиколлинеарность
+Поскольку `fGRAZE` - интересующий нас предиктор, то удалим из модели `YRISOL`
+```{r}
+M0.1 <- lm(ABUND ~ LOGAREA + LOGDIST + LOGLDIST + ALT + fGRAZE, data = BD)
+vif(M0.1)
+```
+## Проверяем на мультиколлинеарность
+```{r}
+M0.2 <- lm(ABUND ~   LOGAREA + LOGDIST +  ALT + fGRAZE, data = BD)
+vif(M0.2)
+```
+
+
+##Упрощаем модель
+```{r}
+M1 <- lm(ABUND ~   LOGAREA + LOGDIST +  ALT + fGRAZE, data = BD)
+drop1(M1, test = "F")
+```
+
+##Упрощаем модель
+```{r}
+M2 <- update(M1, ~.- ALT)
+drop1(M2, test = "F")
+```
+
+
+
+##Упрощаем модель
+```{r}
+M3 <- update(M2, ~.- LOGDIST)
+drop1(M3, test = "F")
+```
+
+Больше ничего выбросить нельзя!
+
+##Смотрим на результаты 
+
+<small>
+```{r}
+summary(M3)
+```
+
+</small>
+
+## Природа коэффициентов в линейной модели с дискретными предикторами
+
+Запишем уравнение, описывающее связь обилия птиц с предикторами
+<small>
+```{r, echo=FALSE}
+lm_equation(M3, strict = FALSE)
+```
+
+</small>
+
+## Природа коэффициентов в линейной модели с дискретными предикторами
+
+При включении в модель дискретных предикторов их уровни кодируются при помощи числовых переменных-болванок (dummy variables) 
 
 Переменных болванок нужно на одну меньше, чем число уровней фактора
 
 Для каждого из объектов каждая из болванок принимает значение 1 для своего уровня фактора
 
-## Пробуем вручную создавать переменные-болванки
-
-R может все сделать автоматически, но давайте попробуем вручную создать переменные-болванки и сравнить результаты с автоматическим способом.
-
-В примере с клевером понадобится 2 переменных болванки
+## Природа коэффициентов в линейной модели с дискретными предикторами
 
 ```{r}
-clover$Plot_B <- as.numeric(clover$Plot == "B")
-clover$Plot_C <- as.numeric(clover$Plot == "C")
+X <- model.matrix(M3)
+head(X, 10)
 ```
+`fGRAZE1` отсутствует, он взят за базовый уровень 
 
-Почему нам не нужна отдельная переменная-болванка для участка A?
 
-## Почему нам не нужна отдельная переменная-болванка для участка A? {.smaller}
+##Задание: 
+Найдите коэффициенты линейной модели с использованием матричной алгебры
 
-Потому что, если площадка с участка А, то `Plot_B` и `Plot_C` будут равны 0
-```{r dummies, eval=FALSE}
-clover[, c("Plot", "Plot_B", "Plot_C")]
-```
+## Решение
 
-<div class="columns-2">
-```{r dummies, echo=FALSE}
-```
-</div>
+$$
+\pmb{\beta} = [\textbf{X}'\textbf{X}]^{-1}[\textbf{X}'\textbf{y}]
+$$
 
-## Подбираем параметры линейной модели
 
 ```{r}
-M2_dummy <- lm(Clover ~ Yarrow + Plot_B + Plot_C, data = clover)
+betas <- solve(t(X)%*% X) %*% (t(X) %*% BD$ABUND)
+betas
 ```
 
-### На самом деле, мы можем сразу подобрать нужную модель с дискретным предиктором. В ручном создании болванок нет необходимости.
 
-```{r}
-M2 <- lm(Clover ~ Yarrow + Plot, data = clover)
-```
 
-Значения коэффициентов получатся одинаковые
+##Трактовка коэффциентов:
 
-```{r}
-coef(M2)
-coef(M2_dummy)
-```
-
-## Смотрим на результаты линейной модели {.smaller}
-
-### Внимание! Эта модель описывает три __параллельные линии__ для каждого из уровней фактора Участок, поскольку не включает взаимодействие факторов
-
-```{r}
-summary(M2)
-```
-
-## Попробуем записать уравнение модели, где появился дискретный предиктор {.smaller}
-
-```{r}
-coef(M2)
-```
-
-Уравнение:
-
-```{r, echo=FALSE, results='asis'}
-lm_equation(M2, strict = FALSE)
-```
-
-Трактовка коэффциентов:
-
-- $b_0 =$ `r round(coef(M2)[1], 2)` - интерцепт, урожайность клевера __на базовом уровне (на участке A)__, если нет тысячелистника
+- $b_0 =$ `r round(coef(M3)[1], 2)` - интерцепт, обилие птиц __на базовом уровне (при `fGRAZE` = 1)__, если `LOGAREA` = 0.
 
 Общий угол наклона:
 
-- $b_1 =$ `r round(coef(M2)[2], 2)` - на столько уменьшается урожайность клевера на любом участке при увеличении плотности тысячелистника на 1 цветонос на кв.м
+- $b_1 =$ `r round(coef(M3)[2], 2)` - на столько особей увеличится численность птиц при любом уровне выпаса при увеличении логарифма площади на единицу
 
-Поправки для интерцепта:
+Для остальных уровней выпаса:
 
-- $b_2 =$ `r round(coef(M2)[3], 2)` - отличие урожайности клевера __на участке B от участка A__
-- $b_3 =$ `r round(coef(M2)[4], 2)` - отличие урожайности клевера __на участке C от участка A__
+- $b_2 =$ `r round(coef(M3)[3], 2)` - отличие обилия птиц при `fGRAZE` = 2 от обилия птиц при `fGRAZE` = 1
+- $b_3 =$ `r round(coef(M3)[4], 2)` - отличие обилия птиц при `fGRAZE` = 3 от обилия птиц при `fGRAZE` = 1
 
-## Давайте запишем отдельные уравнения для каждого типа участков
+и т.д.
 
-Общее уравнение модели с параллельными линиями:
+## Задание. 
+Запишите уравнение, описывающее связь между обилием птиц и `LOGAREA`  для каждого уровня выпаса
+
+##Решение
+
+<small>
+
+Общее уравнение модели с параллельными линиями:   
 
 ```{r, echo=FALSE, results='asis'}
-lm_equation(M2, strict = FALSE, rnd = 3)
+lm_equation(M3, strict = FALSE, rnd = 3)
 ```
 
-Для участка A:
+Для `fGRAZE` = 1:   
+ABUND = 15.72 + 7.25LOGAREA 
 
-Clover = 57.58 - 0.11 Yarrow
+Для `fGRAZE` = 2:   
+ABUND = 15.72 + 7.25LOGAREA + 0.38 = (15.72 + 0.38) + 7.25LOGAREA  
 
-Для участка B:
+Для `fGRAZE` = 3:   
+ABUND = 15.72 + 7.25LOGAREA - 0.19 = (15.72 - 0.19) + 7.25LOGAREA
 
-Clover = (57.58 + 0.32) - 0.11 Yarrow = 57.9 - 0.11 Yarrow
-
-Для участка C:
-
-Clover = (57.58 - 0.54) - 0.11 Yarrow = 57.04 - 0.11 Yarrow
+</small>
+и т.д.
 
 ## Базовый уровень
 
@@ -242,334 +281,293 @@ Clover = (57.58 - 0.54) - 0.11 Yarrow = 57.04 - 0.11 Yarrow
 
 Интерцепт в уравнении регрессии описывает среднее значение предиктора на базовом уровне.
 
-В R базовым уровнем считается первый уровень фактора
+В `R` базовым уровнем считается первый уровень фактора (обычно первый по алфавиту)
 
 ```{r}
-levels(clover$Plot)
+  levels(BD$fGRAZE)
 ```
 
-В данном случае это уровень "A"
+В данном случае это уровень "1"
 
 ## Что произойдет с моделью, если мы изменим базовый уровень? {.smaller}
 
 ```{r}
-clover$Plot <- relevel(clover$Plot, ref = "C")
-levels(clover$Plot) # Теперь первым идет "C"
+BD$fGRAZE <- relevel(BD$fGRAZE, ref = "5")
+levels(BD$fGRAZE) # Теперь первым идет "5"
 ```
 ```{r}
-M2_C <- lm(Clover ~ Yarrow + Plot, data = clover)
-summary(M2_C)
+M3_ref_5 <- lm(formula = formula(M3), data = BD)
+summary(M3_ref_5)
 ```
 
-## Изменился ли смысл модели от смены уровней? Нет! {.smaller}
+## Изменился ли смысл модели от смены уровней? 
 
-<div class="columns-2">
-```{r, }
-coef(M2)
-```
-
-```{r, echo=FALSE,results='asis'}
-lm_equation(M2, strict = FALSE, rnd = 3)
-```
-
-Трактовка коэффциентов:  
-- $b_0 =$ `r round(coef(M2)[1], 2)` - интерцепт, урожайность клевера __на базовом уровне (на участке A)__, если нет тысячелистника
-
-Общий угол наклона:  
-- $b_1 =$ `r round(coef(M2)[2], 2)` - на столько уменьшается урожайность клевера на любом участке при увеличении плотности тысячелистника на 1 цветонос на кв.м
-
-Поправки для интерцепта:  
-- $b_2 =$ `r round(coef(M2)[3], 2)` - отличие урожайности клевера __на участке B от участка A__
-- $b_3 =$ `r round(coef(M2)[4], 2)` - отличие урожайности клевера __на участке C от участка A__
-
-```{r}
-coef(M2_C)
-```
-
-```{r, echo=FALSE,results='asis'}
-lm_equation(M2_C, strict = FALSE, rnd = 3)
-```
-
-Трактовка коэффциентов:  
-- $b_0 =$ `r round(coef(M2_C)[1], 2)` - интерцепт, урожайность клевера __на базовом уровне (на участке С)__, если нет тысячелистника
-
-Общий угол наклона:  
-- $b_1 =$ `r round(coef(M2_C)[2], 2)` - на столько уменьшается урожайность клевера на любом участке при увеличении плотности тысячелистника на 1 цветонос на кв.м
-
-Поправки для интерцепта:  
-- $b_2 =$ `r round(coef(M2_C)[3], 2)` - отличие урожайности клевера __на участке A от участка C__
-- $b_3 =$ `r round(coef(M2_C)[4], 2)` - отличие урожайности клевера __на участке B от участка C__
-
-</div>
-
-## Изменился ли смысл модели от смены уровней? {.smaller}
-
-### Даже уравнения для каждой из прямых остались прежними в пределах ошибки округления
-
-<div class="columns-2">
-
-Общее уравнение модели с параллельными линиями:
+<small>
 
 ```{r, echo=FALSE, results='asis'}
-lm_equation(M2, strict = FALSE, rnd = 3)
+lm_equation(M3_ref_5, strict = FALSE, rnd = 3)
 ```
 
-Для участка A:
+Для `fGRAZE` = 1:
 
-Clover = 57.58 - 0.11 Yarrow</br></br>
+было: ABUND = 15.72 + 7.25LOGAREA 
 
-Для участка B:
+стало: ABUND = 3.8 + 7.2LOGAREA + 11.9 = 15.7 + 7.2LOGAREA
 
-Clover = (57.58 + 0.32) - 0.11 Yarrow =  
-= 57.9 - 0.11 Yarrow
 
-Для участка C:
+Для `fGRAZE` = 2:
 
-Clover = (57.58 - 0.54) - 0.11 Yarrow =  
-= 57.04 - 0.11 Yarrow
+было: ABUND = 16.1 + 7.25LOGAREA
 
-Общее уравнение модели с параллельными линиями:
+стало: ABUND = 3.8 + 7.2LOGAREA + 12.3 = 16.1 + 7.2LOGAREA 
 
-```{r, echo=FALSE, results='asis'}
-lm_equation(M2_C, strict = FALSE, rnd = 3)
-```
+и т.д.
 
-Для участка A:
+</small>
 
-Clover = (57.03 + 0.54) - 0.11 Yarrow =  
-= 57.57 - 0.11 Yarrow
 
-Для участка B:
+### Модели остались неизменными!
 
-Clover = (57.03 + 0.86) - 0.11 Yarrow =  
-= 57.89 - 0.11 Yarrow
-
-Для участка C:
-
-Clover = 57.03 - 0.11 Yarrow
-
-</div>
-
-## График модели с одинаковыми углами наклона {.smaller}
+## Строим график модели с одинаковыми углами наклона 
 
 Нужны исходные данные с предсказанными значениями и стандартными ошибками. При этом хорошо бы, чтобы диапазоны предикторов для каждого из уровней дискретной переменной соответствовали реальным значениям.
 
-Решение средствами пакета `plyr`:
-```{r, tidy=FALSE}
-library(plyr)
-# делим датафрейм на части по переменной Plot
-# по каждой из частей считаем при помощи summarise
-# последовательность от мин. до макс. значения Yarrow
-my_df <- plyr::ddply(clover, .(Plot),
-    summarise,
-    Yarrow = seq(min(Yarrow),  max(Yarrow), length = 10))
-# Считаем предсказанные значения и стандартные ошибки
-M2_pred <- predict(M2, newdata = my_df, se.fit = TRUE)
-# Добавляем их в датафрейм
-my_df$Clover <- M2_pred$fit
-my_df$SE <- M2_pred$se.fit
+## Строим график модели с одинаковыми углами наклона 
+
+Решение привычными методами:
+
+```{r}
+my_df <- expand.grid(
+  fGRAZE = unique(BD$fGRAZE), 
+  LOGAREA = seq(min(BD$LOGAREA), max(BD$LOGAREA), 0.1 )
+  )
+my_df$Predicted <- predict(M3, newdata = my_df)
+my_df$SE <- predict(M3, newdata = my_df, se.fit = TRUE)$se.fit
+
 ```
 
-## Самостоятельно попробуйте разобрать, как сделать тот же самый исходный датафрейм в пакете dplyr
+## Строим график модели с одинаковыми углами наклона 
+
+
+Решение средствами пакета `dplyr`:
 
 ```{r, eval=FALSE, tidy=FALSE}
-# Выгружаем plyr, потому что dplyr конфликтует с plyr
-detach("package:plyr", unload=TRUE)
 library(dplyr)
-# Разбиваем clover на группы по переменной Plot 
-# и считаем минимум и максимум Yarrow
-minmax <- clover %>% group_by(Plot) %>%
-  summarise(mYarrow = min(Yarrow),
-  MYarrow = max(Yarrow))
-# Pазбиваем minmax по переменной Plot создаем датафрейм, 
-# где Yarrow - это последовательность от минимума до максимума для данного Plot,
+
+# Конвейерный принцип обработки данных 
+
+minmax <- BD %>% group_by(fGRAZE) %>% #Передаем датафрейм функции group_by()
+  summarise(minAREA = min(LOGAREA),
+  maxAREA = max(LOGAREA)) #Передаем функции summarise()
+
+# Pазбиваем minmax по переменной GRAZE создаем датафрейм, 
+# где LOGAREA - это последовательность от минимума до максимума для данного fGRAZE,
 # снимаем группировку,
 # добавляем предсказанные значения и стандартные ошибки
-my_df <- minmax %>% group_by(Plot) %>% 
-  do(data.frame(Yarrow = seq(.$mYarrow, .$MYarrow, length = 10))) %>% 
+
+my_df2 <- minmax %>% group_by(fGRAZE) %>% 
+  do(data.frame(LOGAREA = seq(.$minAREA, .$maxAREA, length = 10))) %>% 
   ungroup %>% 
-  mutate(Clover = predict(M2, newdata = .),
-    SE = predict(M2, newdata = ., se.fit = TRUE)$'se.fit')
+  mutate(Predicted = predict(M3, newdata = .),
+    SE = predict(M3, newdata = ., se.fit = TRUE)$'se.fit')
 ```
 
 ## Строим график с параллельными прямыми
 
-```{r, tidy=FALSE, fig.height=3}
-gg_cl_parallel <- ggplot(data = my_df, aes(y = Clover, x = Yarrow, colour = Plot, fill = Plot)) + 
+### Оба метода дали идентичные графики
+
+Но вторым методом получилось более строго
+```{r, tidy=FALSE, fig.height=5, echo=FALSE}
+gg_parallel1 <- ggplot(data = my_df, aes(y = Predicted, x = LOGAREA, colour = fGRAZE, fill = fGRAZE)) +  
   geom_line() + 
-  geom_ribbon(aes(ymax = Clover + 1.98 * SE, 
-                  ymin = Clover - 1.98 * SE),
+  geom_ribbon(aes(ymax = Predicted + 1.98 * SE, 
+                  ymin = Predicted - 1.98 * SE),
               alpha = 0.3, colour = NA) +
-    geom_point(data = clover) +
-  labs(colour = "Участок", fill = "Участок", 
-       x = "Плотность тысячелистника, цветоносов/кв.м",
-       y = "Урожайность клевера, г/кв.м")
-gg_cl_parallel
+    geom_point(data = BD, aes(x = LOGAREA, y = ABUND)) +
+  labs(colour = "Уровень выпаса", fill = "Уровень выпаса", 
+       x = "Логарифм площади",
+       y = "Обилие птиц") + ggtitle("Наша модель") + 
+  theme(text = element_text(size = 10) )
+
+
+gg_parallel2 <- ggplot(data = my_df2, aes(y = Predicted, x = LOGAREA, colour = fGRAZE, fill = fGRAZE)) +  
+  geom_line() + 
+  geom_ribbon(aes(ymax = Predicted + 1.98 * SE, 
+                  ymin = Predicted - 1.98 * SE),
+              alpha = 0.3, colour = NA) +
+    geom_point(data = BD, aes(x = LOGAREA, y = ABUND)) +
+  labs(colour = "Уровень выпаса", fill = "Уровень выпаса", 
+       x = "Логарифм площади",
+       y = "Обилие птиц") + ggtitle("Наша модель") + 
+  theme(text = element_text(size = 10) )
+
+
+gg_initial <- ggplot(data = BD, aes(x = LOGAREA, y = ABUND, color = fGRAZE)) + geom_point() + geom_smooth(method = "lm") + ggtitle("По сырым данным")  + 
+  theme(text = element_text(size = 10) )
+
+
+grid.arrange(gg_parallel1, gg_parallel2, ncol = 2)
 ```
 
-## Добавим отдельные панели
 
-```{r}
-gg_cl_parallel + facet_wrap(~ Plot)
+## Сравним модель с "сырыми данными"
+
+```{r, echo=FALSE, fig.height=5, fig.width=9}
+grid.arrange(gg_parallel2, gg_initial, ncol = 2)
 ```
 
-## Но может быть линии на самом деле не параллельны? {.smaller}
 
-### Мы должны были начать с этой, полной, модели!!!
+## Может быть линии на самом деле не параллельны? 
+
+### Мы должны были начать именно с этой, полной, модели
 
 Чтобы проверить, одинаковы ли зависимости для каждого из участков, нам нужно подобрать модель со взаимодействием и протестировать его значимость.
 
-```{r, R.options=list(width = 90)}
-# вернем уровни на место в прежнем порядке
-clover$Plot <- factor(clover$Plot, levels = c("A", "B", "C"), labels = c("A", "B", "C")) 
-M3 <- lm(Clover ~ Yarrow * Plot, data = clover)
-coef(M3)
-```
-
-Общее уравнение:  
-```{r, echo=FALSE, results='asis'}
-lm_equation(M3, strict = FALSE, rnd = 3)
-```
-
-Трактовка коэффциентов:  
-- $b_0 =$ `r round(coef(M3)[1], 3)` - урожайность клевера, если нет тысячелистника (на участке A, а для других - с учетом поправки)  
-- $b_1 =$ `r round(coef(M3)[2], 3)` - угол наклона прямой (для участка А, а для других - с учетом поправок)
-
-<div class="columns-2">
-Поправки интерсепта:  
-- $b_2 =$ `r round(coef(M3)[3], 3)` - для участка B  
-- $b_3 =$ `r round(coef(M3)[4], 3)` - для участка C
-
-Поправки угла наклона:  
-- $b_4 =$ `r round(coef(M3)[5], 3)` - для участка B  
-- $b_5 =$ `r round(coef(M3)[6], 3)` - для участка C
-
-</div>
-
-## Чтобы лучше понять смысл коэффициентов, давайте запишем отдельные уравнения для каждого типа участков
-
-Общее уравнение модели с разными углами наклона:
-
-```{r, echo=FALSE, results='asis'}
-lm_equation(M3, strict = FALSE, rnd = 3)
-```
-
-Для участка A:
-
-Clover = 55.219 - 0.094 Yarrow
-
-Для участка B:
-
-Clover = (55.219 + 0.606) + (- 0.094 - 0.002) Yarrow = 55.825 - 0.096 Yarrow
-
-Для участка C:
-
-Clover = (55.219 + 8.081) + (- 0.094 - 0.054) Yarrow = 63.3 - 0.148 Yarrow
-
-## График с разными углами наклона
-
 ```{r}
-gg_cl + aes(colour = Plot, fill = Plot) + 
-  geom_smooth(method = "lm", alpha = 0.2) +
-  labs(colour = "Участок", fill = "Участок")
+M4 <- lm(ABUND ~ (LOGAREA + LOGDIST +  ALT + fGRAZE)^2, data = BD)
 ```
 
-## Проверяем условия применимости
+Эта запись говорит о том, что в модель включаются только взаимодействия второго уровня
 
-```{r, fig.show='hold', fig.height=3.5, fig.width=10}
+##Упрощаем модель
+```{r}
+drop1(M4, test = "F")
+```
+
+
+##Упрощаем модель
+```{r}
+M5 <- update(M4, ~.-LOGAREA:LOGDIST )
+drop1(M5, test = "F")
+```
+
+
+##Упрощаем модель
+```{r}
+M6 <- update(M5, ~.-LOGDIST:fGRAZE )
+drop1(M6, test = "F")
+```
+
+
+
+##Упрощаем модель
+```{r}
+M7 <- update(M6, ~.-ALT:fGRAZE)
+drop1(M7, test = "F")
+```
+
+##Упрощаем модель
+```{r}
+M8 <- update(M7, ~.-LOGDIST:ALT)
+drop1(M8, test = "F")
+```
+
+##Упрощаем модель
+```{r}
+M9 <- update(M8, ~.-LOGDIST)
+drop1(M9, test = "F")
+```
+
+
+
+##Упрощаем модель
+```{r}
+M10 <- update(M9, ~.-LOGAREA:ALT)
+drop1(M10, test = "F")
+```
+
+
+##Упрощаем модель
+```{r}
+M11 <- update(M10, ~.-ALT)
+drop1(M11, test = "F")
+```
+
+
+##Упрощаем модель
+```{r}
+M12 <- update(M11, ~.-LOGAREA:fGRAZE )
+drop1(M12, test = "F")
+```
+
+
+##Финальная модель
+
+<small>
+```{r, echo=FALSE}
+lm_equation(M12, strict = FALSE)
+```
+
+</small>
+
+### Наличие взаимодействия не было доказано!
+
+
+
+## Не забываем, что полученную модель надо еще проверить на условия применимости.
+
+```{r, echo=FALSE, fig.height=5}
 library(car)
-op <- par(mfrow = c(1, 3), cex = 1)
-qqPlot(M3)
-plot(M3, which = 3)
-plot(M3, which = 4)
-par(op)
+op <- par(mfrow = c(1, 1)) # располагаем картинки в 3 колонки
+par(mfrow = c(1, 3))
+plot(M12, which = 4)          # Расстояние Кука
+residualPlot(M12)             # График остатков
+qqPlot(M12)                   # Квантильный график остатков
+par(op) 
 ```
 
-Есть подозрение на гетерогенность дисперсий
 
-## Проверим остатки на гетерогенность дисперсий тестом Бройша-Пагана
 
-```{r, message=FALSE}
-library(lmtest)
-bptest(M3)
-```
+## А если по условиям задачи нас все-таки интересуют взаимодействия? 
 
-Все в порядке, можно продолжать
+### Проверим по AIC какая модель лучше 
 
-## Как проверить, действительно ли различается урожайность между участками?
-
-### 1 способ:
-
-При помощи частного F-критерия можно сравнить полную и уменьшенную модель
-
-На первом этапе пробуем удалить только взаимодействие
 ```{r}
-drop1(M3, test = "F")
+formula(M12)
 ```
-При удалении взаимодействия модель не ухудшается. Взаимодействие можно не учитывать
 
-## Как проверить, действительно ли различается урожайность между участками?
-
-### 1 способ (продолжение):
-
-Подбираем модель без взаимодействия. На самом деле, мы это уже делали. Это M2
 ```{r}
-# M2 <- lm(Clover ~ Yarrow + Plot, data = clover)
-drop1(M2, test = "F")
+formula(M11)
 ```
-При удалении Plot модель не ухудшается - выкидываем Plot
 
-## Как проверить, действительно ли различается урожайность между участками?
 
-### 1 способ (продолжение):
-
-Подбираем модель без Plot На самом деле, мы это уже делали. Это M1
 ```{r}
-# M1 <- lm(Clover ~ Yarrow, data = clover)
-drop1(M1, test = "F")
+AIC(M12, M11)
 ```
 
-Из этой модели уже ничего не выкинуть
+Введение взаимодействия немного улучшает модель!
 
-## Как проверить, действительно ли различается урожайность между участками?
 
-### 2 способ:
 
-Можно провести дисперсионный анализ одним из способов (подробнее в следующей лекции)
+## Строим график модели с разными углами наклона 
+
 ```{r}
-# anova(M3)        # способ А
-# summary(aov(M3)) # способ Б
-library(car)     # способ В
-Anova(M3)
+my_df <- unique(BD[, c("fGRAZE", "LOGAREA")]) # еще один метод
+  
+my_df$Predicted <- predict(M11, newdata = my_df)
+my_df$SE <- predict(M11, newdata = my_df, se.fit = TRUE)$se.fit
+
 ```
 
-## После подбора финальной модели нужно еще раз проверить условия применимости
 
-```{r, fig.show='hold', fig.height=3.5, fig.width=10}
-op <- par(mfrow = c(1, 3), cex = 1)
-qqPlot(M1)
-plot(M1, which = 3)
-plot(M1, which = 4)
-par(op)
+```{r, echo=FALSE, fig.height=4, fig.width=9}
+gg_not_parallel <- ggplot(data = my_df, aes(y = Predicted, x = LOGAREA, colour = fGRAZE, fill = fGRAZE)) +  
+  geom_line() + 
+  geom_ribbon(aes(ymax = Predicted + 1.98 * SE, 
+                  ymin = Predicted - 1.98 * SE),
+              alpha = 0.3, colour = NA) +
+    geom_point(data = BD, aes(x = LOGAREA, y = ABUND)) +
+  labs(colour = "Уровень выпаса", fill = "Уровень выпаса", 
+       x = "Логарифм площади",
+       y = "Обилие птиц") + ggtitle("Модель со взаимодействиями") + 
+  theme(text = element_text(size = 10) )
+
+grid.arrange(gg_parallel2, gg_not_parallel, ncol = 2)
 ```
 
-Есть подозрение на гетерогенность дисперсий
-
-## Проверим остатки на гетерогенность дисперсий тестом Бройша-Пагана
-
-```{r, message=FALSE}
-bptest(M1)
-```
-
-На грани. Если рассуждать формально, то можно продолжать.
-
-Модель M1 - финальная
+## Как охарактеризовать результат в статье?
 ```{r}
-coef(M1)
-```
-
-```{r, echo=FALSE, results='asis'}
-lm_equation(M1, strict = FALSE, rnd = 3)
+anova(M11)
 ```
 
 ## Пример: Козы и глисты
@@ -588,8 +586,11 @@ lm_equation(M1, strict = FALSE, rnd = 3)
 Goat by Jennifer C. [on Flickr](https://flic.kr/p/fjU4J9)
 </div>
 
+<small>
 <div class=.footnote>Пример из библиотеки данных   
 http://www.statlab.uni-heidelberg.de/data/ancova/goats.story.html</div>
+
+</small>
 
 ## Читаем и знакомимся с данными
 
@@ -654,7 +655,7 @@ cat(full_fact(fit = MG1, nways = 2))
 
 ## График модели со взаимодействием
 
-Похоже, что взаимодействие не будет достоверным. Если это и вправду так, то этот график нам больше не понадобится.
+Похоже, что взаимодействие не будет достоверным. 
 
 ```{r}
 gg_g <- ggplot(data = goat, aes(y = wt, x = init, colour = treat)) + 
@@ -728,68 +729,13 @@ lm_equation(MG2, strict = FALSE)
 
 Привес коз при интенсивной обработке от глистов на 1.26 кг выше, чем при стандартном методе обработки (t-тест, p < 0.05)
 
-## Данные для графика с параллельными прямыми
-
-Решение средствами пакета `plyr`:
-```{r, tidy=FALSE}
-# делим датафрейм на части по переменной treat
-# по каждой из частей считаем
-# последовательность от мин. до макс. значения Yarrow
-my_df <- plyr::ddply(goat, .(treat),
-    summarise,
-    init = seq(min(init),  max(init), length = 10))
-# Считаем предсказанные значения и стандартные ошибки
-MG2_pred <- predict(MG2, newdata = my_df, se.fit = TRUE)
-# Добавляем их в датафрейм
-my_df$wt <- MG2_pred$fit
-my_df$SE <- MG2_pred$se.fit
-```
-
-## Самостоятельно попробуйте разобрать, как сделать тот же самый исходный датафрейм в пакете dplyr
-
-```{r, message=FALSE, eval=FALSE}
-library(dplyr)
-my_df <- goat %>% 
-  group_by(treat) %>%
-  summarise(min_init = min(init),
-  max_init = max(init)) %>% group_by(treat) %>% 
-  do(data.frame(init = seq(.$min_init, .$max_init, length = 10))) %>% 
-  ungroup %>% 
-  mutate(wt = predict(MG2, newdata = .),
-    SE = predict(MG2, newdata = ., se.fit = TRUE)$'se.fit')
-```
-
-## Строим график
-
-```{r, tidy=FALSE}
-gg_g_parallel <- 
-  ggplot(data = my_df, aes(y = wt, x = init, fill = treat, colour = treat)) + 
-  geom_line() + 
-  geom_ribbon(alpha = 0.3, 
-              aes(ymax = wt + 1.98 * SE, 
-                  ymin = wt - 1.98 * SE), colour = NA) +
-  geom_point(data = goat)
-gg_g_parallel
-```
-
-## Подписываем оси
-
-```{r, tidy=FALSE}
-gg_g_parallel + 
-  labs(x = "Начальный вес, кг", y = "Привес, кг") +
-  scale_colour_discrete("Способ обработки", breaks = c("intensive", "standard"), 
-                        labels = c("Интенсивный", "Стандартный")) +
-  scale_fill_discrete("Способ обработки", breaks = c("intensive", "standard"), 
-                      labels = c("Интенсивный", "Стандартный"))
-```
-
 
 ## Take home messages
 
 - Коэффициенты регрессии при дискретных предикторах позволяют сопоставить средние значения для каждого уровня фактора со средним значением для базового уровня.
 - При изменении базового уровня, коэффициенты изменятся, но суть модели останется той же.
 - В одной модели можно объединить как непрерывные, так и дискретные предикторы.
-- При анализе экспериметальных данных, включение в анализ некоторых ковариат может помочь лучше увидеть закономерности.
+- При анализе экспериментальных данных, включение в анализ некоторых ковариат может помочь лучше увидеть закономерности.
 
 
 ## Что почитать

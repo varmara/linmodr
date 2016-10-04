@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Марина Варфоломеева, Вадим Хайтов" />
+
+
+<title>Диагностика линейных моделей</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #0000ff; } /* Keyword */
+code > span.ch { color: #008080; } /* Char */
+code > span.st { color: #008080; } /* String */
+code > span.co { color: #008000; } /* Comment */
+code > span.ot { color: #ff4000; } /* Other */
+code > span.al { color: #ff0000; } /* Alert */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #008000; font-weight: bold; } /* Warning */
+code > span.cn { } /* Constant */
+code > span.sc { color: #008080; } /* SpecialChar */
+code > span.vs { color: #008080; } /* VerbatimString */
+code > span.ss { color: #008080; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { } /* Variable */
+code > span.cf { color: #0000ff; } /* ControlFlow */
+code > span.op { } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #ff4000; } /* Preprocessor */
+code > span.do { color: #008000; } /* Documentation */
+code > span.an { color: #008000; } /* Annotation */
+code > span.cv { color: #008000; } /* CommentVar */
+code > span.at { } /* Attribute */
+code > span.in { color: #008000; } /* Information */
+</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="my_styles.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.9em;
+  padding-left: 5px;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+.tocify-subheader {
+  display: inline;
+}
+.tocify-subheader .tocify-item {
+  font-size: 0.95em;
+  padding-left: 10px;
+}
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/linmodr-course/">Linmodr course</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li><a href="index.html">О курсе</a></li>
+        <li><a href="lectures.html">Презентации и данные</a></li>
+        <li><a href="evaluation_criteria.html">Критерии оценки домашних заданий</a></li>
+        <li class="dropdown">
+          <a href="appendix" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Полезности<span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+             <li><a href="supplement.html">Дополнительные темы</a></li>
+             <li><a href="resources.html">Ссылки и ресурсы</a></li>
+             <li><a href="coding_practices.html">Правила хорошего кода</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Диагностика линейных моделей</h1>
+<h3 class="subtitle"><em>Линейные модели…</em></h3>
+<h4 class="author"><em>Марина Варфоломеева, Вадим Хайтов</em></h4>
+
+</div>
+
+
+<div id="--" class="section level2">
+<h2>Диагностика линейных моделей</h2>
+<ul>
+<li>Анализ остатков
+<ul>
+<li>Проверка на наличие влиятельных наблюдений</li>
+<li>Проверка условий применимости линейных моделей</li>
+</ul></li>
+</ul>
+<div id="-" class="section level3">
+<h3>Вы сможете</h3>
+<ul>
+<li>перечислить условия применимости линейной регрессии</li>
+<li>идентифицировать основные нарушения условий применимости линейной регрессии по паттернам на графиках остатков</li>
+<li>написать код на языке R, который позволяет нарисовать диагностические графики остатков для линейной регрессии</li>
+</ul>
+</div>
+</div>
+<div id="-------" class="section level2">
+<h2>Зачем нужна диагностика модели? Разве тестов было недостаточно?</h2>
+<pre><code>dat &lt;- read.table(&#39;http://www4.stat.ncsu.edu/~stefanski/NSF_Supported/
+Hidden_Images/orly_owl_files/orly_owl_Lin_4p_5_flat.txt&#39;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw">lm</span>(V1 ~<span class="st"> </span>V2 +<span class="st"> </span>V3 +<span class="st"> </span>V4 +<span class="st"> </span>V5 -<span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> dat)
+<span class="kw">coef</span>(<span class="kw">summary</span>(fit))</code></pre></div>
+<pre><code>#    Estimate Std. Error t value Pr(&gt;|t|)
+# V2    0.986     0.1280    7.70 1.99e-14
+# V3    0.971     0.1266    7.67 2.50e-14
+# V4    0.861     0.1196    7.20 8.30e-13
+# V5    0.927     0.0833   11.13 4.78e-28</code></pre>
+<p>Все достоверно? Пишем статью?</p>
+<p></p>
+<p>Постройте график зависимости остатков от предсказанных значений при помощи этого кода</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(car)
+<span class="kw">residualPlot</span>(fit, <span class="dt">pch =</span> <span class="st">&quot;.&quot;</span>)</code></pre></div>
+</div>
+<div id="oh-really" class="section level2">
+<h2>Oh, really?</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(car)
+<span class="kw">residualPlot</span>(fit, <span class="dt">pch =</span> <span class="st">&quot;.&quot;</span>)</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/bird-1.pdf" width="355.2" height="6cm" style="display: block; margin: auto;" /></p>
+<p></p>
+</div>
+<div id="---" class="section level2">
+<h2>Анализ остатков линейных моделей</h2>
+<div id="----" class="section level3">
+<h3>Проверка на наличие влиятельных наблюдений</h3>
+</div>
+<div id="----" class="section level3">
+<h3>Проверка условий применимости линейных моделей</h3>
+<ul>
+<li>Линейная связь между зависимой перменной (<span class="math inline">\(Y\)</span>) и предикторами (<span class="math inline">\(X\)</span>)</li>
+<li>Независимость значений <span class="math inline">\(Y\)</span> друг от друга</li>
+<li>Нормальное распределение <span class="math inline">\(Y\)</span> для каждого уровня значений <span class="math inline">\(X\)</span></li>
+<li>Гомогенность дисерсий <span class="math inline">\(Y\)</span> для каждого уровня значений <span class="math inline">\(X\)</span></li>
+<li>Отсутствие коллинеарности предикторов (для можественной регрессии)</li>
+</ul>
+</div>
+</div>
+<div id="--------iq---" class="section level2">
+<h2>С этим примером мы познакомились в прошлый раз: IQ и размеры мозга</h2>
+<p>Зависит ли уровень интеллекта от размера головного мозга? (Willerman et al. 1991)</p>
+
+
+<p> Было исследовано 20 девушек и 20 молодых людей.</p>
+<p>У каждого индивида измеряли:</p>
+<ul>
+<li>вес</li>
+<li>рост</li>
+<li>размер головного мозга (количество пикселей на изображении ЯМР сканера)</li>
+<li>уровень интеллекта (различные IQ тесты)</li>
+</ul>
+<p></p>
+<p></p>
+</div>
+<div id="----" class="section level2">
+<h2>Вспомним, на чем мы остановились</h2>
+<p>Не забудьте войти в вашу директорию для матметодов при помощи <code>setwd()</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Данные можно загрузить с сайта</span>
+<span class="kw">library</span>(downloader)
+<span class="co"># в рабочем каталоге создаем суб-директорию для данных</span>
+if(!<span class="kw">dir.exists</span>(<span class="st">&quot;data&quot;</span>)) <span class="kw">dir.create</span>(<span class="st">&quot;data&quot;</span>)
+<span class="co"># скачиваем файл</span>
+<span class="kw">download</span>(
+  <span class="dt">url =</span> <span class="st">&quot;https://varmara.github.io/linmodr-course/data/IQ_brain.csv&quot;</span>, 
+  <span class="dt">destfile =</span> <span class="st">&quot;data/IQ_brain.csv&quot;</span>)</code></pre></div>
+<div id="-" class="section level3">
+<h3>Подберем модель</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">brain &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/IQ_brain.csv&quot;</span>, <span class="dt">header =</span> <span class="ot">TRUE</span>)
+brain_model &lt;-<span class="st"> </span><span class="kw">lm</span>(PIQ ~<span class="st"> </span>MRINACount, <span class="dt">data =</span> brain)
+<span class="kw">coef</span>(<span class="kw">summary</span>(brain_model))</code></pre></div>
+<pre><code>#             Estimate Std. Error t value Pr(&gt;|t|)
+# (Intercept)  1.74376 42.3923825  0.0411   0.9674
+# MRINACount   0.00012  0.0000465  2.5858   0.0137</code></pre>
+</div>
+</div>
+<div id="-----1" class="section level1">
+<h1>Проверка на наличие влиятельных наблюдений</h1>
+<div id="--" class="section level2">
+<h2>Влиятельные наблюдения — это…</h2>
+<p>наблюдения, которые вносят слишком большой вклад в оценку парметров (коэффициентов) модели.</p>
+<p> </p>
+<p></p>
+<p> Учет каких из этих точек повлияет на ход регрессии и почему? </p>
+<ul>
+<li>Точка 1 почти не повлияет, т.к. у нее маленький остаток, хоть и большой <span class="math inline">\(X\)</span></li>
+<li>Точка 2 почти не повлияет, т.к. ее <span class="math inline">\(X\)</span> близок к среднему, хоть и большой остаток</li>
+<li>Точка 3 повлияет сильно, т.к. у нее не только большой остаток, но и большой <span class="math inline">\(X\)</span></li>
+</ul>
+<p></p>
+</div>
+<div id="-" class="section level2">
+<h2>Типы остатков</h2>
+<div id="-" class="section level3">
+<h3>“Сырые” остатки</h3>
+<p><span class="math inline">\(\varepsilon_i = y_i - \hat{y_i}\)</span></p>
+<p></p>
+</div>
+<div id="-" class="section level3">
+<h3>Пирсоновские остатки</h3>
+<p><span class="math inline">\(p_i = \frac{\varepsilon_i}{\sqrt{Var(\hat{y_i})}}\)</span>, где <span class="math inline">\(\sqrt{Var(\hat{y_i})}\)</span> — это cтандартное отклонение предсказанных значений</p>
+<p>легко сравнивать, т.к. стандартизованы</p>
+<p></p>
+</div>
+<div id="-" class="section level3">
+<h3>Стьюдентовские остатки</h3>
+<p><span class="math inline">\(s_i = \frac{p_i}{\sqrt{1 - h_{ii}}} = \frac{\varepsilon_i}{\sqrt{Var(\hat{y_i})(1-h_{ii})}}\)</span>,<br />
+где <span class="math inline">\(h_{ii}\)</span> — “сила воздействия” отдельных наблюдений (leverage)</p>
+<p>легко сравнивать, т.к. стандартизованы и учитывают влияние наблюдений</p>
+</div>
+</div>
+<div id="--h_ii-leverage" class="section level2">
+<h2>Воздействие точек <span class="math inline">\(h_{ii}\)</span> (leverage)</h2>
+<div id="----x_i---------haty_i" class="section level3">
+<h3>показывает, насколько каждое значение <span class="math inline">\(x_i\)</span> влияет на ход линии регрессии, то есть на <span class="math inline">\(\hat{y_i}\)</span></h3>
+<p></p>
+<p> </p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<ul>
+<li>Точки, располагающиеся дальше от <span class="math inline">\(\bar{x}\)</span>, оказывают более сильное влияние на <span class="math inline">\(\hat{y_i}\)</span><br />
+</li>
+<li>Эта величина, в норме, варьирует в промежутке от <span class="math inline">\(1/n\)</span> до 1<br />
+</li>
+<li>Если <span class="math inline">\(h_{ii} &gt; 2(p/n)\)</span>, то надо внимательно посмотреть на данное значение (p — число параметров, n — объем выборки)</li>
+</ul>
+<p></p>
+</div>
+</div>
+<div id="--cooks-distance" class="section level2">
+<h2>Расстояние Кука (Cook’s distance)</h2>
+<div id="-------" class="section level3">
+<h3>описывает, как повлияет на модель удаление данного наблюдения</h3>
+<p><span class="math display">\[D_i = \frac{\sum{(\hat{y_j}-\hat{y}_{j(i)})^2}}{p \cdot MSE} \large( \frac {h_{ii}} {1 - h_{ii}} \large)\]</span></p>
+<ul>
+<li><span class="math inline">\(\hat{y_j}\)</span> - значение предсказанное полной моделью</li>
+<li><span class="math inline">\(\hat{y}_{j(i)}\)</span> - значение, предказанное моделью, построенной без учета <span class="math inline">\(i\)</span>-го значения предиктора</li>
+<li><span class="math inline">\(p\)</span> - количество параметров в модели</li>
+<li><span class="math inline">\(MSE\)</span> - среднеквадратичная ошибка модели (<span class="math inline">\(\hat\sigma^2\)</span>)</li>
+<li><span class="math inline">\(h_{ii}\)</span> — “сила воздействия” отдельных наблюдений (leverage)</li>
+</ul>
+<p></p>
+<p>Расстояние Кука зависит одновременно от величины остатков и “силы воздействия” наблюдений.</p>
+<p>Статистических тестов для <span class="math inline">\(D_i\)</span> нет, но можно использовать один из двух условных порогов. Наблюдение является выбросом (outlier), если:</p>
+<ul>
+<li><span class="math inline">\(D_i &gt; 1\)</span></li>
+<li><span class="math inline">\(D_i &gt; 4/(N − k − 1)\)</span> (N - объем выборки, k - число предикторов)</li>
+</ul>
+</div>
+</div>
+<div id="-----brain_model" class="section level2">
+<h2>Проверяем наличие влиятельных наблюдений в <code>brain_model</code></h2>
+<p>График расстояния Кука.<br />
+Значения приведены в том же порядке, что и в исходных данных.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(brain_model, <span class="dt">which =</span> <span class="dv">4</span>)</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-5-1.pdf" width="739.2" /></p>
+<p>Второй вариант — построить обычный график остатков, и отметить на нем расстояния Кука.</p>
+</div>
+<div id="---------." class="section level2">
+<h2>Чтобы построить график остатков с расстояниями Кука нам понадобятся данные.</h2>
+<p>Извлечем из результатов сведения для анализа остатков при помощи функции <code>fortify()</code> из пакета <code>{ggplot2}</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+brain_diag &lt;-<span class="st"> </span><span class="kw">fortify</span>(brain_model)
+<span class="kw">head</span>(brain_diag, <span class="dv">2</span>)</code></pre></div>
+<pre><code>#   PIQ MRINACount   .hat .sigma  .cooksd .fitted .resid .stdresid
+# 1 124     816932 0.0664   20.9 0.049838     100  24.02    1.1840
+# 2 124    1001121 0.0669   21.3 0.000304     122   1.87    0.0921</code></pre>
+<p></p>
+<ul>
+<li><code>.hat</code> — “сила воздействия” данного наблюдения (<em>leverage</em>)<br />
+</li>
+<li><code>.cooksd</code> — расстояние Кука<br />
+</li>
+<li><code>.fitted</code> — предсказанные значения<br />
+</li>
+<li><code>.resid</code> — остатки</li>
+<li><code>.stdresid</code> — стандартизованные остатки</li>
+</ul>
+</div>
+<div class="section level2">
+<h2>Задание</h2>
+<p>Используя данные из датафрейма <code>brain_diag</code>,<br />
+постройте график зависимости стандартизированных остатков модели <code>brain_model</code> от предсказанных значений.</p>
+<p>Сделайте так, чтобы размер точек изменялся в зависимости от значения расстояния Кука.</p>
+</div>
+<div class="section level2">
+<h2>Решение</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">theme_set</span>(<span class="kw">theme_bw</span>()) <span class="co"># устанавливаем тему (не обязательно)</span>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> brain_diag, <span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .stdresid, <span class="dt">size =</span> .cooksd)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_hline</span>(<span class="kw">aes</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>))</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-7-1.pdf" width="739.2" /></p>
+<p>Что мы видим?</p>
+<p></p>
+<ul>
+<li>Большая часть стандартизованных остатков в пределах двух стандартных отклонений</li>
+<li>Есть одно влиятельное наблюдение, которое нужно проверить, но сила его влияния невелика (расстояние Кука &lt; 1)</li>
+<li>Среди остатков нет тренда, но, возможно, есть иной паттерн…</li>
+</ul>
+</div>
+<div id="--loess---" class="section level2">
+<h2>Добавим линию loess-сглаживания на график</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> brain_diag, <span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .stdresid, <span class="dt">size =</span> .cooksd)) +
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;loess&quot;</span>, <span class="dt">se=</span><span class="ot">FALSE</span>) </code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-8-1.pdf" width="739.2" /></p>
+<p>Чем мог быть вызван такой странный паттерн?</p>
+<p></p>
+<ul>
+<li>Неучтенная переменная — добавляем в модель</li>
+<li>Нелинейная зависимость — используем GAM, нелинейную регрессию и т.д.</li>
+</ul>
+</div>
+<div id="----" class="section level2">
+<h2>Что делать с наблюдениями-выбросами?</h2>
+<div class="section level3">
+<h3>Удалить?</h3>
+<p><strong>Осторожно!</strong> Нельзя удалять выбросы только на основе такого диагноза. Задача диагностики — заставить вас искать причины такого поведения данных. Удалять следует только очевидные ошибки в наблюдениях.</p>
+</div>
+<div class="section level3">
+<h3>Трансформировать?</h3>
+<p>Некоторые виды трансформаций</p>
+<table>
+<thead>
+<tr class="header">
+<th>Трансформация</th>
+<th>Формула</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>степень -2</td>
+<td><span class="math inline">\(1/x^2\)</span></td>
+</tr>
+<tr class="even">
+<td>степень -1</td>
+<td><span class="math inline">\(1/x\)</span></td>
+</tr>
+<tr class="odd">
+<td>степень -0.5</td>
+<td><span class="math inline">\(1/\sqrt{x}\)</span></td>
+</tr>
+<tr class="even">
+<td>степень 0.5</td>
+<td><span class="math inline">\(\sqrt{x}\)</span></td>
+</tr>
+<tr class="odd">
+<td>логарифмирование</td>
+<td><span class="math inline">\(log(x)\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="----assumptions" class="section level1">
+<h1>Условия применимости линейных моделей (Assumptions)</h1>
+<div id="-" class="section level2">
+<h2>1. Линейность связи</h2>
+<p>Нелинейные зависимости не всегда видны на исходных графиках в осях Y vs X</p>
+<p>Они становятся лучше заметны на графиках рассеяния остатков (Residual plots)</p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-9-1.pdf" width="739.2" /></p>
+<div id="---" class="section level3">
+<h3>Проверка на линейность связи</h3>
+<ul>
+<li>График зависимости <span class="math inline">\(Y\)</span> от <span class="math inline">\(x\)</span> (для множественной регрессии - от всех <span class="math inline">\(x\)</span>)</li>
+<li>График остатков от предсказанных значений</li>
+</ul>
+</div>
+</div>
+<div id="----" class="section level2">
+<h2>Что делать, если связь нелинейна?</h2>
+<ul>
+<li>Добавить неучтенные переменные</li>
+<li>Добавить взаимодействие переменных</li>
+<li>Применить линеаризующее преобразование (Осторожно!)</li>
+<li>Применить обобщенную линейную модель с другой функцией связи (об этом позже)</li>
+<li>Построить аддитивную модель (если достаточно наблюдений по <span class="math inline">\(x\)</span>)</li>
+<li>Построить нелинейную модель (если известна форма зависимости)</li>
+</ul>
+</div>
+<div id="--" class="section level2">
+<h2>Пример линеаризующего преобразования</h2>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-10-1.pdf" width="739.2" /></p>
+<p></p>
+<p><strong>Осторожно!</strong> При таком преобразовании вы рискуете изучить не то, что хотели. Матожидание логарифма величины (как при трансформации) не то же самое, что логарифм матожидания величины (как при использовании обобщенной линейной модели с логарифмической функцией связи). Но об этом — позже.</p>
+</div>
+<div id="-y---" class="section level2">
+<h2>2. Независимость <span class="math inline">\(Y\)</span> друг от друга</h2>
+<p>Каждое значение <span class="math inline">\(Y_i\)</span> должно быть независимо от любого другого <span class="math inline">\(Y_j\)</span></p>
+<p>Это нужно контролировать на этапе планирования сбора материала</p>
+<ul>
+<li>Наиболее частые источники зависимостей:
+<ul>
+<li>псевдоповторности (повторно измеренные объекты)</li>
+<li>неучтенные переменные</li>
+<li>временные автокорреляции (если данные - временной ряд)</li>
+<li>пространственные автокорреляции (если пробы взяты в разных местах)</li>
+<li>и т.п.</li>
+</ul></li>
+</ul>
+<p></p>
+<p>Взаимозависимости можно заметить на графиках остатков:</p>
+<ul>
+<li>остатки vs. предсказанные значения</li>
+<li>остатки vs. переменные в модели</li>
+<li>остатки vs. переменные не в модели</li>
+</ul>
+</div>
+<div id="----" class="section level2">
+<h2>Нарушение условия независимости: Неучтенная переменная</h2>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-11-1.pdf" width="739.2" /></p>
+<p>Если в модели не учтена переменная <span class="math inline">\(X2\)</span> (слева), внешне все нормально (только остатки большие), но если построить график зависимости остатков от <span class="math inline">\(X2\)</span>.</p>
+<p>Если <span class="math inline">\(X2\)</span> учесть (справа) — остатки становятся меньше, зависимость остатков от <span class="math inline">\(X2\)</span> исчезает.</p>
+</div>
+<div id="---" class="section level2">
+<h2>Нарушение условия независимости: Автокорреляция</h2>
+<p>В данном случае, наблюдения — это временной ряд.</p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-12-1.pdf" width="739.2" /></p>
+<p>На графиках остатков четко видно, что остатки не являются независимыми.</p>
+</div>
+<div id="--" class="section level2">
+<h2>Проверка на автокорреляцию</h2>
+<p>Проверка на автокорреляцию нужна если данные это временной ряд, или если известны координаты проб.</p>
+<p>Способы проверки временной автокорреляции (годятся, если наблюдения в ряду расположены через равные интервалы):</p>
+<ul>
+<li>График автокорреляционной функции остатков (ACF-plot) покажет корреляции с разными лагами.</li>
+<li>Критерий Дарбина-Уотсона (значимость автокорреляции 1-го порядка).</li>
+</ul>
+<p>Для проверки пространственных автокорреляций</p>
+<ul>
+<li>вариограмма</li>
+<li>I Морана (Moran’s I)</li>
+</ul>
+</div>
+<div id="--------" class="section level2">
+<h2>Что делать, если у вас нарушено условие независимости значений?</h2>
+<p>Выбор зависит от обстоятельств. Вот несколько возможных вариантов.</p>
+<ul>
+<li>псевдоповторности
+<ul>
+<li>избавляемся от псевдоповторностей, вычислив среднее</li>
+<li>подбираем модель со случайным фактором</li>
+</ul></li>
+<li>неучтенные переменные
+<ul>
+<li>включаем в модель (если возможно)</li>
+</ul></li>
+<li>временные автокорреляции
+<ul>
+<li>моделируем автокорреляцию</li>
+<li>подбираем модель со случайным фактором</li>
+</ul></li>
+<li>пространственные автокорреляции
+<ul>
+<li>моделируем пространственную автокорреляцию</li>
+<li>делим на пространственные блоки и подбираем модель со случайным фактором</li>
+</ul></li>
+</ul>
+</div>
+<div id="--y-----x" class="section level2">
+<h2>3. Нормальное распределение <span class="math inline">\(Y\)</span> (для каждого уровня значений <span class="math inline">\(X\)</span>)</h2>
+<p><img src="figure/Zuur.png" width="400" height="300" ></p>
+<p><img src="figure/Normality.png" width="400" height="200" ></p>
+<p>Это условие невозможно проверить “влоб”, т.к. обычно каждому <span class="math inline">\(X\)</span> сообветствует лишь небольшое число <span class="math inline">\(Y\)</span></p>
+<p>Если <span class="math inline">\(Y\)</span> это нормально распределенная случайная величина</p>
+<p><span class="math display">\[Y_i \in N(\mu_{y_i}, \sigma^2)\]</span></p>
+<p>и мы моделируем ее как</p>
+<p><span class="math display">\[Y_i \sim b_0 + b_1x_{1i} + \cdots + \varepsilon_i\]</span></p>
+<p>то остатки от этой модели — тоже нормально распределенная случайная величина</p>
+<p><span class="math display">\[\varepsilon_i \in N(\mu_{y_i}, \sigma^2)\]</span></p>
+<p>Т.е. выполнение этого условия можно оценить по поведению случайной части модели.</p>
+</div>
+<div id="---" class="section level2">
+<h2>Проверка нормальности распределения остатков</h2>
+<p>Есть формальные тесты, но:</p>
+<ul>
+<li>у формальных тестов тоже есть свои условия применимости</li>
+<li>при больших выборках формальные тесты покажут, что значимы даже небольшие отклонения от нормального распределения</li>
+<li>тесты, которые используются в линейной регрессии, устойчивы к небольшим отклонениям от нормального распределения</li>
+</ul>
+<p>Лучший способ проверки — квантильный график остатков.</p>
+</div>
+<div id="--" class="section level2">
+<h2>Квантильный график остатков</h2>
+<p><em>Квантиль</em> - значение, которое заданная случайная величина не превышает с фиксированной вероятностью.</p>
+<p>Если точки - это реализации случайной величины из <span class="math inline">\(N(0, \sigma^2)\)</span>, то они должны лечь вдоль прямой <span class="math inline">\(Y=X\)</span>. Если это стьюдентизированные остатки — то используются квантили t-распределения</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">qqPlot</span>(brain_model) <span class="co"># из пакета car</span></code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-13-1.pdf" width="739.2" /></p>
+</div>
+<div id="----ggplot2" class="section level2">
+<h2>Аналогичный график при помощи <code>ggplot2</code></h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mean_val &lt;-<span class="st"> </span><span class="kw">mean</span>(brain_diag$.stdresid)
+sd_val &lt;-<span class="st"> </span><span class="kw">sd</span>(brain_diag$.stdresid)
+<span class="kw">ggplot</span>(brain_diag, <span class="kw">aes</span>(<span class="dt">sample =</span> .stdresid)) +<span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">stat =</span> <span class="st">&quot;qq&quot;</span>) +<span class="st"> </span>
+<span class="st">    </span><span class="kw">geom_abline</span>(<span class="dt">intercept =</span> mean_val, <span class="dt">slope =</span> sd_val)</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-14-1.pdf" width="739.2" style="display: block; margin: auto;" /></p>
+</div>
+<div id="------" class="section level2">
+<h2>Что делать, если остатки распределены не нормально?</h2>
+<p>Зависит от причины</p>
+<ul>
+<li>Нелинейная связь?
+<ul>
+<li>Построить аддитивную модель (если достаточно наблюдений по <span class="math inline">\(x\)</span>)</li>
+<li>Построить нелинейную модель (если известна форма зависимости)</li>
+</ul></li>
+<li>Неучтенные переменные?
+<ul>
+<li>добавляем в модель</li>
+</ul></li>
+<li>Зависимая переменная распределена по-другому?
+<ul>
+<li>трансформируем данные (неудобно)</li>
+<li>подбираем модель с другим распределением остатков (обобщенную линейную модель)</li>
+</ul></li>
+</ul>
+</div>
+<div id="--" class="section level2">
+<h2>4. Постоянство дисперсии (гомоскедастичность)</h2>
+<p>Это самое важное условие, поскольку многие тесты чувствительны к гетероскедастичности.</p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-15-1.pdf" width="739.2" /></p>
+</div>
+<div id="--" class="section level2">
+<h2>Проверка постоянства дисперсий</h2>
+<p>Есть формальные тесты (тест Бройша-Пагана, тест Кокрана), но:</p>
+<ul>
+<li>у формальных тестов тоже есть свои условия применимости, и многие сами неустойчивы к гетероскедастичности</li>
+<li>при больших выборках формальные тесты покажут, что значима даже небольшая гетероскедастичность</li>
+</ul>
+<p>Лучший способ проверки — график остатков.</p>
+</div>
+<div id="--" class="section level2">
+<h2>Проверка на гетероскедастичность</h2>
+<p>Мы уже строили график остатков в <code>ggplot2</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> brain_diag,
+       <span class="kw">aes</span>(<span class="dt">x =</span> .fitted, <span class="dt">y =</span> .stdresid)) +
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">0</span>) </code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-16-1.pdf" width="739.2" /></p>
+</div>
+<div id="---1" class="section level2">
+<h2>Проверка на гетероскедастичность</h2>
+<p>Можем построить аналогичный график остатков средствами пакета <code>car</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">residualPlot</span>(brain_model)</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-17-1.pdf" width="739.2" height="4cm" /></p>
+<p></p>
+<ul>
+<li>Гетерогенность дисперсий не выражена.</li>
+</ul>
+</div>
+<div id="------" class="section level2">
+<h2>Что делать если вы столкнулись с гетероскедастичностью?</h2>
+<p></p>
+<p></p>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-18-1.pdf" width="6cm" height="8cm" /></p>
+<p></p>
+<p>Трансформация может помочь…</p>
+<p>Но на самом деле, нужно смотреть на причину гетерогенности</p>
+<ul>
+<li>Неучтенные переменные
+<ul>
+<li>добавляем в модель</li>
+</ul></li>
+<li>Зависимая переменная распределена по-другому
+<ul>
+<li>трансформируем данные (неудобно)</li>
+<li>подбираем модель с другим распределением остатков (обобщенную линейную модель)</li>
+</ul></li>
+<li>Моделируем гетерогенность дисперсии.</li>
+</ul>
+<p></p>
+</div>
+<div id="-----" class="section level2">
+<h2>Некоторые распространенные паттерны на графиках остатков</h2>
+<p></p>
+<p> </p>
+<p></p>
+<p></p>
+<p></p>
+<ul>
+<li><ol style="list-style-type: lower-alpha">
+<li>Условия применимости соблюдаются. Модель хорошая</li>
+</ol></li>
+<li><ol start="2" style="list-style-type: lower-alpha">
+<li>Клиновидный паттерн. Есть гетероскедастичность. Модель плохая</li>
+</ol></li>
+<li><ol start="3" style="list-style-type: lower-alpha">
+<li>Остатки рассеяны равномерно, но модель неполна. Нужны дополнительные предикторы. Модель можно улучшить</li>
+</ol></li>
+<li><ol start="4" style="list-style-type: lower-alpha">
+<li>Нелинейный паттерн сохранился. Линейная модель использована некорректно. Модель плохая</li>
+</ol></li>
+</ul>
+<p></p>
+</div>
+<div id="-1" class="section level2">
+<h2>Задание</h2>
+<p>Выполните три блока кода (см. код лекции).</p>
+<p>Какие нарушения условий применимости линейных моделей здесь наблюдаются?</p>
+</div>
+<div id="--1" class="section level2">
+<h2>Задание, блок 1</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">12345</span>)
+x1 &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">100</span>, <span class="dv">1</span>)
+y1 &lt;-<span class="st">  </span><span class="kw">diffinv</span>(<span class="kw">rnorm</span>(<span class="dv">99</span>)) +<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="fl">0.2</span>, <span class="dv">2</span>)
+dat1 =<span class="st"> </span><span class="kw">data.frame</span>(x1, y1)
+<span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(<span class="dt">x =</span> x1, <span class="dt">y =</span> y1)) +<span class="st"> </span><span class="kw">geom_point</span>()+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;lm&quot;</span>, <span class="dt">alpha =</span> <span class="fl">0.7</span>)</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-19-1.pdf" width="739.2" /></p>
+</div>
+<div id="--1" class="section level2">
+<h2>Решение, блок 1</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod1 &lt;-<span class="st"> </span><span class="kw">lm</span>(y1 ~<span class="st"> </span>x1, <span class="dt">data =</span> dat1)
+op &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>)) <span class="co"># располагаем картинки в 3 колонки</span>
+<span class="kw">plot</span>(mod1, <span class="dt">which =</span> <span class="dv">4</span>)          <span class="co"># Расстояние Кука</span>
+<span class="kw">residualPlot</span>(mod1)             <span class="co"># График остатков</span>
+<span class="kw">qqPlot</span>(mod1)                   <span class="co"># Квантильный график остатков</span>
+<span class="kw">par</span>(op)                    <span class="co"># возвращаем старые графические параметры</span></code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-20-1.pdf" width="739.2" /></p>
+<p></p>
+<ul>
+<li>Выбросов нет</li>
+<li>Зависимость нелинейна</li>
+<li>Остатки не подчиняются нормальному распределению</li>
+</ul>
+</div>
+<div id="--2" class="section level2">
+<h2>Задание, блок 2</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">  <span class="kw">set.seed</span>(<span class="dv">12345</span>)
+  x2 &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1000</span>, <span class="dv">1</span>, <span class="dv">100</span>)
+  b_0 &lt;-<span class="st"> </span><span class="dv">100</span>;  b_1 &lt;-<span class="st"> </span><span class="dv">20</span>
+  h &lt;-<span class="st"> </span>function(x) x^<span class="fl">0.5</span>
+  eps &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">1000</span>, <span class="dv">0</span>, <span class="kw">h</span>(x2))
+  y2 &lt;-<span class="st"> </span>b_0 +<span class="st"> </span>b_1 *<span class="st"> </span>x2 +<span class="st"> </span>eps
+  dat2 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(x2, y2)
+  <span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2)) +<span class="st"> </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>)</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-21-1.pdf" width="739.2" /></p>
+</div>
+<div id="--2" class="section level2">
+<h2>Решение, блок 2</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod2 &lt;-<span class="st"> </span><span class="kw">lm</span>(y2 ~<span class="st"> </span>x2, <span class="dt">data =</span> dat2)
+op &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))
+<span class="kw">plot</span>(mod2, <span class="dt">which =</span> <span class="dv">4</span>)
+<span class="kw">residualPlot</span>(mod2)
+<span class="kw">qqPlot</span>(mod2)
+<span class="kw">par</span>(op)</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-22-1.pdf" width="739.2" /></p>
+<p></p>
+<ul>
+<li>Выбросов нет</li>
+<li>Гетерогенность дисперсий</li>
+<li>Остатки не подчиняются нормальному распределению</li>
+</ul>
+</div>
+<div id="--3" class="section level2">
+<h2>Задание, блок 3</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2309587</span>)
+x3 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">50</span>, <span class="dv">10</span>)
+b_0 &lt;-<span class="st"> </span><span class="dv">100</span>; b_1 &lt;-<span class="st"> </span><span class="dv">20</span>; eps &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">0</span>, <span class="dv">100</span>)
+y3 &lt;-<span class="st"> </span>b_0 +<span class="st"> </span>b_1*x3 +<span class="st"> </span>eps
+y3[<span class="dv">100</span>] &lt;-<span class="st"> </span><span class="dv">1000</span>; x3[<span class="dv">100</span>] &lt;-<span class="st"> </span><span class="dv">95</span>; y3[<span class="dv">99</span>] &lt;-<span class="st"> </span><span class="dv">1300</span>; x3[<span class="dv">99</span>] &lt;-<span class="st"> </span><span class="dv">90</span>; y3[<span class="dv">98</span>] &lt;-<span class="st"> </span><span class="dv">1500</span>; x3[<span class="dv">98</span>] &lt;-<span class="st"> </span><span class="dv">80</span>
+dat3 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(x3, y3)
+<span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(<span class="dt">x=</span>x3, <span class="dt">y=</span>y3)) +<span class="st"> </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&quot;lm&quot;</span>)</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-23-1.pdf" width="739.2" /></p>
+</div>
+<div id="--3" class="section level2">
+<h2>Решение, блок 3</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod3 &lt;-<span class="st"> </span><span class="kw">lm</span>(y3 ~<span class="st"> </span>x3, <span class="dt">data =</span> dat3)
+op &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))
+<span class="kw">plot</span>(mod3, <span class="dt">which =</span> <span class="dv">4</span>)
+<span class="kw">residualPlot</span>(mod3)
+<span class="kw">qqPlot</span>(mod3)
+<span class="kw">par</span>(op)</code></pre></div>
+<p><img src="05_model_validation_files/figure-html/unnamed-chunk-24-1.pdf" width="739.2" /></p>
+<p></p>
+<ul>
+<li>100-е наблюдение сильно влияет на ход регрессии</li>
+<li>Зависимость нелинейна</li>
+</ul>
+</div>
+<div id="----------" class="section level2">
+<h2>Что нужно писать в тексте статьи по поводу проверки валидности моделей?</h2>
+<div id="-1" class="section level3">
+<h3>Вариант 1</h3>
+<p>Привести необходимые графики в электронных приложениях.</p>
+<p></p>
+</div>
+<div id="-2" class="section level3">
+<h3>Вариант 2</h3>
+<p>Привести в тексте работы результаты тестов на гомогеность дисперсии, автокорреляцию (если используются пространственые или временные предикторы) и нормальность распределиня остатков.</p>
+<p></p>
+</div>
+<div id="3" class="section level3">
+<h3>Вариант3</h3>
+<p>Написать в главе <em>“Материал и методика”</em> фразу вроде такой: “Визуальная проверка графиков рассяния остатков не выявила заметных отклонений от условий гомогенности дисперсий и нормальности”.</p>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<ul>
+<li>Не всякая модель, в которой коэффициенты достоверно отличаются от нуля, может считаться валидной</li>
+<li>Обязательный этап работы с моделями - проверка условий применимости</li>
+<li>Наиболее важную информацию о валидности модели дает анализ остатков</li>
+</ul>
+</div>
+<div id="-" class="section level2">
+<h2>Что почитать</h2>
+<ul>
+<li>Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014.</li>
+<li>Quinn G.P., Keough M.J. (2002) Experimental design and data analysis for biologists, pp. 92-98, 111-130</li>
+<li>Diez D. M., Barr C. D., Cetinkaya-Rundel M. (2014) Open Intro to Statistics., pp. 354-367.</li>
+<li>Logan M. (2010) Biostatistical Design and Analysis Using R. A Practical Guide, pp. 170-173, 208-211</li>
+<li>Legendre P., Legendre L. (2012) Numerical ecology. Second english edition. Elsevier, Amsterdam.</li>
+</ul>
+</div>
+</div>
+
+<p><small>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">linmodr</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="varmara.github.io/linmodr-course" property="cc:attributionName" rel="cc:attributionURL">Marina Varfolomeeva, Vadim Khaitov, and Yuta tamberg</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+</small></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+$(document).ready(function () {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
