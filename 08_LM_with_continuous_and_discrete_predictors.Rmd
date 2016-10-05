@@ -411,7 +411,7 @@ grid.arrange(gg_parallel1, gg_parallel2, ncol = 2)
 
 Вторым методом получилось более строго, так как "обрезанные" графики не дают возможности для экстраполяций 
 
-```{r}
+```{r, echo=FALSE}
 grid.arrange(gg_parallel1, gg_parallel2, ncol = 2)
 ```
 
