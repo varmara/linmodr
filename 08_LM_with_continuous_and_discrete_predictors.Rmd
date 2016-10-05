@@ -720,7 +720,6 @@ summary(MG2)
 ```{r}
 coef(MG2)
 ```
-
 Уравнение:
 
 ```{r echo=FALSE,results='asis'}
