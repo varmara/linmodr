@@ -374,12 +374,10 @@ my_df2 <- minmax %>% group_by(fGRAZE) %>%
 
 ## Строим график с параллельными прямыми
 
-### Оба метода дали идентичные графики
-
-Но вторым методом получилось более строго
+Какой вариант правльный?
 ```{r, tidy=FALSE, fig.height=5, echo=FALSE}
 gg_parallel1 <- ggplot(data = my_df, aes(y = Predicted, x = LOGAREA, colour = fGRAZE, fill = fGRAZE)) +  
-  geom_line() + 
+  geom_path() + 
   geom_ribbon(aes(ymax = Predicted + 1.98 * SE, 
                   ymin = Predicted - 1.98 * SE),
               alpha = 0.3, colour = NA) +
@@ -408,6 +406,15 @@ gg_initial <- ggplot(data = BD, aes(x = LOGAREA, y = ABUND, color = fGRAZE)) + g
 
 grid.arrange(gg_parallel1, gg_parallel2, ncol = 2)
 ```
+
+## Строим график с параллельными прямыми
+
+Вторым методом получилось более строго, так как "обрезанные" графики не дают возможности для экстраполяций 
+
+```{r}
+grid.arrange(gg_parallel1, gg_parallel2, ncol = 2)
+```
+
 
 
 ## Сравним модель с "сырыми данными"
@@ -574,16 +581,20 @@ anova(M11)
 
 Как влияет на прирост массы коз интенсивность профилактики паразитарных заболеваний?
 
+<div class="columns-2">
+
+<img src="images/Goat-by-Jennifer-C.-Flickr.jpg" width="300" height="300">   
+<small> Goat by Jennifer C. [on Flickr](https://flic.kr/p/fjU4J9) </small>  
+
+
 Известно, что у легких животных привес больше, поэтому мы должны учитывать в модели не только способ обработки от глистов, но и влияние начального веса.
 
-<div class="columns-2">
 
 - Treatment - обработка от глистов (стандартная, интенсивная)
 - Weightgain - привес, кг
 - Initial.wt - начальный вес, кг
 
-<img src="images/Goat-by-Jennifer-C.-Flickr.jpg" width="300" height="300">   
-Goat by Jennifer C. [on Flickr](https://flic.kr/p/fjU4J9)
+
 </div>
 
 <small>
