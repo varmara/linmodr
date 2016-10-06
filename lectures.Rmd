@@ -80,8 +80,9 @@ install.packages("dplyr")
 - [код R](08_code_LM_with_continuous_and_discrete_predictors.R)
 - Данные
     - [goats.csv](data/goats.csv)
+
 - [Домашнее задание №4 --- Линейные модели с непрерывными и дискретными предикторами](hw/hw4_ancova-crabs.zip) Надеюсь, вам еще не надоели крабы!)
-<!-- - [Примеры вопросов следующего теста](test_handouts/05-modsel-ancova-handout-test1.pdf) -->
+- [Примеры вопросов следующего теста](test_handouts/05-mregr-handout-test1.pdf)
 
 ## 9.Линейные модели только с дискретными предикторами (дисперсионный анализ) 
 
