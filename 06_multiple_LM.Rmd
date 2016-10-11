@@ -23,9 +23,8 @@ institute: "Кафедра Зоологии беспозвоночных, Био
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
-# opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
 opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
-library("extrafont")
+# library("extrafont")
 ```
 
 
