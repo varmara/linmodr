@@ -90,15 +90,15 @@ install.packages("dplyr")
 install.packages(c("DAAG", "multcomp"))
 ```
 
-- Презентация [html] | [pdf]
-- [код R]
-- Данные
+- Презентация [pdf](09_anova.pdf)
+- [код R](09_code_anova.R)
 
 ## 10. Многофакторный дисперсионный анализ 
 
-- Презентация [html] | [pdf]
-- [код R]
+- Презентация [pdf](10_two-way_anova_and_interactions.pdf)
+- [код R](10_two-way_anova_and_interactions.R)
 - Данные
+    - [hall.csv](data/hall.csv)
 - [Примеры вопросов следующего теста]
 
 ## 11. Линейные модели для бинарных данных (логистическая регрессия) 
