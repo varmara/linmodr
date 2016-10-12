@@ -96,7 +96,7 @@ install.packages(c("DAAG", "multcomp"))
 ## 10. Многофакторный дисперсионный анализ 
 
 - Презентация [pdf](10_two-way_anova_and_interactions.pdf)
-- [код R](10_two-way_anova_and_interactions.R)
+- [код R](10_code_two-way_anova_and_interactions.R)
 - Данные
     - [hall.csv](data/hall.csv)
 - [Примеры вопросов следующего теста]
