@@ -56,7 +56,7 @@ Anova(fmod2, type = 2)
 
 #' ## Дисперсионный анализ c III типом сумм квадратов
 fmod3 <- lm(log_rich ~ treat * time, data = fert, contrasts = list(treat = contr.sum, time = contr.sum))
-Anova(fmod3)
+Anova(fmod3, type = 3)
 
 #' ## Пост хок тест для взаимодействия факторов
 fert$treat_time <- interaction(fert$treat, fert$time)
@@ -68,7 +68,7 @@ summary(dat_tukey)
 #' ## Данные для графика при помощи `predict()`
 MyData <- expand.grid(treat = levels(fert$treat),
                       time = levels(fert$time))
-MyData <- data.frame(MyData, predict(fmod, newdata = MyData,
+MyData <- data.frame(MyData, predict(fmod2, newdata = MyData,
                                      interval = "confidence"))
 # Обратная трансформация
 MyData$richness <- 10^MyData$fit

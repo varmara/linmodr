@@ -166,7 +166,7 @@ $\alpha$, $\beta$ и $\gamma$ --- это группы коэффициентов
 
 \pause
 
-- взаимодействие достоверно, и не маскирует главные эффекты
+- взаимодействие недостоверно
   - фактор А влияет
   - фактор В влияет
 
@@ -411,7 +411,7 @@ Anova(fmod2, type = 2)
 
 ```{r tidy.opts=list(width.cutoff=40)}
 fmod3 <- lm(log_rich ~ treat * time, data = fert, contrasts = list(treat = contr.sum, time = contr.sum))
-Anova(fmod3)
+Anova(fmod3, type = 3)
 ```
 
 
@@ -451,8 +451,9 @@ summary(dat_tukey)
 ```{r}
 MyData <- expand.grid(treat = levels(fert$treat),
                       time = levels(fert$time))
-MyData <- data.frame(MyData, predict(fmod, newdata = MyData, 
-                                     interval = "confidence"))
+MyData <- data.frame(MyData,
+  predict(fmod2, newdata = MyData,
+          interval = "confidence"))
 # Обратная трансформация
 MyData$richness <- 10^MyData$fit
 MyData$LWR <- 10^MyData$lwr
@@ -472,11 +473,11 @@ MyData
 
 ```{r purl=FALSE}
 MyData <- expand.grid(treat = levels(fert$treat),
-                      time = levels(fert$time))
+                     time = levels(fert$time))
 X <- model.matrix(~ treat * time, data = MyData)
-betas <- coef(fmod)
+betas <- coef(fmod2)
 MyData$fit <- X %*% betas
-MyData$se <- sqrt(diag(X %*% vcov(fmod) %*% t(X)))
+MyData$se <- sqrt(diag(X %*% vcov(fmod2) %*% t(X)))
 MyData$lwr <- MyData$fit - qnorm(0.975) * MyData$se
 MyData$upr <- MyData$fit + qnorm(0.975) * MyData$se
 # Обратная трансформация
