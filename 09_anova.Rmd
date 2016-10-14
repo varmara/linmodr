@@ -19,7 +19,8 @@ institute: "Кафедра Зоологии беспозвоночных, Био
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
+# to render
+# rmarkdown::render("09_anova.Rmd", output_format = "beamer_presentation")
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
