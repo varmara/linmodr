@@ -99,7 +99,7 @@ install.packages(c("DAAG", "multcomp"))
 - [код R](10_code_two-way_anova_and_interactions.R)
 - Данные
     - [hall.csv](data/hall.csv)
-- [Примеры вопросов следующего теста]
+- [Примеры вопросов следующего теста](test_handouts/06-anova-handout-test1.pdf)
 
 ## 11. Линейные модели для бинарных данных (логистическая регрессия) 
 
