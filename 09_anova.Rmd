@@ -499,7 +499,7 @@ sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[
 ```{r echo=FALSE, results='asis', purl=FALSE}
 library(xtable)
 smr <- fix_Anova(cu_anova,
-                 rown = c("Влажность", "Остаточная"), 
+                 rown = c("Хозяин", "Остаточная"), 
                  coln = c("SS", "df", "F", "P"))
 xtb <- xtable(
   smr,
