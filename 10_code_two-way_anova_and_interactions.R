@@ -87,9 +87,7 @@ MyData
 
 
 #' ## Графики для результатов: Столбчатый график
-
 pos <- position_dodge(width = 0.9)
-
 gg_barp <- ggplot(data = MyData, aes(x = time, y = richness,
             ymin = LWR,  ymax = UPR, fill = treat)) +
   geom_bar(stat = "identity", position = pos) +
@@ -101,9 +99,9 @@ gg_barp
 #' ## Графики для результатов: Линии с точками
 gg_linep <- ggplot(data = MyData, aes(x = time, y = richness,
               ymin = LWR,  ymax = UPR, colour = treat)) +
-  geom_point(size = 3, position = position_dodge(0.2)) +
-  geom_line(aes(group = treat), position = position_dodge(0.2)) +
-  geom_errorbar(width = 0.1, position = position_dodge(0.2))
+  geom_point(size = 3, position = pos) +
+  geom_line(aes(group = treat), position = pos) +
+  geom_errorbar(width = 0.1, position = pos)
 gg_linep
 
 
