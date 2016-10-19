@@ -1,0 +1,93 @@
+---
+title: "Заголовок beamer-test"
+subtitle: "Подзаголовок beamer-test"
+author: "Автор презентации"
+output:
+  beamer_presentation:
+    colortheme: beaver
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: default
+    toc: no
+institute: "Кафедра Очень Важных Наук, Известный Университет"
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# to render
+# rmarkdown::render("beamer-test.Rmd", output_format = "beamer_presentation")
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+```
+
+## Слайд с некрасивой таблицей в rmarkdown
+
+|Строки| Столбец 1| Столбец 2 с длинным предлинным названием |
+|------|-----|-----|
+|Строка 1| Ячейка 1| Ячейка 2 |
+|Строка 2 с длинным названием | Ячейка с длинным содержимым | Ячейка с еще более длинным содержимым |
+
+## Слайд с красивой таблицей в LATEX
+
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{L{0.25\textwidth} C{0.25\textwidth} C{0.25\textwidth} C{0.25\textwidth}}
+\hline\noalign{\smallskip}
+Строки & Столбец 1 & Столбец 2 с длинным предлинным названием \\
+\hline\noalign{\smallskip}
+Строка 1 & Ячейка 1 & Ячейка 2 \\
+Строка 2 с длинным названием & Ячейка с длинным содержимым & Ячейка с еще более длинным содержимым \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
+
+## Двухколоночный слайд с рисунком и подписью мелким шрифтом внизу
+
+Фрагментация лесных местообитаний - одна из важнейших проблем Австралии. 
+Вопрос: от каких факторов зависит обилие птиц во фрагментированных лесных массивах? (Loyn, 1987)
+
+\columnsbegin
+
+\column{0.5\textwidth}
+
+**Зависимая перменная**
+
+- `ABUND` - Обилие птиц на стандартном маршруте
+
+\includegraphics[width=\linewidth]{images/Australia.png}   
+
+\column{0.5\textwidth}
+
+**Предикторы**
+
+- `AREA` - площадь лесного массива (Га)  
+- `YRISOL` - год, в котором произошла изоляция лесного массива   
+- `DIST` - расстояние до ближайшего лесного массива (км)   
+- `LDIST` - расстояние до ближайшего более крупного массива (км)    
+- `GRAZE` - качественная оценка уровня выпаса скота (1 - низкий уровень, 5 - высокий уровень)    
+- `ALT` - высота над уровнем моря (м)   
+
+\columnsend
+
+\vskip0pt plus 1filll
+\tiny{Пример из кн. Quinn, Keugh, 2002, данные из Loyn, 1987)}
+
+
+
+
+## Слайд с графиком с подписями
+
+```{r pressure, fig.height=4, out.height='4cm'}
+plot(pressure, 
+     xlab = "Температура", 
+     ylab = "Давление", 
+     main = "Название графика кирилицей")
+```
+
