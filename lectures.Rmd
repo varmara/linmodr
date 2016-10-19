@@ -90,6 +90,11 @@ install.packages("caret")
 - Презентация [html](10_two-way_anova_and_interactions.html) | [pdf]
 - [код R](10_code_two-way_anova_and_interactions.R)
 - Данные
+<<<<<<< HEAD
+=======
+    - [hall.csv](data/hall.csv)
+- [Примеры вопросов следующего теста](test_handouts/06-anova-handout-test1.pdf)
+>>>>>>> 500fa17a1063479bbed3911ef35035dd125548ee
 
 ## 11.Линейные модели для бинарных данных (логистическая регрессия) 
 

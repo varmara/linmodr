@@ -19,7 +19,8 @@ institute: "Кафедра Зоологии беспозвоночных, Био
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
+# to render
+# rmarkdown::render("09_anova.Rmd", output_format = "beamer_presentation")
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
@@ -498,7 +499,7 @@ sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[
 ```{r echo=FALSE, results='asis', purl=FALSE}
 library(xtable)
 smr <- fix_Anova(cu_anova,
-                 rown = c("Влажность", "Остаточная"), 
+                 rown = c("Хозяин", "Остаточная"), 
                  coln = c("SS", "df", "F", "P"))
 xtb <- xtable(
   smr,
