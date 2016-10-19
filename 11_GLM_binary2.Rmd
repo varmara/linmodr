@@ -1,0 +1,153 @@
+---
+title: "Регрессионный анализ для бинарных данных"
+subtitle    : "Линейные модели..."
+author: Вадим Хайтов, Марина Варфоломеева
+output:
+  beamer_presentation:
+    colortheme: beaver
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: default
+    toc: no
+institute: "" 
+---
+
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# to render
+# rmarkdown::render("beamer-test.Rmd", output_format = "beamer_presentation")
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7, cache = TRUE)
+```
+
+
+## Мы рассмотрим 
++ Регрессионный анализ для бинарных зависимых переменных
+
+### Вы сможете
++ Построить логистическую регрессионную модель, подобранную методом максимального правдоподобия
++ Дать трактовку параметрам логистической регрессионной модели 
++ Провести анализ девиансы, основанный на логистической регрессии
+
+
+## Бинарные данные - очень распространенный тип зависимых переменных
+
++ Вид есть - вида нет
++ Кто-то в результате эксперимента выжил или умер
++ Пойманное животное заражено паразитами или здорово
++ Команда выиграла или проиграла 
+
+и т.д.
+
+## На каком острове лучше искать ящериц? 
+
+\columnsbegin
+
+\column{0.5 \textwidth}
+
+\includegraphics[width=\linewidth] {images/esher.jpg}
+
+\column {0.5 \textwidth}
+```{r, echo=TRUE}
+liz <- read.csv("data/polis.csv")
+head(liz)
+```
+\columnsend
+
+\vskip0pt plus 1filll
+\tiny{Пример взят из книги Quinn \& Keugh (2002), Оригинальная работа Polis et al. (1998)}
+
+
+
+## Зависит ли встречаемость ящериц от размера острова?
+
+\columnsbegin
+\column {0.5 \textwidth}
+
+
+\begin{small}
+
+Обычную линейную регрессию подобрать можно,
+
+Зависимая переменная: PA - (есть ящерицы "1" - нет ящериц "0")
+
+Предиктор  - PARATIO (отношение периметра к площади)
+
+
+\end{small}
+
+```{r, echo=FALSE, eval=FALSE}
+fit <- lm(PA ~ PARATIO, data = liz)
+summary(fit)
+```
+
+\column {0.5 \textwidth}
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+
+ggplot(liz, aes(x=PARATIO, y=PA)) + geom_point() + geom_smooth(method="lm", se=FALSE)
+```
+
+\textbf {но она категорически не годится}
+
+\columnsend
+
+<!-- ## Эти данные лучше описывает логистическая кривая  -->
+
+<!-- \columnsbegin -->
+
+<!-- \column {0.5 \textwidth} -->
+<!-- ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.width=5, fig.height=5} -->
+
+<!-- ggplot(liz, aes(x=PARATIO, y=PA)) + geom_smooth(method="glm", method.args = list(family="binomial"), se=FALSE, size = 2) + ylab("Предсказанная вероятность встречи") + geom_point() -->
+<!-- ``` -->
+
+<!-- \column {0.5 \textwidth} -->
+<!-- Логистическая кривая описывается такой формулой -->
+
+<!-- $$ \pi(x) = \frac{e^{\beta_0+\beta_1x}}{1+e^{\beta_0+\beta_1x}} $$ -->
+
+<!-- \columnsend -->
+
+<!-- ## Зависимую величину можно преобразовать в более удобную для моделирования форму -->
+
+<!-- > 1. Дискретный результат: 1 или 0 -->
+<!-- > 2. Дискретные данные можно преобразовать в форму оценки вероятности события: $\pi = \frac{N_i}{N_{total}}$, непрерывная аеличина, варьирующая от 0 до 1 -->
+<!-- > 3. Вероятность события можно выразить в форме шансов (odds): $odds=\frac{\pi}{1-\pi}$ варьируют от 0 до $+\infty$. *NB: Если шансы > 1, то вероятность события, что $y_i=1$ выше, чем вероятность события $y_i = 0$.  Если шансы < 1, то наоборот*. В обыденной речи мы часто использем фразы, наподобие такой "*шансы на победу 1 к 3*" -->
+<!-- > 4. Шансы преобразуются в _Логиты_ (logit):  $ln(odds)=\ln(\frac{\pi}{1-\pi})$ варьируют от  $-\infty$ до $+\infty$. Логиты гораздо удобнее для построения моделей. -->
+
+
+<!-- ## Что станет с логистической моделью после логит-преобразования? -->
+<!-- ###Немного алгебры -->
+<!-- Обозначим для краткости $\beta_0 + \beta_1x \equiv z$ -->
+
+<!-- Тогда -->
+<!-- \begin{small} -->
+<!-- $$ g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})= \ln(\frac{\frac{e^z}{1+e^z}}{1-\frac{e^z}{1+e^z}}) $$ -->
+<!-- \pause -->
+<!-- $$ g(x)=\ln(\frac{e^z}{1+e^z}) - \ln({1-\frac{e^z}{1+e^z}}) $$ -->
+<!-- \pause -->
+<!-- $$ g(x)=\ln(\frac{e^z}{1+e^z}) - \ln({\frac{1+e^z - e^z}{1+e^z}}) = \ln(\frac{e^z}{1+e^z}) - \ln({\frac{1}{1+e^z}})  $$ -->
+<!-- \pause -->
+<!-- $$ g(x)=\ln(e^z) - \ln(1+e^z) - (\ln(1) -\ln(1+e^z))  $$ -->
+<!-- \pause -->
+<!-- $$ g(x)=\ln(e^z) - \ln(1+e^z) - 0 +\ln(1+e^z) = \ln(e^z) = z $$ -->
+<!-- \end{small} -->
+
+
+<!-- ## Логистическая модель после логит-преобразования становится линейной -->
+
+<!-- $$ g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})=\beta_0 + \beta_1x$$ -->
+
+<!-- Остается только подобрать параметры этой линейной модели: $\beta_0$ (интерсепт) и $\beta_1$ (угловой коэффициент) -->

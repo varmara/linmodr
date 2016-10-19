@@ -1,0 +1,154 @@
+---
+title: "Линейные модели для счетных данных"
+subtitle: "Линейные модели..."
+author: "Вадим Хайтов, Марина Варфоломеева"
+output:
+  beamer_presentation:
+    colortheme: beaver
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: default
+    toc: no
+institute: "" 
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# to render
+# rmarkdown::render("beamer-test.Rmd", output_format = "beamer_presentation")
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+```
+
+
+## Мы рассмотрим 
++ Различные варианты анализа, применяющегося для тех случаев, когда зависимая перменная - счетная величина (целые неотрицательные числа)
+
+###  Вы сможете
++ Объяснить особенности разных типов распределений, принадлежащих экспоненциальному семейству. 
++ Построить пуасоновскую и квази-пуассоновскую линейную модель
++ Объяснить проблемы, связанные с избыточностью дисперсии в модели
++ Построить модель, основанную на отрицательном биномиальном распределении
+
+
+# Различные типы распределений 
+
+## Распределение
+
+То, что мы в быту привыкли называть **распределением** - это функция плотности вероятности.
+
+**Плотность вероятности** - это функция, описывающая вероятность получения разных значений случайной величины
+
+
+
+
+## Нормальное распределение {.columns-2}
+
+\columnsbegin
+
+\column{0.5\textwidth}
+
+
+$$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^2}}$$
+
+### Два параметра ($\mu$, $\sigma$)
+
+Среднее: &emsp; $E(Y)  = \mu$
+
+Дисперсия: $var(Y) = \sigma^2$
+
+### Пределы варьирования   
+
+$-\infty \le Y \le +\infty$    
+
+\column{0.5\textwidth}
+
+```{r, echo=FALSE, fig.width=5, fig.height=6, warning=FALSE}
+library(ggplot2)
+mu1 <- 10
+mu2 <- 20
+sigma1 <- 5
+sigma2 <- 10
+y <- -20:50
+pi <- data.frame(y = rep(y, 4), pi = c(dnorm(y, mu1, sigma1), dnorm(y, mu1, sigma2), dnorm(y, mu2, sigma1), dnorm(y, mu2, sigma2)), mu = rep(c(mu1, mu2), each = 2*length(y)), sigma = rep(c(sigma1, sigma2, sigma1, sigma2), each = length(y)) )
+
+ggplot(pi, aes(x = y, y = pi)) + geom_line(stat = "identity") + facet_grid(mu~sigma, labeller = label_both, scales = "free_y") + ggtitle("Нормальное распределение \nпри разных параметрах") + ylab("Плотность вероятности (f)")
+
+```
+
+\columnsend
+
+
+
+
+## Слайд с некрасивой таблицей в rmarkdown
+
+|Строки| Столбец 1| Столбец 2 с длинным предлинным названием |
+|------|-----|-----|
+|Строка 1| Ячейка 1| Ячейка 2 |
+|Строка 2 с длинным названием | Ячейка с длинным содержимым | Ячейка с еще более длинным содержимым |
+
+## Слайд с красивой таблицей в LATEX
+
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{L{0.25\textwidth} C{0.25\textwidth} C{0.25\textwidth} C{0.25\textwidth}}
+\hline\noalign{\smallskip}
+Строки & Столбец 1 & Столбец 2 с длинным предлинным названием \\
+\hline\noalign{\smallskip}
+Строка 1 & Ячейка 1 & Ячейка 2 \\
+Строка 2 с длинным названием & Ячейка с длинным содержимым & Ячейка с еще более длинным содержимым \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
+
+## Двухколоночный слайд с рисунком и подписью мелким шрифтом внизу
+
+Фрагментация лесных местообитаний - одна из важнейших проблем Австралии. 
+Вопрос: от каких факторов зависит обилие птиц во фрагментированных лесных массивах? (Loyn, 1987)
+
+\columnsbegin
+
+\column{0.5\textwidth}
+
+**Зависимая перменная**
+
+- `ABUND` - Обилие птиц на стандартном маршруте
+
+\includegraphics[width=\linewidth]{images/Australia.png}   
+
+\column{0.5\textwidth}
+
+**Предикторы**
+
+- `AREA` - площадь лесного массива (Га)  
+- `YRISOL` - год, в котором произошла изоляция лесного массива   
+- `DIST` - расстояние до ближайшего лесного массива (км)   
+- `LDIST` - расстояние до ближайшего более крупного массива (км)    
+- `GRAZE` - качественная оценка уровня выпаса скота (1 - низкий уровень, 5 - высокий уровень)    
+- `ALT` - высота над уровнем моря (м)   
+
+\columnsend
+
+\vskip0pt plus 1filll
+\tiny{Пример из кн. Quinn, Keugh, 2002, данные из Loyn, 1987)}
+
+
+
+
+## Слайд с графиком с подписями
+
+```{r pressure, fig.height=4, out.height='4cm'}
+plot(pressure, 
+     xlab = "Температура", 
+     ylab = "Давление", 
+     main = "Название графика кирилицей")
+```
+

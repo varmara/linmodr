@@ -116,11 +116,11 @@ install.packages("qcc")
 install.packages("AER")
 ```
 
-- Презентация [html](12_GLM_count.html) | [pdf]
+- Презентация [html](12_GLM_count.html) | [pdf](12_GLM_count2.pdf)
 - [код R](12_code_GLM_count.R)
 - Данные
     - [mussel_juv_ad.csv](data/mussel_juv_ad.csv)
-    - [ICU.csv](data/ICU.csv)
+    
 - [Домашнее задание №5]
 
 ## 13. Смешанные линейные модели 
