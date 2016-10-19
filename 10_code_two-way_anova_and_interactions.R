@@ -56,7 +56,7 @@ Anova(fmod2, type = 2)
 
 #' ## Дисперсионный анализ c III типом сумм квадратов
 fmod3 <- lm(log_rich ~ treat * time, data = fert, contrasts = list(treat = contr.sum, time = contr.sum))
-Anova(fmod3)
+Anova(fmod3, type = 3)
 
 #' ## Пост хок тест для взаимодействия факторов
 fert$treat_time <- interaction(fert$treat, fert$time)
@@ -68,7 +68,7 @@ summary(dat_tukey)
 #' ## Данные для графика при помощи `predict()`
 MyData <- expand.grid(treat = levels(fert$treat),
                       time = levels(fert$time))
-MyData <- data.frame(MyData, predict(fmod, newdata = MyData,
+MyData <- data.frame(MyData, predict(fmod2, newdata = MyData,
                                      interval = "confidence"))
 # Обратная трансформация
 MyData$richness <- 10^MyData$fit
@@ -87,7 +87,9 @@ MyData
 
 
 #' ## Графики для результатов: Столбчатый график
+
 pos <- position_dodge(width = 0.9)
+
 gg_barp <- ggplot(data = MyData, aes(x = time, y = richness,
             ymin = LWR,  ymax = UPR, fill = treat)) +
   geom_bar(stat = "identity", position = pos) +
@@ -99,9 +101,9 @@ gg_barp
 #' ## Графики для результатов: Линии с точками
 gg_linep <- ggplot(data = MyData, aes(x = time, y = richness,
               ymin = LWR,  ymax = UPR, colour = treat)) +
-  geom_point(size = 3, position = pos) +
-  geom_line(aes(group = treat), position = pos) +
-  geom_errorbar(width = 0.1, position = pos)
+  geom_point(size = 3, position = position_dodge(0.2)) +
+  geom_line(aes(group = treat), position = position_dodge(0.2)) +
+  geom_errorbar(width = 0.1, position = position_dodge(0.2))
 gg_linep
 
 

@@ -1,0 +1,89 @@
+---
+title: "Линейные модели для счетных данных"
+subtitle    : "Линейные модели..."
+author: Вадим Хайтов, Марина Варфоломеева
+output:
+  beamer_presentation:
+    colortheme: beaver
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: default
+    toc: no
+institute: "Кафедра Зоологии беспозвоночных, Биологический факультет, СПбГУ"
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, cache = TRUE)
+```
+
+
+## Мы рассмотрим 
++ Различные варианты анализа, применяющегося для тех случаев, когда зависимая перменная - счетная величина (целые неотрицательные числа)
+
+###  Вы сможете
++ Объяснить особенности разных типов распределений, принадлежащих экспоненциальному семейству. 
++ Построить пуасоновскую и квази-пуассоновскую линейную модель
++ Объяснить проблемы, связанные с избыточностью дисперсии в модели
++ Построить модель, основанную на отрицательном биномиальном распределении
+
+
+# Различные типы распределений 
+
+## Распределение
+
+То, что мы в быту привыкли называть **распределением** - это функция плотности вероятности.
+
+**Плотность вероятности** - это функция, описывающая вероятность получения разных значений случайной величины
+
+
+
+
+## Нормальное распределение 
+
+\begin {columns}
+\column{0.5\textwidth}
+
+$$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^2}}$$
+
+### Два параметра ($\mu$, $\sigma$)
+
+Среднее: &emsp; $E(Y)  = \mu$
+
+Дисперсия: $var(Y) = \sigma^2$
+
+### Пределы варьирования   
+
+$-\infty \le Y \le +\infty$    
+
+\column{0.5\textwidth}
+
+```{r, echo=FALSE, fig.width=5, fig.height=6, warning=FALSE}
+library(ggplot2)
+mu1 <- 10
+mu2 <- 20
+sigma1 <- 5
+sigma2 <- 10
+y <- -20:50
+pi <- data.frame(y = rep(y, 4), pi = c(dnorm(y, mu1, sigma1), dnorm(y, mu1, sigma2), dnorm(y, mu2, sigma1), dnorm(y, mu2, sigma2)), mu = rep(c(mu1, mu2), each = 2*length(y)), sigma = rep(c(sigma1, sigma2, sigma1, sigma2), each = length(y)) )
+
+ggplot(pi, aes(x = y, y = pi)) + geom_line(stat = "identity") + facet_grid(mu~sigma, labeller = label_both, scales = "free_y") + ggtitle("Нормальное распределение \nпри разных параметрах") + ylab("Плотность вероятности (f)")
+
+```
+
+\end{columns}
+
+## Что почитать
++ Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014.
++ Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. - Statistics for biology and health. Springer, New York, NY. 
+
+

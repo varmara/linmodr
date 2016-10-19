@@ -13,6 +13,7 @@
 
 ## Читаем данные
 BD <- read.csv("data/loyn.csv")
+str(BD)
 BD$fGRAZE <- factor(BD$GRAZE)
 
 ## Проверяем сбаллансированность комплекса
@@ -20,7 +21,8 @@ table(BD$fGRAZE)
 
 # "пустой график"
 dot <- ggplot(data = BD, aes(y = 1:nrow(BD))) + geom_point()
-
+library(ggplot2)
+library(gridExtra)
 
 ## Добавляем эстетики
 dot1 <- dot + aes(x = ABUND)
@@ -72,8 +74,8 @@ X
 
 ## Применям матричную алгебру для поиска вектора коэффициентов
 
-
-
+Matr <- (t(X) %*% X)
+solve(Matr) %*% (t(X) %*% BD$ABUND)
 
 
 ## Меняем базовый уровень
@@ -96,9 +98,17 @@ my_df <- expand.grid(
   fGRAZE = unique(BD$fGRAZE),
   LOGAREA = seq(min(BD$LOGAREA), max(BD$LOGAREA), 0.1 )
   )
+
+my_df <- unique(BD[, c("fGRAZE", "LOGAREA")]) # еще один метод
+
 my_df$Predicted <- predict(M3, newdata = my_df)
 my_df$SE <- predict(M3, newdata = my_df, se.fit = TRUE)$se.fit
 
+
+my_df$Predicted <- predict(M3, newdata = my_df)
+my_df$SE <- predict(M3, newdata = my_df, se.fit = TRUE)$se.fit
+
+head(my_df)
 
 # С применением конвейерного метода обработки данных
 library(dplyr)
@@ -123,7 +133,7 @@ my_df2 <- minmax %>% group_by(fGRAZE) %>%
 ## Строим рафики
 
 gg_parallel1 <- ggplot(data = my_df, aes(y = Predicted, x = LOGAREA, colour = fGRAZE, fill = fGRAZE)) +
-  geom_line() +
+  geom_path() +
   geom_ribbon(aes(ymax = Predicted + 1.98 * SE,
                   ymin = Predicted - 1.98 * SE),
                   alpha = 0.3, colour = NA) +
@@ -153,6 +163,8 @@ grid.arrange(gg_parallel1, gg_parallel2, ncol = 2)
 grid.arrange(gg_parallel2, gg_initial, ncol = 2)
 
 ## Модель с взаимодействиям предикторов
+M4 <- lm(ABUND ~ (LOGAREA * LOGDIST *  ALT * fGRAZE), data = BD)
+
 M4 <- lm(ABUND ~ (LOGAREA + LOGDIST +  ALT + fGRAZE)^2, data = BD)
 drop1(M4, test = "F")
 
@@ -195,6 +207,40 @@ formula(M11)
 
 AIC(M12, M11)
 
+
+
+
+library(caret)
+SEED = 12345
+
+set.seed(SEED)
+
+train_control <- trainControl(method = "boot")
+
+f1 <- formula(M11)
+
+MCV1 <- train(f1, data = BD, trControl = train_control, method = "lm")
+
+
+MCV1$results # итоговая статистика
+
+## Меняем структуру модели
+f2 <- formula(M12)
+
+
+set.seed(SEED)
+
+MCV2 <- train(f2, data = BD, trControl = train_control, method = "lm")
+
+c(
+  MCV1$results$RMSE,
+  MCV2$results$RMSE
+  )
+
+
+
+
+
 ## Визуализируем модель с взаимодействиями
 my_df <- unique(BD[, c("fGRAZE", "LOGAREA")]) # еще один метод
 
@@ -223,10 +269,47 @@ str(goat)
 colnames(goat) <- c("treat", "wt", "init")
 
 levels(goat$treat)
+Mod <- lm(wt ~ treat*init, data = goat )
+
+Mod_vif <- lm(wt ~ treat + init, data = goat )
+vif(Mod_vif)
+
 
 ## Меняем уровни местами
 goat$treat <- relevel(goat$treat, ref = "standard")
 
 #Решение
 
+library(car)
+op <- par(mfrow = c(1, 1)) # располагаем картинки в 3 колонки
+par(mfrow = c(1, 3))
+plot(Mod, which = 4)          # Расстояние Кука
+residualPlot(Mod)             # График остатков
+qqPlot(Mod)                   # Квантильный график остатков
+par(op)
+
+drop1(Mod, test = "F" )
+
+anova(Mod)
+
+summary(Mod)
+
+Mod2 <- update(Mod, ~ . - treat:init )
+
+summary(Mod2)
+
+my_df <- unique(goat[, c("treat", "init")]) # еще один метод
+
+my_df$Predicted <- predict(Mod2, newdata = my_df)
+my_df$SE <- predict(Mod2, newdata = my_df, se.fit = TRUE)$se.fit
+
+
+ggplot(my_df, aes(x = init, y = Predicted, color = treat)) + geom_path() + geom_point(data = goat, aes(x = init, y = wt, color = treat), size = 4) + geom_ribbon(aes(ymax = Predicted + 1.98 * SE, ymin = Predicted - 1.98 * SE, color = treat), alpha = 0.4) 
+
+op <- par(mfrow = c(1, 1)) # располагаем картинки в 3 колонки
+par(mfrow = c(1, 3))
+plot(Mod2, which = 4)          # Расстояние Кука
+residualPlot(Mod)             # График остатков
+qqPlot(Mod)                   # Квантильный график остатков
+par(op)
 

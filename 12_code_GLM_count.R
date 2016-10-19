@@ -1,3 +1,9 @@
+# title: "Линейные модели для счетных данных"
+# subtitle    : "Линейные модели..."
+# author: Вадим Хайтов, Марина Варфоломеева
+
+
+
 install.packages("AER")
 install.packages("qcc")
 

@@ -14,7 +14,7 @@ output:
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, cache = FALSE)
 ```
 
 
@@ -199,24 +199,15 @@ ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu, 
 
 ##Связующая функция (Link function)
 
-Предсказаные значения, т.е. $E(Y_i)$, лежат на линии регрессии 
+Предсказаные значения, т.е. $E(Y_i) = \mu_i$, лежат на линии регрессии.   
 
-<div class="columns-2">
-<img src="images/poisson_model.png" width="500" height="500" >   
+Линейные модели основаны на линейной связи между зависимой переменной и предиктором. Но для некоторых типов распределений это невозможно по природе величин (например, они лежат в интервале [0,1]).
 
-<img src="images/Zuur.png" width="500" height="500" >   
-из кн. Zuur et al.2009    
+Поэтому  для каждого типа распределения наиболее "естественным" будет свой ообый характер связи.  
 
-</dev>
-
-
-
-## Связующая функция (Link function)
-
-Для каждого типа распределения характер связи между $\mu_i$ и значениями предиктора может быть разным.  
 Функция, описывающая связь между $\mu_i$ и значениями предикторов, называется *связующей функцией*
 
-### Наиболее распространенные (канонические) связующие функции
+## Наиболее распространенные (канонические) связующие функции
 
 Характер величин | Распределение | Связующая функция (link function)   
 |-------------|-------------|-------------|  
@@ -225,64 +216,163 @@ ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu, 
 Счетные величины (0, 1, 2, 3...)  |  Распределение Пуассона или Отрицательное биномиальное распределение  |log $X\beta = ln(\mu)$  
 
 
+**NB!** Есть и другие связующие функции
 
-## Логарифмическая связующая функция и распределение Пуассона {.smaller}
-```{r, eval=FALSE}
-M_sim1 <- glm(y ~ x, data = dat, family = poisson(link = "log"))
+```{r, echo=FALSE, fig.height=5, fig.width=8, warning=FALSE, message=FALSE}
+
+
+library(gridExtra)
+
+theme_set(theme_bw())
+
+# Регрессия с нормальным распределением 
+xy <- data.frame(X = rep(1:10, 3))
+xy$Y <- 10*xy$X + rnorm(30, 0, 10)
+
+Mod <- lm(Y ~ X, data = xy)
+
+xy$predicted <- predict(Mod)
+
+xy$predicted2 <- xy$predicted/0.8
+
+rand_df <- matrix(rep(NA,100000), ncol = 10)
+for(i in 1:10) rand_df[,i] <- rnorm(10000, xy$predicted[i], summary(Mod)$sigma)
+
+rand_df <- data.frame(X = rep(xy$X, each = 10000), Y = as.vector(rand_df))
+
+
+
+Plot_Norm <- ggplot(xy, aes(x = X, y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), adjust = 5) + geom_point() + geom_smooth(method = "lm", se = F) + geom_point(data = xy, aes(x = X, y = predicted), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная") + ggtitle("Нормальное распределение") 
+
+
+
+
+#Регрессия с биномиальным распределением
+
+#Нсходящая
+xy <- data.frame(X = rep(seq(1,50, 5), 3))
+p <- -0.2*xy$X + 5
+p <- exp(p) / (1 + exp(p))
+
+Size = length(xy$X)
+
+xy$Y <- rbinom(30, Size, p)/Size
+
+Mod <- glm(Y ~ X, data = xy, family = "binomial")
+
+
+
+xy$predicted <- predict(Mod, type = "response")
+
+
+rand_df <- matrix(rep(NA,100000), ncol = 10)
+
+
+
+for(i in 1:10) rand_df[,i] <- rbinom(10000, Size, xy$predicted[i]) / Size
+
+rand_df <- data.frame(X = rep(xy$X, each = 10000), Y = as.vector(rand_df))
+
+pred_df <- data.frame(X = unique(xy$X))
+pred_df$predicted <- predict(Mod, type = "response", newdata = pred_df)
+
+Plot_Binom1 <-  ggplot(data = xy, aes(x = factor(X), y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), adjust = 10) + geom_point(data = xy, aes(x = factor(X), y = Y)) + geom_path(data = pred_df, aes(x = factor(X), y = predicted, group = 1), color = "blue", size = 1) + geom_point(data = xy, aes(x = factor(X), y = predicted), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная \n(доля положительных исходов)") + ggtitle("Биномиальное распределение")
+
+
+#Восходящая
+
+xy <- data.frame(X = rep(seq(1,50, 5), 3))
+p <- 0.2*xy$X - 5
+p <- exp(p) / (1 + exp(p))
+
+Size = length(xy$X)
+
+xy$Y <- rbinom(30, Size, p)/Size
+
+Mod <- glm(Y ~ X, data = xy, family = "binomial")
+
+
+
+xy$predicted <- predict(Mod, type = "response")
+
+
+rand_df <- matrix(rep(NA,100000), ncol = 10)
+
+
+
+for(i in 1:10) rand_df[,i] <- rbinom(10000, Size, xy$predicted[i]) / Size
+
+rand_df <- data.frame(X = rep(xy$X, each = 10000), Y = as.vector(rand_df))
+
+pred_df <- data.frame(X = unique(xy$X))
+pred_df$predicted <- predict(Mod, type = "response", newdata = pred_df)
+
+Plot_Binom2<-  ggplot(data = xy, aes(x = factor(X), y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), adjust = 10) + geom_point(data = xy, aes(x = factor(X), y = Y)) + geom_path(data = pred_df, aes(x = factor(X), y = predicted, group = 1), color = "blue", size = 1) + geom_point(data = xy, aes(x = factor(X), y = predicted), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная \n(доля положительных исходов)") + ggtitle("Биномиальное распределение")
+
+
+
+
+
+# Регрессия с пуассоновским распределением
+
+xy <- data.frame(X = rep(seq(1,50, 5), 3))
+p <- 2*xy$X + 5
+
+# p <- exp(p)
+
+xy$Y <- rpois(30, p)
+
+Mod <- glm(Y ~ X, data = xy, family = "poisson")
+
+
+
+xy$predicted <- predict(Mod, type = "response")
+
+
+rand_df <- matrix(rep(NA,100000), ncol = 10)
+
+
+
+for(i in 1:10) rand_df[,i] <- rpois(10000, xy$predicted[i]) 
+
+rand_df <- data.frame(X = rep(xy$X, each = 10000), Y = as.vector(rand_df))
+
+pred_df <- data.frame(X = unique(xy$X))
+pred_df$predicted <- predict(Mod, type = "response", newdata = pred_df)
+
+Plot_Poiss <-  ggplot(data = xy, aes(x = factor(X), y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), adjust = 5) + geom_point(data = xy, aes(x = factor(X), y = Y)) + geom_path(data = pred_df, aes(x = factor(X), y = predicted, group = 1), color = "blue", size = 1) + geom_point(data = xy, aes(x = factor(X), y = predicted), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная") + ggtitle("Пуассоновское распределение")
+
+
+```
+
+##Связующая функция (Link function)
+
+В случае с нормальным распределением, предсказанные значения лежат на прямой линии, связывающей значения предиктора $x_i$ и предсказанное значение $\mu_i$. 
+
+`link = "identity"`   
+
+```{r, echo=FALSE, fig.height=5}
+Plot_Norm
+```
+
+##Связующая функция (Link function)
+
+В случае с биномиальным распределением, предсказанные значения лежат на логистической кривой, связывающей значения предиктора $x_i$ и предсказанное значение $\mu_i$.  
+
+`link = "logit"`  
+
+```{r, echo=FALSE, fig.height=5}
+grid.arrange(Plot_Binom1, Plot_Binom2, ncol = 2)
 ```
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=5.2}
-set.seed(1234567)
-x <- seq(1, 100, 10) 
-y <- rpois(length(x), lambda = exp(0.01 + 0.02*x))
+##Связующая функция (Link function)
 
-dat <- data.frame(x = x, y = y)
+В случае с пуассоновским распределением, предсказанные значения лежат експоненциальной кривой, связывающей значения предиктора $x_i$ и предсказанное значение $\mu_i$.  
 
-M_sim1 <- glm(y ~ x, data = dat, family = poisson(link = "log"))
-M_sim2 <- glm(y ~ x, data = dat, family = poisson(link = "sqrt"))
-
-
-NewData <- data.frame(x=seq(1, 100, 1))
-
-G <- predict(M_sim1, newdata = NewData, type = "link", se.fit = TRUE)
-
-NewData$pois_Pred1  <- exp(G$fit) 
-NewData$pois_SEUP1 <- exp(G$fit + 1.96*G$se.fit) 
-NewData$pois_SELOW1 <- exp(G$fit - 1.96*G$se.fit)
-
-G <- predict(M_sim2, newdata = NewData, type = "link", se.fit = TRUE)
-
-NewData$pois_Pred2  <- exp(G$fit) 
-NewData$pois_SEUP2 <- exp(G$fit + 1.96*G$se.fit) 
-NewData$pois_SELOW2 <- exp(G$fit - 1.96*G$se.fit)
-
-
-
-
-Points <- data.frame(x = rep(dat$x, each=50), Pred = rep(fitted(M_sim1), each=50))
-
-
-for (i in 1:nrow(Points)){
-  Points$draw[i] <- rpois(1, lambda = Points$Pred[i])
-  Points$pi[i] <- dpois(Points$draw[i], lambda = Points$Pred[i])
-  }
-
-Pl1 <- ggplot(NewData, aes(x =  x , y = pois_Pred1))  + geom_point(data = dat, aes(x=x, y=y), size=5, color="blue4") + geom_hline(yintercept=0) + geom_point(data = Points, aes(x=x, y=draw, color = pi), size=2, position = position_jitter(width = 1, height = 0) ) + geom_line(data=NewData, aes(x=x, y=pois_Pred1), color = "red", size=2) + ylab("Draws from Poisson distributions") + ggtitle("Связывающая функция - 'log' ") + scale_color_gradient(low = "yellow", high = "black") + labs(color = "Вероятность")
-Pl1
-
-# for (i in 1:nrow(Points)){
-#   Points$draw[i] <- rpois(1, lambda = Points$Pred[i])
-#   Points$pi[i] <- dpois(Points$draw[i], lambda = Points$Pred[i])
-#   }
-# 
-# 
-# 
-# Pl2 <- ggplot(NewData, aes(x =  x , y = pois_Pred2))  + geom_point(data = dat, aes(x=x, y=y), size=4, color="blue4") + geom_hline(yintercept=0) + geom_point(data = Points, aes(x=x, y=draw, color = pi), size=1, position = position_jitter(width = 1, height = 0) ) + geom_line(data=NewData, aes(x=x, y=pois_Pred2), color = "red", size=2) +  ylab("Draws from Poisson distributions") + ggtitle("Связывающая функция - 'sqrt' ") + scale_color_gradient(low = "yellow", high = "black")
-# 
-# library(gridExtra)
-# grid.arrange(Pl1, Pl2, ncol = 2)
-
+`link = "log"`
+```{r, echo=FALSE, fig.height=5}
+Plot_Poiss
 ```
 
 
@@ -302,9 +392,13 @@ head(juv_ad, 12)
 
 <div class="columns-2">
 
-```{r muss-data, echo=FALSE}
-```
 <img src="images/mussel_bed.png" width="400" height="400" >
+
+```{r, eval=TRUE, echo=FALSE}
+juv_ad <- read.table("data/mussel_juv_ad.csv", sep=";", header =T)
+head(juv_ad, 12)
+```
+
 </div>
 
 ## В этих данных ожидается проблема автокорреляции остатков
@@ -482,7 +576,7 @@ Anova(M4a)
 ## Предсказания упрощенной модели
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.width=10}
-MyData <- expand.grid(Year = factor(seq(min(juv_ad$Year), max(juv_ad$Year))), Adult = seq(min(juv_ad$Adult), max(juv_ad$Adult)))
+MyData <-unique(juv_ad)
 
 MyData$Predicted <- predict(M4a, newdata = MyData, type = "response")
 
@@ -536,7 +630,8 @@ ggplot(M5_diag, aes(x=.fitted, y = .pears_resid)) + geom_point() +
 ## Визуализируем предсказание модели
 
 ```{r, m-viz, eval=TRUE, echo=FALSE, fig.height=5, fig.width=10}
-MyData <- expand.grid(Year = factor(seq(min(juv_ad$Year), max(juv_ad$Year))), Adult = seq(min(juv_ad$Adult), max(juv_ad$Adult)))
+MyData <-unique(juv_ad)
+
 
 MyData$Predicted <- predict(M5, newdata = MyData, type = "response")
 ggplot(MyData, aes(x = Adult, y = Predicted, group = Year)) + geom_line(color = "blue") + geom_hline(yintercept = 0) + ylab("Ожидаемое количество молоди") + geom_point(data = juv_ad, aes(x = Adult, y = Juv, color = factor(Year) )) + facet_wrap(~Year, ncol = 5) + guides(color=FALSE)
