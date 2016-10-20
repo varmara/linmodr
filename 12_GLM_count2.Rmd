@@ -862,7 +862,7 @@ ggplot(Mod_nb_test, aes(x=.fitted, y = .pears_resid)) + geom_point() +
 Resid_Mod <- resid(Mod_nb_final, type = "pearson") 
 N <- nrow(af) 
 p <- length(coef(Mod_nb_final)) 
-df <- (N - p) 
+df <- (N - p) +1 
 fi <- sum(Resid_Mod^2) /df  
 fi
 ```
