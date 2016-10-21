@@ -218,6 +218,7 @@ ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu, 
 
 **NB!** Есть и другие связующие функции
 
+
 ```{r, echo=FALSE, fig.height=5, fig.width=8, warning=FALSE, message=FALSE}
 
 
@@ -400,7 +401,6 @@ head(juv_ad, 12)
 ```
 
 </div>
-
 ## В этих данных ожидается проблема автокорреляции остатков
 
 ### Вопрос:
