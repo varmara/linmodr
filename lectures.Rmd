@@ -121,7 +121,9 @@ install.packages("AER")
 - Данные
     - [mussel_juv_ad.csv](data/mussel_juv_ad.csv)
     - [ICU.csv](data/ICU.csv)
+
 - [Домашнее задание №5](hw/hw5_glm-pois-negbin-abalone.zip)
+- [Примеры вопросов следующего теста](test_handouts/07-glm-handout-test1.pdf)
 
 ## 13. Смешанные линейные модели 
 
