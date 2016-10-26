@@ -127,6 +127,10 @@ install.packages("AER")
 
 ## 13. Смешанные линейные модели 
 
+```{r eval=FALSE}
+install.packages(c("lme4", "nlme"))
+```
+
 - Презентация [html] | [pdf]
 - [код R]
 - Данные
