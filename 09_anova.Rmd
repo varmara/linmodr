@@ -29,30 +29,6 @@ opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE,
 source("support_linmodr.R")
 ```
 
-
-```{r libs-funs, echo=FALSE}
-lm_equation <- function(fit, strict = TRUE, rnd = 2){
-#   extracting call formula 
-  frml <- as.character(fit$call)[2]
-#   extract signs
-    sign <- ifelse(grepl("-", coef(fit)[-1]), " - ", " + ")
-  # extract coefficients
-  coeffs <- format(round(abs(coef(fit)), rnd), digits = 2, trim = TRUE)
-  if(strict == TRUE){
-    i <- 1:(length(coeffs) - 1)
-    vars <- c("Y", paste0(" X", i))
-    
-  } else {
-# extract vector of variable names
-  vars <- c(all.vars(formula(fit))[1], names(fit$coefficients)[-1])
-# combine everything
-  }
-  start <- ifelse(coef(fit)[1] > 0, paste(vars[1], coeffs[1], sep = " = "), paste(vars[1], coeffs[1], sep = " = - "))
-  end <- paste(sign, coeffs[-1], vars[-1], sep = "", collapse = "")
-  return(cat(start, end, sep = ""))
-}
-```
-
 ## Линейные модели с дискретными предикторами (дисперсионный анализ)
 
 ### Вы сможете
