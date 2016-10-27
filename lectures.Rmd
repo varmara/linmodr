@@ -131,12 +131,12 @@ install.packages("AER")
 install.packages(c("lme4", "nlme"))
 ```
 
-- Презентация [html] | [pdf]
+- Презентация [pdf](13_GLMM_gaussian.pdf)
 - [код R](13_code_GLMM_gaussian.R)
 
 ## 14. Коррекция гетерогенности дисперсий в смешанных линейных моделях 
 
-- Презентация [html] | [pdf]
+- Презентация [pdf](14_variance_structure.pdf)
 - [код R](14_code_variance_structure.R)
 - Данные: [myt.csv](data/myt.csv)
 
