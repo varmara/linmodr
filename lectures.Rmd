@@ -132,7 +132,7 @@ install.packages(c("lme4", "nlme"))
 ```
 
 - Презентация [html] | [pdf]
-- [код R](12_code_GLMM_gaussian.R)
+- [код R](13_code_GLMM_gaussian.R)
 
 ## 14. Коррекция гетерогенности дисперсий в смешанных линейных моделях 
 
