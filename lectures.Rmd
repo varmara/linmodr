@@ -140,7 +140,7 @@ install.packages(c("lme4", "nlme"))
 - [код R](14_code_variance_structure.R)
 - Данные: [myt.csv](data/myt.csv)
 
-- [Домашнее задание №6]
+- [Домашнее задание №6](hw/hw6_glmm-gaussian-milk.zip)
 - [Примеры вопросов следующего теста]
 
 ## 15. Обобщенные смешанные линейные модели для бинарных данных 
