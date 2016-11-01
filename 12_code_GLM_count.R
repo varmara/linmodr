@@ -38,6 +38,9 @@ drop1(M1, test = "F")
 M2 <- lm(Juv ~ Adult  +  factor(Year), data = juv_ad)
 Anova(M2)
 
+summary(M2)
+
+
 # Визуализируем предсказания модели ==================
 MyData <- expand.grid(Year = factor(seq(min(juv_ad$Year), max(juv_ad$Year))), Adult = seq(min(juv_ad$Adult), max(juv_ad$Adult)))
 
@@ -74,7 +77,7 @@ p <- length(coef(M3))   # Число параметров в модели
 
 df <- (N - p) # число степенейсвободы
 
-fi <- sum(Resid_M3^2) /df  #Величина fi показывает во сколько раз в среднем 
+fi <- sum(Resid_M3^2) /df  #Величина fi показывает во сколько раз в среднем
 #sigma > mu для данной модели
 
 fi
@@ -85,13 +88,13 @@ fi
 M4 <- glm(Juv ~ Adult * factor(Year), data = juv_ad, family = "quasipoisson")
 Anova(M4)
 
-# Упрощенная модель без взаимодействия =============   
+# Упрощенная модель без взаимодействия =============
 
 M4a <- glm(Juv ~ Adult  + factor(Year), data = juv_ad, family = "quasipoisson")
 Anova(M4a)
 
 
-#Предсказания упрощенной модели 
+#Предсказания упрощенной модели
 
 MyData <- expand.grid(Year = factor(seq(min(juv_ad$Year), max(juv_ad$Year))), Adult = seq(min(juv_ad$Adult), max(juv_ad$Adult)))
 
@@ -99,18 +102,32 @@ MyData$Predicted <- predict(M4a, newdata = MyData, type = "response")
 
 ggplot(MyData, aes(x=Adult, y = Predicted, group = Year)) + geom_line(color = "blue") + geom_hline(yintercept = 0) + ylab("Ожидаемое количество молоди") +ylab("Ожидаемое количество молоди") + geom_point(data = juv_ad, aes(x = Adult, y = Juv, color = factor(Year) )) + facet_wrap(~Year) + guides(color=FALSE)
 
-#Модель, основанная на отрицательном биномиальном распределении  
+#Модель, основанная на отрицательном биномиальном распределении
 
 library(MASS)
 
 M5 <- glm.nb(Juv ~ Adult*factor(Year) , data = juv_ad, link = "log")
 Anova(M5)
 
+drop1(M5, test = "Chi")
 # Здесь будет Ваш код для проверки избыточност дисперсии в модели M5 =====
 
 
 
+Resid_M5 <- resid(M5, type = "pearson") # Пирсоновские остатки
 
+summary(M5)
+
+N <- nrow(juv_ad) # Объем выборки
+
+p <- length(coef(M5)) + 1    # Число параметров в модели
+
+df <- (N - p) # число степенейсвободы
+
+fi <- sum(Resid_M5^2) /df  #Величина fi показывает во сколько раз в среднем
+#sigma > mu для данной модели
+
+fi
 
 
 
@@ -118,6 +135,24 @@ Anova(M5)
 
 
 
+
+
+
+
+
+
+
+
+
+MyData <-unique(juv_ad)
+
+
+MyData$Predicted <- predict(M5, newdata = MyData, type = "response")
+
+MyData$SE <- predict(M5, newdata = MyData, type = "response", se = TRUE)$se.fit
+
+
+ggplot(MyData, aes(x = Adult, y = Predicted, group = Year)) + geom_line(color = "blue") + geom_smooth(aes(ymin = x - 1.96*SE, ymax = x + 1.96*SE))+  geom_hline(yintercept = 0) + ylab("Ожидаемое количество молоди") + geom_point(data = juv_ad, aes(x = Adult, y = Juv, color = factor(Year) )) + facet_wrap(~Year, ncol = 5) + guides(color=FALSE)
 
 
 

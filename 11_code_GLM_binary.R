@@ -4,7 +4,13 @@
 # Линейные модели на R, осень 2015
 
 
-liz <- read.csv("polis.csv")
+liz <- read.csv("data/polis.csv")
+
+Mod_1 <- lm(PA ~ PARATIO, data = liz)
+summary(Mod_1)
+
+
+
 
 liz_model <- glm(PA ~ PARATIO , family="binomial", data = liz)
 summary(liz_model)
@@ -14,13 +20,144 @@ summary(liz_model)
 
 
 
+
+
+
+
+
+
+
+
+#Остаточная девианса
+Dev_resid <- -2*as.numeric(logLik(liz_model))
+
+#Нулевая девианса
+Dev_nul <- -2*as.numeric(logLik(update(liz_model, ~-PARATIO)))
+
+# Значение критерия
+(G2 <- Dev_nul - Dev_resid)
+
+anova(liz_model, update(liz_model, ~-PARATIO), test = "Chi")
+
+drop1(liz_model, test = "Chi")
+
+
+(p_value <- 1 - pchisq(G2, df = 1))
+
+
+
+exp(coef(liz_model)[2])
+
+
 ## Построение логистической кривой средствами ggplot
 
-ggplot(liz, aes(x=PARATIO, y=PA)) + geom_point() + geom_smooth(method="glm", family="binomial", se=TRUE, size = 2) + ylab("Предсказанная вероятность встречи") + annotate("text", x=40, y=0.75, parse=TRUE, label = "pi == frac(e ^ {beta[0]+beta[1] %.% x}, 1 + e ^ {beta[0]+beta[1] %.% x})", size = 10)
+
+
+
+
+
+
+
+ggplot(liz, aes(x=PARATIO, y=PA)) + geom_point() + geom_smooth(method="glm", method.args = list( family="binomial"), se=TRUE, size = 2) + ylab("Вероятность встречи ящериц") + annotate("text", x=40, y=0.75, parse=TRUE, label = "pi == frac(e ^ {beta[0]+beta[1]%.%x}, 1 + e ^ {beta[0]+beta[1]%.%x})", size = 10) = 10
 
 
 ##Задание: Постройте график логистической ререссии для модели `liz_model`  без использования `geom_smooth()`
 
+MyData <- data.frame(PARATIO =
+                       seq(min(liz$PARATIO), max(liz$PARATIO)))
+
+
+
+
+MyData$Predicted <- predict(liz_model,
+                            newdata = MyData,
+                            type = "response"
+                            )
+
+
+
+
+
+
+
+
+
+MyData <- data.frame(PARATIO = seq(min(liz$PARATIO), max(liz$PARATIO)))
+
+
+
+
+# Формируем модельную матрицу для искуственно созданных данных
+X <- model.matrix( ~ PARATIO, data = MyData)
+
+```
+
+## Извлекаем характеристики подобранной модели и получаем предсказанные значения
+
+
+
+
+
+
+
+
+
+
+```{r}
+# Вычисляем параметры подобранной модели и ее матрицу ковариаций
+betas    <- coef(liz_model) # Векор коэффицентов
+Covbetas <- vcov(liz_model) # Ковариационная матрица
+
+# Вычисляем предсказанные значения, перемножая модельную матрицу на вектор
+
+# коэффициентов
+MyData$eta <- X %*% betas
+
+
+## Получаем предсказанные значения
+
+# Переводим предсказанные значения из логитов в вероятности
+MyData$Pi  <- exp(MyData$eta) / (1 + exp(MyData$eta))
+
+## Вычисляем границы доверительного интервала
+
+```{r}
+# Вычисляем стандартные отшибки путем перемножения матриц
+MyData$se <- sqrt(diag(X %*% Covbetas %*% t(X)))
+
+# Вычисляем доверительные интервалы
+MyData$CiUp  <- exp(MyData$eta + 1.96 *MyData$se) /
+  (1 + exp(MyData$eta  + 1.96 *MyData$se))
+
+MyData$CiLow  <- exp(MyData$eta - 1.96 *MyData$se) /
+  (1 + exp(MyData$eta  - 1.96 *MyData$se))
+
+
+```
+
+## Строим график
+
+ggplot(MyData, aes(x = PARATIO, y = Pi)) +
+  geom_line(aes(x = PARATIO, y = CiUp),
+            linetype = 2, size = 1) +
+  geom_line(aes(x = PARATIO, y = CiLow),
+            linetype = 2, size = 1) +
+  geom_line(color = "blue", size=2) +
+  ylab("Вероятность встречи")
+```
+
+
+
+
+
+
+
+
+ggplot(MyData, aes(x = PARATIO, y = Predicted)) +
+  geom_line(size=2, color = "blue") +
+  xlab("Отношение периметра к площади") +
+  ylab ("Вероятность") +
+  ggtitle("Вероятность встречи ящериц")
 
 
 
@@ -33,7 +170,7 @@ ggplot(liz, aes(x=PARATIO, y=PA)) + geom_point() + geom_smooth(method="glm", fam
 
 
 ########################
-# Строим график вручную 
+# Строим график вручную
 ########################
 
 MyData <- data.frame(PARATIO = seq(min(liz$PARATIO), max(liz$PARATIO)))
@@ -55,7 +192,7 @@ MyData$CiUp  <- exp(MyData$eta + 1.96 * MyData$se) / (1 + exp(MyData$eta  + 1.96
 
 MyData$CiLow  <- exp(MyData$eta - 1.96 *MyData$se) / (1 + exp(MyData$eta  - 1.96 * MyData$se))
 
-## Строим график  
+## Строим график
 
 ggplot(MyData, aes(x = PARATIO, y = Pi)) +  geom_line(aes(x = PARATIO, y = CiUp), linetype = 2, size = 1) + geom_line(aes(x = PARATIO, y = CiLow), linetype = 2, size = 1) +  geom_line(color = "blue", size=2) + ylab("Вероятность встречи")
 
@@ -64,7 +201,7 @@ ggplot(MyData, aes(x = PARATIO, y = Pi)) +  geom_line(aes(x = PARATIO, y = CiUp)
 
 # Множественная логистическая регрессия
 
-surviv <- read.table("ICU.csv", header=TRUE, sep=";")
+surviv <- read.table("data/ICU.csv", header=TRUE, sep=";")
 
 
 
@@ -83,10 +220,7 @@ summary(M1)
 
 
 ##Задание: Проведите анализ девиансы для данной модели
-
-
-
-
+anova(M1, update(M1, ~-.), test = "Chi")
 
 ##Упростим модель с помощью функции step()
 
@@ -98,13 +232,21 @@ M2 <- glm(formula = STA ~ AGE + CAN + SYS + TYP + PH + PCO + LOC, family = "bino
 anova(M1, M2, test = "Chi")
 
 
+anova(M2, update(M2, ~-.), test = "Chi")
+
+
+anova(M2, test = "Chi")
+
+coef(M2)
+
+
 ## Вопрос. Во сколько раз изменяется отношение шансов на выживание при условии, что пациент онкологический больной (при прочих равных условиях)?
 
 
 
 #Визуализируем предсказания модели
 
-MyData = expand.grid(AGE = seq(min(surviv$AGE), max(surviv$AGE), 1), CAN = levels(surviv$CAN),  SYS = seq(min(surviv$SYS), max(surviv$SYS), 10),  TYP =  "Emergency", PH = "1", PCO = "1", LOC ="1") 
+MyData = expand.grid(AGE = seq(min(surviv$AGE), max(surviv$AGE), 1), CAN = levels(surviv$CAN),  SYS = seq(min(surviv$SYS), max(surviv$SYS), 10),  TYP =  "Emergency", PH = "1", PCO = "1", LOC ="1")
 
 MyData$Predicted <- predict(M2, newdata = MyData, type = "response")
 

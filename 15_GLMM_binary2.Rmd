@@ -1,12 +1,21 @@
 ---
-title       : "Смешанные модели для бинарных зависимых величин"
-subtitle    : "Линейные модели..."
-author: Вадим Хайтов, Марина Варфоломеева
+title: "Смешанные модели для бинарных зависимых величин"
+subtitle: "Линейные модели..."
+author: " Вадим Хайтов, Марина Варфоломеева"
 output:
-  ioslides_presentation:
-    widescreen: yes
-    css: assets/my_styles.css
-    logo: assets/Linmod_logo.png
+  beamer_presentation:
+    colortheme: beaver
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: default
+    toc: no
+institute: ""
 ---
 
 ## Вы узнаете
@@ -20,11 +29,13 @@ output:
 
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# to render
+# rmarkdown::render("beamer-test.Rmd", output_format = "beamer_presentation")
 # output options
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, cache = TRUE)
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7, cache=TRUE)
 ```
 
 
@@ -37,24 +48,31 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 
 ## Биномиальное распределение
 
-$f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}$
+$$f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}$$
 
-<div class="columns-2">
+\fontsize{12pt}{14.4}\selectfont
 
-<small>
+\columnsbegin
 
-### Два параметра ($N$, $\pi$)
+\column{0.5\textwidth}
 
-Среднее: &emsp;&emsp; $E(Y)  = N \times \pi$  
-Дисперсия: $var(Y) = N \times \pi \times (1-\pi)$  
+\textbf {Два параметра} ($N$, $\pi$)
+
+Среднее:  $E(Y)  = N \times \pi$  
+
+Дисперсия: $var(Y) = N \times \pi \times (1-\pi)$ 
+
 Параметр $N$ определяет количество объектов в испытании  
+
 Парметр $\pi$ - вероятность события ($y = 1$)
 
-### Пределы варьирования
+\textbf{Пределы варьирования}
 
-$0 \le Y \le +\infty$, &emsp; $Y$ **целочисленные**
-</small>
+$0 \le Y \le +\infty$,  
 
+$Y$ **целочисленные**
+
+\column{0.5\textwidth}
 
 ```{r, echo=FALSE, fig.width=5, fig.height=5}
 library(ggplot2)
@@ -69,7 +87,7 @@ pi <- data.frame(y = rep(y, 4), pi = c(dbinom(y, size = N1, prob = mu1), dbinom(
 ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu,  scales = "free_y", labeller = label_both) + ggtitle("Биномиальное распрделение \n при разных параметрах") + ylab("Плотность вероятности (f)")
 
 ```
-</div>
+\columnsend
 
 ##Вопросы 
 >- Что такое шансы?
@@ -80,11 +98,11 @@ ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu, 
 
 ##Шансы и логиты   
 Дискретный отклик: 1 или 0    
-<br><br>
+
 Вероятност события: $\pi = \frac{N_i}{N_{total}}$   
-<br><br>
+
 Шансы (odds): $odds=\frac{\pi}{1-\pi}$   
-<br><br>
+
 _Логиты_ (logit):  $ln(odds)=\ln(\frac{\pi}{1-\pi})$   
 
 ##Связывающая функция для бинарных перменных отклика
@@ -95,10 +113,10 @@ _Логиты_ (logit):  $ln(odds)=\ln(\frac{\pi}{1-\pi})$
 
 Помимо логит-функции можно применить еще несколько:
 
-*Complementary Log-Log* связывающая функция : $\eta(\pi)=\ln(-\ln(1-\pi))$  
-`family = binomial(link = "cloglog")`    
+*Complementary Log-Log* связывающая функция : $\eta(\pi)=\ln(-\ln(1-\pi))$
+`family = binomial(link = "cloglog")`
 
-*Пробит* - связывающая фунция: $\eta(\pi)=\Phi^{-1}(\pi)$  
+*Пробит* - связывающая фунция: $\eta(\pi)=\Phi^{-1}(\pi)$
 `family = binomial(link = "probit")`
 
 
@@ -121,22 +139,41 @@ ggplot(dat, aes(x = x, y = y)) + geom_smooth(method= "glm", method.args = list(f
 ```
 
 #Построение модели для бинарной переменной отклика
-## Морские желуди: Кого съедят бореотрофоны? {.smaller .columns-2}
-Данные взяты из работы    
-Yakovis Y., Artemieva A. "Bored to Death: Community-Wide Effect of Predation on a Foundation Species in a Low-Disturbance Arctic Subtidal System" PLOS, 2015. DOI: 10.1371/journal.pone.0132973    
-  
-<img src="images/druse.png" width="400" > 
 
-<img src="images/drilled_barnacle.png" height="550" > 
+## Морские желуди: Кого съедят бореотрофоны?
 
+\begin{small}
+Данные взяты из работы:
+\it{Yakovis Y., Artemieva A.} "Bored to Death: Community-Wide Effect of Predation on a Foundation Species in a Low-Disturbance Arctic Subtidal System" PLOS, 2015. DOI: 10.1371/journal.pone.0132973
+\end{small}
+
+\columnsbegin
+
+\column{0.5 \textwidth}
+
+\textbf {Общий вид друзы морских желудей}
+
+\includegraphics[width=\linewidth]{images/druse.png}
+
+
+\column{0.5 \textwidth}
+
+\textbf{\it{Balanus crenatus}, просверленные улитками \it{Boreotrophon clathratus}}
+
+
+\includegraphics[width=\linewidth]{images/drilled_barnacle.png}
+
+\columnsend
 
 ##Вопрос: от каких факторов зависит будет ли атакован балянус хищником?
-Мы будем оценивать связь вероятности гибели балянуса от нападения *Boreotrophon clathratus*.   
+
+Мы будем оценивать связь вероятности гибели балянуса от нападения *Boreotrophon clathratus*.
 
 
-###Дизайн сбора материала 
+\textbf{Дизайн сбора материала}
 
-<img align="middle" src="images/design.png" width="600" height="400" > 
+
+\includegraphics[width=\linewidth]{images/design.png}
 
 
 ##Читаем данные
@@ -155,20 +192,27 @@ bal$Substrate_ID <- factor(bal$Substrate_ID)
 
 
 
-##Переменные 
+##Переменные
 
-`Site` -точка сбора материала    
+`Site` -точка сбора материала   
+
 `Sample` - квдарат 1х1 м, на котором производился сбор друз   
-`BorN` - количество *Boreotrophon clathratus* на квадрате   
-`Substrate_ID` - Номер друзы   
-`ALength` - Диаметр апертуры   
-`Age` - Возраст балянуса   
-`Position` - Расположение балянуса (первичный субстрат/вторичный субстрат)   
-`Status` - живой/мертвый 
-<br> <br>
-`Drill` - Зависимая переменная (0 - нет следов сверления; 1 - есть следы сверления)
 
-###Для ответа на поставленный вопрос целесообразно работать с мертвыми особями
+`BorN` - количество *Boreotrophon clathratus* на квадрате    
+
+`Substrate_ID` - Номер друзы    
+
+`ALength` - Диаметр апертуры    
+
+`Age` - Возраст балянуса    
+
+`Position` - Расположение балянуса (первичный субстрат/вторичный субстрат)    
+
+`Status` - живой/мертвый   
+
+`Drill` - Зависимая переменная (0 - нет следов сверления; 1 - есть следы сверления)   
+
+\textbf{Для ответа на поставленный вопрос целесообразно работать с мертвыми особями}
 
 ##Задание
 
@@ -178,27 +222,27 @@ bal$Substrate_ID <- factor(bal$Substrate_ID)
 
 ```{r}
 bal1 <- bal[bal$Status == "live_barnacle", ]
-mean(bal1$Drill ==1) 
+mean(bal1$Drill ==1)
 
 ```
 
 ```{r}
 bal2 <-  bal[bal$Status == "empty_test", ]
-mean(bal2$Drill == 1) 
+mean(bal2$Drill == 1)
 ```
 
 
 
-## Задание 
-###Напишите код, который задаст формулу для фиксированной части модели 
+## Задание
+###Напишите код, который задаст формулу для фиксированной части модели
 
 ##Решение
 ```{r}
 Fix_effect <- formula(Drill ~ BorN + ALength + Age + Position + Site)
 ```
 
-## Задание 
-###Напишите код, который задаст формулу для случайной части модели 
+## Задание
+###Напишите код, который задаст формулу для случайной части модели
 
 ##Решение
 
@@ -210,21 +254,33 @@ Rand_effect <- formula(~1|Sample/Substrate_ID)
 
 ##Согласно дизайну сбора материала, необходимо построить обобщенную смешанную линейную модель (GLMM)
 
-Функция максимального правдоподобия для GLMM     
+Функция максимального правдоподобия для GLMM
 
 $$Lik(\beta, D) = \Pi_i\int f(Y_i|b_i)\times f(b_i)db_i$$
 
-Вычисление максимума функции правдоподобия для GLMM может производиться только в численном виде (аналитическое решение невозможно). Поэтому все алгоритмы очень затратны по времени.  
+Вычисление максимума функции правдоподобия для GLMM может производиться только в численном виде (аналитическое решение невозможно). Поэтому все алгоритмы очень затратны по времени.
 
 ##Инструменты `R`, позволяющие подобрать GLMM
 
-Пакет         | Функция     | Особенности работы функции   
-|-------------|-------------|-------------|  
-`MASS` | `glmPQL()` | Использует penalised quasi-likelihood (PQL) алгоритм, следовательно не выдает AIC. Выбор оптмальной модели может производиться только на основе оценок статистической значимсоти параметров (критерий Вальда). Работает быстро.    
-`glmmML`  | `glmmML()` | Выдает значение AIC. Может использовать только один уровень группирующих факторов. Работает быстро.   
-`lme4` |  `glmer()`  | Выдает значение AIC. Работает медленно. При сложных моделях часто не сходится.    
-`glmmADMB`  | `glmmadmb()` | Выдает значение AIC. Работает ОЧЕНЬ медленно (Для сложных моделей и бльших объемов данных до нескольких часов).  
+\fontsize{10 pt}{12}\selectfont
 
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{L{0.25\textwidth} C{0.25\textwidth} L{0.5\textwidth}}
+\hline\noalign{\smallskip}
+Пакет & Функция & Особенности работы функции\\
+\hline\noalign{\smallskip}
+\hline\noalign{\smallskip}
+
+MASS & glmPQL() & Использует penalised quasi-likelihood (PQL) алгоритм, следовательно не выдает AIC. Выбор оптмальной модели может производиться только на основе оценок статистической значимсоти параметров (критерий Вальда). Работает быстро.\\
+glmmML  & glmmML() & Выдает значение AIC. Может использовать только один уровень группирующих факторов. Работает быстро. \\
+lme4 &  glmer()  & Выдает значение AIC. Работает медленно. При сложных моделях часто не сходится. \\
+glmmADMB  & glmmadmb() & Выдает значение AIC. Работает ОЧЕНЬ медленно (Для сложных моделей и бльших объемов данных до нескольких часов).\\
+
+\hline\noalign{\smallskip}
+\hline\noalign{\smallskip}
+
+\end{tabular}
+}
 
 **Важно!**Во всех случаях надо с осторожостью принимать решения при уровнях значимости близкх к 5%!   
 Альтернативный подход к построению сложных моделей - использование методов **Байесовской статистики**
@@ -234,8 +290,8 @@ $$Lik(\beta, D) = \Pi_i\int f(Y_i|b_i)\times f(b_i)db_i$$
 ```{r, eval=FALSE, message=FALSE}
 library(MASS)
 
-M1_PQL <- glmmPQL(Fix_effect, random = ~1|Sample/Substrate_ID, 
-                  data = bal2, 
+M1_PQL <- glmmPQL(Fix_effect, random = ~1|Sample/Substrate_ID,
+                  data = bal2,
                   family = "binomial")
 ```
 
@@ -247,7 +303,8 @@ M1_PQL <- glmmPQL(Fix_effect, random = Rand_effect, data = bal2,family = "binomi
 C_glmmPQL <- round(nlme::fixed.effects(M1_PQL), 3)
 ```
 
-##Результаты {.smaller}
+##Результаты
+\fontsize{8 pt}{9.6}\selectfont
 ```{r}
 summary(M1_PQL)
 
@@ -267,12 +324,15 @@ C_glmmML_2 <- round(as.numeric(coefficients(M2_ML)), 3)
 
 ##Результаты первой модели
 
+\fontsize{8 pt}{9.6}\selectfont
+
 ```{r}
 glmmML::summary.glmmML(M1_ML)
 ```
 
 ##Результаты второй модели
 
+\fontsize{8 pt}{9.6}\selectfont
 ```{r}
 glmmML::summary.glmmML(M2_ML)
 ```
@@ -284,38 +344,45 @@ glmmML::summary.glmmML(M2_ML)
 ```{r, message=FALSE, cache=TRUE}
 library(lme4)
 M1_glmer <- glmer(Drill ~ BorN + ALength + Age + Position + Site +
-                    (1|Sample/Substrate_ID), data = bal2, 
-                  family = "binomial") 
+                    (1|Sample/Substrate_ID), data = bal2,
+                  family = "binomial")
 
 C_glmer <- round(lme4::fixef(M1_glmer), 3)
 ```
 
-##Результаты {.smaller .columns-2}
+##Результаты 
+\fontsize{8 pt}{9.6}\selectfont
 ```{r}
 summary(M1_glmer)
 ```
 
 
 
-##Сравним коэффициенты, подобранные разными функциями 
+##Сравним коэффициенты, подобранные разными функциями
 
 ```{r echo=FALSE, eval=FALSE}
-data.frame(C_glmmPQL, C_glmmML_1, C_glmmML_2, C_glmer)
+# data.frame(C_glmmPQL, C_glmmML_1, C_glmmML_2, C_glmer)
 ```
 
-<pre>
-          Parameter glmmPQL glmmML_1  glmmML_2  glmer
-1       (Intercept)  -4.119   -4.367   -4.152  -4.404
-2              BorN   0.072    0.087*   0.117*  0.094*
-3           ALength   0.148*   0.132*   0.065   0.127*
-4               Age  -0.100   -0.068    0.036  -0.061
-5 Positionsecondary   1.261*   1.297*   1.224*  1.306*
-6             Site2  -0.298   -0.290    0.205  -0.231
+\resizebox{1\textwidth}{!}{
 
+\begin{tabular}{L{0.2\textwidth} L{0.2\textwidth} L{0.2\textwidth} L{0.2\textwidth} L{0.2\textwidth}}
 
-</pre>
+\hline\noalign{\smallskip}
+Parameter&glmmPQL&glmmML1&glmmML2&glmer\\
+\hline\noalign{\smallskip}
 
-###Выбор на совести исследователя!
+(Intercept)&-4.119&-4.367&-4.152&-4.404 \\
+BorN&0.072&0.087*&0.117*&0.094*\\
+ALength&0.148*& 0.132*&0.065&0.127*\\
+Age&-0.100&-0.068&0.036&-0.061\\
+Positionsecondary&1.261*&1.297*&1.224*&1.306*\\
+Site2&-0.298&-0.290&0.205&-0.231 \\
+\end{tabular}
+}
+
+\pause
+\textbf{Выбор функции на совести исследователя!}
 
 ##Выбор оптимальной модели
 
@@ -350,7 +417,9 @@ anova(M2_glmer, M3_glmer)
 drop1(M3_glmer)
 ```
 
-##Результаты {.smaller}
+##Результаты 
+
+\fontsize{8 pt}{9.6}\selectfont
 
 ```{r}
 summary(M3_glmer)
@@ -363,7 +432,7 @@ plot(M3_glmer)
 ```
 
 
-##Проверка валидности модели {.smaller}
+##Проверка валидности модели 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=5}
 library(ggplot2)
@@ -391,8 +460,8 @@ grid.arrange(Pl1, Pl2, Pl3, Pl4, ncol = 2)
 ```{r, echo=FALSE, fig.height=5}
 MyData <- expand.grid(BorN = seq(min(bal2$BorN), max(bal2$BorN)),
                       ALength = seq(min(bal2$ALength), max(bal2$ALength)),
-                      Position = levels(bal2$Position)) 
-                      
+                      Position = levels(bal2$Position))
+
 
 MyData$Predicted <- predict(M3_glmer,newdata = MyData, type = "response", re.form = NA)
 
@@ -404,11 +473,11 @@ ggplot(MyData, aes(x = ALength, y = Predicted, color = BorN)) + geom_line(aes(gr
 
 - Построение обобщенных смешанных моделей (GLMM) для бинарных перменных отклика аналогично построению моделей для GLM и LMM.
 - Идеального алгоритма для построения GLMM пока нет.
-- Существующие ныне алгоритмы пригодны только для простых моделей.    
+- Существующие ныне алгоритмы пригодны только для простых моделей.
 
 
 ## Что почитать
-+ Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. - Statistics for biology and health. Springer, New York, NY. 
++ Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. - Statistics for biology and health. Springer, New York, NY.
 
 
 

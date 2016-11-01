@@ -1,12 +1,21 @@
 ---
-title       : "Смешаные линейные модели для счетных данных"
-subtitle    : "Линейные модели..."
-author: Марина Варфоломеева, Вадим Хайтов
+title: "Смешаные линейные модели для счетных данных"
+subtitle: "Линейные модели..."
+author: "Марина Варфоломеева, Вадим Хайтов"
 output:
-  ioslides_presentation:
-    widescreen: yes
-    css: assets/my_styles.css
-    logo: assets/Linmod_logo.png
+  beamer_presentation:
+    colortheme: beaver
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: default
+    toc: no
+institute: ""
 ---
 
 ## Вы узнаете
@@ -20,31 +29,44 @@ output:
 - Научитесь проверять наличие нелинейных паттернов в остатках
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# to render
+# rmarkdown::render("beamer-test.Rmd", output_format = "beamer_presentation")
 # output options
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, cache = TRUE)
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7, cache=TRUE)
 ```
 
 # Cмешанные модели для счетных данных
 
-## От чего завист призывный крик совят? {.smaller .columns-2}
-
-<img src="images/owls.jpg" width="400" >   
-
-фото с http://www.mobilmusic.ru/wallpaper.php?id=1343149
-
+## От чего завист призывный крик совят? 
 Данные из Roulin & Bersier 2007, пример из кн. Zuur et al., 2007
 
+\columnsbegin
+
+\column{0.5\textwidth}
+
+\includegraphics[width=\linewidth]{images/owls.jpg}
+
+
+\vskip0pt plus 1filll
+\tiny{фото с http://www.mobilmusic.ru/wallpaper.php?id=1343149)}
+
+
+
+\column{0.5\textwidth}
 Будем моделировать зависимость числа криков совят (SiblingNegotiation) от многих факторов
 
-- `FoodTreatment` - тритмент (сытые или голодные)
-- `SexParent` - пол родителя
-- `FoodTreatment x SexParent`
-- `ArrivalTime` - время прибытия родителя
-- `ArrivalTime х SexParent`
-- `Nest` - гнездо
+
+\textbf{FoodTreatment} - тритмент (сытые или голодные)   
+\textbf{SexParent} - пол родителя   
+\textbf{FoodTreatment x SexParent}   
+\textbf{ArrivalTime} - время прибытия родителя   
+\textbf{ArrivalTime х SexParent}   
+\textbf{Nest} - гнездо  
+
+\columnsend
 
 ## Загружаем пакеты и данные
 
@@ -68,7 +90,8 @@ if (!file.exists(filename)) download(url, filename)
 ```{r}
 Owls <- read.delim("data/Owls_Roulin_Bersier_2007.csv")
 str(Owls)
-# SiblingNegotiation - число криков совят - заменим на более короткое название
+#' SiblingNegotiation - число криков совят 
+#- заменим на более короткое название
 Owls$NCalls <- Owls$SiblingNegotiation
 # Число пропущенных значений
 sum(!complete.cases(Owls))
@@ -85,15 +108,19 @@ grid.arrange(dotplot + aes(x = NCalls),
   dotplot + aes(x = ArrivalTime), nrow = 1)
 ```
 
->- Выбросов нет
+\pause
+Выбросов нет
 
 ## Различаются ли гнезда?
 
 ```{r}
-ggplot(Owls, aes(x = Nest, y = NCalls)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggplot(Owls, aes(x = Nest, y = NCalls)) + 
+  geom_boxplot() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-> - Гнезд много, они различаются. Можно и нужно учесть как случайный эффект
+\pause
+Гнезд много, они различаются. Можно и нужно учесть как случайный эффект
 
 ## Сколько наблюдений в каждом гнезде?
 
@@ -101,15 +128,18 @@ ggplot(Owls, aes(x = Nest, y = NCalls)) + geom_boxplot() + theme(axis.text.x = e
 table(Owls$Nest)
 ```
 
-> - Хорошо, что наблюдений в каждом гнезде много. Только в двух по четыре - не очень.
+\pause
+Хорошо, что наблюдений в каждом гнезде много. Только в двух по четыре - не очень.
 
 ## Как распределен отклик?
 
 ```{r}
-ggplot(Owls, aes(x = NCalls)) + geom_histogram(binwidth = 1, fill = "steelblue", colour = "black")
+ggplot(Owls, aes(x = NCalls)) + 
+  geom_histogram(binwidth = 1, fill = "steelblue", colour = "black")
 ```
 
->- Напоминает распределение Пуассона
+\pause
+Напоминает распределение Пуассона
 
 ## Сколько нулей?
 
@@ -117,50 +147,66 @@ ggplot(Owls, aes(x = NCalls)) + geom_histogram(binwidth = 1, fill = "steelblue",
 sum(Owls$NCalls == 0)/nrow(Owls)
 ```
 
-> - `r round(sum(Owls$NCalls == 0)/nrow(Owls)*100, 0)`% нулей
+`r round(sum(Owls$NCalls == 0)/nrow(Owls)*100, 0)`% нулей
 
 ## Какого размера выводки в гнездах?
 
-Это нужно учесть, потому что чем больше выводок, тем больше птенцов будут разговаривать. 
+Это нужно учесть, потому что чем больше выводок, тем больше птенцов будут разговаривать.
 
 ```{r, echo=F}
-range(Owls$BroodSize)
+#range(Owls$BroodSize)
 library(doBy)
 
 Brood_Nest <- summaryBy(BroodSize ~ Nest, data = Owls)
-# 
+#
 # library(dplyr)
 # Owls %>% group_by(Nest) %>% summarise(., BroodSize = mean(BroodSize)) %>%
 ggplot(Brood_Nest, aes(y = BroodSize.mean, x = Nest)) + geom_bar(stat = "identity", fill = "steelblue") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-> - Выводки разные. В пуассоновской glmer() это можно откорректировать при помощи offset. Сделаем offset(logBroodSize)
+\pause
+Выводки разные. В пуассоновской glmer() это можно откорректировать при помощи offset. Сделаем offset(logBroodSize)
 
 ## Боксплоты для дискретных факторов
 
 ```{r}
-ggplot(Owls, aes(y = NCalls, x = FoodTreatment, fill = SexParent)) + geom_boxplot()
+ggplot(Owls, aes(y = NCalls, x = FoodTreatment, fill = SexParent)) + 
+  geom_boxplot()
 ```
 
-> - Подозрительно, возможно, есть взаимодействие.
+\pause
+
+Подозрительно, возможно, есть взаимодействие.
 
 ## Может быть есть взаимодействие?
 
 ```{r}
-ggplot(Owls) + stat_summary(aes(x = FoodTreatment, y = NCalls, colour = SexParent), fun.data = "mean_cl_boot", position = position_dodge(width = 0.5))
+ggplot(Owls) + 
+  stat_summary(aes(x = FoodTreatment, y = NCalls, colour = SexParent), 
+               fun.data = "mean_cl_boot", 
+               position = position_dodge(width = 0.5))
 ```
 
-> - Похоже, что может быть взаимодействие
+\pause
+
+Похоже, что может быть взаимодействие
 
 ## Задание: Постройте такой график
 
 Нарисуем все данные для будущей модели
 
 ```{r owls-all, fig.height=5, fig.width=10, echo=FALSE}
-ggplot(Owls) + geom_segment(aes(x = ArrivalTime, y = 0, xend = ArrivalTime, yend = NCalls, colour = FoodTreatment)) + facet_grid(FoodTreatment + SexParent ~ Nest) + ylab("NCall") + theme(legend.position = "bottom")
+ggplot(Owls) + geom_segment(aes(x = ArrivalTime, y = 0, 
+                                xend = ArrivalTime, 
+                                yend = NCalls, colour = FoodTreatment)) +
+  facet_grid(FoodTreatment + SexParent ~ Nest) + 
+  ylab("NCall") + 
+  theme(legend.position = "bottom", 
+        axis.text.x = element_text(angle = 90, hjust = 1, size = 5))
 ```
 
-> - Птенцы больше орут, если голодали прошлой ночью. И возможно, орут у самцов
+\pause
+Птенцы больше орут, если голодали прошлой ночью. И возможно, орут у самцов
 
 ## Код для графика
 
@@ -176,33 +222,58 @@ library(car)
 vif(M0)
 ```
 
-> - ок
+\pause
 
-## Линейная модель с пуассоновским распределением остатков {.smaller}
+ок
 
+## Линейная модель с пуассоновским распределением остатков 
+
+\begin {small}
 $$NCalls_{ij} = e^{\beta_0 + \beta_{1}SexP_{M} + \beta_{2}FoodT_{S} + \beta_{3}ArrivalT + \beta_{4} SexP_{M}:FoodT_{S} + \beta_{5}SexP{M}:ArrivalT + log(BroodSize) + a_{i} + \epsilon_{ij}}$$
+\end{small}
 
-- $NCalls \sim \boldsymbol{P}(\mu_{ij})$  --- отклик подчиняется распределению Пуассона с параметром $\mu$
-- $E(NCalls_{ij}) = \mu_{ij}$
-- $var(NCalls_{ij}) = \mu_{ij}$
-- $ln(\mu_{ij}) = \eta_{ij}$  --- функция связи --- логарифм
 
-$\begin{array}{l}
-\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \beta_{2}FoodTreatment_{S} + \beta_{3}ArrivalTime + \\
-+ \beta_{4} SexParent_{M}:FoodTreatment_{S} + \beta_{5}SexParent{M}:ArrivalTime + log(BroodSize) + \\
-+ a_{i} + \epsilon_{ij}
+\columnsbegin
+
+\column{0.5\textwidth}
+
+$NCalls \sim \boldsymbol{P}(\mu_{ij})$  --- отклик подчиняется распределению Пуассона с параметром $\mu$
+$E(NCalls_{ij}) = \mu_{ij}$
+$var(NCalls_{ij}) = \mu_{ij}$
+$ln(\mu_{ij}) = \eta_{ij}$  --- функция связи --- логарифм
+
+
+\column{0.5\textwidth}
+
+$\begin{array}{l} 
+\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \\
++\beta_{2}FoodTreatment_{S} + \beta_{3}ArrivalTime + \\
++ \beta_{4} SexParent_{M}:FoodTreatment_{S} + \\
++\beta_{5}SexParent{M}:ArrivalTime + \\
++ log(BroodSize) + a_{i} + \epsilon_{ij} 
 \end{array}$
 
-- $a_{i}\sim N(0, \sigma^2_{Nest})$ --- случайный эффект гнезда (intercept)
-- $\epsilon_{ij} \sim N(0, \sigma^2)$ --- остатки модели
-- $i$ --- гнездо
-- $j$ --- наблюдение
+
+$a_{i}\sim N(0, \sigma^2_{Nest})$ --- случайный эффект гнезда (intercept)
+
+$\epsilon_{ij} \sim N(0, \sigma^2)$ --- остатки модели 
+
+$i$ --- гнездо
+
+$j$ --- наблюдение
+
+\columnsend
+
 
 ## Подберем линейную модель с пуассоновским распределением остатков
 
 ```{r warning=TRUE, message=TRUE}
 library(lme4)
-M1 <- glmer(NCalls ~ SexParent * FoodTreatment + SexParent * ArrivalTime + offset(logBroodSize) + (1 | Nest), family = "poisson", data = Owls)
+M1 <- glmer(NCalls ~ SexParent * FoodTreatment +
+              SexParent * ArrivalTime +
+              offset(logBroodSize) +
+              (1 | Nest),
+            family = "poisson", data = Owls)
 ```
 
 Смешанная модель с распределением пуассона не сходится. Один из возможных вариантов выхода - стандартизация предикторов
@@ -212,9 +283,19 @@ M1 <- glmer(NCalls ~ SexParent * FoodTreatment + SexParent * ArrivalTime + offse
 У нас только один непрерывный предиктор
 
 ```{r}
-Owls$ArrivalTime_std <- (Owls$ArrivalTime - mean(Owls$ArrivalTime)) / sd(Owls$ArrivalTime)
+Owls$ArrivalTime_std <- (Owls$ArrivalTime - mean(Owls$ArrivalTime)) /
+  sd(Owls$ArrivalTime)
 
-M1 <- glmer(NCalls ~ SexParent * FoodTreatment + SexParent * ArrivalTime_std + offset(logBroodSize) + (1 | Nest), family = "poisson", data = Owls)
+```
+
+## Модель со стандартизированным предиктором
+```{r}
+M1 <- glmer(NCalls ~ SexParent * FoodTreatment +
+              SexParent * ArrivalTime_std +
+              offset(logBroodSize) +
+              (1 | Nest),
+            family = "poisson", data = Owls)
+
 ```
 
 Эта модель сходится
@@ -230,21 +311,36 @@ R_M1 <- resid(M1, type = "pearson") # Пирсоновские остатки
 N <- nrow(Owls) # Объем выборки
 p <- length(fixef(M1)) + 1   # Число параметров в модели (сигма для гнезда)
 df <- (N - p) # число степенейсвободы
-fi <- sum(R_M1^2) /df  #Величина fi показывает во сколько раз в среднем sigma > mu для данной модели
+fi <- sum(R_M1^2) /df
+#Величина fi показывает во сколько раз в среднем sigma > mu для данной модели
 fi
 ```
 
-> - Избыточность дисперсии.
+\pause
+Явная избыточность дисперсии.
 
-## Почему здесь могла быть избыточность дисперсии?
+## Почему здесь могла быть избыточность дисперсии? И что с ней делать?
 
-> - Отскакивающие значения  --> убрать
-+ Пропущены ковариаты или взаимодействия предикторов  --> добавить
-+ Наличие внутригрупповых корреляций (нарушение независимости выборок)  --> другие случайные эффекты?
-+ Нелинейная взаимосвязь между ковариатами и зависимой переменной  --> GAMM
-+ Неверно подобрана связывающая функция  --> заменить
-+ Количество нулей больше, чем предсказывает распределение Пуассона (Zero inflation)     --> ZIP
-+ Просто большая дисперсия? --> NB
+\pause
+-Отскакивающие значения  --> \textbf{убрать}
+
+\pause
+-Пропущены ковариаты или взаимодействия предикторов  --> \textbf{добавить}
+
+\pause
+- Наличие внутригрупповых корреляций (нарушение независимости выборок)  --> \textbf{включить другие случайные эффекты}
+
+\pause
+- Нелинейная взаимосвязь между ковариатами и зависимой переменной  --> \textbf{GAMM}
+
+\pause
+- Неверно подобрана связывающая функция  --> \textbf{заменить}
+
+\pause
+- Количество нулей больше, чем предсказывает распределение Пуассона (Zero inflation)     --> \textbf{ZIP Model} (Zero inflation Poisson Model)
+
+\pause
+- Просто большая дисперсия? --> \textbf{Модель, основанная на NB распределении}
 
 ## Диагностика модели
 
@@ -256,7 +352,7 @@ plot(M1)
 
 ## Более удобный график остатков
 
-```{r}
+```{r, fig.height=3.5}
 M1_diag <- fortify(M1)
 M1_diag$.rfitted <- predict(M1, type = "response")
 
@@ -264,62 +360,94 @@ gg_resid <- ggplot(M1_diag, aes(x = .rfitted, y = .scresid, colour = FoodTreatme
 gg_resid
 ```
 
-> - Есть большие остатки
+\pause
+Есть большие остатки
 
 ## Есть ли еще какие-то паттерны в остатках?
 
 ```{r fig.height=4.5, fig.width=10}
-# gg_resid %+% aes(x = ArrivalTime)
-gg_resid %+% aes(x = ArrivalTime) + geom_smooth()
+gg_resid %+% aes(x = ArrivalTime) + geom_smooth(se = FALSE, color = "black")
 ```
 
-> - Есть намек на нелинейность. Возможно, нужен GAMM
+\pause
+Есть намек на нелинейность. Возможно, нужен GAMM
 
-## Проверяем, есть ли нелинейный паттерн в остатках {.smaller .columns-2}
+## Проверяем, есть ли нелинейный паттерн в остатках
 
 ```{r fig.width=4.5, fig.height=4, fig.align='right', tidy.opts=list(width = 50), tidy=TRUE}
 library(mgcv)
 nonlin1 <- gam(.scresid ~ s(ArrivalTime), data = M1_diag)
 summary(nonlin1)
+```
+
+
+## Выявляется нелинейный паттерн
+```{r, fig.height=3.5}
 plot(nonlin1)
 abline(h = 0, lty = 2)
 ```
 
-> - Совершенно точно нужен GAMM. Но продолжим с GLMM
 
-## У нас была сверхдисперсия. Пробуем NB GLMM {.smaller}
+\pause
+Совершенно точно нужен GAMM. Но продолжим с GLMM
+
+## У нас была сверхдисперсия. Пробуем NB GLMM
+
+\begin{small}
 
 $$NCalls_{ij} = e^{\beta_0 + \beta_{1}SexP_{M} + \beta_{2}FoodT_{S} + \beta_{3}ArrivalT + \beta_{4} SexP_{M}:FoodT_{S} + \beta_{5}SexP{M}:ArrivalT + log(BroodSize) + a_{i} + \epsilon_{ij}}$$
+\end{small}
+
+\columnsbegin
+
+\column{0.5\textwidth}
 
 - $NCalls_{ij} \sim \boldsymbol{NB}(\mu_{ij}, k)$  --- отклик подчиняется отрицательному биномиальному распределению с параметрами $\mu$ и $k$
+
 - $E(NCalls_{ij}) = \mu_{ij}$
+
 - $var(NCalls_{ij}) = \mu_{ij} + \mu^2_{ij} / k$
+
 - $ln(\mu_{ij}) = \eta_{ij}$  --- функция связи --- логарифм
 
-$\begin{array}{l}
-\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \beta_{2}FoodTreatment_{S} + \beta_{3}ArrivalTime + \\
-+ \beta_{4} SexParent_{M}:FoodTreatment_{S} + \beta_{5}SexParent{M}:ArrivalTime + log(BroodSize) + \\
+\column{0.5\textwidth}
+
+\small {$\begin{array}{l}
+
+\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \\
++\beta_{2}FoodTreatment_{S} +\beta_{3}ArrivalTime + \\
++\beta_{4} SexParent_{M}:FoodTreatment_{S} + \\
++\beta_{5}SexParent{M}:ArrivalTime + log(BroodSize) + \\
 + a_{i} + \epsilon_{ij}
-\end{array}$
+\end{array}$}
 
 - $a_{i}\sim N(0, \sigma^2_{Nest})$ --- случайный эффект гнезда (intercept)
 - $\epsilon_{ij} \sim N(0, \sigma^2)$ --- остатки модели
 - $i$ --- гнездо
 - $j$ --- наблюдение
 
+\columnsend
+
+
 
 ## Подберем NB GLMM
 
 ```{r}
-M2 <- glmer.nb(NCalls ~ SexParent * FoodTreatment + SexParent * ArrivalTime_std + offset(logBroodSize) + (1 | Nest), data = Owls)
-# # Если эта модель вдруг не сходится, есть обходной маневр. Можно попробовать заранее определить k  при помощи внутренней функции. В lme4 параметр k называется theta
+M2 <- glmer.nb(NCalls ~ SexParent * FoodTreatment +
+                 SexParent * ArrivalTime_std +
+                 offset(logBroodSize) +
+                 (1 | Nest),
+               data = Owls)
+# # Если эта модель вдруг не сходится, есть обходной маневр.
+#Можно попробовать заранее определить k  при помощи внутренней функции.
+#В lme4 параметр k называется theta
 # th <- lme4:::est_theta(M1)
 # M2 <- update(M1, family = negative.binomial(theta=th))
 ```
 
 ## Задание:
 
-Проверьте модель с отрицательным биномиальным распределением отклика 
+Проверьте модель с отрицательным биномиальным распределением отклика
 
 - на избыточность дисперсии
 - наличие паттернов в остатках
@@ -336,18 +464,20 @@ fi <- sum(R_M2^2) /df  #Величина fi показывает во сколь
 fi
 ```
 
-> - Сносно
+\pause
+Сносно
 
-## Диагностика отр. биномиальной модели
+## Диагностика модели c отр. биномиальным рспределением остатков
 
-```{r}
+```{r, fig.height=3.5}
 M2_diag <- fortify(M2)
 M2_diag$.rfitted <- predict(M2, type = "response")
 gg_resid <- ggplot(M2_diag, aes(x = .rfitted, y = .scresid, colour = FoodTreatment)) + geom_point() + facet_wrap(~FoodTreatment + SexParent)
 gg_resid
 ```
 
-> - Есть большие остатки
+\pause
+Есть большие остатки
 
 ## Есть ли еще какие-то паттерны в остатках?
 
@@ -355,29 +485,39 @@ gg_resid
 
 ```{r}
 # gg_resid %+% aes(x = ArrivalTime)
-gg_resid %+% aes(x = ArrivalTime) + geom_smooth()
+gg_resid %+% aes(x = ArrivalTime) + geom_smooth(se = FALSE, color = "black")
 ```
 
-> - Подозрительно. Возможно, нужен GAMM
+\pause
+Подозрительно. Возможно, нужен GAMM
 
-## Проверяем, есть ли нелинейные паттерны {.smaller .columns-2}
+## Проверяем, есть ли нелинейные паттерны
 
 ```{r fig.width=4.5, fig.height=4, fig.align='right', tidy.opts=list(width = 50), tidy=TRUE}
 nonlin2 <- gam(.scresid ~ s(ArrivalTime), data = M2_diag)
 summary(nonlin2)
-plot(nonlin2) 
-abline(h = 0)
 ```
 
-> - Совершенно точно нужен GAMM
+## Нелинейный паттерн в остатках остался
 
-## Подбор оптимальной модели  {.smaller}
+```{r, fig.height=3.5}
+plot(nonlin2)
+abline(h = 0)
+
+```
+
+\pause
+Совершенно точно нужен GAMM
+
+## Подбор оптимальной модели
 
 Все ли достоверно?
-
+<small>
 ```{r}
 summary(M2)
 ```
+
+</small>
 
 ## Можно ли что-то выкинуть
 
@@ -385,7 +525,8 @@ summary(M2)
 drop1(M2, test = "Chi")
 ```
 
-> - Если выкинуть взаимодействия, модель не станет хуже
+\pause
+Если выкинуть взаимодействия, модель не станет хуже
 
 ## Выкидываем одно взаимодействие
 
@@ -394,7 +535,8 @@ M3 <- update(M2, .~.-SexParent:ArrivalTime_std)
 drop1(M3, test = "Chisq")
 ```
 
-> - теперь можно выкинуть второе
+\pause
+теперь можно выкинуть второе
 
 ## Выкидываем второе взаимодействие
 
@@ -403,22 +545,25 @@ M4 <- update(M3, .~.-SexParent:FoodTreatment)
 drop1(M4, test = "Chisq")
 ```
 
-> - теперь можно выкинуть пол родителя
+\pause
+теперь можно выкинуть пол родителя
 
-##
+## Финальная модель
 
 ```{r}
 M5 <- update(M4, .~.-SexParent)
 drop1(M5, test = "Chisq")
 ```
 
-> - это финальная модель
-
 ## Второй способ подбора оптимальной модели - AIC
 
 ```{r}
 AIC(M2, M3, M4, M5)
 ```
+
+\pause
+Выбираем модель с минимальным AIC
+
 
 ## Модель изменилась. Нужно повторить диагностику
 
@@ -433,7 +578,8 @@ fi <- sum(R_M5^2) /df  #Величина fi показывает во сколь
 fi
 ```
 
-> - Сносно
+\pause
+Сносно
 
 ## Диагностика отр. биномиальной модели
 
@@ -444,34 +590,49 @@ gg_resid <- ggplot(M5_diag, aes(x = .rfitted, y = .scresid, colour = FoodTreatme
 gg_resid
 ```
 
-> - Есть большие остатки
+\pause
+Есть большие остатки
 
 ## Есть ли еще какие-то паттерны в остатках?
 
 Может быть паттерны в остатках исчезли от того, что мы использовали другую GLMM?
 
 ```{r}
-# gg_resid %+% aes(x = ArrivalTime)
-gg_resid %+% aes(x = ArrivalTime) + geom_smooth()
+gg_resid %+% aes(x = ArrivalTime) + geom_smooth(se = FALSE, color = "black")
 ```
 
-> - Подозрительно. Возможно, нужен GAMM
+\pause
+Подозрительно. Возможно, нужен GAMM
 
-## Проверяем, есть ли нелинейные паттерны {.smaller .columns-2}
+## Проверяем, есть ли нелинейные паттерны
 
 ```{r fig.width=4.5, fig.height=4, fig.align='right', tidy.opts=list(width = 50), tidy=TRUE}
 nonlin5 <- gam(.scresid ~ s(ArrivalTime), data = M5_diag)
 summary(nonlin5)
-plot(nonlin5) 
-abline(h = 0)
 ```
 
-> - Совершенно точно нужен GAMM
-> - Но мы продолжим
 
-## Финальная GLMM, которую мы получили, выглядит так {.smaller}
+##Нелинейный паттерн никуда не делся...
+
+
+```{r, fig.height=3.5}
+plot(nonlin5)
+abline(h = 0)
+
+```
+
+\pause
+Совершенно точно нужен GAMM
+\pause
+Но мы продолжим
+
+## Финальная GLMM, которую мы получили, выглядит так
+
+\begin{small}
 
 $$NCalls_{ij} = e^{\beta_0 + \beta_{1}SexP_{M} + \beta_{2}FoodT_{S} + \beta_{3}ArrivalT + log(BroodSize) + a_{i} + \epsilon_{ij}}$$
+
+\end{small}
 
 - $NCalls_{ij} \sim \boldsymbol{NB}(\mu_{ij}, k)$  --- отклик подчиняется отрицательному биномиальному распределению с параметрами $\mu$ и $k$
 - $E(NCalls_{ij}) = \mu_{ij}$
@@ -489,12 +650,18 @@ $\begin{array}{l}
 - $j$ --- наблюдение
 
 
+
 ## Готовим данные для графика модели
 
 ```{r}
 library(plyr)
-NewData <- ddply(Owls, .variables = .(FoodTreatment), summarise, ArrivalTime_std = seq(min(ArrivalTime_std),  max(ArrivalTime_std), length = 100))
-NewData$ArrivalTime <- NewData$ArrivalTime_std * sd(Owls$ArrivalTime) + mean(Owls$ArrivalTime)
+NewData <- ddply(Owls, .variables = .(FoodTreatment),
+                 summarise,
+                 ArrivalTime_std = seq(min(ArrivalTime_std),
+                                       max(ArrivalTime_std), length = 100))
+
+NewData$ArrivalTime <- NewData$ArrivalTime_std * sd(Owls$ArrivalTime) +
+  mean(Owls$ArrivalTime)
 ```
 
 
@@ -512,10 +679,11 @@ NewData$SE <- sqrt(diag(X %*% vcov(M5) %*% t(X)))
 ## График предсказанных значений
 
 ```{r owls-pred, echo=FALSE}
-ggplot() + 
-  geom_point(data = Owls, aes(x = ArrivalTime, y = NCalls), colour = "steelblue") + 
-  geom_ribbon(data = NewData, aes(x = ArrivalTime, ymax = exp(Pred + 1.96 * SE), ymin = exp(Pred - 1.96 * SE)), alpha = 0.3) + 
-  geom_line(data = NewData, aes(x = ArrivalTime, y = exp(Pred), group = FoodTreatment)) + 
+ggplot() +
+  geom_point(data = Owls,
+             aes(x = ArrivalTime, y = NCalls), colour = "steelblue") +
+  geom_ribbon(data = NewData, aes(x = ArrivalTime, ymax = exp(Pred + 1.96 * SE), ymin = exp(Pred - 1.96 * SE)), alpha = 0.3) +
+  geom_line(data = NewData, aes(x = ArrivalTime, y = exp(Pred), group = FoodTreatment)) +
   facet_wrap(~FoodTreatment)
 ```
 
