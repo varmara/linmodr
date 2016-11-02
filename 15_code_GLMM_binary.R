@@ -1,4 +1,10 @@
-bal <- read.table("Yakovis2.csv", header = TRUE, sep = ";")
+# title       : "Смешанные модели для бинарных зависимых величин"
+# subtitle    : "Линейные модели..."
+# author: Вадим Хайтов, Марина Варфоломеева
+
+#Читаем данные
+
+bal <- read.table("data/Yakovis2.csv", header = TRUE, sep = ";")
 
 #Some housekeeping
 bal$Site <- factor(bal$Site)
@@ -12,11 +18,12 @@ bal$Substrate_ID <- factor(bal$Substrate_ID)
 # Доля мертвых со следами сверления
 
 
+#
 
 ##Подбираем модель с помощью функции `glmmPQL`
 library(MASS)
 
-M1_PQL <- glmmPQL(Fix_effect, random = ~1|Sample/Substrate_ID, data = bal2, family = "binomial")
+M1_PQL <- glmmPQL(Fix_effect, random = ~1|Sample/Substrate_ID, data = bal, family = "binomial")
 
 summary(M1_PQL)
 
@@ -34,7 +41,7 @@ summary(M2_ML)
 ##Подбираем модель с помощью функции `glmer()`
 
 library(lme4)
-M1_glmer <- glmer(Drill ~ BorN + ALength + Age + Position + Site +  (1|Sample/Substrate_ID), data = bal2, family = "binomial") 
+M1_glmer <- glmer(Drill ~ BorN + ALength + Age + Position + Site +  (1|Sample/Substrate_ID), data = bal2, family = "binomial")
 
 summary(M1_glmer)
 
@@ -110,14 +117,11 @@ dev.off()
 #Визуализация предсказаний модели
 MyData <- expand.grid(BorN = seq(min(bal2$BorN), max(bal2$BorN)),
                       ALength = seq(min(bal2$ALength), max(bal2$ALength)),
-                      Position = levels(bal2$Position)) 
+                      Position = levels(bal2$Position))
 
 
 MyData$Predicted <- predict(M3_glmer,newdata = MyData, type = "response", re.form = NA)
 
 
-png("prediction.png",   width = 600, height = 600)
-
 ggplot(MyData, aes(x = ALength, y = Predicted, color = BorN)) + geom_line(aes(group = BorN), size = 1.5) + facet_grid(~Position, labeller = label_both) + scale_color_gradient(low = "green", high = "red")
 
-dev.off()

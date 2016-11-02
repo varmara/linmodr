@@ -25,7 +25,7 @@ filename <- "Owls_Roulin_Bersier_2007.csv"
 if (!file.exists(filename)) download(url, filename)
 
 ## Знакомство с данными
-Owls <- read.delim("Owls_Roulin_Bersier_2007.csv")
+Owls <- read.delim("data/Owls_Roulin_Bersier_2007.csv")
 str(Owls)
 # SiblingNegotiation - число криков совят - заменим на более короткое название
 Owls$NCalls <- Owls$SiblingNegotiation

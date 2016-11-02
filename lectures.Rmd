@@ -145,13 +145,17 @@ install.packages(c("lme4", "nlme"))
 
 ## 15. Обобщенные смешанные линейные модели для бинарных данных 
 
+```{r eval=FALSE}
+install.packages("glmmML")
+```
+
 - Презентация [html] | [pdf]
-- [код R]
-- Данные
+- [код R](15_code_GLMM_binary.R)
+- Данные [Yakovis2.csv](data/Yakovis2.csv)
 
 ## 16. Обобщенные смешанные модели для счетных данных 
 
 - Презентация [html] | [pdf]
-- [код R]
-- Данные
+- [код R](16_GLMM_count_st.R)
+- Данные [Owls_Roulin_Bersier_2007.csv](data/Owls_Roulin_Bersier_2007.csv)
 
