@@ -18,19 +18,28 @@ bal$Substrate_ID <- factor(bal$Substrate_ID)
 # Доля мертвых со следами сверления
 
 
-#
+
+#Формулы для фиксированных и случайных эффектов
+
+
+
+
 
 ##Подбираем модель с помощью функции `glmmPQL`
 library(MASS)
 
-M1_PQL <- glmmPQL(Fix_effect, random = ~1|Sample/Substrate_ID, data = bal, family = "binomial")
+M1_PQL <- glmmPQL(Fix_effect, random = ~1|Sample/Substrate_ID, data = bal2, family = "binomial")
 
 summary(M1_PQL)
 
+length(unique(bal2$Substrate_ID))
 
 ##Подбираем модель с помощью функции `glmmML()`
+
 library(glmmML)
+
 M1_ML <- glmmML(Fix_effect, cluster = Substrate_ID, data = bal2)
+
 M2_ML <- glmmML(Fix_effect, cluster = Sample, data = bal2)
 
 summary(M1_ML)
@@ -46,6 +55,7 @@ M1_glmer <- glmer(Drill ~ BorN + ALength + Age + Position + Site +  (1|Sample/Su
 summary(M1_glmer)
 
 ##Сравним коэффициенты, подобранные разными функциями
+
 
 GLMMPQL <- round(as.numeric(fixed.effects(M1_PQL)), 3)
 GLMMML_1 = round(as.numeric(coefficients(M1_ML)), 3)
@@ -115,12 +125,10 @@ dev.off()
 
 
 #Визуализация предсказаний модели
-MyData <- expand.grid(BorN = seq(min(bal2$BorN), max(bal2$BorN)),
-                      ALength = seq(min(bal2$ALength), max(bal2$ALength)),
-                      Position = levels(bal2$Position))
+MyData <- expand.grid(BorN = seq(min(bal2$BorN), max(bal2$BorN)), ALength = seq(min(bal2$ALength), max(bal2$ALength)),Position = levels(bal2$Position))
 
 
-MyData$Predicted <- predict(M3_glmer,newdata = MyData, type = "response", re.form = NA)
+MyData$Predicted <- predict(M3_glmer,newdata = MyData, re.form = NA)
 
 
 ggplot(MyData, aes(x = ALength, y = Predicted, color = BorN)) + geom_line(aes(group = BorN), size = 1.5) + facet_grid(~Position, labeller = label_both) + scale_color_gradient(low = "green", high = "red")

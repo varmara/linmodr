@@ -149,13 +149,13 @@ install.packages(c("lme4", "nlme"))
 install.packages("glmmML")
 ```
 
-- Презентация [html] | [pdf]
+- Презентация [html](15_GLMM_binary.html) | [pdf](15_GLMM_binary2.pdf)
 - [код R](15_code_GLMM_binary.R)
 - Данные [Yakovis2.csv](data/Yakovis2.csv)
 
 ## 16. Обобщенные смешанные модели для счетных данных 
 
-- Презентация [html] | [pdf]
+- Презентация [html](16_GLMM_count.html) | [pdf](16_GLMM_count2.pdf)
 - [код R](16_code_GLMM_count.R)
 - Данные [Owls_Roulin_Bersier_2007.csv](data/Owls_Roulin_Bersier_2007.csv)
 

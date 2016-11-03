@@ -31,10 +31,13 @@ str(Owls)
 Owls$NCalls <- Owls$SiblingNegotiation
 
 ##Есть ли наблюдения-выбросы? строим dot-plot
+
 dotplot <- ggplot(Owls, aes(y = 1:nrow(Owls))) + geom_point(colour = "steelblue")
+
 
 grid.arrange(dotplot + aes(x = NCalls),
   dotplot + aes(x = ArrivalTime), nrow = 1)
+
 
 ## Различаются ли гнезда?
 ggplot(Owls, aes(x = Nest, y = NCalls)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -47,6 +50,11 @@ ggplot(Owls, aes(x = NCalls)) + geom_histogram(binwidth = 1, fill = "steelblue",
 
 ## Сколько нулей?
 sum(Owls$NCalls == 0)/nrow(Owls)
+
+mean(Owls$NCalls == 0)
+
+
+
 
 ## Какого размера выводки в гнездах?
 range(Owls$BroodSize)
@@ -67,6 +75,13 @@ ggplot(Owls) + stat_summary(aes(x = FoodTreatment, y = NCalls, colour = SexParen
 
 
 
+ggplot(data = Owls) + geom_segment(aes(x = ArrivalTime, y = 0,
+                                xend = ArrivalTime,
+                                yend = NCalls, colour = FoodTreatment)) +
+  facet_grid(FoodTreatment + SexParent ~ Nest) + ylab("NCall") + theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, hjust = 1, size = 5))
+
+
+
 
 ## Колинеарность
 M0 <- lm(NCalls ~ SexParent + FoodTreatment + ArrivalTime, data = Owls)
@@ -82,12 +97,19 @@ Owls$ArrivalTime_std <- (Owls$ArrivalTime - mean(Owls$ArrivalTime)) / sd(Owls$Ar
 M1 <- glmer(NCalls ~ SexParent * FoodTreatment + SexParent * ArrivalTime_std + offset(logBroodSize) + (1 | Nest), family = "poisson", data = Owls)
 
 
+
+summary(M1)
+
+
 ## Задание:
 # Проверьте модель M1 на избыточность дисперсии
 
 ## Избыточность дисперсии (Overdispersion)
 R_M1 <- resid(M1, type = "pearson") # Пирсоновские остатки
+
 N <- nrow(Owls) # Объем выборки
+
+
 p <- length(fixef(M1)) + 1   # Число параметров в модели (сигма для гнезда)
 df <- (N - p) # число степенейсвободы
 fi <- sum(R_M1^2) /df  #Величина fi показывает во сколько раз в среднем sigma > mu для данной модели
@@ -114,13 +136,26 @@ gg_resid %+% aes(x = ArrivalTime) + geom_smooth()
 
 ## Проверяем, есть ли нелинейный паттерн в остатках
 library(mgcv)
+
 nonlin1 <- gam(.scresid ~ s(ArrivalTime), data = M1_diag)
+
+
+
 summary(nonlin1)
+
+
+
 plot(nonlin1)
+
 abline(h = 0, lty = 2)
 
 ## У нас была сверхдисперсия. Нужно NB GAMM
+
+
 M2 <- glmer.nb(NCalls ~ SexParent * FoodTreatment + SexParent * ArrivalTime_std + offset(logBroodSize) + (1 | Nest), data = Owls)
+
+summary(M2)
+
 # # Если эта модель вдруг не сходится, есть обходной маневр. Можно попробовать заранее определить Theta при помощи внутренней функции
 # th <- lme4:::est_theta(M1)
 # M2 <- update(M1, family = negative.binomial(theta=th))
@@ -216,15 +251,25 @@ abline(h = 0)
 
 ## Готовим данные для графика модели
 library(plyr)
+
+
 NewData <- ddply(Owls, .variables = .(FoodTreatment), summarise, ArrivalTime_std = seq(min(ArrivalTime_std),  max(ArrivalTime_std), length = 100))
+
 NewData$ArrivalTime <- NewData$ArrivalTime_std * sd(Owls$ArrivalTime) + mean(Owls$ArrivalTime)
 
 ## Предсказания и ошибки
 # Модельная матрица
+
 X <- model.matrix(~ FoodTreatment + ArrivalTime_std, data = NewData)
+head(X)
 # К предсказанным значениям нужно прибавить оффсет. Мы будем делать предсказания для среднего размера выводка.
+
 NewData$Pred <- X %*% fixef(M5) + log(mean(Owls$BroodSize))
+
+
+
 # Стандартные ошибки предсказаний
+
 NewData$SE <- sqrt(diag(X %*% vcov(M5) %*% t(X)))
 
 ## График предсказанных значений
