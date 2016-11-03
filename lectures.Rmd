@@ -158,4 +158,4 @@ install.packages("glmmML")
 - Презентация [html](16_GLMM_count.html) | [pdf](16_GLMM_count2.pdf)
 - [код R](16_code_GLMM_count.R)
 - Данные [Owls_Roulin_Bersier_2007.csv](data/Owls_Roulin_Bersier_2007.csv)
-
+- [Примеры вопросов следующего теста](test_handouts/09-glmm-handout-test1.pdf)
