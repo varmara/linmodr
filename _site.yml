@@ -1,4 +1,4 @@
-name: "linmodr-course"
+name: "linmodr"
 output_dir: "."
 include: ["import.R"]
 exclude: ["docs.txt", "*.csv", "*.xls", "*.xlsx"]
@@ -7,7 +7,7 @@ output:
     toc: true
     toc_float:
       collapsed: false
-    theme: flatly
+    theme: simplex
     highlight: haddock
     include:
       after_body: _footer.html
