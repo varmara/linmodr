@@ -640,22 +640,6 @@ snail_colours <span class="co"># это текстовый вектор.</span><
 <p>Та же история с функцией <code>mean</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <pre><code>## [1] 11.42857</code></pre>
-<p>Попробуем написать пользовательскую функцию <code>mmean()</code>, которая будет по умолчанию считать среднее значение элементов в векторе с учетом пропущенных значений (<code>NA</code>)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mmean &lt;-<span class="st"> </span>function(x){
-  <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-  }</code></pre></div>
-<p>В этом коде: - mmean - переменная, название функции. В эту переменную мы складываем функцию, которую создает функция <code>function()</code> - <code>function()</code> - функция, которая делает функции. В скобках перечисляются аргументы (названия переменных, которые мы передаем в функцию, чтобы она что-то сделала с ними) - <code>{ }</code> - в фигурных скобках тело функции - последовательность действий, которую нужно сделать с аргументами</p>
-<p>У больших функций бывает еще инструкция <code>return()</code>, которая сообщает, что именно должна возвращать наша функция. Вот как выглядела бы наша функция с этой инструкцией</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mmean &lt;-<span class="st"> </span>function(x){
-  res &lt;-<span class="st"> </span><span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
-  <span class="kw">return</span>(res)
-}</code></pre></div>
-<p>Проверим нашу функцию при помощи встроенной функции</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(vect_num, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1] 0.5</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mmean</span>(vect_num)</code></pre></div>
-<pre><code>## [1] 0.5</code></pre>
-<p>Работает</p>
 </div>
 
 <p><small>
