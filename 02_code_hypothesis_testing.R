@@ -1,4 +1,4 @@
-# https://varmara.github.io/linmodr-course/02_code_hypothesis_testing.R
+# https://varmara.github.io/linmodr/02_code_hypothesis_testing.R
 #' title: "Тестирование статистических гипотез"
 #' author: "Марина Варфоломеева, Вадим Хайтов"
 

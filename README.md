@@ -4,7 +4,7 @@
 
 Презентации сделаны в формате ioslides.
 
-Удобнее всего работать с проектом RStudio __linmodr-course.Rproj__
+Удобнее всего работать с проектом RStudio __linmodr.Rproj__
 
 ## git pull
 

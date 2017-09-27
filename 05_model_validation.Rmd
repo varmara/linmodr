@@ -130,7 +130,7 @@ library(downloader)
 if(!dir.exists("data")) dir.create("data")
 # скачиваем файл
 download(
-  url = "https://varmara.github.io/linmodr-course/data/IQ_brain.csv", 
+  url = "https://varmara.github.io/linmodr/data/IQ_brain.csv", 
   destfile = "data/IQ_brain.csv")
 ```
 ### Подберем модель

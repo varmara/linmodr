@@ -24,7 +24,7 @@ library(downloader)
 if(!dir.exists("data")) dir.create("data")
 # скачиваем файл
 download(
-  url = "https://varmara.github.io/linmodr-course/data/loyn.csv",
+  url = "https://varmara.github.io/linmodr/data/loyn.csv",
   destfile = "data/loyn.csv")
 
 #' ## Читаем данные
