@@ -6,6 +6,10 @@ title: Презентации и данные
 
 - Конспект [html](01_intro_to_r.html)
 - [код R](01_code_intro_to_r.R)
+- [код R](01_intro_ggplot.R)
+- Данные:
+    - [fev.xls](data/fev.xls)
+
 
 ## 2. Тестирование гипотез
 
