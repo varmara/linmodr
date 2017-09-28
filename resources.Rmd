@@ -33,7 +33,6 @@ title: Ресурсы по R и статистике
 ## Статистика
 
 - Гланц, С., 1998. Медико-биологическая статистика. М., Практика.
-- **Legendre, P. and Legendre, L.F., 2012. Numerical ecology (Vol. 24). Elsevier.**
 - **Quinn, G.G.P., Keough, M.J., 2002. Experimental design and data analysis for biologists. Cambridge University Press.**
 - Sokal, R.R., Rohlf, F.J., 1995. Biometry (3rd edn). WH Freman and company: New York.
 - Zar, J.H., 2010. Biostatistical Analysis. Prentice Hall: New York.
