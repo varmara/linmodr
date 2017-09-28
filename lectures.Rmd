@@ -4,56 +4,65 @@ title: Презентации и данные
 
 ## 1. Знакомство с R 
 
+```{r eval=FALSE}
+install.packages("ggplot2")
+install.packages("readxl")
+```
+
 - Конспект [html](01_intro_to_r.html)
-- [код R](01_code_intro_to_r.R)
-- [код R](01_intro_ggplot.R)
+- Код R
+    - [01_code_intro_to_r](01_code_intro_to_r.R)
+    - [01_intro_ggplot.R](01_intro_ggplot.R)
 - Данные:
     - [fev.xls](data/fev.xls)
 
 
-## 2. Тестирование гипотез
+## 2. Базовая статистика на R
 
-```{r eval=FALSE}
-install.packages("ggplot2")
-```
+### Описательная статистика
+
+### Тестирование гипотез
+
 <!-- - Презентация [html](02_hypothesis_testing.html) |  [pdf](02_hypothesis_testing.pdf) -->
 <!-- - [код R](02_code_hypothesis_testing.R) -->
 <!-- - [Домашнее задание №1 --- Тестирование гипотез](hw/hw1_t-test-cholest.zip) (выберите себе один из вариантов) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/02-ttest-handout-test1.pdf) (в следующем тесте будет 4 вопроса из этих 10) -->
 
 ## 3. Простая линейная регрессия 
 
-```{r eval=FALSE}
-install.packages(c("reshape2", "gridExtra", "car"))
-```
+### Простая линейная регрессия 
+
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("reshape2", "gridExtra", "car")) -->
+<!-- ``` -->
 
 <!-- - Презентация [html](03_LM.html) | [pdf](03_LM.pdf) -->
 <!-- - [код R](03_code_LM.R) -->
 <!-- - Данные: -->
 <!--     - [IQ_brain.csv](data/IQ_brain.csv) -->
 
-## 4. Регрессия в матричном виде
+### Простая линейная регрессия в матричном виде
 
 <!-- - Презентация [html](04_Introduction_to_matrix_algebra.html) | [pdf](04_Introduction_to_matrix_algebra.pdf) -->
 <!-- - [код R](04_code_Introduction_to_matrix_algebra.R) -->
 <!-- - Данные: -->
 <!--     - [IQ_brain.csv](data/IQ_brain.csv) -->
 <!-- - [Домашнее задание №2 --- Линейная регрессия, часть 1](hw/hw2_lin-regr-crabs.zip) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/03-regr-handout-test1.pdf) -->
 
 
-## 5. Проверка условий применимости регрессионных моделей 
+## 4. Условия применимости линейных моделей
 
-```{r eval=FALSE}
-install.packages(c("downloader", "ISwR"))
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("downloader", "ISwR")) -->
+<!-- ``` -->
 
 <!-- - Презентация [pdf](05_model_validation.pdf) -->
 <!-- - [код R](05_code_model_validation.R) -->
 <!-- - Данные: -->
 <!--     - [IQ_brain.csv](data/IQ_brain.csv) -->
 
-## 6. Множественная линейная регрессия 
+## 5. Множественная линейная регрессия 
+
+### Множественная линейная регрессия
 
 <!-- - Презентация [pdf](06_multiple_LM.pdf) -->
 <!-- - [код R](06_code_multiple_LM.R) -->
@@ -61,12 +70,12 @@ install.packages(c("downloader", "ISwR"))
 <!--     - [loyn.csv](data/loyn.csv) -->
 
 <!-- - [Домашнее задание №3 --- Линейная регрессия, часть 2](hw/hw3_lin-regr-crabs-assump.zip)  -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/04-multregr-handout-test1.pdf) -->
 
-## 7. Сравнение линейных моделей 
-```{r, eval=FALSE}
-install.packages("caret")
-```
+### Выбор оптимальной модели
+
+<!-- # ```{r, eval=FALSE} -->
+<!-- # install.packages("caret") -->
+<!-- # ``` -->
 
 <!-- - Презентация [html](07_model_selection.html) | [pdf] -->
 <!-- - [код R](07_code_model_selection.R) -->
@@ -74,38 +83,42 @@ install.packages("caret")
 <!--     - [loyn.csv](data/loyn.csv) -->
     
 
-## 8. Линейные модели с непрерывными и дискретными предикторами 
+## 6. Линейные модели с непрерывными и дискретными предикторами 
 
-```{r, eval=FALSE}
-install.packages("dplyr")
-```
+### Модели с разными значениями интерсепта для групп
+
+<!-- ```{r, eval=FALSE} -->
+<!-- install.packages("dplyr") -->
+<!-- ``` -->
 
 <!-- - Презентация [html](08_LM_with_continuous_and_discrete_predictors.html) | [pdf] -->
 <!-- - [код R](08_code_LM_with_continuous_and_discrete_predictors.R) -->
 <!-- - Данные -->
 <!--     - [goats.csv](data/goats.csv) -->
 
+### Модели с разными значениями угла наклона для групп
+
 <!-- - [Домашнее задание №4 --- Линейные модели с непрерывными и дискретными предикторами](hw/hw4_ancova-crabs.zip) Надеюсь, вам еще не надоели крабы!) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/05-mregr-handout-test1.pdf) -->
 
-## 9. Линейные модели только с дискретными предикторами (дисперсионный анализ) 
+## 7. Линейные модели только с дискретными предикторами (дисперсионный анализ) 
 
-```{r, eval=FALSE}
-install.packages(c("DAAG", "multcomp"))
-```
+<!-- ```{r, eval=FALSE} -->
+<!-- install.packages(c("DAAG", "multcomp")) -->
+<!-- ``` -->
+
+### Однофакторный дисперсионный анализ
 
 <!-- - Презентация [pdf](09_anova.pdf) -->
 <!-- - [код R](09_code_anova.R) -->
 
-## 10. Многофакторный дисперсионный анализ 
+### Многофакторный дисперсионный анализ 
 
 <!-- - Презентация [pdf](10_two-way_anova_and_interactions.pdf) -->
 <!-- - [код R](10_code_two-way_anova_and_interactions.R) -->
 <!-- - Данные -->
 <!--     - [hall.csv](data/hall.csv) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/06-anova-handout-test1.pdf) -->
 
-## 11. Линейные модели для бинарных данных (логистическая регрессия) 
+## 8. Обобщенные линейные модели (GLM) для бинарных данных (=логистическая регрессия) 
 
 <!-- - Презентация [html](11_GLM_binary.html) | [pdf] -->
 <!-- - [код R](11_code_GLM_binary.R) -->
@@ -113,12 +126,12 @@ install.packages(c("DAAG", "multcomp"))
 <!--    - [polis.csv](data/polis.csv) -->
 <!--    - [ICU.csv](data/ICU.csv) -->
 
-## 12. Линейные модели для счетных данных 
+## 9. Обобщенные линейные модели (GLM) для счетных данных 
 
-```{r, eval=FALSE}
-install.packages("qcc")
-install.packages("AER")
-```
+<!-- ```{r, eval=FALSE} -->
+<!-- install.packages("qcc") -->
+<!-- install.packages("AER") -->
+<!-- ``` -->
 
 <!-- - Презентация [html](12_GLM_count.html) | [pdf](12_GLM_count2.pdf) -->
 <!-- - [код R](12_code_GLM_count.R) -->
@@ -127,18 +140,17 @@ install.packages("AER")
 <!--     - [ICU.csv](data/ICU.csv) -->
 
 <!-- - [Домашнее задание №5](hw/hw5_glm-pois-negbin-abalone.zip) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/07-glm-handout-test1.pdf) -->
 
-## 13. Смешанные линейные модели 
+## 10. Смешанные модели (GLMM) для нормально-распределенных данных
 
-```{r eval=FALSE}
-install.packages(c("lme4", "nlme"))
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("lme4", "nlme")) -->
+<!-- ``` -->
 
 <!-- - Презентация [pdf](13_GLMM_gaussian.pdf) -->
 <!-- - [код R](13_code_GLMM_gaussian.R) -->
 
-## 14. Коррекция гетерогенности дисперсий в смешанных линейных моделях 
+## 11. Моделирование структуры дисперсии в смешаных моделях
 
 <!-- - Презентация [pdf](14_variance_structure.pdf) -->
 <!-- - [код R](14_code_variance_structure.R) -->
@@ -147,19 +159,18 @@ install.packages(c("lme4", "nlme"))
 <!-- - [Домашнее задание №6](hw/hw6_glmm-gaussian-milk.zip) -->
 <!-- - [Примеры вопросов следующего теста](test_handouts/08-glmm-handout-test1.pdf) -->
 
-## 15. Обобщенные смешанные линейные модели для бинарных данных 
+## 12. Смешанные линейные модели (GLMM) для бинарных данных
 
-```{r eval=FALSE}
-install.packages("glmmML")
-```
-
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("glmmML") -->
+<!-- ``` -->
 <!-- - Презентация [html](15_GLMM_binary.html) | [pdf](15_GLMM_binary2.pdf) -->
 <!-- - [код R](15_code_GLMM_binary.R) -->
 <!-- - Данные [Yakovis2.csv](data/Yakovis2.csv) -->
 
-## 16. Обобщенные смешанные модели для счетных данных 
+## 13. Смешанные линейные модели (GLMM) для счетных данных
 
 <!-- - Презентация [html](16_GLMM_count.html) | [pdf](16_GLMM_count2.pdf) -->
 <!-- - [код R](16_code_GLMM_count.R) -->
 <!-- - Данные [Owls_Roulin_Bersier_2007.csv](data/Owls_Roulin_Bersier_2007.csv) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/09-glmm-handout-test1.pdf) -->
+
