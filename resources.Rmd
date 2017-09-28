@@ -2,8 +2,6 @@
 title: Ресурсы по R и статистике
 ---
 
-- [Исходный код сайта в RMarkdown](http://github.com/varmara/mathmethr)
-
 ## R --- базовые знания
 
 - [Cheat-sheet по RStudio](https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf) от [RStudio](https://www.rstudio.com)
