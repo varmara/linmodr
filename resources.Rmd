@@ -2,34 +2,41 @@
 title: Ресурсы по R и статистике
 ---
 
-## Статистика:
+- [Исходный код сайта в RMarkdown](http://github.com/varmara/mathmethr)
 
-Гланц, С., 1998. Медико-биологическая статистика. М., Практика.
+## R --- базовые знания
 
-Diez, D. M., Barr, C. D., Çetinkaya-Rundel, M., 2010. [OpenIntro: Statistics.](http://www.openintro.org/stat/down/)
+- [Cheat-sheet по RStudio](https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf) от [RStudio](https://www.rstudio.com)
+- Очень краткая шпаргалка по R [Cheat-sheet по базовому R](http://www.rstudio.com/wp-content/uploads/2016/06/r-cheat-sheet.pdf) от [Mhairi McNeill](http://mhairihmcneill.com/)
+- Более подробная шпаргалка [R reference card](https://cran.r-project.org/doc/contrib/Short-refcard.pdf) от Tom Short
+- [Data import cheat-sheet](https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/data-import-cheatsheet.pdf)
 
-Quinn, G.G.P., Keough, M.J., 2002. Experimental design and data analysis for biologists. Cambridge University Press.
 
-Sokal, R.R., Rohlf, F.J., 1995. Biometry (3rd edn). WH Freman and company: New York.
+## R-графика
 
-Zar, J.H., 2010. Biostatistical Analysis. Prentice Hall: New York.
+- [Cookbook for R](http://www.cookbook-r.com/) --- сайт [книги Winston Chang](http://www.amazon.com/gp/product/0596809158/ref=as_li_tf_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0596809158&linkCode=as2&tag=cooforr09-20)
+- [Руководство по ggplot2](http://ggplot2.tidyverse.org/reference/)
+- [Cheat-sheet по ggplot2](https://github.com/rstudio/cheatsheets/raw/master/old/pdfs/ggplot2-cheatsheet-2.1.pdf)
+ от [RStudio](https://www.rstudio.com)
+- [ggplot2 Quick Reference: colour and fill](http://sape.inf.usi.ch/quick-reference/ggplot2/colour)
+- [ggplot2 Quick reference: shape](http://sape.inf.usi.ch/quick-reference/ggplot2/shape)
+
 
 ## Статистика на R
 
-Everitt, B.S., 2010. A handbook of statistical analyses using R. CRC Press.
+- **Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R.** М.: ДМК Пресс, 2014
+- **Diez, D.M., Barr, C.D. and Çetinkaya-Rundel, M., 2015. [OpenIntro Statistics](https://www.openintro.org/stat/textbook.php?stat_book=os) OpenIntro.**
+- Logan, M., 2011. Biostatistical design and analysis using R: a practical guide. Wiley
+- Maindonald, J., Braun, J., 2006. Data Analysis and Graphies Using R: An Example-based Approach (Cambridge Series in Statistical and Probabilistic Mathematics). Cambridge University Press.
+- Teetor, P., 2011. R cookbook. O’Reilly.
+- **Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data.** Springer Science & Business Media.
 
-Logan, M., 2011. Biostatistical design and analysis using R: a practical guide. Wiley
 
-Maindonald, J., Braun, J., 2006. Data Analysis and Graphies Using R: An Example-based Approach (Cambridge Series in Statistical and Probabilistic Mathematics). Cambridge University Press.
+## Статистика
 
-## R-справочники (некоторые с элементами статистики)
-
-[A (very) short introduction to R](http://cran.r-project.org/doc/contrib/Torfs+Brauer-Short-R-Intro.pdf)
-
-Chang, W., 2012. R graphics cookbook. O’Reilly.
-
-Kabacoff, R., 2011. R in Action. Manning Publications.
-
-[R reference card v2](http://cran.r-project.org/doc/contrib/Baggott-refcard-v2.pdf)
-
-Teetor, P., 2011. R cookbook. O’Reilly.
+- Гланц, С., 1998. Медико-биологическая статистика. М., Практика.
+- **Legendre, P. and Legendre, L.F., 2012. Numerical ecology (Vol. 24). Elsevier.**
+- **Quinn, G.G.P., Keough, M.J., 2002. Experimental design and data analysis for biologists. Cambridge University Press.**
+- Sokal, R.R., Rohlf, F.J., 1995. Biometry (3rd edn). WH Freman and company: New York.
+- Zar, J.H., 2010. Biostatistical Analysis. Prentice Hall: New York.
+- **Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data.** Springer Science & Business Media.
