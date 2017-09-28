@@ -362,15 +362,15 @@ div.tocify {
 </div>
 <div id="r----" class="section level1">
 <h1>R как калькулятор, математические операции</h1>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2+2</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span></code></pre></div>
 <pre><code>## [1] 4</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1024</span>/<span class="dv">2</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1024</span> /<span class="st"> </span><span class="dv">2</span></code></pre></div>
 <pre><code>## [1] 512</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1</span>:<span class="dv">10</span></code></pre></div>
 <pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">34</span>*<span class="dv">4</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">34</span> *<span class="st"> </span><span class="dv">4</span></code></pre></div>
 <pre><code>## [1] 136</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2</span>^<span class="dv">4</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2</span> ^<span class="st"> </span><span class="dv">4</span></code></pre></div>
 <pre><code>## [1] 16</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(<span class="dv">27</span>)</code></pre></div>
 <pre><code>## [1] 5.196152</code></pre>
@@ -384,14 +384,26 @@ div.tocify {
 <span class="dv">1238</span> *<span class="st"> </span><span class="dv">3</span> -&gt;<span class="st"> </span>var_2
 var_2</code></pre></div>
 <pre><code>## [1] 3714</code></pre>
-<p>Как выбрать название переменной?</p>
+<div id="---" class="section level2">
+<h2>Как выбрать название переменной?</h2>
 <ul>
-<li><code>a</code> - плохо, и даже <code>b</code>, <code>с</code>, или <code>х</code>. Но в некоторых случаях допустимо:)</li>
+<li><code>a</code> - плохо, и даже <code>b</code>, или <code>х</code>. Но в некоторых случаях допустимо:)</li>
 <li><code>var1</code> - плохо, но уже лучше</li>
 <li><code>var_1</code> - плохо, но уже лучше</li>
 <li><code>shelllength</code> - говорящее, но плохо читается</li>
 <li><code>shell_length</code>, <code>wing_colour</code> или <code>leg_num</code> - хорошие говорящие и читабельные названия</li>
 </ul>
+</div>
+<div id="---" class="section level2">
+<h2>Использование переменных в рассчетах</h2>
+<p>Задача: Представьте прямоугольный треугольник с вершинами A B и С. Пусть известны длины его катетов: AB = 3, BC = 4. Вычислите длину его гипотенузы AC (используйте переменные).</p>
+<p>Решение:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">AB &lt;-<span class="st"> </span><span class="dv">3</span>
+BC &lt;-<span class="st"> </span><span class="dv">4</span>
+AC &lt;-<span class="st"> </span><span class="kw">sqrt</span>(AB^<span class="dv">2</span> +<span class="st"> </span>BC^<span class="dv">2</span>)
+AC</code></pre></div>
+<pre><code>## [1] 5</code></pre>
+</div>
 </div>
 <div id="-" class="section level1">
 <h1>Структуры данных</h1>
@@ -426,6 +438,16 @@ var_2</code></pre></div>
 <p>Векторы можно хранить в переменных для последующего использования</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num &lt;-<span class="st"> </span>-<span class="dv">11</span>:<span class="dv">12</span> <span class="co"># численный вектор от -11 до 12 сохранен в переменной vect_num</span>
 vect_num_1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1.3</span>, <span class="fl">1.7</span>, <span class="fl">1.2</span>, <span class="fl">0.9</span>, <span class="fl">1.6</span>, <span class="fl">1.4</span>) <span class="co"># численный вектор, сохранен в переменной vect_num_1</span></code></pre></div>
+<p>Задача: Создайте вектор <code>vect_num_2</code>, в котором сначала следуют все элементы вектора <code>vect_num</code>, а затем все элементы вектора <code>vect_num_1</code></p>
+<p>Решение:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Вариант 1. Можно просто перечислить все элементы</span>
+vect_num_2 &lt;-<span class="st"> </span><span class="kw">c</span>(-<span class="dv">11</span>:<span class="dv">12</span>, <span class="fl">1.3</span>, <span class="fl">1.7</span>, <span class="fl">1.2</span>, <span class="fl">0.9</span>, <span class="fl">1.6</span>, <span class="fl">1.4</span>)
+<span class="co"># Вариант 2. Можно использовать сами векторы</span>
+vect_num_2 &lt;-<span class="st"> </span><span class="kw">c</span>(vect_num, vect_num_1)
+vect_num_2</code></pre></div>
+<pre><code>##  [1] -11.0 -10.0  -9.0  -8.0  -7.0  -6.0  -5.0  -4.0  -3.0  -2.0  -1.0
+## [12]   0.0   1.0   2.0   3.0   4.0   5.0   6.0   7.0   8.0   9.0  10.0
+## [23]  11.0  12.0   1.3   1.7   1.2   0.9   1.6   1.4</code></pre>
 </div>
 <div id="--" class="section level3">
 <h3>Адресация внутри векторов</h3>
