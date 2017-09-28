@@ -2,20 +2,20 @@
 title: Презентации и данные
 ---
 
-## 1. Знакомство с R 
+## 1. Знакомство с R и основы ggplot2
 
 ```{r eval=FALSE}
 install.packages("ggplot2")
 install.packages("readxl")
 ```
 
-- Конспект [html](01_intro_to_r.html)
+- [Знакомство с R](01_intro_to_r.html)
+- [Основы ggplot2](01_intro_ggplot.html)
 - Код R
     - [01_code_intro_to_r](01_code_intro_to_r.R)
     - [01_intro_ggplot.R](01_intro_ggplot.R)
 - Данные:
     - [fev.xls](data/fev.xls)
-
 
 ## 2. Базовая статистика на R
 
