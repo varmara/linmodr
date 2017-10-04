@@ -1,6 +1,6 @@
 ---
 title: "Тестирование статистических гипотез"
-author: "Юта Тамберг, Марина Варфоломеева"
+author: "Марина Варфоломеева, Юта Тамберг, Вадим Хайтов"
 subtitle: ""
 output:
   ioslides_presentation:
@@ -78,7 +78,10 @@ dnorm_limit <- function(x, alph = 0.05, mu = 0, sig = 1, sides = 2, what = "alph
 ## Тестирование гипотез
 
 - Стандартное нормальное распределение
-
+- Как устроено тестирование гипотез
+- t-статистика
+- Применение t-теста
+- Статистическая значимость
 
 # Стандартное нормальное распределение
 
@@ -438,18 +441,18 @@ ggplot(dfr, aes(x = x)) +
 Ответить на этот вопрос можно, построив __теоретическое распределение тестовой статистики__ для случая, когда верна $H_0$
 
 
-## Пример тестовой статистики: Z-тест
-
-### Z-тест для разницы средних (для больших выборок)
+## Пример тестовой статистики: Z-тест для разницы средних (для больших выборок)
 
 $H_0: \bar x_1 - \bar x_2 = 0$, $H_A: \bar x_1 - \bar x_2 \ne 0$
 
-$$Z = \frac{\Delta - 0}{SE} = \frac{\bar x_1 - \bar x_2}{SE}$$
+$$Z = \frac{\bar x_1 - \bar x_2}{SE}$$
+<small>
+$\bar x_1 - \bar x_2$ --- разница средних; $SE = SD / \sqrt{n}$ --- стандартная ошибка
+</small>
 
-Для больших выборок (больше 100) разница средних значений $\Delta = \bar x_1 - \bar x_2$ распределена практически нормально (согласно теореме центрального предела). Поэтому для тестирования гипотез можно использовать стандартное нормальное распределение. При стандартизации используется стандартная ошибка $SE = SD/\sqrt{n}$
+__Для больших выборок__ (больше 100) выборочная оценка стандартизованной разницы средних значений  распределена практически нормально. Поэтому для тестирования гипотез можно использовать стандартное нормальное распределение. 
 
-
-```{r hypoth, echo = FALSE, purl = FALSE, fig.height=2.5}
+```{r hypoth, echo = FALSE, purl = FALSE, fig.height=2.2}
 th <- theme_bw() #+ theme(axis.line.y = element_blank(), axis.text = element_blank(), panel.grid = element_blank())
 z_df <- data.frame(z = seq(-6, 6, length.out = 1000))
 gg_norm_h0 <- ggplot(data = z_df, aes(x = z)) +
@@ -493,10 +496,8 @@ gg_large_p <- gg_norm_h0 +
            label = "P(z[obs] <= -z[0])", parse = TRUE) +
       annotate(geom = "text", x = Z_large, y = 0.1, hjust = -0.3,
            label = "P(z[obs] >= z[0])", parse = TRUE) +
-      annotate(geom = "text", x = -Z_large, y = 0.4, hjust = 1.1,
-           label = "-z[0] == -1.5", parse = TRUE) +
-      annotate(geom = "text", x = Z_large, y = 0.4, hjust = -0.1,
-           label = "z[0] == 1.5", parse = TRUE) +
+      annotate(geom = "text", x = 0, y = 0.41, hjust = 0.5,
+           label = "group('|',z[0],'|') == 1.5", parse = TRUE) +
   theme(legend.position = "none") +
   labs(title = paste("Большая доверительная вероятность\nP =", round(2*pnorm(-abs(Z_large)), 2)))
 
@@ -512,10 +513,8 @@ gg_small_p <- gg_norm_h0 +
            label = "P(z[obs] <= -z[0])", parse = TRUE) +
       annotate(geom = "text", x = Z_small, y = 0.1, hjust = -0.1,
            label = "P(z[obs] >= z[0])", parse = TRUE) +
-      annotate(geom = "text", x = -Z_small, y = 0.4, hjust = 1.1,
-           label = "-z[0] == -2.3", parse = TRUE) +
-      annotate(geom = "text", x = Z_small, y = 0.4, hjust = -0.1,
-           label = "z[0] == 2.3", parse = TRUE) +
+      annotate(geom = "text", x = 0, y = 0.41, hjust = 0.5,
+           label = "group('|',z[0],'|') == 2.3", parse = TRUE) +
   labs(title = paste("Небольшая доверительная вероятность\nP =", round(2*pnorm(-abs(Z_small)), 2)))
 
 grid.arrange(gg_large_p, gg_small_p, nrow = 1, widths = c(0.47, 0.53))
@@ -658,7 +657,7 @@ $$t=\frac{\bar{x}_1 - \bar{x}_2}{SE}$$
 - Величины нормально распределены
 - __Дисперсии в группах одинаковы__
 
-- $\Delta = \bar x_1 - \bar x_2$ --- это разность между двумя средними значениями  
+- $\bar x_1 - \bar x_2$ --- это разность между двумя средними значениями  
 - $SE = \sqrt{\frac{s_1^2(n_1-1) +s_2^2(n_2-1)}{n_1+n_2-2}\Big(\frac{1}{n_1} + \frac{1}{n_2}\Big)}$ --- Обобщенное стандартная ошибка разности двух средних
 - $df = (n_1 - 1) + (n_2 - 1) = n_1 + n_2 - 2$ --- число степеней свободы
 
@@ -687,19 +686,27 @@ t-статистика подчиняется t-распределению.
 
 Форма t-распределения зависит только от одного параметра --- числа степеней свободы $df = n_1 + n_2 - 2$
 
+При больших объемах выборок форма t-распределения приближается к нормальному
+
+
 ```{r gg-t, echo=FALSE, purl=FALSE}
 t_df <- data.frame(t = seq(-6, 6, length.out = 1000))
 
 gg_t <- ggplot(data = t_df, aes(x = t)) +
-  stat_function(fun = dt, args=list(df=18), size = 1, geom="line", colour="darkred") + 
     labs(x = "Стандартизованная разница средних", 
        y = "Плотность\nвероятности", 
-       title = "t-распределение, df = 18")
+       title = "t-распределение")
 
-gg_t
+gg_t + 
+  stat_function(fun = dt, args = list(df = 2), size = 1, geom = "line", aes(colour = "2")) + 
+  stat_function(fun = dt, args = list(df = 4), size = 1, geom = "line", aes(colour = "4")) +   stat_function(fun = dt, args = list(df = 10), size = 1, geom = "line", aes(colour = "10")) + 
+  stat_function(fun = dt, args = list(df = 100), size = 1, geom = "line", aes(colour = "100")) + 
+  scale_colour_manual("df", values = c("2" = "#bd0026", "4" = "#f03b20", "10" = "#fd8d3c", "100" = "#fed976"), breaks = c("2", "4", "10", "100"))
 ```
 
-## В хвостах этого распределения находятся редкие значения
+## Уровень значимости $\alpha$
+
+Для t-теста  $\alpha$ --- это вероятность ошибочно сделать вывод о том, что средние выборок различаются __при условии, что эти выборки получены из одной генеральной совокупности__.
 
 ```{r gg-tcrit, echo=FALSE, purl=FALSE}
 alpha <- 0.05
@@ -713,178 +720,137 @@ gg_t +
                 geom = "area", fill = "red", alpha = 0.7) + 
   stat_function(fun = dt, args=list(df=df), 
                 geom = "line", colour = "darkred") +
-  labs(title = "t-распределение, df = 18, alpha = 0.05") + 
+  labs(title = "Тестирование гипотез при помощи t-теста") + 
   # редкие
-  annotate(geom = "text", x = -4, y = 0.1, label = "Редкие значения") + 
-  annotate(geom = "text", x = 4, y = 0.1, label = "Редкие значения") + 
-  annotate(geom = "text", x = 0, y = 0.1, label = "Обычные значения") + 
+  annotate(geom = "text", x = -4, y = 0.1, label = "Редкие значения\nP ≤ α, отвергаем H0") + 
+  annotate(geom = "text", x = 4, y = 0.1, label = "Редкие значения\nP ≤ α, отвергаем H0") + 
+  annotate(geom = "text", x = 0, y = 0.1, label = "Обычные значения\nP > α, сохраняем H0") + 
   geom_vline(xintercept = p_cut, size = 1, linetype = "dotted") +
   geom_vline(xintercept = -p_cut, size = 1, linetype = "dotted") +
     annotate(geom = "text", x = -p_cut, y = 0.4, hjust = 1.1, 
            label = "-t и t при alpha 0.05") 
 ```
 
-Обычно используется уровень значимости $\alpha$ 0.05 или 0.01. 
+## Тестирование гипотезы о равенстве двух средних при помощи t-теста
 
-__Уровень значимости $\alpha$ --- это вероятность ошибочно отвергнуть справедливую нулевую гипотезу__. Т.е. это вероятность найти различия там, где их нет (__вероятность ошибки I рода__).
+### Алгоритм действий
 
-Для t-теста  $\alpha$ --- это вероятность ошибочно сделать вывод о том, что средние выборок различаются __при условии, что эти выборки получены из одной генеральной совокупности__.
+1. Для конкретных данных считаем значение t-критерия
+2. Сравниваем его с теоретическим распределением t (распределением при условии, что $H_0$ верна) при данном числе степеней свободы df. Находим p --- вероятность найти более экстремальное значение тестовой статистики.
+3. Решаем, отвергнуть ли $H_0$:
+    + Если $P \le \alpha$, сохраняем $H_0$
+    + Если $P > \alpha$, отвергаем $H_0$
+
+```{r gg-tcrit-h, echo=FALSE, purl=FALSE, fig.width=10}
+# |t|
+T_large <- 1.5 
+T_small <- 2.3
+  
+gg_t_large_p_alpha <- gg_t +
+    stat_function(fun = dt, args = list(df = df), 
+                geom = "line", colour="darkred", size = 1, aes(colour = "H0")) +
+# p
+stat_function(fun = dt_limit, 
+              args = list(alph = 2*pt(-abs(T_large), df = df)), 
+              geom = "area", fill = "grey", alpha = 0.7) + 
+  # alpha
+  stat_function(fun = dt_limit, 
+                args = list(alph = alpha, df = df, sides = sides), 
+                geom = "area", fill = "red", alpha = 0.2) +
+  
+    # limits
+  geom_vline(xintercept = T_large, size = 1, linetype = "dotted") +
+  geom_vline(xintercept = -T_large, size = 1, linetype = "dotted") +
+  annotate(geom = "text", x = -T_large, y = 0.1, hjust = 1.3,
+           label = "P(t[obs] <= -t[0])", parse = TRUE) +
+  annotate(geom = "text", x = T_large, y = 0.1, hjust = -0.3,
+           label = "P(t[obs] >= t[0])", parse = TRUE) +
+  annotate(geom = "text", x = 0, y = 0.41, hjust = 0.5,
+           label = "group('|', t[0], '|') == 1.5", parse = TRUE) +
+  theme(legend.position = "none") +
+# tails
+  annotate(geom = "text", x = qt(0.025, df = 18), y = 0.04, hjust = 1.6,
+           label = "alpha/2", parse = TRUE) +
+      annotate(geom = "text", x = qt(0.975, df = 18), y = 0.04, hjust = -0.6,
+           label = "alpha/2", parse = TRUE) +
+    labs(title = "P > α, сохраняем H0")
+
+gg_t_small_p_alpha <- gg_t + 
+    stat_function(fun=dt, args=list(df=df), 
+                geom="line", colour="darkred", size = 1, aes(colour = "H0")) +
+  # p
+stat_function(fun = dt_limit, 
+              args = list(alph = 2*pt(-abs(T_small), df = df)), 
+              geom = "area", fill = "grey", alpha = 0.7) + 
+  # alpha
+  stat_function(fun = dt_limit, 
+                args = list(alph = alpha, df = df, sides = sides), 
+                geom = "area", fill = "red", alpha = 0.2) +
+    # limits
+  geom_vline(xintercept = T_small, size = 1, linetype = "dotted") +
+  geom_vline(xintercept = -T_small, size = 1, linetype = "dotted") +
+  annotate(geom = "text", x = -T_small, y = 0.1, hjust = 1.1,
+           label = "P(t[obs] <= -t[0])", parse = TRUE) +
+  annotate(geom = "text", x = T_small, y = 0.1, hjust = -0.1,
+           label = "P(t[obs] >= t[0])", parse = TRUE) +
+  annotate(geom = "text", x = 0, y = 0.41, hjust = 0.5,
+           label = "group('|', t[0], '|') == 2.3", parse = TRUE) +
+  # tails
+  annotate(geom = "text", x = qt(0.025, df = 18), y = 0.04, hjust = 1.6,
+           label = "alpha/2", parse = TRUE) +
+      annotate(geom = "text", x = qt(0.975, df = 18), y = 0.04, hjust = -0.6,
+           label = "alpha/2", parse = TRUE) +
+    labs(title = "P ≤ α, отвергаем H0")
 
 
+grid.arrange(gg_t_large_p_alpha, gg_t_small_p_alpha, nrow = 1, widths = c(0.47, 0.53))
+```
 
-# ЧАСТЬ 3. Применение t-теста
 
-## Пример t-теста
+# Применение t-теста
 
-Давайте выполним t-тест и решим, как нам поступить с нулевой гипотезой (для этого нам пригодятся операции `qt` и `pt`)
+## Пример: Снотворное
 
-Для начала создадим две выборки длин ящериц из популяций Берлина и Саратова. В этих гипотетических выборках длины распределены нормально, и имеют заведомо отличающимися $\mu$
+В датасете `sleep` содержатся данные об увеличении продолжительности сна по сравнению с контролем после применения двух снотворных препаратов (Cushny, Peebles, 1905, Student, 1908)
 
 ```{r}
-# Зерно для генератора случайных чисел для сопоставимости результатов
-set.seed(456) 
-# Создаем две выборки по 100 из нормального распределения с разными параметрами
-Saratov <- rnorm(n = 100, mean = 130, sd = 5)
-Berlin <- rnorm(n = 100, mean = 129, sd = 5)
-city <- c(rep("B", 100), rep("S", 100))
-# Сохраняем выборки в датафрейме для удобства
-lizards <- data.frame(city = factor(city),
-                        length = c(Berlin, Saratov))
-
-
-head(lizards)
-
+data(sleep)
+head(sleep)
+# str(sleep)
 ```
 
-## Построим частотные распределения этих выборок
+## Двухвыборочный t-критерий
+
+Сравним увеличение продолжительности сна при помощи двухвыборочного t-критерия.
+
+\fontsize{10pt}{10pt}
+```{r}
+tt <- t.test(extra ~ group, sleep)
+tt
+```
+
+\pause
+
+Результаты можно описать, например, так:
+
+- Различия изменения продолжительности сна при применении двух препаратов были недостоверны ($t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.01)`$)
+
+
+## Что спрятано в результатах?
+
+Как называются отдельные элементы результатов можно узнать посмотрев их структуру при помощи функции `str()`
 
 ```{r}
-library(ggplot2) # Загрузим библиотеку
-theme_set(theme_bw()) # Зададим тему
+str(tt)
 ```
 
-Сконструируем "скелет" графика
+## Можно получить элементы результатов в виде отдельных цифр
 
-```{r height-gg-plot1, warning=FALSE, message=FALSE}
-ggplot(lizards, aes(x = length)) + 
-  geom_histogram()
+```{r purl=FALSE}
+tt$parameter # степени свободы
+tt$p.value # доверительная вероятность
+tt$statistic # значение t-критерия
 ```
-
-## Изменим ширину интервалов гистограммы
-Здесь ящерицы из разных мест пока еще смешаны.
-
-```{r height-gg-plot2}
-ggplot(lizards, aes(x = length)) + 
-  geom_histogram(binwidth = 3)
-```
-
-## Разделим столбцы гистограммы по признаку city и сохраним в новую переменную
-
-```{r height-gg-plot3}
-gg_length <- ggplot(lizards, aes(x = length, fill = city)) + 
-    geom_histogram(binwidth = 3, colour = "grey40", position = "dodge")
-gg_length
-```
-
-## Добавим подписи осей и заголовок
-
-```{r height-gg-plot5}
-gg_length + 
-  labs(x = "Length (cm)", 
-       y = "Count", 
-       title ="Length distribution of lizards", 
-       fill = "City")
-```
-
-### Наш график готов!
-
-## Выполним t-тест
-
-```{r}
-t_lizards <- t.test(data = lizards, length ~ city)
-# length ~ city показывает, что значения переменной
-# length сгруппированы по признаку city
-# Порядок записи важен!
-t_lizards
-```
-
-## Основные результаты
-
-`t_lizards` это комплексный объект, который можно изучить с помощью функции `str()`
-
-Нас интересуют две переменные: значение тестовой t-статистики 
-
-```{r}
-t_value_lizards <- t_lizards$statistic
-t_value_lizards
-```
-
-и итоговое p-value
-
-```{r}
-p_value_lizards <- t_lizards$p.value
-p_value_lizards
-```
-
-
-## Достоверны ли различия? Смотрим в "таблицу"
-
-Рассчитаем "табличное" значение t-критерия с помощью функции `qt()`
-
-- так как критерий двухсторонний, мы должны разбить 5% на два кусочка по 2.5%, т.е. `p = c(0.025, 0.975)`
-- число степеней свободы $n_1 + n_2 - 2$ равно `100 + 100 - 2 = 198`
-
-Подставим эти аргументы:
-
-```{r}
-qt(p = c(0.025, 0.975), 198)
-```
-
-Теперь с этими критическими значениями можно сравнить эмпирический результат:
-
-```{r}
-t_value_lizards
-```
-
-## Достоверны ли различия? Сравниваем вероятности
-
-С помощью команды `pt()` определим вероятность того, что случайная величина, взятая из t-распределения, окажется меньше рассчитанной нами t-статистики
-
-```{r}
-pt(t_value_lizards, df = 198)
-```
-### Это "сырая" величина. Её еще нельзя сравнивать с уровнем значимости.
-
-Мы должны либо умножить p.value на 2, либо поделить  $\alpha$ пополам, и только после этого сравнивать их.
-
-```{r}
-p.value <- 2 * pt(t_value_lizards, df = 198)
-p.value
-```
-
-Этот результат совпадает с тем, что рассчитал t-тест
-
-
-### Вопрос: Вероятность какого события отражает p=`r t_lizards$p.value`?
-
-## Уровень значимости p=`r round(t_lizards$p.value, 4)`
-
-Это вероятность того, что выборки которые мы имеем были получены из одной совокупности.
-
-Иными словами: 
-
-Это НЕ вероятность того, что H0 верна.
-
-Это вероятность того, что в мире, где H0 верна, а длины ящериц из Берлина и Саратова равны, шанс получить эмпирические выборки с такими различиями как у нас, составляет 0.2%.
-
-Кстати, какова разница между средними длинами в наших выборках?
-
-
-## Допущения (Assumptions) t-критерия
-
-- Независимость выборок друг от друга     
-- Нормальное распределение сравниваемых величин   
-- Равенство дисперсий (можно нарушать, требуется коррекция по методу Велча)  
 
 ## Задание
 
@@ -892,7 +858,7 @@ p.value
 
 Прочитаем эти данные
 ```{r}
-rem <- read.csv("data/aml.csv", header = T)
+rem <- read.csv(file = "data/aml.csv", header = TRUE)
 str(rem)
 ```
 
@@ -904,25 +870,41 @@ str(rem)
 ## Решение
 
 ```{r purl=FALSE}
-t.test (data = rem, time ~ group)
+t.test(data = rem, time ~ group)
 ```
 
 Или так:
 
 ```{r purl=FALSE, results="hide"}
-t.test (rem$time[rem$group==1], rem$time[rem$group==2])
+t.test(rem$time[rem$group == 1], rem$time[rem$group == 2])
 ```
 
-# Напоследок
+# Статистическая значимость
 
 ## Статистическая значимость
 
-Статистическая значимость бывает только одна и она говорит о том, в каких отношениях состоят обнаруженные нами эмпирически различия с $\alpha$.
+Статистическая значимость бывает только одна, и она говорит о том, в каких отношениях состоят, обнаруженные нами эмпирически различия с $\alpha$.
 
-Если мы отвергаем H0, имеются различия.
+- Если мы отвергаем $H_0$ --- значит, имеются различия
+- Если мы не отвергаем $H_0$ --- значит, все одинаково
 
-Если мы не отвергаем H0, все одинаково. 
-
-Пожалуйста, никаких недостоверных различий! Если различия есть, то они достоверны. Если различия не достоверны, то их нет.
+Пожалуйста, никаких "недостоверных различий"! Если различия есть, то они достоверны. Если различия не достоверны, то их нет.
 
 А что делать, если сердцем чувствуешь, что что-то должно быть, но тест не дает нужного ответа? Собрать выборки побольше, и посчитать заново. С уже проведенным тестом спорить не надо.
+
+## Take-home messages
+
+- Стандартизация --- преобразование данных в отклонения от среднего значения, измеренные в стандартных отклонениях
+- Стандартное нормальное распределение удобно для рассчетов вероятностей
+- Вероятность попадания случайной величины в произвольный интервал можно получить в результате интегрирования кривой распределения на этом интервале
+- При тестировании нулевой гипотезы оценивают вероятность получения данного или более экстремального значения тестовой статистики при условии справедливости нулевой гипотезы. Если эта вероятность меньше выбранного уровня значимости, то нулевую гипотезу отвергают
+- Для сравнения выборочных средних в независимых выборках лучше использовать t-критерий Уэлча, который учитывает, что дисперсии в выборках могут быть разными
+
+## Дополнительные ресурсы
+
+- OpenIntro: Statistics
+- Quinn, Keough, 2002
+- Sokal, Rohlf, 1995
+- Zar, 1999
+
+
