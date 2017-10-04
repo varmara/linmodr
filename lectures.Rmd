@@ -29,7 +29,7 @@ install.packages("readxl")
 
 <!-- - Презентация [02.2_hypothesis_testing.html](02.2_hypothesis_testing.html) -->
 - Код [02.2_hypothesis_testing_code.R](02.2_hypothesis_testing_code.R)
-- Данные [data/aml.csv](data/aml.csv)
+- Данные [aml.csv](data/aml.csv)
 
 
 <!-- - [Домашнее задание №1 --- Тестирование гипотез](hw/hw1_t-test-cholest.zip) (выберите себе один из вариантов) -->
