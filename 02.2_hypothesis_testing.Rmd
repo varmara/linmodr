@@ -1,0 +1,827 @@
+---
+title: "Тестирование статистических гипотез"
+author: "Юта Тамберг, Марина Варфоломеева"
+subtitle: ""
+output:
+  ioslides_presentation:
+    css: assets/my_styles.css
+    widescreen: yes
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+```
+```{r libs-funs, include = FALSE, cache = FALSE, purl = FALSE}
+library(ggplot2)
+library(gridExtra)
+dt_limit <- function(x, alph = 0.05, df = 18, sides = 2, ncp = 0, what = "alpha") {
+  #' Function to generate data for plotting with ggplot
+  #' (non)central t distribution
+  #' with shaded areas for alpha, beta and power
+  #' Authors: Marina Varfolomeeva, Vadim Khaitov
+  #' Usage inside stat_function:
+  #' stat_function(fun = dt_limit,
+  #'               args = list(alph = alpha, df = df, sides = sides),
+  #'               geom = "area", fill = "red", alpha = 0.7)
+  if(sides == 1) alph <- alph
+  if(sides == 2) alph <- alph/2
+  t_cr <- abs(qt(p = alph, df = df))
+
+  if(what == "alpha"){
+    y <- dt(x, df, ncp = ncp)
+    y[!(x < -t_cr | x > t_cr)] <- NA
+  }
+  if(what == "beta"){
+    y <- dt(x, df, ncp = ncp)
+    y[!(x >= -t_cr & x <= t_cr)] <- NA
+  }
+  if(what == "power"){
+    y <- dt(x, df, ncp = ncp)
+    y[!(x < -t_cr | x > t_cr)] <- NA
+  }
+  return(y)
+}
+
+dnorm_limit <- function(x, alph = 0.05, mu = 0, sig = 1, sides = 2, what = "alpha") {
+  #' Function to generate data for plotting with ggplot
+  #' (non)central t distribution
+  #' with shaded areas for alpha, beta and power
+  #' Authors: Marina Varfolomeeva, Vadim Khaitov
+  #' Usage inside stat_function:
+  #' stat_function(fun = dt_limit,
+  #'               args = list(alph = alpha, df = df, sides = sides),
+  #'               geom = "area", fill = "red", alpha = 0.7)
+  if(sides == 1) alph <- alph
+  if(sides == 2) alph <- alph/2
+  z_cr <- abs(qnorm(p = alph, mean = mu, sd = sig))
+
+  if(what == "alpha"){
+    y <- dnorm(x, mean = mu, sd = sig)
+    y[!(x < -z_cr | x > z_cr)] <- NA
+  }
+  if(what == "beta"){
+    y <- dnorm(x, mean = mu, sd = sig)
+    y[!(x >= -z_cr & x <= z_cr)] <- NA
+  }
+  if(what == "power"){
+    y <- dnorm(x, mean = mu, sd = sig)
+    y[!(x < -z_cr | x > z_cr)] <- NA
+  }
+  return(y)
+}
+```
+
+## Тестирование гипотез
+
+- Стандартное нормальное распределение
+
+
+# Стандартное нормальное распределение
+
+## Стандартизация (Z-преобразование)
+
+Стандартизованная величина (Z-оценка) --- показывает, на сколько стандартных отклонений значение отличается от среднего
+
+<div class="columns-2">
+
+```{r echo=FALSE, purl=FALSE, fig.height=5, fig.width=4.5}
+Xi <- rnorm(n = 100000, mean = 50, sd = 7)
+Mu <- mean(Xi)
+SD <- sd(Xi)
+Zi <- (Xi - Mu) / SD
+Z <- data.frame(Xi, Zi)
+
+gg_sample <- ggplot(data = Z, aes(x = Xi)) + geom_histogram(binwidth = 2, fill = "lightblue", color = "black") + labs(title = "Normal Distribution, \nmu = 50, sd = 7") + geom_vline(xintercept = mean(Xi), colour = "red", size = 1)
+
+gg_z <- ggplot(data = Z, aes(x = Zi)) + geom_histogram(binwidth = 0.3, fill = "steelblue", color = "black", alpha = 0.5) + labs(title = "Standard Normal Distribution, \nmu = 0, sd = 1") + geom_vline(xintercept = mean(Zi), colour = "red", size = 1)
+
+grid.arrange(gg_sample, gg_z, ncol = 1)
+```
+
+$$z_i=\frac{x_i - \bar{x}}{SD}$$
+
+После **стандартизации** получается стандартное нормальное распределение
+
+<br/>
+
+**После стандартизации всегда**:
+
+- среднее $\mu = 0$
+- стандартное отклонение $\sigma = 1$
+
+<br/>
+
+Для стандартного нормального распределения легко можно посчитать вероятность (площадь под кривой)
+
+</div>
+
+
+## Пример: Размеры улиток
+
+В выборке улиток средний диаметр раковины 5 см со стандартным отклонением 1.5 см.
+
+- Какова вероятность того, что случайно выбранная улитка окажется __меньше 3 см__?
+- Какова вероятность того, что случайно выбранная улитка окажется __больше 6 см__?
+- Какова доля улиток с размером раковины __в пределах 3--6 см__?
+
+![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
+
+
+<small>tres caracoles by Alberto Villen on Freeimages.com</small>
+
+
+## Вероятность встретить значение меньше заданного размера
+
+В выборке улиток средний диаметр раковины 5 см со стандартным отклонением 1.5 см.
+
+### Какова вероятность того, что случайно выбранная улитка окажется __меньше 3 см__? 
+
+```{r}
+Z_1 <- (3 - 5) / 1.5
+dnorm(Z_1)
+```
+
+```{r snail-small, purl=FALSE, echo=FALSE}
+mu <- 5; sig <- 1.5; X1 <- 3; X2 <- 6
+dfr <- data.frame(x = seq(0, 9, length.out = 1000))
+dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y[!(dfr$x < X1)] <- NA
+ggplot(dfr, aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  scale_x_continuous(name = "Diameter", breaks = 1:8,
+                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-score", breaks = -4:4)) +
+  labs(y = "Probability density") + 
+  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
+  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed")
+```
+
+## Вероятность встретить значение больше заданного размера
+
+В выборке улиток средний диаметр раковины 5 см со стандартным отклонением 1.5 см.
+
+### Какова вероятность того, что случайно выбранная улитка окажется __больше 6 см__?
+
+```{r}
+Z_2 <- (6 - 5) / 1.5
+dnorm(Z_2)
+```
+
+```{r snail-large, purl=FALSE, echo=FALSE}
+dfr <- data.frame(x = seq(0, 9, length.out = 1000))
+dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y[!(dfr$x > X2)] <- NA
+ggplot(dfr, aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  scale_x_continuous(name = "Diameter", breaks = 1:8,
+                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-score", breaks = -4:4)) +
+  labs(y = "Probability density") + 
+  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
+  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
+```
+
+## Вероятность встретить значение в заданных пределах
+
+В выборке улиток средний диаметр раковины 5 см со стандартным отклонением 1.5 см.
+
+### Какова доля улиток с размером раковины __в пределах 3--6 см__?
+
+```{r}
+1 - dnorm(Z_2) - dnorm(Z_1)
+```
+
+```{r snail-medium, purl=FALSE, echo=FALSE}
+dfr <- data.frame(x = seq(0, 9, length.out = 1000))
+dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y[!(dfr$x > X1 & dfr$x < X2)] <- NA
+ggplot(dfr, aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  scale_x_continuous(name = "Diameter", breaks = 1:8,
+                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-score", breaks = -4:4)) +
+  labs(y = "Probability density") + 
+  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
+  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed") +
+  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
+```
+
+## Задача:
+
+Предположим, что средний рост мужчин в России 176 см со стандартным отклонением 7 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
+
+- Какова вероятность того, что случайно выбранный мужчина окажется __ниже 160 см__?
+
+- Какова вероятность того, что случайно выбранный мужчина окажется  __больше 190 см__?
+
+- Какова доля мужчин, не подходящих по росту в пилоты, т.е. __меньше 160 и больше 190 см__?
+
+## Решение
+
+Предположим, что средний рост мужчин в России 176 см со стандартным отклонением 7 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
+
+### Какова вероятность того, что случайно выбранный мужчина окажется __ниже 160 см__?
+
+```{r purl=FALSE}
+Z_short <- (160 - 176) / 7
+dnorm(Z_short)
+```
+
+```{r men-short, purl=FALSE, echo=FALSE}
+mu <- 176; sig <- 7; X1 <- 160; X2 <- 190
+dfr <- data.frame(x = seq(150, 200, length.out = 1000))
+dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y[!(dfr$x < X1)] <- NA
+ggplot(dfr, aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  scale_x_continuous(name = "Height, cm",
+                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-score", breaks = -4:4)) +
+  labs(y = "Probability density") + 
+  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
+  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed")
+```
+
+## Решение
+
+Предположим, что средний рост мужчин в России 176 см со стандартным отклонением 7 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
+
+### Какова вероятность того, что случайно выбранный мужчина окажется  __больше 190 см__?
+
+```{r purl=FALSE}
+Z_tall <- (190 - 176) / 7
+dnorm(Z_tall)
+```
+
+```{r men-tall, purl=FALSE, echo=FALSE}
+dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y[!(dfr$x > X2)] <- NA
+ggplot(dfr, aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  scale_x_continuous(name = "Height, cm",
+                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-score", breaks = -4:4)) +
+  labs(y = "Probability density") + 
+  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
+  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
+```
+
+
+## Решение
+
+Предположим, что средний рост мужчин в России 176 см со стандартным отклонением 7 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
+
+### Какова доля мужчин, не подходящих по росту в пилоты, т.е. __меньше 160 и больше 190 см__?
+
+
+```{r purl=FALSE}
+dnorm(Z_short) + dnorm(Z_tall)
+```
+
+```{r men-not-pilots, purl=FALSE, echo=FALSE}
+dfr$y1 <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y1[!(dfr$x < X1)] <- NA
+dfr$y2 <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y2[!(dfr$x > X2)] <- NA
+
+ggplot(dfr, aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  scale_x_continuous(name = "Height, cm",
+                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-score", breaks = -4:4)) +
+  labs(y = "Probability density") + 
+  geom_area(aes(x = x, y = y1), fill = "steelblue", alpha = 0.5) +
+  geom_area(aes(x = x, y = y2), fill = "steelblue", alpha = 0.5) +
+  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed") +
+  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
+```
+
+
+# Как устроено тестирование гипотез
+
+## Сравнение выборок
+
+Различия между выборками не всегда видны невооружённым глазом.
+
+
+![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg) ![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
+
+
+<small>tres caracoles by Alberto Villen on Freeimages.com</small>
+
+## Гипотезы: нулевая и альтернативная
+
+Первый шаг в сравнении – формулировка нулевой гипотезы. Вместе с нулевой гипотезой рождается альтернативная гипотеза.
+
+![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg) ![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
+
+<small>tres caracoles by Alberto Villen on Freeimages.com</small>
+
+>- Нулевая гипотеза $H_0$ чаще всего формулируется как **отсутствие различий** между сравниваемыми объектами. Например: Улитки из обеих популяций одинакового размера
+
+>- Альтернативная гипотеза $H_A$ формулируется как **присутствие различий**, она обратна нулевой гипотезе, т.е. включает все остальные случаи. Например: Улитки из обеих популяций разного размера.
+
+## Нулевая и альтернативная гипотезы --- это "два мира"
+
+Вне зависимости от нас, реальность может находиться в одном из двух состояний:
+
+- $H_0$ верна, улитки одинаковы
+- $H_0$ неверна, улитки различаются 
+
+|$H_0$ верна |	$H_0$ неверна |
+|:-----:|:-----:|
+
+<br />После статистического теста мы принимаем решение о том, принять или отвергнуть $H_0$. Но это решение не обязательно окажется верным. Возможно четыре исхода:
+
+В мире где улитки одинаковы ($H_0$ верна) мы можем:  
+- принять $H_0$ (верное решение),  
+- отвергнуть $H_0$ (ошибка).
+
+Аналогично, в мире где улитки различаются ($H_A$ верна), мы можем:  
+- принять $H_0$ (ошибка),  
+- либо отвергнуть $H_0$ (верное решение).
+
+## Верные и неверные решения
+
+<div class="columns-2">
+
+**Ошибка I рода: нашли то, чего нет**
+
+**Ошибка II рода: не нашли то, что было**
+
+</div>
+
+| 	|$H_0$ верна |	$H_0$ неверна |
+|:-----:|:-----:|:-----:|
+| Отклонить H0 | Ошибка I рода с вероятностью <span class="orange">&alpha;</span></br>Ложно-положительный результат | 	Верно |
+| Сохранить H0 | Верно | Ошибка II рода с вероятностью <span class= "blue">&beta;</span> </br> Ложно-отрицательный результат |
+
+
+## Тестирование гипотез: Тестовые статистики
+
+Гипотезы выражаются математически в виде тестовых статистик. 
+
+По нашим реальным данным мы вычисляем __эмпирическое значение тестовой статистики__.
+
+Дальше мы должны ответить на вопрос:
+
+### Насколько вероятно получить _такое или более экстремальное_ эмпирическое значение, если верна нулевая гипотеза  $H_0$?
+
+Ответить на этот вопрос можно, построив __теоретическое распределение тестовой статистики__ для случая, когда верна $H_0$
+
+
+## Z-тест для разницы средних (для больших выборок)
+
+$H_0: \bar x_1 - \bar x_2 = 0$, $H_A: \bar x_1 - \bar x_2 \ne 0$
+
+$$Z = \frac{\Delta - 0}{SE} = \frac{\bar x_1 - \bar x_2}{SE}$$
+
+Для больших выборок (больше 100) разница средних значений $\Delta = \bar x_1 - \bar x_2$ распределена практически нормально (согласно теореме центрального предела). Поэтому для тестирования гипотез можно использовать стандартное нормальное распределение. При стандартизации используется стандартная ошибка $SE = SD/\sqrt{n}$
+
+
+```{r hypoth, echo = FALSE, purl = FALSE, fig.height=2.5}
+th <- theme_bw() #+ theme(axis.line.y = element_blank(), axis.text = element_blank(), panel.grid = element_blank())
+
+gg_norm_h0 <- ggplot(data = z_df, aes(x = z)) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1), 
+                size = 1, geom = "line", aes(colour = "H0")) +
+  # stat_function(fun = dnorm, 
+                # args = list(mean = 1.5, sd = 1), 
+                # geom = "line", aes(colour = "Ha"), size = 1) + 
+  scale_colour_manual("Гипотеза", values = c("red3")) +
+  labs(x = "Z", 
+       y = "Плотность\nвероятности") + th
+gg_norm_h0
+```
+
+Одни значения тестовой статистики будут встречаться часто, другие --- редко.
+
+
+## Доверительная вероятность (p-value)
+
+Площадь под любым участком этой кривой соответствует вероятности получения значений тестовой статистики в этом интервале (при условии справедливости $H_0$).
+
+Вероятность получить _такое или более экстремальное_ эмпирическое значение (при условии справедливости $H_0$) --- это __доверительная вероятность__ (p-value)
+
+Обычно нам все равно, в какой из хвостов теоретического распределения попадает наше значение тестовой статистики, поэтому мы обычно учитываем оба
+
+$$P = P(z_{observed} < |z_0|~и~z_{observed} > |z_0|)$$
+
+```{r hypoth-p, echo = FALSE, purl = FALSE, fig.width=10, fig.height=2.5}
+grid.arrange(
+gg_norm_h0 + 
+  # alpha
+  stat_function(fun = dnorm_limit, 
+                args = list(alph = 0.48, mu = 0, sig = 1, sides = 2), 
+                geom = "area", fill = "grey", alpha = 0.7) + 
+  # limits
+  geom_vline(xintercept = 0.8, size = 1, linetype = "dotted") +
+  geom_vline(xintercept = -0.8, size = 1, linetype = "dotted") +
+    annotate(geom = "text", x = -0.8, y = 0.08, hjust = 1.3,
+           label = "P(z[observed] <= -z[0])", parse = TRUE) +
+      annotate(geom = "text", x = 0.8, y = 0.08, hjust = -0.3,
+           label = "P(z[observed] >= z[0])", parse = TRUE) +
+      annotate(geom = "text", x = -0.8, y = 0.4, hjust = 1.1,
+           label = "-z[0] == -0.8", parse = TRUE) +
+      annotate(geom = "text", x = 0.8, y = 0.4, hjust = -0.1,
+           label = "z[0] == 0.8", parse = TRUE) +
+  theme(legend.position = "none"),
+
+gg_norm_h0 + 
+  # alpha
+  stat_function(fun = dnorm_limit, 
+                args = list(alph = 0.09, mu = 0, sig = 1, sides = 2), 
+                geom = "area", fill = "grey", alpha = 0.7) + 
+  # limits
+  geom_vline(xintercept = 1.8, size = 1, linetype = "dotted") +
+  geom_vline(xintercept = -1.8, size = 1, linetype = "dotted") +
+    annotate(geom = "text", x = -1.8, y = 0.08, hjust = 1.1,
+           label = "P(z[observed] <= -z[0])", parse = TRUE) +
+      annotate(geom = "text", x = 1.8, y = 0.08, hjust = -0.1,
+           label = "P(z[observed] >= z[0])", parse = TRUE) +
+      annotate(geom = "text", x = -1.8, y = 0.4, hjust = 1.1,
+           label = "-z[0] == -1.8", parse = TRUE) +
+      annotate(geom = "text", x = 1.8, y = 0.4, hjust = -0.1,
+           label = "z[0] == 1.8", parse = TRUE),
+
+nrow = 1, widths = c(0.47, 0.53))
+```
+
+## Тестирование гипотез: Как принять решение?
+
+Вероятность получить конкретное эмпирическое значение меньше 5%
+
+
+
+
+## Для каждого из этих "миров" мы можем построить распределение тестовой статистики
+
+```{r hypoth1, echo = FALSE, purl = FALSE}
+th <- theme_minimal() + theme(axis.line.y = element_blank(), axis.text = element_blank(), panel.grid = element_blank())
+
+gg_norm <- ggplot(data = z_df, aes(x = z)) +
+  stat_function(fun = dnorm, args = list(mean = 0, sd = 1), 
+                size = 1, geom = "line", aes(colour = "H0")) +
+  stat_function(fun = dnorm, 
+                args = list(mean = 1.5, sd = 1), 
+                geom = "line", aes(colour = "Ha"), size = 1) + scale_colour_manual("Гипотезы",values=c("darkred","steelblue")) +
+  labs(x = "Значение статистики", 
+       y = "Плотность\nвероятности") + th
+gg_norm
+```
+
+
+## Ошибки
+
+Вероятность ошибки I рода мы задаем сами --- это уровень значимости теста, $\alpha$. Это та вероятность, меньше которой мы отказываемся верить в справедливость H0.
+
+Ошибка второго рода обычно скрыта. Но ее можно уменьшить вслепую, например увеличив объем выборки.
+
+
+## Как принять решение?
+
+### Статистические таблицы
+Принцип прост -- мы вычисляем **эмпирическое** значение тестовой статистики, и сравниваем его с **критическим** значением этой же статистики из таблицы.
+
+Т.е. мы сравниваем тестовую статистику с тестовой статистикой: t-критерий с t-критерием, $\chi^2$ с $\chi^2$.
+
+### P-value
+
+Принятие решения на основании p-value стало возможным когда стали доступны большие вычислительные мощности.
+
+P-value отражает вероятность обнаружить тот уровень различий между выборками который мы видим, при условии что H0 верна.
+
+Если р велико, мы решаем что выборки принципиально одинаковы, если мало - что выборки принципиально различаются.
+
+Принимая решение на основании p-value мы сравниваем ее с уровнем значимости $\alpha$, т.е. сравниваем вероятность с вероятностью.
+
+## P-value. Ещё раз, другими словами
+
+Допустим, мы сравнили выборки и получили р = 0.03
+
+P-value = 0.03 не значит, что H0 верна с вероятностью 3%!
+
+P-value = 0.03 значит, что в мире, где выборки одинаковы а H0 верна, шанс получить результат который мы получили составляет 3%.
+
+Уже мы сами решаем, кажется ли нам такая вероятность приемлемой.
+
+
+# ЧАСТЬ 2. В сердце статистического теста
+
+## Шаг назад. Cтандартизация 
+
+Из эмпирического распределения *X* создадим распределение *Z*, где каждое значение $x_i$ будет заменено на $z_i$. 
+
+1. Выполним центрирование. Для этого заменим значения переменной на девиаты: $x_i - \bar{x}$
+
+2. Нормируем разброс. Для этого разделим девиаты на стандартное отклонение выборки.
+
+$$z_i=\frac{x_i - \bar{x}}{SD}$$
+
+
+## После стандартизации всегда:
+<div class="columns-2">
+
+```{r echo=FALSE, purl=FALSE, fig.height=5.95, fig.width=5.5}
+Xi <- rnorm(n = 10000, mean = 50, sd = 7)
+Mu <- mean(Xi)
+SD <- sd(Xi)
+Zi <- (Xi - Mu) / SD
+Z <- data.frame(Xi, Zi)
+
+gg_sample <- ggplot(data = Z, aes(x = Xi)) + geom_histogram(binwidth = 2, fill = "steelblue", color = "black") + labs(title = "Normal Distribution, \nmu = 50, sd = 7") + geom_vline(xintercept = mean(Xi), colour = "red", size = 1)
+
+gg_z <- ggplot(data = Z, aes(x = Zi)) + geom_histogram(binwidth = 0.3, fill = "steelblue", color = "black") + labs(title = "Standard Normal Distribution, \nmu = 0, sd = 1") + geom_vline(xintercept = mean(Zi), colour = "red", size = 1)
+
+grid.arrange(gg_sample, gg_z, ncol = 1)
+```
+
+- среднее $\mu = 0$
+
+- стандартное отклонение $\sigma = 1$
+
+</div>
+
+## Операции с распределениями
+
+Давайте познакомимся с тремя полезными функциями для работы с распределениями: `r, q, p`
+
+### r = random number generation.
+
+С помощью этой функции можно смоделировать взятие выборки из генеральной совокупности с заданными параметрами.
+
+Например: `rnorm(1000, mean = 20, sd = 2)` сгенерирует выборку в 1000 случайных значений из нормального распределения.
+
+
+### q = quantile function.
+
+С ее помощью можно получить квантиль (точнее персентиль) - то значение переменной, которое отсекает заданную часть распределения.
+
+Например: `qnorm(0.5, mean = 20, sd = 2)` вернет среднюю, т.к. ровно 50% значений в нормальном распределении $< \mu$
+
+`qnorm(0.025, mean = 20, sd = 2)` вернет то значение X, которое делит распределение на куски в 2.5% и 97.5%, т.е. 2.5% всех значений будут меньше, а 97.5% - больше него.
+
+## Задание
+
+С помощью функции `qnorm` получите 5-number summary для распределения с параметрами $\mu$ = 3 и $\sigma$ = 5
+
+## Решение
+
+Для 5-number summary нам нужны минимальное и максимальное значение, медиана, I и III квантили.
+
+Создадим вектор 
+
+```{r}
+five_numbers <- c(0, 0.25, 0.5, 0.75, 1)
+```
+
+и передадим его функции `qnorm`
+
+```{r}
+qnorm(five_numbers, 3, 5)
+```
+
+## Операции с распределениями
+
+### p = probability distribution function
+
+С ее помощью можно рассчитать вероятность того, что случайная величина, взятая из данного распределения, окажется меньше заданного нами значения.
+
+Эта операция принципиально обратна тому, что делает `q`.
+
+Например: `pnorm(20, mean = 20, sd = 2)` вернет вероятность 0.5, или 50%, поскольку мы передали ей в качестве аргумента среднюю
+
+Эта функция работает кумулятивно:
+
+```{r}
+round(pnorm(c(0, 15, 20, 25, 40), 20, 2), 3)
+```
+
+## t-статистика
+
+$$t=\frac{d}{SE_d}$$
+
+- $d=\bar{x_1} - \bar{x_2}$ - это разность между двумя средними значениями  
+
+- $SE_d$ - Общее среднеквадратичное отклонение разности двух средних
+
+$$SE_d = \sqrt{\frac{sd_1^2(n_1-1) +sd_2^2(n_2-1)}{n_1+n_2-2}(\frac{1}{n_1} + \frac{1}{n_2})}$$
+
+Если $n_1 = n_2$, то формула существенно упрощается
+
+<small>$$SE_d = \sqrt{\frac {sd_1^2} {n_1} + \frac {sd_2^2} {n_2}}$$</small>
+
+Таким образом, t-распределение это стандартизованное распределение разностей двух средних значений из одной генеральной совокупности
+
+## t-распределение
+
+Распределение t-статистики описывает заковыристая функция. Нам нужно знать про нее один важный факт: форма распределения зависит от единственного параметра $df$ - числа степеней свободы.
+
+$$df = n_1 + n_2 - 2$$
+
+Давайте посмотрим, как выглядят распределения с разными df:
+
+```{r, echo=FALSE, purl=FALSE}
+t <- seq(-4.5,4.5,0.01)
+t2 <- rep(seq(-4.5,4.5,0.01), 2)
+df <- c(rep(3,length(t)), rep(300,length(t)))
+pt <- c(dt(t, 3), dt(t, 300))
+t_dist <- data.frame(t2, df, pt)
+t_dist$df <- as.factor(t_dist$df)
+gg_t_dfs <- ggplot(data = t_dist, aes(x=t2, y=pt, group=df, color=df)) + geom_line(size=1.5) + geom_vline(xintercept = 0) + xlab("t-statistic") + ylab("Probability")
+gg_t_dfs
+```
+
+
+# ЧАСТЬ 3. Применение t-теста
+
+## Пример t-теста
+
+Давайте выполним t-тест и решим, как нам поступить с нулевой гипотезой (для этого нам пригодятся операции `qt` и `pt`)
+
+Для начала создадим две выборки длин ящериц из популяций Берлина и Саратова. В этих гипотетических выборках длины распределены нормально, и имеют заведомо отличающимися $\mu$
+
+```{r}
+# Зерно для генератора случайных чисел для сопоставимости результатов
+set.seed(456) 
+# Создаем две выборки по 100 из нормального распределения с разными параметрами
+Saratov <- rnorm(n = 100, mean = 130, sd = 5)
+Berlin <- rnorm(n = 100, mean = 129, sd = 5)
+city <- c(rep("B", 100), rep("S", 100))
+# Сохраняем выборки в датафрейме для удобства
+lizards <- data.frame(city = factor(city),
+                        length = c(Berlin, Saratov))
+
+
+head(lizards)
+
+```
+
+## Построим частотные распределения этих выборок
+
+```{r}
+library(ggplot2) # Загрузим библиотеку
+theme_set(theme_bw()) # Зададим тему
+```
+
+Сконструируем "скелет" графика
+
+```{r height-gg-plot1, warning=FALSE, message=FALSE}
+ggplot(lizards, aes(x = length)) + 
+  geom_histogram()
+```
+
+## Изменим ширину интервалов гистограммы
+Здесь ящерицы из разных мест пока еще смешаны.
+
+```{r height-gg-plot2}
+ggplot(lizards, aes(x = length)) + 
+  geom_histogram(binwidth = 3)
+```
+
+## Разделим столбцы гистограммы по признаку city и сохраним в новую переменную
+
+```{r height-gg-plot3}
+gg_length <- ggplot(lizards, aes(x = length, fill = city)) + 
+    geom_histogram(binwidth = 3, colour = "grey40", position = "dodge")
+gg_length
+```
+
+## Добавим подписи осей и заголовок
+
+```{r height-gg-plot5}
+gg_length + 
+  labs(x = "Length (cm)", 
+       y = "Count", 
+       title ="Length distribution of lizards", 
+       fill = "City")
+```
+
+### Наш график готов!
+
+## Выполним t-тест
+
+```{r}
+t_lizards <- t.test(data = lizards, length ~ city)
+# length ~ city показывает, что значения переменной
+# length сгруппированы по признаку city
+# Порядок записи важен!
+t_lizards
+```
+
+## Основные результаты
+
+`t_lizards` это комплексный объект, который можно изучить с помощью функции `str()`
+
+Нас интересуют две переменные: значение тестовой t-статистики 
+
+```{r}
+t_value_lizards <- t_lizards$statistic
+t_value_lizards
+```
+
+и итоговое p-value
+
+```{r}
+p_value_lizards <- t_lizards$p.value
+p_value_lizards
+```
+
+
+## Достоверны ли различия? Смотрим в "таблицу"
+
+Рассчитаем "табличное" значение t-критерия с помощью функции `qt()`
+
+- так как критерий двухсторонний, мы должны разбить 5% на два кусочка по 2.5%, т.е. `p = c(0.025, 0.975)`
+- число степеней свободы $n_1 + n_2 - 2$ равно `100 + 100 - 2 = 198`
+
+Подставим эти аргументы:
+
+```{r}
+qt(p = c(0.025, 0.975), 198)
+```
+
+Теперь с этими критическими значениями можно сравнить эмпирический результат:
+
+```{r}
+t_value_lizards
+```
+
+## Достоверны ли различия? Сравниваем вероятности
+
+С помощью команды `pt()` определим вероятность того, что случайная величина, взятая из t-распределения, окажется меньше рассчитанной нами t-статистики
+
+```{r}
+pt(t_value_lizards, df = 198)
+```
+### Это "сырая" величина. Её еще нельзя сравнивать с уровнем значимости.
+
+Мы должны либо умножить p.value на 2, либо поделить  $\alpha$ пополам, и только после этого сравнивать их.
+
+```{r}
+p.value <- 2 * pt(t_value_lizards, df = 198)
+p.value
+```
+
+Этот результат совпадает с тем, что рассчитал t-тест
+
+
+### Вопрос: Вероятность какого события отражает p=`r t_lizards$p.value`?
+
+## Уровень значимости p=`r round(t_lizards$p.value, 4)`
+
+Это вероятность того, что выборки которые мы имеем были получены из одной совокупности.
+
+Иными словами: 
+
+Это НЕ вероятность того, что H0 верна.
+
+Это вероятность того, что в мире, где H0 верна, а длины ящериц из Берлина и Саратова равны, шанс получить эмпирические выборки с такими различиями как у нас, составляет 0.2%.
+
+Кстати, какова разница между средними длинами в наших выборках?
+
+
+## Допущения (Assumptions) t-критерия
+
+- Независимость выборок друг от друга     
+- Нормальное распределение сравниваемых величин   
+- Равенство дисперсий (можно нарушать, требуется коррекция по методу Велча)  
+
+## Задание
+
+Файл `aml.csv` содержит данные о влиянии регулярной химиотерапии на продолжительность ремиссии.
+
+Прочитаем эти данные
+```{r}
+rem <- read.csv("data/aml.csv", header = T)
+str(rem)
+```
+
+- В переменной `time` представлена продолжительность ремиссии в днях.
+- `group` указывает, к какой экспериментальной группе принадлежал пациент. В группе 1 проводилась регулярная химиотерапия, в группе 2 - нет.
+
+Ваша задача сравнить эти группы с помощью t-теста.
+
+## Решение
+
+```{r purl=FALSE}
+t.test (data = rem, time ~ group)
+```
+
+Или так:
+
+```{r purl=FALSE, results="hide"}
+t.test (rem$time[rem$group==1], rem$time[rem$group==2])
+```
+
+# Напоследок
+
+## Статистическая значимость
+
+Статистическая значимость бывает только одна и она говорит о том, в каких отношениях состоят обнаруженные нами эмпирически различия с $\alpha$.
+
+Если мы отвергаем H0, имеются различия.
+
+Если мы не отвергаем H0, все одинаково. 
+
+Пожалуйста, никаких недостоверных различий! Если различия есть, то они достоверны. Если различия не достоверны, то их нет.
+
+А что делать, если сердцем чувствуешь, что что-то должно быть, но тест не дает нужного ответа? Собрать выборки побольше, и посчитать заново. С уже проведенным тестом спорить не надо.
