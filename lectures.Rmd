@@ -21,10 +21,17 @@ install.packages("readxl")
 
 ### Описательная статистика
 
+<!-- - Презентация [02.1_descriptive_statistics.html](02.1_descriptive_statistics.html) -->
+- Код [02.1_descriptive_statistics_code.R](02.1_descriptive_statistics_code.R)
+- Данные [2.1_diatome_count.csv](data/2.1_diatome_count.csv)
+
 ### Тестирование гипотез
 
-<!-- - Презентация [html](02_hypothesis_testing.html) |  [pdf](02_hypothesis_testing.pdf) -->
-<!-- - [код R](02_code_hypothesis_testing.R) -->
+<!-- - Презентация [02.2_hypothesis_testing.html](02.2_hypothesis_testing.html) -->
+- Код [02.2_hypothesis_testing_code.R](02.2_hypothesis_testing_code.R)
+- Данные [data/aml.csv](data/aml.csv)
+
+
 <!-- - [Домашнее задание №1 --- Тестирование гипотез](hw/hw1_t-test-cholest.zip) (выберите себе один из вариантов) -->
 
 ## 3. Простая линейная регрессия 
