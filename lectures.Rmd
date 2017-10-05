@@ -21,13 +21,13 @@ install.packages("readxl")
 
 ### Описательная статистика
 
-<!-- - Презентация [02.1_descriptive_statistics.html](02.1_descriptive_statistics.html) -->
+- Презентация [02.1_descriptive_statistics.html](02.1_descriptive_statistics.html)
 - Код [02.1_descriptive_statistics_code.R](02.1_descriptive_statistics_code.R)
 - Данные [2.1_diatome_count.csv](data/2.1_diatome_count.csv)
 
 ### Тестирование гипотез
 
-<!-- - Презентация [02.2_hypothesis_testing.html](02.2_hypothesis_testing.html) -->
+- Презентация [02.2_hypothesis_testing.html](02.2_hypothesis_testing.html)
 - Код [02.2_hypothesis_testing_code.R](02.2_hypothesis_testing_code.R)
 - Данные [aml.csv](data/aml.csv)
 
