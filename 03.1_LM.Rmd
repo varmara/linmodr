@@ -258,7 +258,7 @@ ggplot(data.frame(x=x, y=y), aes(x=x, y=y)) + geom_point(size=4)  + geom_abline(
 **Фиксированная часть:** $у_i = 2 + 5x_i$   
 **Случайная часть:** $\varepsilon_i$ 
 
-Бывают модели, в которых случайная часть выглядит существенно сложнее (модели со смешаными эффектами). В таких моделях необходимо смоделировать еще и поведение случайной части.
+Бывают модели, в которых случайная часть выглядит существенно сложнее (модели со смешанными эффектами). В таких моделях необходимо смоделировать еще и поведение случайной части.
 
 
 
@@ -635,7 +635,7 @@ pl_brain + geom_smooth(method="lm")
 
 ## Зависимость в генеральной совокупности
 
-Симулированный пример: Генральная совокупность, в которой связь между Y и X, описывается следующей зависимостью
+Симулированный пример: Генеральная совокупность, в которой связь между Y и X, описывается следующей зависимостью
 $$
 y_i = 10 + 10x_i + \varepsilon_i \\
 \varepsilon \in N(0, 20)
@@ -899,7 +899,11 @@ IQ = 1.74 + 0.00012 MRINACount ($F_{1,38}$ = 6.686, p = 0.0136, $R^2$ = 0.149)
 
 ## Что почитать
 
-- Гланц, 1999, стр. 221-244
-- [Open Intro to Statistics](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/OpenIntroStatSecond.pdf): [Chapter 7. Introduction to linear regression](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/oiStat2_07.pdf), pp. 315-353.  
-- Quinn, Keough, 2002, pp. 78-110
++ Гланц, С., 1998. Медико-биологическая статистика. М., Практика
++ Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014
++ Diez, D.M., Barr, C.D. and Çetinkaya-Rundel, M., 2015. OpenIntro Statistics. OpenIntro.
++ Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data. Springer Science & Business Media.
++ Quinn G.P., Keough M.J. 2002. Experimental design and data analysis for biologists
++ Logan M. 2010. Biostatistical Design and Analysis Using R. A Practical Guide
+
 
