@@ -11,7 +11,7 @@ head(brain)
 ## Находим строки с пропущенными значениями
 sum(!complete.cases(brain))
 
-sapply(brain, function(x) sum(is.na(x)))
+colSums(is.na(brain))
 
 brain[!complete.cases(brain), ]
 
