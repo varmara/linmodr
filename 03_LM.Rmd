@@ -185,13 +185,13 @@ pl_brain
 
 
 
-## Решение
+<!-- ## Решение -->
 
-```{r, fig.align='center', fig.width=4}
-pl_brain + theme_dark() + 
-  geom_point(aes(color = Gender), size = 4) + 
-  scale_color_manual(values =  c("red", "blue"))
-```
+<!-- ```{r, fig.align='center', fig.width=4} -->
+<!-- pl_brain + theme_dark() +  -->
+<!--   geom_point(aes(color = Gender), size = 4) +  -->
+<!--   scale_color_manual(values =  c("red", "blue")) -->
+<!-- ``` -->
 
 ##   Два подхода к исследованию: <br> Тестирование гипотезы <br>VS<br> Построение модели 
 
@@ -245,12 +245,22 @@ y <- 2 + 5*x + rnorm(20,0, 20)
 ggplot(data.frame(x=x, y=y), aes(x=x, y=y)) + geom_point(size=4)  + geom_abline(slope=5, intercept = 2)  + ylim(0,100) + theme_bw()
 
 ```
-Модель: $у_i = 2 + 5x_i + \epsilon_i$    
-Появляется дополнительный член $\epsilon_i$ 
+Модель: $у_i = 2 + 5x_i + \varepsilon_i$    
+Появляется дополнительный член $\varepsilon_i$ 
 Он вводит в модель влияние неучтенных моделью факторов. 
 Обычно считают, что $\epsilon \in N(0, \sigma^2)$ 
 
 </div>
+
+## Случайная и фиксированая часть модели
+В стохастические модели выделяется две части:
+
+**Фиксированная часть:** $у_i = 2 + 5x_i$   
+**Случайная часть:** $\varepsilon_i$ 
+
+Бывают модели, в которых случайная часть выглядит существенно сложнее (модели со смешаными эффектами). В таких моделях необходимо смоделировать еще и поведение случайной части.
+
+
 
 
 ## Модели с дискретными предикторами
@@ -326,21 +336,122 @@ stature of their Parents" (цит. по `Legendre & Legendre, 1998`)
 >- Через подбор функции максимального правдоподобия (Maximum Likelihood) - используется для подгонки сложных линейных и нелинейных моделей.
 
 
-## Кратко о методе макcимального правдоподобия 
-<img src="images/Zuur.png" width="600" height="500" >
 
-<div class = "footnote">
-(из кн. Zuur et al., 2009, стр. 19)  
-</div>
+## Кратко о методе макcимального правдоподобия {.columns-2}
+Симулированный пример, в котором 
 
-## Кратко о методе макcимального правдоподобия 
-Симулированный пример с использованием `geom_violin()`
-```{r, echo=FALSE, fig.height=6}
+$$
+y_i = 10x_i + \varepsilon_i \\
+\varepsilon \in N(0, 10)
+$$
+
+Точки (данные) - это выборки из нескольких "локальных" генеральных совокупностей с нормальным распределением зависимой переменной (каждая совокупность соответствует одному значению предиктора).    
+
+Линия регрессии проходит через средние значения нормальных распределений.   
+
+Параметры прямой подбираются так, чтобы вероятность существования данных при таких параметрах была бы максимальной.   
+```{r gg-norm-tunnel, echo=FALSE, fig.height=7, purl=FALSE}
+## Based on code by Arthur Charpentier:
+## http://freakonometrics.hypotheses.org/9593
+## TODO: wrap it into a function and adapt it for use with other distributions
+## as Markus Gesmann has done here
+## http://www.magesblog.com/2015/08/visualising-theoretical-distributions.html
+
+n <- 2
+
 
 xy <- data.frame(X = rep(1:10, 3))
+
 xy$Y <- 10*xy$X + rnorm(30, 0, 10)
+
 xy$predicted <- predict(lm(Y ~ X, data = xy))
 
+
+# X <- sqrt(brain$MRINACount) 
+# Y <- sqrt(brain$PIQ)
+
+X <- xy$X
+Y <- (xy$Y)
+
+
+df <- data.frame(X , Y)
+
+# regression
+reggig <- glm(Y ~ X, data = df, family = gaussian(link = "identity"))
+
+# empty plot
+vX <- seq(min(X) - 0.1, max(X) + 0.1, length = n)
+vY <- seq(min(Y) - 10, max(Y) + 10, length = n)
+mat <- persp(x = vX, y = vY, z = matrix(0, n, n), 
+             zlim = c(0, 0.1),
+             theta =  - 45, phi = 20, expand = 0.1,
+             ticktype  = "detailed",  box = FALSE, border = "gray60")
+
+x <- seq(min(X), max(X), length = 501)
+
+# expected values
+C <- trans3d(x, predict(reggig, newdata = data.frame(X = x), type = "response"), rep(0, length(x)), mat)
+lines(C, lwd = 2)
+
+sdgig <- sqrt(summary(reggig)$dispersion)
+
+# 1SD
+y1 <- qnorm(.95, predict(reggig, newdata = data.frame(X = x), type = "response"),  sdgig)
+C <- trans3d(x, y1, rep(0, length(x)), mat)
+lines(C, lty = 2, col = "#d95f02")
+y2 <- qnorm(.05, predict(reggig, newdata = data.frame(X = x), type = "response"),  sdgig)
+C <- trans3d(x, y2, rep(0, length(x)), mat)
+lines(C, lty = 2, col = "#d95f02")
+
+# C <- trans3d(c(x, rev(x)), c(y1, rev(y2)), rep(0, 2 * length(x)), mat)
+# polygon(C, border = NA, col = "yellow")
+
+# data points
+C <- trans3d(X, Y, rep(0, length(X)), mat)
+points(C,  pch = 16, col = "red", cex = 0.6)
+
+# density curves
+n <- 10
+vX <- seq(min(X), max(X), length = n)
+
+mgig <- predict(reggig, newdata = data.frame(X = vX))
+
+sdgig <- sqrt(summary(reggig)$dispersion)
+
+for(j in n:1){
+  stp <- 251
+  x <- rep(vX[j], stp)
+  y <- seq(min(min(Y) - 10, 
+               qnorm(.05, 
+                     predict(reggig, 
+                             newdata = data.frame(X = vX[j]), 
+                             type = "response"),  
+                     sdgig)), 
+           max(Y) + 10, 
+           length = stp)
+  z0 <- rep(0, stp)
+  z <- dnorm(y,  mgig[j],  sdgig)
+  C <- trans3d(c(x, x), c(y, rev(y)), c(z, z0), mat)
+  polygon(C, border = NA, col = "light blue", density = 40)
+  C <- trans3d(x, y, z0, mat)
+  lines(C, lty = 2, col = "grey60")
+  C <- trans3d(x, y, z, mat)
+  lines(C, col = "steelblue")
+}
+
+```
+
+
+
+
+## Кратко о методе макcимального правдоподобия 
+Аналогичная картинка, но с использованием `geom_violin()`
+```{r, echo=FALSE, fig.height=5.5}
+
+# xy <- data.frame(X = rep(1:10, 3))
+# xy$Y <- 10*xy$X + rnorm(30, 0, 10)
+# xy$predicted <- predict(lm(Y ~ X, data = xy))
+# 
 
 rand_df <- matrix(rep(NA,100000), ncol = 10)
 for(i in 1:10) rand_df[,i] <- rnorm(10000, xy$predicted[i], 10)
@@ -349,11 +460,10 @@ rand_df <- data.frame(X = rep(xy$X, each = 10000), Y = as.vector(rand_df))
 
 
 
-ggplot(xy, aes(x = X, y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), scale = ) + geom_point() + geom_smooth(method = "lm", se = F) + geom_point(data = xy, aes(x = X, y = predicted), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная") 
-
-
+ggplot(xy, aes(x = X, y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), adjust = 5 ) + geom_point() + geom_smooth(method = "lm", se = F) + geom_point(data = xy, aes(x = X, y = predicted), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная") 
 ```
-  
+ 
+ 
 
 ## Метод наименьших квадратов
 
@@ -366,9 +476,9 @@ ggplot(xy, aes(x = X, y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), 
 
 
 Остатки (Residuals):            
-$$e_i = y_i - \hat{y_i}$$
+$$\varepsilon_i = y_i - \hat{y_i}$$
 
-Линия регрессии (подобранная модель) - это та линия, у которой $\sum{e_i}^2$ минимальна.
+Линия регрессии (подобранная модель) - это та линия, у которой $\sum{\varepsilon_i}^2$ минимальна.
 
 
 
@@ -523,13 +633,25 @@ pl_brain + geom_smooth(method="lm")
 Возникает из-за неопределенности оценок коэффициентов модели, вследствие выборочного характера оценок.           
 
 
-## Симулированный пример
+## Зависимость в генеральной совокупности
 
-Линии регрессии, полученные для 100 выборок (по 20 объектов в каждой), взятых из одной и той же генеральной совокупности 
-```{r, echo=FALSE, fig.align='center', fig.height=5, purl = FALSE}
+Симулированный пример: Генральная совокупность, в которой связь между Y и X, описывается следующей зависимостью
+$$
+y_i = 10 + 10x_i + \varepsilon_i \\
+\varepsilon \in N(0, 20)
+$$
+```{r}
 pop_x <- rnorm(1000, 10, 3)
 pop_y <- 10 + 10*pop_x + rnorm(1000, 0, 20)
 population <- data.frame(x=pop_x, y=pop_y)
+
+ggplot(population, aes(x=x, y=y)) + geom_point(alpha=0.3, color="red")+ geom_abline(aes(intercept=10, slope=10), color="blue", size=2)
+```
+
+##Зависимости, выявленные в нескольких разных выборках
+
+Линии регрессии, полученные для 100 выборок (по 20 объектов в каждой), взятых из одной и той же генеральной совокупности 
+```{r, echo=FALSE, fig.align='center', fig.height=5, purl = FALSE}
 samp_coef <- data.frame(b0 = rep(NA, 100), b1=rep(NA, 100))
 for(i in 1:100) {
   samp_num <- sample(1:1000, 20)
@@ -657,7 +779,7 @@ geom_text(label="Extrapolation", aes(x=1200000, y=70))
 
 Зависимость есть, если $\beta_1 \ne 0$ 
 
-Нулевая гипотеза $H_0: \beta = 0$
+Нулевая гипотеза $H_0: \beta_1 = 0$
 
 Тестируем гипотезу 
 
@@ -710,7 +832,7 @@ grid.arrange(pl_exp, pl_res, pl_tot, nrow=1)
 
 ```{r, echo=FALSE, fig.width=5}
 f <- seq(-0.2, 10, 0.1)
-ggplot(data.frame(f = f, p = df(f, 1, 38)), aes(x = f, y = p)) + geom_line(size = 1.3) + ggtitle("F-distribution") + xlab("F") + geom_vline(xintercept = c(6.686), color = "red",) + geom_hline(yintercept = 0) + xlim(-0.2, 10)
+ggplot(data.frame(f = f, p = df(f, 1, 38)), aes(x = f, y = p)) + geom_line(size = 1.3) + ggtitle("F-distribution") + xlab("F") + geom_vline(xintercept = c(6.686), color = "red") + geom_hline(yintercept = 0) + xlim(-0.2, 10)
 ```
 
 Форма F-распределения зависит от двух параметров:
