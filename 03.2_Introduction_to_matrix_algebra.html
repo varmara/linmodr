@@ -182,24 +182,24 @@
 
 <table class = 'rmdtable'>
 <tr class="header">
-<th align="left">Возрастная группа</th>
-<th align="left">Количество особей в момент времени \(t_2\)</th>
+<th align="center">Возрастная группа</th>
+<th align="center">Количество особей в момент времени \(t_2\)</th>
 </tr>
 <tr class="odd">
-<td align="left">0+</td>
-<td align="left">\(5 \cdot 10 + 1 \cdot 20 = 70\)</td>
+<td align="center">0+</td>
+<td align="center">\(5 \cdot 10 + 1 \cdot 20 = 70\)</td>
 </tr>
 <tr class="even">
-<td align="left">1+</td>
-<td align="left">\(100 \cdot 0.1 = 10\)</td>
+<td align="center">1+</td>
+<td align="center">\(100 \cdot 0.1 = 10\)</td>
 </tr>
 <tr class="odd">
-<td align="left">2+</td>
-<td align="left">\(10 \cdot 0.5 = 5\)</td>
+<td align="center">2+</td>
+<td align="center">\(10 \cdot 0.5 = 5\)</td>
 </tr>
 <tr class="even">
-<td align="left">3+</td>
-<td align="left">\(5 \cdot 0.3 = 1.5\)</td>
+<td align="center">3+</td>
+<td align="center">\(5 \cdot 0.3 = 1.5\)</td>
 </tr>
 </table>
 
@@ -486,18 +486,18 @@ B</pre>
 <p>Предположим, что мы подсчитывали двумя разными методами крупных и мелких животных трех видов в одних и тех же пробах</p>
 
 <pre >##         Sp1 Sp2 Sp3
-## Sample1  14  12  13
-## Sample2  11   9  10
-## Sample3   8   3  10
-## Sample4   9  10   9
-## Sample5   9  10   6</pre>
+## Sample1  11   7   9
+## Sample2  13  16   9
+## Sample3  12   8  10
+## Sample4  12  11  10
+## Sample5  13  14  10</pre>
 
 <pre >##         Sp1 Sp2 Sp3
-## Sample1  48  52  42
-## Sample2  47  46  47
-## Sample3  45  54  54
-## Sample4  58  46  47
-## Sample5  57  46  58</pre>
+## Sample1  54  51  44
+## Sample2  53  48  50
+## Sample3  51  41  39
+## Sample4  56  55  45
+## Sample5  52  55  53</pre>
 
 </article></slide><slide class=''><hgroup><h2>Биологическое приложение</h2></hgroup><article  id="--1">
 
@@ -506,11 +506,11 @@ B</pre>
 <pre class = 'prettyprint lang-r'>Large + Small</pre>
 
 <pre >##         Sp1 Sp2 Sp3
-## Sample1  62  64  55
-## Sample2  58  55  57
-## Sample3  53  57  64
-## Sample4  67  56  56
-## Sample5  66  56  64</pre>
+## Sample1  65  58  53
+## Sample2  66  64  59
+## Sample3  63  49  49
+## Sample4  68  66  55
+## Sample5  65  69  63</pre>
 
 </article></slide><slide class=''><hgroup><h2>Простое умножение</h2></hgroup><article  id="-">
 
@@ -546,11 +546,11 @@ Processed_Factor &lt;- 1/Rpocessed_portion</pre>
 <pre class = 'prettyprint lang-r'>Small * Processed_Factor</pre>
 
 <pre >##         Sp1 Sp2 Sp3
-## Sample1  48  52  42
-## Sample2  47  46  47
-## Sample3  90 108 108
-## Sample4 174 138 141
-## Sample5 228 184 232</pre>
+## Sample1  54  51  44
+## Sample2  53  48  50
+## Sample3 102  82  78
+## Sample4 168 165 135
+## Sample5 208 220 212</pre>
 
 </article></slide><slide class=''><hgroup><h2>Скалярное произведение векторов</h2></hgroup><article  id="--">
 
@@ -691,9 +691,7 @@ Pop$T10 &lt;- as.vector( Lesl %*% (Pop$T9 ))</pre>
 
 </article></slide><slide class=''><hgroup><h2>Вычисление корреляций через произведение матриц</h2></hgroup><article  id="----">
 
-<p>$$ </p>
-
-<p>$$</p>
+<p>\[\bf{Cor} = \frac{\bf{{X}&#39;_{stand}}\bf{X_{stand}}}{N-1}\]</p>
 
 <p>Используем известные нам данные по размеру головного мозга</p>
 
