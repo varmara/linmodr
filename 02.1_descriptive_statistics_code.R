@@ -127,7 +127,7 @@ round(mean_apple_diam,3) == round(mean(apples),3)
 
 #' ### Девиата (отклонение) - разность между значением вариаты (измерения) и средней:
 
-raw.deviates <- c(apples - mean(apples))
+raw.deviates <- apples - mean(apples)
 raw.deviates
 
 

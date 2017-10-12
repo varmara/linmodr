@@ -365,7 +365,7 @@ round(mean_apple_diam,3) == round(mean(apples),3)
 $$x_i - \bar{x}$$
 
 ```{r}
-raw.deviates <- c(apples - mean(apples))
+raw.deviates <- apples - mean(apples)
 raw.deviates
 ```
  
