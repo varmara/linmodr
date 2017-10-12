@@ -137,6 +137,15 @@ head(X)
 
 MyData$predicted <- X %*% betas
 
+##График модели
+
+ggplot(MyData, aes()) + geom_abline(slope = , intercept = )
+
+
+
+
+
+
 MyData$se <- sqrt(diag(X %*% covbetas %*% t(X)))
 
 MyData$CiUp  <- MyData$predicted + 1.96 *MyData$se
