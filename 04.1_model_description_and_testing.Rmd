@@ -1,0 +1,241 @@
+---
+title: "Описание и проверка значимости линейных моделей"
+author: Марина Варфоломеева, Вадим Хайтов
+output:
+  ioslides_presentation:
+    widescreen: true
+    css: assets/my_styles.css
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, 
+               fig.width = 7, fig.height = 3, 
+               warning = FALSE)
+```
+
+## Описание и проверка значимости линейных моделей
+
+
+### Вы сможете
+
+
+```{r echo=FALSE, purl=FALSE}
+lm_equation <- function(fit, strict = TRUE, rnd = 2){
+#   extracting call formula 
+  frml <- as.character(fit$call)[2]
+#   extract signs
+    sign <- ifelse(grepl("-", coef(fit)[-1]), " - ", " + ")
+  # extract coefficients
+  coeffs <- format(round(abs(coef(fit)), rnd), digits = 2, nsmall = rnd, trim = TRUE)
+  if(strict == TRUE){
+    i <- 1:(length(coeffs) - 1)
+    vars <- c("Y", paste0(" X", i))
+    
+  } else {
+# extract vector of variable names
+  vars <- c(all.vars(formula(fit))[1], names(fit$coefficients)[-1])
+# combine everything
+  }
+  start <- ifelse(coef(fit)[1] > 0, paste(vars[1], coeffs[1], sep = " = "), paste(vars[1], coeffs[1], sep = " = - "))
+  end <- paste(sign, coeffs[-1], vars[-1], sep = "", collapse = "")
+  return(paste0(start, end, sep = ""))
+}
+```
+
+
+# Вспомним пример из прошлой лекции
+
+## Пример: IQ и размеры мозга
+Зависит ли уровень интеллекта от размера головного мозга? (Willerman et al. 1991)
+
+<div class="columns-2"> 
+
+![Scan_03_11](images/MRI-Scan_03_11-by_bucaorg(Paul_Burnett)_no_Flickr.jpg)
+<small>[Scan_03_11](https://flic.kr/p/c45eZ3) by bucaorg(Paul_Burnett) on Flickr</small>  
+
+<br/>
+
+Было исследовано 20 девушек и 20 молодых людей
+
+У каждого индивида измеряли:
+
+- вес
+- рост
+- размер головного мозга (количество пикселей на изображении ЯМР сканера)
+- Уровень интеллекта измеряли с помощью IQ тестов
+
+<small>Пример: Willerman, L., Schultz, R., Rutledge, J. N., and Bigler, E. (1991), "In Vivo Brain Size and Intelligence", Intelligence, 15, p.223--228.  
+Данные: ["The Data and Story Library"](http://lib.stat.cmu.edu/DASL)  
+Фото: [Scan\_03\_11](https://flic.kr/p/c45eZ3) by bucaorg (Paul Burnett) on Flickr
+</small>
+
+</div>
+
+## Вспомним, на чем мы остановились
+
+```{r echo=FALSE, purl=TRUE}
+## Код из прошлой лекции #################################
+
+## Открываем данные
+library(readxl)
+brain <- read.csv("data/IQ_brain.csv", header = TRUE)
+
+## Линейная модель
+brain_model <- lm(PIQ ~ MRINACount, data = brain)
+summary(brain_model)
+```
+
+## Уравнение и график зависимости
+
+$`r lm_equation(brain_model, strict = FALSE, rnd = 5)`$
+
+```{r echo=FALSE, purl=TRUE}
+
+library(ggplot2)
+theme_set(theme_bw())
+ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
+```
+
+## Тестирование гипотез с помощью линейных моделей
+ 
+### Два равноправных способа
+>- Проверка достоверности оценок коэффициента $b_1$ (t-критерий). 
+>- Оценка соотношения описанной и остаточной дисперсии (F-критерий). 
+
+## Тестирование гипотез с помощью t-критерия  
+
+Зависимость есть, если $\beta_1 \ne 0$ 
+
+Нулевая гипотеза $H_0: \beta_1 = 0$
+
+Тестируем гипотезу 
+
+$$t=\frac{b_1-0}{SE_{b_1}}$$
+
+Число степеней свободы: $df=n-2$     
+>- Итак,           
+>- `t value` - Значение t-критерия          
+>- `Pr(>|t|)` - Уровень значимости         
+
+
+## Зависит ли IQ от размера головного мозга? 
+
+$$PIQ = 1.744 + 0.0001202 MRINACount$$
+
+```{r}
+summary(brain_model)
+```
+
+## Тестирование гипотез с помощью F-критерия  
+
+```{r echo=FALSE, fig.height=2.8, fig.width=10}
+
+pl_exp <- pl_brain + geom_smooth(method="lm", se=F, size=1.3) + geom_abline(aes(intercept=mean(PIQ), slope=0), size=1.3) + geom_text(label="Mean IQ", aes(x=1050000, y=(mean(PIQ)-6)), size = 4) + geom_segment(data=brain_predicted, aes(x=MRINACount, y=mean(PIQ), xend=MRINACount, yend=fit)) + ggtitle("Explained variation")
+
+pl_res <- pl_brain + geom_smooth(method="lm", se=F, size=1.3) + geom_segment(data=brain_predicted, aes(x=MRINACount, y=PIQ, xend=MRINACount, yend=fit)) + ggtitle("Residual variation")
+
+pl_tot <-pl_brain + geom_abline(aes(intercept=mean(PIQ), slope=0), size=1.3) + geom_text(label="Mean IQ", aes(x=1050000, y=(mean(PIQ)-6)), size = 5) + geom_segment(data=brain_predicted, aes(x=MRINACount, y=PIQ, xend=MRINACount, yend=mean(PIQ))) + ggtitle("Total variation")
+
+
+grid.arrange(pl_exp, pl_res, pl_tot, nrow=1)
+```
+
+
+
+|**Объясненная дисперсия**  | **Остаточная дисперсия**   | **Полная дисперсия** | 
+|-----|-----|-----|
+| $SS_{Regression}=\sum{(\hat{y}-\bar{y})^2}$ | $SS_{Residual}=\sum{(\hat{y}-y_i)^2}$ | $SS_{Total}=\sum{(\bar{y}-y_i)^2}$ |
+| $df_{Regression} = 1$ | $df_{Residual} = n-2$  | $df_{Total} = n-1$ |
+| $MS_{Regression} =\frac{SS_{Regression}}{df}$ | $MS_{Residual} =\frac{SS_{Residual}}{df_{Residual}}$ | $MS_{Total} =\frac{SS_{Total}}{df_{Total}}$ |
+
+## F критерий
+
+Если зависимости нет, то $MS _{Regression} = MS_{Residual}$
+
+ $$ F= \frac{MS _{Regression}}{MS_{Residual}}$$
+
+Логика та же, что и с t-критерием  
+
+
+```{r, echo=FALSE, fig.width=5}
+f <- seq(-0.2, 10, 0.1)
+ggplot(data.frame(f = f, p = df(f, 1, 38)), aes(x = f, y = p)) + geom_line(size = 1.3) + ggtitle("F-distribution") + xlab("F") + geom_vline(xintercept = c(6.686), color = "red") + geom_hline(yintercept = 0) + xlim(-0.2, 10)
+```
+
+Форма F-распределения зависит от двух параметров:
+$df_{Regression} = 1$ и $df_{Residual} = n-2$
+
+
+
+## Оценка качества подгонки модели с помощью коэффициента детерминации
+
+### В чем различие между этми двумя моделями?
+
+```{r, echo=FALSE, fig.align='center', fig.height=5}
+x <- rnorm(100, 20, 5)
+y1 <- 10 * x + 5 + rnorm(100, 0, 5)
+y2 <- 10 * x + 5 + rnorm(100, 0, 40)
+d <- data.frame(x=x, y1=y1)
+pl_R1 <- ggplot(d, aes(x=x, y=y1)) + geom_point() + geom_smooth(method="lm", se=F) 
+pl_R2 <- ggplot(d, aes(x=x, y=y2)) + geom_point() + geom_smooth(method="lm", se=F) 
+grid.arrange (pl_R1, pl_R2)
+```
+
+## Оценка качества подгонки модели с помощью коэффициента детерминации
+
+Коэффициент детерминации описывает какую долю дисперсии зависимой переменной объясняет модель
+
+>- $$R^2 = \frac{SS_{Regression}}{SS_{Total}}$$
+>- $$0< R^2 < 1$$
+>- $$R^2 = r^2$$
+
+
+## Еще раз смотрим на результаты регрессионного анализа зависимости IQ от размеров мозга
+
+```{r}
+summary(brain_model)
+```
+
+## Adjusted R-squared - скорректированный коэффициет детерминации
+
+Применяется если необходимо сравнить две модели с разным количеством параметров  
+
+$$ R^2_{adj} = 1- (1-R^2)\frac{n-1}{n-k}$$
+
+$k$ - количество параметров в модели   
+
+Вводится штраф за каждый новый параметр
+
+## Как записываются результаты регрессионного анлиза в тексте статьи?
+
+Мы показали, что связь между результатами теста на IQ описывается моделью вида
+<br>
+IQ = 1.74 + 0.00012 MRINACount ($F_{1,38}$ = 6.686, p = 0.0136, $R^2$ = 0.149)
+<br>
+<br>
+
+
+
+## Summary
+
+- Гипотезы о наличии зависимости можно тестировать при помощи t- или F-теста. $(H _0: \beta _1 = 0$)
+- Качество подгонки модели можно оценить при помощи коэффициента детерминации $(R^2)$
+
+## Что почитать
+
++ Гланц, С., 1998. Медико-биологическая статистика. М., Практика
++ Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014
++ Diez, D.M., Barr, C.D. and Çetinkaya-Rundel, M., 2015. OpenIntro Statistics. OpenIntro.
++ Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data. Springer Science & Business Media.
++ Quinn G.P., Keough M.J. 2002. Experimental design and data analysis for biologists
++ Logan M. 2010. Biostatistical Design and Analysis Using R. A Practical Guide
+
+
