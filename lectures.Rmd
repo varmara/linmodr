@@ -35,7 +35,7 @@ install.packages("readxl")
 
 ### Простая линейная регрессия 
 
-<!-- - Презентация: [03.1_LM.html](03.1_LM.html) -->
+- Презентация: [03.1_LM.html](03.1_LM.html)
 - Код: [03.1_LM_code.R](03.1_LM_code.R)
 - Данные: 
     + [IQ_brain.csv](data/IQ_brain.csv)
@@ -43,7 +43,7 @@ install.packages("readxl")
 
 ### Краткое введение в мир матричной алгебры
 
-<!-- - Презентация: [03.2_Introduction_to_matrix_algebra.html](03.2_Introduction_to_matrix_algebra.html) -->
+- Презентация: [03.2_Introduction_to_matrix_algebra.html](03.2_Introduction_to_matrix_algebra.html)
 - Код: [03.2_Introduction_to_matrix_algebra_code.R](03.2_Introduction_to_matrix_algebra_code.R)
 
 ## 4. Диагностика линейных моделей
