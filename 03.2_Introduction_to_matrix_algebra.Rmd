@@ -367,21 +367,11 @@ Small * Processed_Factor
 $$
 \textbf{a} \bullet \textbf{b} =  
 \begin{pmatrix}
-a_1 \\
-a_3 \\    
-a_4 \\
-a_5 \\
-a_6 \\
-a_7
+a_1 \\ a_2 \\ a_3 \\ a_4 \\ a_5 \\ a_6 \\ a_7
 \end{pmatrix}
 \times
 \begin{pmatrix}
-b_1 &
-b_3 &    
-b_4 &
-b_5 &
-b_6 &
-b_7
+b_1 & b_2 & b_3 & b_4 & b_5 & b_6 & b_7
 \end{pmatrix}
 = x
 $$
@@ -393,12 +383,7 @@ $$
 Сколько особей родится в популяции, если мы знаем репродуктивные характеристики всех возрастных групп?
 $$
 \begin{pmatrix}
-N_1 \\
-N_3 \\    
-N_4 \\
-N_5 \\
-N_6 \\
-N_7
+N_1 \\ N_2 \\ N_3 \\ N_4 \\ N_5 \\ N_6 \\ N_7
 \end{pmatrix}
 \times
 \begin{pmatrix}
@@ -452,6 +437,7 @@ P_{1-2}& 0 & 0 & 0 & 0 & 0 & 0 \\
 \times
 \begin{pmatrix}
 N1_t \\
+N2_t \\
 N3_t \\    
 N4_t \\
 N5_t \\
@@ -461,6 +447,7 @@ N7_t
 =
 \begin{pmatrix}
 N1_{t+1} \\
+N2_{t+1} \\
 N3_{t+1} \\    
 N4_{t+1} \\
 N5_{t+1} \\
