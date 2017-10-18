@@ -46,14 +46,18 @@ install.packages("readxl")
 - Презентация: [03.2_Introduction_to_matrix_algebra.html](03.2_Introduction_to_matrix_algebra.html)
 - Код: [03.2_Introduction_to_matrix_algebra_code.R](03.2_Introduction_to_matrix_algebra_code.R)
 
-## 4. Диагностика линейных моделей
+## 4. Описание, проверка значимости и валидности линейной модели
 
-<!-- - Презентация: [04_model_validation.html](04_model_validation.html) -->
-<!-- - Код: [04_model_validation_code.R](04_model_validation_code.R) -->
-<!-- - Данные:  -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!--     + [secher.xls](data/secher.xls) -->
-    
+<!-- - Презентация: [04_model_description_testing_and_validation.html](04_model_description_testing_and_validation.html) -->
+- Код: 
+    + [04_model_description_testing_and_validation_code.R](04_model_description_testing_and_validation_code.R)
+    + (04_task_assumptions_catsM.R)
+    + (04_task_assumptions_GAG.R)
+- Данные:
+    + [IQ_brain.csv](data/IQ_brain.csv)
+    + [catsM.xlsx](data/catsM.xlsx)
+    + [GAGurine.xlsx](data/GAGurine.xlsx)
+
 ## 5. Множественная линейная регрессия 
 
 ### Множественная линейная регрессия
