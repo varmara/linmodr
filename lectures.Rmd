@@ -51,8 +51,8 @@ install.packages("readxl")
 <!-- - Презентация: [04_model_description_testing_and_validation.html](04_model_description_testing_and_validation.html) -->
 - Код: 
     + [04_model_description_testing_and_validation_code.R](04_model_description_testing_and_validation_code.R)
-    + (04_task_assumptions_catsM.R)
-    + (04_task_assumptions_GAG.R)
+    + [04_task_assumptions_catsM.R](04_task_assumptions_catsM.R)
+    + [04_task_assumptions_GAG.R](04_task_assumptions_GAG.R)
 - Данные:
     + [IQ_brain.csv](data/IQ_brain.csv)
     + [catsM.xlsx](data/catsM.xlsx)
