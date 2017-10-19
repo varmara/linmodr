@@ -160,7 +160,7 @@ X <- brain$MRINACount[brain$PIQ == 150]
 pl_tot <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
   geom_hline(yintercept = gmean, size = 1) + 
   geom_segment(aes(x = MRINACount, y = PIQ, 
-                   xend = MRINACount, yend = gmean), colour = "grey50") + 
+                   xend = MRINACount, yend = gmean), colour = "grey70") + 
   geom_point() +
     annotate("text", label = "Общее\nсреднее", 
              x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
@@ -171,25 +171,25 @@ pl_tot <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +
 pl_all <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +  
   geom_smooth(method = "lm", se = F, size = 1.3) + 
     geom_segment(aes(x = MRINACount, y = PIQ, 
-                   xend = MRINACount, yend = gmean), colour = "grey50") +  
+                   xend = MRINACount, yend = gmean), colour = "grey70") +  
   geom_hline(yintercept = gmean, size = 2) + 
       annotate("text", label = "Общее среднее", 
              x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
-  annotate("segment", x = X - 1500, y = Y, xend = X - 1500, yend = gmean, colour = "grey50", size = 2) + 
-  annotate("segment", x = X + 2000, y = Y, xend = X + 2000, yend = Y_hat, colour = "#E69F00", size = 2) +
-  annotate("segment", x = X + 2000, y = Y_hat, xend = X + 2000, yend = gmean, colour = "#009E73", size = 2) +
+  annotate("segment", x = X - 1500, y = Y, xend = X - 1500, yend = gmean, colour = "grey70", size = 2) + 
+  annotate("segment", x = X + 2000, y = Y, xend = X + 2000, yend = Y_hat, colour = "#009E73", size = 2) +
+  annotate("segment", x = X + 2000, y = Y_hat, xend = X + 2000, yend = gmean, colour = "#E69F00", size = 2) +
   geom_point(size = 2)
 
 # Когда нет зависимости
 pl_no <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +  
       geom_segment(aes(x = MRINACount, y = PIQ, 
-                   xend = MRINACount, yend = gmean), colour = "grey50") +  
+                   xend = MRINACount, yend = gmean), colour = "grey70") +  
   geom_hline(yintercept = gmean, size = 5) + 
       annotate("text", label = "Общее среднее", 
              x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
     geom_hline(yintercept = gmean, size = 2, colour = "dodgerblue1") + 
-  annotate("segment", x = X - 1500, y = Y, xend = X - 1500, yend = gmean, colour = "grey50", size = 2) + 
-  annotate("segment", x = X + 2000, y = Y, xend = X + 2000, yend = gmean, colour = "#E69F00", size = 2) +
+  annotate("segment", x = X - 1500, y = Y, xend = X - 1500, yend = gmean, colour = "grey70", size = 2) + 
+  annotate("segment", x = X + 2000, y = Y, xend = X + 2000, yend = gmean, colour = "#009E73", size = 2) +
   geom_point(size = 2)
 
 # Объясненная изменчивость
