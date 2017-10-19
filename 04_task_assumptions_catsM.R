@@ -10,8 +10,7 @@
 
 # Задание:
 # - Подберите линейную модель зависимости
-# концентрации глюкозаминогликанов в моче от
-# возраста и проверьте, выполняются ли для нее
+# веса сердца от веса тела и проверьте, выполняются ли для нее
 # условия применимости.
 # - При необходимости измените
 # модель (трансформируйте предиктор) и проведите
@@ -27,3 +26,13 @@ library(car)
 
 # Открываем данные
 cat <- read_excel("data/catsM.xlsx", sheet = 1)
+
+mod <- lm(Hwt ~ Bwt, data = cat)
+
+mod_diag <- fortify(mod)
+
+ggplot(mod_diag, aes(x = 1:nrow(mod_diag), y = .cooksd)) + geom_bar(stat = "identity")
+
+ggplot(mod_diag, aes(x = .fitted, y = .stdresid)) + geom_point()
+
+qqPlot(mod)

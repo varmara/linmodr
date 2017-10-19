@@ -48,7 +48,7 @@ install.packages("readxl")
 
 ## 4. Описание, проверка значимости и валидности линейной модели
 
-<!-- - Презентация: [04_model_description_testing_and_validation.html](04_model_description_testing_and_validation.html) -->
+- Презентация: [04_model_description_testing_and_validation.html](04_model_description_testing_and_validation.html)
 - Код: 
     + [04_model_description_testing_and_validation_code.R](04_model_description_testing_and_validation_code.R)
     + [04_task_assumptions_catsM.R](04_task_assumptions_catsM.R)

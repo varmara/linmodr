@@ -1067,7 +1067,9 @@ qqPlot(mod1)
   eps <- rnorm(1000, 0, h(x2))
   y2 <- b_0 + b_1 * x2 + eps
   dat2 <- data.frame(x2, y2)
-  ggplot(dat2, aes(x = x2, y = y2)) + geom_point() + geom_smooth(method = "lm")
+  ggplot(dat2, aes(x = x2, y = y2)) + 
+    geom_point() + 
+    geom_smooth(method = "lm")
 ```
 
 ## Решение, блок 2
