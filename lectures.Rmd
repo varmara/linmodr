@@ -54,6 +54,7 @@ install.packages("readxl")
     + [04_task_assumptions_catsM.R](04_task_assumptions_catsM.R)
     + [04_task_assumptions_GAG.R](04_task_assumptions_GAG.R)
 - Данные:
+    + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt)
     + [IQ_brain.csv](data/IQ_brain.csv)
     + [catsM.xlsx](data/catsM.xlsx)
     + [GAGurine.xlsx](data/GAGurine.xlsx)
