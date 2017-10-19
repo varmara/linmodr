@@ -149,8 +149,6 @@ summary(brain_model)
 
 # Тестирование гипотез при помощи F-критерия
 
-## Тестирование гипотез при помощи F-критерия
-
 ```{r echo=FALSE}
 lims <- range(brain$PIQ) + c(-1, 1)
 yannot <- lims[1] + 0.5
