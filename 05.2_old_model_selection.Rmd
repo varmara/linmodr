@@ -1,0 +1,821 @@
+---
+title: "Сравнение линейных моделей"
+subtitle    : "Линейные модели..."
+author: Вадим Хайтов, Марина Варфоломеева 
+output:
+  ioslides_presentation:
+    widescreen: yes
+    css: assets/my_styles.css
+    logo: assets/Linmod_logo.png
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, cache = TRUE)
+```
+
+## Мы рассмотрим
+
+- Принципы выбора лучшей линейной модели
+- Сравнение линейных моделей
+- Сравнение предсказательной силы линейных моделей с использованием кросс-валидации
+
+### Вы сможете
+
+- Объяснить связь между качеством описания существующих данных и краткостью модели
+- Объяснить, что такое "переобучение" модели
+- Рассказать, каким образом происходит кросс-валидация моделей
+- Протестировать влияние отдельных параметров линейной регрессии при помощи сравнения вложенных моделей
+- Оценить предсказательную силу модели при помощи k-кратной кросс-валидации
+
+```{r, echo=FALSE, message=FALSE}
+library(ggplot2)
+theme_set(theme_bw(base_size = 14))
+library(gridExtra)
+```
+
+# Принципы выбора лучшей линейной модели
+
+"Essentially, all models are wrong,  
+but some are useful"  
+Georg E. P. Box
+
+##   Два подхода к исследованию: <br> Тестирование гипотезы VS Построение модели 
+
+При тестировании гипотезы, если нулевая гипотеза отвергнута, мы лишь утверждаем, что наши данные не противоречат некоторой постулированной закономернсти (_"концептуальной модели"_)   
+
+##   Два подхода к исследованию: <br> Тестирование гипотезы VS Построение модели 
+
+При построении модели мы ставим более широкую задачу. 
+
+1. Проверка соответствия наблюдаемых данных предполагаемой функциональной связи между зависимой перменной и предикторами: оценки параметров, проверка их статистической значимости, $R^2$, анализ остатков.  
+
+2. Разработка инструмента для предсказания значений в новых условиях: оценка предсказательной способности.
+
+
+
+# Проблема переобученности моделей (overfitting)
+
+## Все ли хорошо с подобранной моделью?
+
+```{r, echo=FALSE, fig.height=6, fig.width=5}
+library(ggplot2)
+n <- 10
+set.seed(384)
+x <- rnorm(n, 4, 1.2)
+y <- 10 + 0.59*x  + 0.1*x^2+ 0.001425*x^3 + rnorm(n)
+
+lc <- coef(lm(y ~ x))
+cc <- coef(lm(y ~ poly(x, 3, raw = TRUE)))
+fic <- coef(lm(y ~ poly(x, 5, raw = TRUE)))
+
+lin <- function(x){lc[1] + lc[2]*x}
+cub <- function(x){cc[1] + cc[2]*x + cc[3]*x^2 + cc[4]*x^3}
+fif <- function(x){fic[1] + fic[2]*x + fic[3]*x^2 + fic[4]*x^3 + fic[5]*x^4 + fic[6]*x^5}
+
+lm_eqn = function(coeffs){
+if(length(coeffs) == 2) {
+eq <- substitute(italic(y) == a + b %.% italic(x),
+                 list(a = format(coeffs[1], digits = 2),
+                      b = format(coeffs[2], digits = 2)))
+}
+if(length(coeffs) == 4) {
+  eq <- substitute(italic(y) == a + b %.% italic(x) + c %.% italic(x)^2 + d %.% italic(x)^3,
+                 list(a = format(coeffs[1], digits = 2),
+                      b = format(coeffs[2], digits = 2),
+                      c = format(coeffs[3], digits = 2),
+                      d = format(coeffs[4], digits = 2)))
+}
+if(length(coeffs) == 6) {
+  eq <- substitute(italic(y) == a + b %.% italic(x) + c %.% italic(x)^2 + d %.% italic(x)^3 + e %.% italic(x)^4 + f %.% italic(x)^5,
+                 list(a = format(coeffs[1], digits = 2),
+                      b = format(coeffs[2], digits = 2),
+                      c = format(coeffs[3], digits = 2),
+                      d = format(coeffs[4], digits = 2),
+                      e = format(coeffs[5], digits = 2),
+                      f = format(coeffs[6], digits = 2)))
+}
+  as.character(as.expression(eq))
+  }
+
+library(grid)
+
+pp <- ggplot(data.frame(x = x, y = y), aes(x = x, y = y)) + geom_point() + theme(plot.title = element_text(size = 10), plot.margin = unit(c(0.5, 0.5, 0.1, 0.1), "lines"))
+
+under <- pp + stat_function(fun = lin, colour = "red") + labs(title = "Высокая погрешность \n(недообучение)")  +  annotate("text", x=1, y=17, label=lm_eqn(lc), hjust=0, size=3, family="Times", fontface="italic", parse=TRUE)
+right <- pp + stat_function(fun = cub, colour = "red") + labs(title = "Оптимальая модель")  + annotate("text", x=1, y=17, label=lm_eqn(cc), hjust=0, size=5, family="Times", fontface="italic", parse=TRUE)
+over <- pp + stat_function(fun = fif, colour = "red") + labs(title = "Высокая дисперсия \n(переобучение)") + annotate("text", x=1, y=17, label=lm_eqn(fic), hjust=0, size=3, family="Times", fontface="italic", parse=TRUE)
+
+```
+
+```{r, echo=FALSE, fig.height=5, fig.width=10}
+
+pp_lm <- pp+geom_smooth(method = "lm")
+
+grid.arrange(pp, pp_lm, ncol = 2)
+```
+
+
+## Для этих данных можно подобрать несколько моделей
+
+
+```{r, echo=FALSE, fig.height=3.5, fig.width=10}
+grid.arrange(under, over, ncol = 2)
+```
+В недообученной (underfitted) модели слишком мало параметров, ее предсказания неточны.   
+
+В переобученной (overfitted) модели слишком много параметров, она предсказывает еще и случайный шум. 
+
+## Оптимальная модель
+
+
+```{r, echo=FALSE, fig.height=4, fig.width=10}
+
+right
+```
+
+## Последствия переобучения модели
+
+Переобучение происходит, когда модель из-за избыточного усложнения описывает уже не только отношения между переменными, но и случайный шум
+
+При увеличении числа предикторов в модели:   
+- более точное описание данных, по которым подобрана модель   
+- низкая точность предсказаний на новых данных из-за переобучения.   
+
+## При постоении моделей важно помнить о трех типах дисперсии
+
+```{r, echo=FALSE, fig.height=5, fig.width=9}
+brain <- read.csv("data/IQ_brain.csv", header = TRUE)
+
+brain_model <- lm(PIQ ~ MRINACount, data = brain)
+brain_predicted <- predict(brain_model, interval="prediction")
+brain_predicted <- data.frame(brain, brain_predicted)
+
+pl_brain <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + geom_point() + xlab("Brain size") + ylab("IQ test") + theme(plot.title = element_text(size = 10), axis.text = element_text(size = 10), axis.title = element_text(size = 10) ) + ggtitle("Model") + geom_smooth(method = "lm", se = F)
+
+pl_exp <- pl_brain + geom_smooth(method="lm", se=F, size=1.3) + geom_abline(aes(intercept=mean(PIQ), slope=0), size=1.3) + geom_text(label="Mean IQ", aes(x=1050000, y=(mean(PIQ)-6)), size = 3) + geom_segment(data=brain_predicted, aes(x=MRINACount, y=mean(PIQ), xend=MRINACount, yend=fit)) + ggtitle("Explained variation") 
+ 
+
+pl_res <- pl_brain + geom_smooth(method="lm", se=F, size=1.3) + geom_segment(data=brain_predicted, aes(x=MRINACount, y=PIQ, xend=MRINACount, yend=fit)) + ggtitle("Residual variation")
+
+pl_tot <-pl_brain + geom_abline(aes(intercept=mean(PIQ), slope=0), size=1.3) + geom_text(label="Mean IQ", aes(x=1050000, y=(mean(PIQ)-6)), size = 3) + geom_segment(data=brain_predicted, aes(x=MRINACount, y=PIQ, xend=MRINACount, yend=mean(PIQ))) + ggtitle("Total variation")
+
+
+grid.arrange(pl_brain, pl_exp, pl_res, pl_tot, nrow=1)
+
+
+```
+
+##При постоении моделей важно помнить о трех типах дисперсии
+
+
+|**Объясненная дисперсия**  | **Остаточная дисперсия**   | **Полная дисперсия** | 
+|-----|-----|-----|
+| $SS_{Regression}=\sum{(\hat{y}-\bar{y})^2}$ | $SS_{Residual}=\sum{(\hat{y}-y_i)^2}$ | $SS_{Total}=\sum{(\bar{y}-y_i)^2}$ |
+| $df_{Regression} = 1$ | $df_{Residual} = n-2$  | $df_{Total} = n-1$ |
+| $MS_{Regression} =\frac{SS_{Regression}}{df}$ | $MS_{Residual} =\frac{SS_{Residual}}{df_{Residual}}$ | $MS_{Total} =\frac{SS_{Total}}{df_{Total}}$ |
+
+
+
+
+## Компромисс при подборе оптимальной модели:<br />точность vs. описание шума
+
+### Хорошее описание существующих данных
+
+Если мы включим много переменных, то лучше опишем данные: большая объясненная изменчивость ($R^2$), маленькая остаточная изменчивость ($MS_{Residual}$)
+
+Но стандартные ошибки параметров будут большие, интерпретация сложная
+
+
+
+### Принцип парсимонии 
+*Entia non sunt multiplicanda praeter necessitatem*
+
+Минимальный набор переменных, который может объяснить существующие данные
+
+Стандартные ошибки параметров будут ниже, интерпретация проще
+
+
+## Критерии и методы выбора моделей зависят от задачи
+
+### Задачи 1 типа: _Объяснение закономерностей_
+
+- Нужны точные тесты влияния предикторов: F-тесты или тесты отношения правдоподобий (likelihood-ratio tests)
+
+### Задачи 2 типа: _Описание функциональной зависимости_
+
+- Нужна точность оценки параметров и парсимония: "информационные" критерии (АIC, BIC, AICc, QAIC, и т.д.)
+
+### Задачи 3 типа: _Предсказание значений зависимой переменной_
+
+- Нужна оценка качества модели на данных, которые не использовались для ее первоначальной подгонки: методы ресамплинга (кросс-валидация, бутстреп)
+
+## Дополнительные критерии для сравнения моделей:
+
+### Не позволяйте компьютеру думать за вас!
+
+- _Хорошая модель должна соответствовать условиям применимости_: анализ остатков, проверк на наличие автокорреляций, выбросы, наличие мультиколлинеарности предикторов и проч.   
+
+- _Другие соображения_: разумность, целесообразность модели, простота, ценность выводов, важность предикторов.
+
+# Сравнение линейных моделей
+
+## Вложенные модели (nested models)
+
+Две модели являются _вложенными_, если одну из них можно получить из другой путем удаления некоторых предикторов.   
+
+Удаление предиктора  - коэффициент при данном предикторе равен нулю. 
+
+### Полная модель (full model)
+
+М1: $y _i = \beta _0 + \beta _1 x _1 + \beta _2 x _2 + \epsilon _i$
+
+### Неполные модели (reduced models)
+
+М2: $y _i = \beta _0 + \beta _1 x _1 + \epsilon _i$   
+
+М3: $y _i = \beta _0 + \beta _2 x _2 + \epsilon _i$
+
+M2 вложена в M1   
+M3 вложена в M1   
+M2 и M3 не вложены друг в друга
+
+### Нулевая модель (null model), вложена в полную (M1) и в неполные (M2, M3)
+
+$y _i = \beta _0 + \epsilon _i$
+
+## Для тренировки запишем вложенные модели для данной полной модели
+
+(1)$y _i = \beta _0 + \beta _1 x _1 + \beta _2 x _2 + \beta _3 x _3 + \epsilon _i$
+
+<div class="columns-2">
+
+Модели:
+
+- (2)$y _i = \beta _0 + \beta _1 x _1 + \beta _2 x _2 + \epsilon _i$
+- (3)$y _i = \beta _0 + \beta _1 x _1 + \beta _3 x _3 + \epsilon _i$
+- (4)$y _i = \beta _0 + \beta _2 x _2 + \beta _3 x _3 + \epsilon _i$
+- (5)$y _i = \beta _0 + \beta _1 x _1 + \epsilon _i$
+- (6)$y _i = \beta _0 + \beta _2 x _2 + \epsilon _i$
+- (7)$y _i = \beta _0 + \beta _3 x _3 + \epsilon _i$
+- (8)$y _i = \beta _0 + \epsilon _i$<br /><br />
+
+Вложенность:
+
+- (2)-(4)- вложены в (1)<br /><br /><br />
+- (5)-(7)- вложены в (1), при этом 
+   - (5)вложена в (1), (2), (3); 
+   - (6)вложена в (1), (2), (4); 
+   - (7)вложена в (1), (3), (4)<br /><br />
+- (8)- нулевая модель - вложена во все
+
+</div>
+
+## Сравнение вложенных линейных моделей при помощи F-критерия
+
+### Полная модель 
+
+$y _i = \beta _0 + \beta _1 x _{i1} + ... + \beta _k x _{ik} + ... + \beta _p x _{ip} + \epsilon _i$  
+$df _{reduced, full} = p$  
+$df _{error, full} = n - p - 1$
+
+### Уменьшеная модель
+
+$y _i = \beta _0 + \beta _1 x _{i1} + ... + \beta _k x _{ik} + \epsilon _i$  
+$df _{reduced, reduced} = k$  
+$df _{error, reduced} = n - k - 1$
+
+### Частный F-критерий - оценивает выигрыш объясненной дисперсии от включения фактора в модель
+
+$$F = \frac {(SS _{error,reduced} - SS _{error,full}) / (df _{reduced, full} - df _{reduced, reduced})} {(SS _{error, full})/ df _{error, full}}$$
+
+## Сравнение линейных моделей при помощи частного F-критерия
+
+Модели обязательно должны быть вложенными!
+
+### Обратный пошаговый алгоритм (backward selection)
+
+1) Подбираем полную модель
+2) Строим редуцированную модель (лишенную одного из предикторов) вложенную в исходную полную  модель 
+3) Тестируем отличие редуцированой модели от полной модели
+4) Предиктор, удаление которого __не ухудшает__ модель, выкидываем из рассмотреия и принимаем редуцированную модель, как "родительскую" для следующего раунда упрощения.  
+
+Повторяем 2-4 до тех пор, пока что-то можно удалить.  
+
+**Важно!** Если модель содержит взаимодействия между предикторами, то в первую очередь надо посмотреть можно ли от него избавиться.  Если взаимодействие из модели удалить нельзя, то нельзя удалять и основные члены модели, входящие во взаимодействие. 
+
+
+
+## Пример: птицы в лесах Австралии
+
+От каких характеристик лесного участка зависит обилие птиц в лесах юго-западной Виктории, Австралия (Loyn, 1987)
+
+Переменных много, мы хотим из них выбрать __оптимальный небольшой__ набор.
+
+
+<div class="columns-2">
+
+![forest in Victoria, Australia](images/vict_m.jpg)
+Mystic Forest - Warburton, Victoria by ¡kuba! on flickr
+
+
+
+56 лесных участков:
+
+- ABUND - обилие птиц
+- AREA - площадь участка
+- YRISOL - год изоляции участка
+- DIST - расстояние до ближайшего леса
+- LDIST - расстояние до ближайшего большого леса
+- GRAZE - пастбищная нагрузка (1-5)
+- ALT - высота над уровнем моря
+
+
+
+## Вспомним, что мы знаем про эту модель с прошлого раза
+
+```{r}
+birds <- read.csv("data/loyn.csv")
+M <- lm(ABUND ~ ., data = birds)
+library(car)
+vif(M) # есть колинеарные предикторы
+# GRAZE - избыточный предиктор, удаляем
+M1 <- update(M, .~. - GRAZE)
+vif(M1)
+```
+
+## .
+
+Незначимо влияние AREA, DIST, LDIST
+
+```{r}
+summary(M1)
+```
+
+## Частный F-критерий, 1 способ: `anova(модель_1, модель_2)`
+
+Вручную выполняем все действия
+
+```{r}
+M2 <- update(M1, . ~ . - AREA)
+anova(M1, M2)
+```
+
+##  Частный F-критерий, 2 способ: `drop1()`
+
+Вручную тестировать каждый предиктор с помощью `anova()` слишком долго. Можно протестировать все за один раз при помощи `drop1()`
+
+```{r}
+drop1(M1, test = "F")
+# Нужно убрать AREA
+```
+
+## .
+
+```{r}
+# Убрали AREA
+M2 <- update(M1, . ~ . - AREA)
+drop1(M2, test = "F")
+# Нужно убрать LDIST
+```
+
+## .
+
+```{r}
+# Убрали LDIST
+M3 <- update(M2, . ~ . - LDIST)
+drop1(M3, test = "F")
+# Больше ничего убрать не получается
+```
+
+## Итоговая модель
+
+```{r}
+summary(M3)
+```
+
+# Тесты отношения правдоподобий
+
+## Ограничение частного F-критерия
+Частный F-критерий применим только для сравнения двух вложенных моделей, подобранных _методом наименьших квадатов_.   
+
+Этот метод не применим для более сложных моделей.    
+Для подбора более сложных моделй используется _метод максимального правдоподобия_.
+
+## Правдоподобие
+
+Правдоподобие (likelihood) -  это соотверствие имеющихся данных тому, что можно получить при определенных значениях параметров модели. 
+
+```{r, echo=FALSE, fig.height=5, fig.width=8}
+
+xy <- data.frame(X = rep(1:10, 3))
+xy$Y <- 10*xy$X + rnorm(30, 0, 10)
+
+Mod <- lm(Y ~ X, data = xy)
+
+xy$predicted <- predict(Mod)
+
+xy$predicted2 <- xy$predicted/0.8
+
+rand_df <- matrix(rep(NA,100000), ncol = 10)
+for(i in 1:10) rand_df[,i] <- rnorm(10000, xy$predicted[i], summary(Mod)$sigma)
+
+rand_df <- data.frame(X = rep(xy$X, each = 10000), Y = as.vector(rand_df))
+
+
+
+pl_lik1 <- ggplot(xy, aes(x = X, y = Y)) + geom_violin(data = rand_df, aes(x = factor(X))) + geom_point() + geom_smooth(method = "lm", se = F) + geom_point(data = xy, aes(x = X, y = predicted), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная") + ggtitle("Модель 1") 
+
+
+rand_df <- matrix(rep(NA,100000), ncol = 10)
+for(i in 1:10) rand_df[,i] <- rnorm(10000, xy$predicted2[i], summary(Mod)$sigma)
+
+rand_df <- data.frame(X = rep(xy$X, each = 10000), Y = as.vector(rand_df))
+
+pl_lik2 <- ggplot(xy, aes(x = X, y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), scale = ) + geom_point()  + geom_path(data = xy, aes(x = X, y = predicted2), color = "blue", size = 1) + geom_point(data = xy, aes(x = X, y = predicted2), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная") + ggtitle("Модель 2") 
+
+grid.arrange(pl_lik1, pl_lik2, ncol=2)
+```
+  
+## Правдоподобие
+
+Чтобы измерить правдоподобие нам нужно оценить вероятность получения имеющегося набора значений зависимой переменной при  заданных параметрах модели, описывающей связь между зависимой переменной и предикторами. 
+
+
+Мы оцениваем это как произведение вероятностей получения каждой из точек данных
+
+$L(x_1, ..., x_n) = \Pi^n _{i = 1}f(x_i; \theta)$
+
+где $f(x; \theta)$ - функция плотности распределения с параметрами $\theta$
+
+
+## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
+
+Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
+
+$N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1} {2 \sigma^2} \epsilon^2)$
+
+Тогда можно описать вероятность получения нашего набора данных при помощи функции правдоподобия (likelihood), как произведение вероятностей:
+
+$L = \Pi^n _{n = 1} N(\epsilon, \sigma^2) = (\frac {1} {2\pi\sigma^2})^{n/2} exp(- \frac {1} {2\sigma^2} \sum \epsilon^2_i)$
+
+$\epsilon = y_i - \hat y_i$
+
+## Подбор параметров модели  
+В случае регрессии от одной переменной (для простоты)
+
+$\hat y_i = b_0 + b_1 x$
+
+
+Реализуется алгоритм поиска такого сочетания  $b_0$, $b_1$ и $\sigma$, при котором $L = \Pi^n _{n = 1} N(\epsilon, \sigma^2)$ (функция правдоподобия) будет иметь максимум. 
+
+
+
+## Логарифм правдоподобия
+
+Вычислительно проще работать с логарифмами правдоподобий (loglikelihood)
+
+$$logLik (\beta, \sigma) = - \frac{n}{2} ln(2\pi) - \frac{n}{2} ln(\sigma^2) - \frac{1}{2\sigma^2}(\sum \epsilon^2_i)$$
+
+$\beta$ - вектор параметров модели
+$\sigma$ - дисперсия остатков
+
+Чем больше логарифм правдоподобия тем лучше модель. 
+
+## Подбор параметров модели методом максимального правдоподобия
+Для подбора параметров методом максимального правдоподобия используют функцию `glm()` и ряд других, более специализированных, функций.
+
+
+```{r}
+# Создаем симулированные данные
+xy <- data.frame(X = rep(1:10, 3))
+xy$Y <- 10*xy$X + rnorm(30, 0, 10)
+
+# Подбираем модель
+Mod <- lm(Y ~ X, data = xy)
+Mod_glm <- glm(Y ~ X, data = xy)
+
+coefficients(Mod)
+```
+
+```{r}
+coefficients(Mod_glm)
+```
+
+
+
+## Логарифм правдоподобия
+$LogLik$ для модели можно найти с помощью функции `logLic()`
+
+```{r}
+logLik(Mod_glm)
+```
+
+## Логарифм правдоподобия вручную
+
+
+```{r}
+xy$predicted <- predict(Mod) # Предсказанные моделью значения
+
+SD <- summary(Mod)$sigma # Оценка дисперсии
+
+xy$Prob <- dnorm(xy$Y, mean = xy$predicted, sd = SD) # Вероятности для каждой точки
+
+xy$LogProb <- log(xy$Prob) # Логарифм вероятностей
+
+sum(xy$LogProb) # Логарифм произведения, равный сумме логарифмов
+
+```
+
+
+
+## Тест отношения правдоподобий (Likelihood Ratio Test)
+
+Тест отношения правдоподобий позволяет определить какая модель более правдоподобна с учетом данных.
+
+$LRT = 2ln(L_1/L_2) = 2(logL_1 - logL_2)$
+
+- $L_1$, $L_2$ - правдоподобия полной и уменьшеной модели
+- $logL_1$, $logL_2$ - логарифмы правдоподобий
+
+Разница логарифмов правдоподобий имеет распределение $\chi^2$ с числом степеней свободы $df = df_2 - df_1$
+
+## Делаем тест отношения правдоподобий
+
+Переподберем нашу полную модель при помощи метода максимального правдоподобия
+
+```{r}
+GLM1 <- glm(ABUND ~ . - GRAZE, data = birds)
+```
+
+Тест отношения правдоподобий можно сделать с помощью тех же функций, что и частный F-критерий:
+
+- по-одному `anova(mod1, mod2, test = "Chisq")`
+- все сразу `drop1(mod1, test = "Chisq")`
+
+### Задание: Подберите оптимальную модель при помощи тестов отношения правдоподобий
+
+## Решение (шаг 1)
+
+```{r}
+drop1(GLM1, test = "Chisq")
+# Нужно убрать AREA
+```
+
+## Решение (шаг 2)
+
+```{r}
+# Убираем AREA
+GLM2 <- update(GLM1, . ~ . - AREA)
+drop1(GLM2, test = "Chisq")
+# Нужно убрать LDIST
+```
+
+## Решение (шаг 3)
+
+```{r}
+# Убираем LDIST
+GLM3 <- update(GLM2, . ~ . - LDIST)
+drop1(GLM3, test = "Chisq")
+# Больше ничего убрать не получается
+```
+
+## Решение (шаг 4)
+
+```{r}
+summary(GLM3)
+```
+
+# Информационные критерии
+
+## AIC - Информационный критерий Акаике (Akaike Information Criterion)
+
+$AIC = -2 logLik + 2p$
+
+- $logLik$ - логарифм правдоподобия для модели
+- $2p$ - штраф за введение в модель $p$ параметров
+
+Чем меньше AIC - тем лучше модель
+
+## Другие информационные критерии
+
+|Критерий | Название  | Формула|
+|------ | ------ | ------|
+|AIC | Информационный критерий Акаике | $AIC = -2 logLik + 2p$|
+|BIC | Баесовский информационный критерий | $BIC = -2 logLik + p \cdot ln(n)$|
+|AICc | Информационный критерий Акаике с коррекцией для малых выборок (малых относительно числа параметров: $n/p < 40$, Burnham, Anderson, 2004) | $AIC_c = -2 logLik + 2p + \frac{2p(p + 1)}{n - p - 1}$|
+|QAIC | Информационный критерий Акаике с использованием квазиправдоподобия - для данных со сверхдисперсией (позже) | |
+
+- $logLik$ - логарифм правдоподобия для модели
+- $p$ - число параметров
+- $n$ - число наблюдений
+
+## Рассчитаем AIC для наших моделей
+
+```{r}
+AIC(GLM1, GLM2, GLM3, k=2)
+# По AIC лучшая модель GLM3
+```
+
+
+
+
+
+
+# Сравнение предсказательной силы моделей
+
+## Кросс-валидация
+
+Если оценивать качество модели по тем же данным, по которым она была подобрана, оценки будут завышенными из-за переобучения. Кросс-валидация решает эту проблему.
+
+Делим данные __случайным образом__ на __тренировочное и тестовое подмножества__, обычно в пропорции 60:40, 70:30 или 80:20
+
+```{r, echo=FALSE, fig.height=1.3}
+
+df <- data.frame(id = 1:35, Data = c(rep("тренировочные", 28), rep("тестовые", 7)), Iteration = rep("1", 35))
+
+
+df$Data <- factor(df$Data, levels = c("тренировочные", "тестовые"))
+
+
+ggplot(df, aes(x = id, y = Iteration, fill = Data)) + geom_tile(colour = "black", stat = "identity") + theme_minimal(base_size = 14) + coord_equal() + labs(x = NULL, y = NULL, title = "Кросс-валидация") + theme(axis.ticks = element_blank(), axis.text = element_blank(), legend.position = "bottom", plot.margin = unit(c(0.5, 0.1, 0.1, 0.1), "lines"))
+```
+
+<div class="columns-2">
+
+### Тренировочные данные
+
+Используются для подбора модели (для обучения)
+  
+Чтобы модель была хорошей, тренировочных данных __должно быть много__ 
+
+### Тестовые данные
+
+Используются для оценки качества модели
+  
+Чтобы надежно оценить качество модели, тестовых данных __тоже должно быть много__
+
+</div>
+
+## K-кратная кросс-валидация (k-fold cross-validation)
+
+Делим данные __случайным образом__ на $k$ частей  
+$k - 1$ часть используется для обучения, на $k$-й части тестируется качество предсказаний модели  
+Процедура повторяется $k$ раз
+
+```{r, echo=FALSE, fig.height=3}
+k <- 10
+npart <- 4
+df <- expand.grid(id = 1:(k*npart), Iteration = 1:k)
+df$Data <- "тренировочные"
+df$Data[unlist(lapply(1:k, function(x) 1:npart + (k*npart+npart)*(x-1)))] <- "тестовые"
+df$Data <- factor(df$Data, levels = c("тренировочные", "тестовые"))
+df$Iteration <- factor(df$Iteration, levels = k:1, labels = k:1)
+ggplot(df, aes(x = id, y = Iteration, fill = Data)) + geom_tile(colour = "black", stat = "identity") + theme_minimal(base_size = 14) + coord_equal() + labs(x = NULL, title = paste0(k, "-кратная кросс-валидация")) + theme(axis.ticks = element_blank(), axis.text.x = element_blank(), legend.position = "bottom", plot.margin = unit(c(0.5, 0.1, 0.1, 0.1), "lines"))
+```
+
+$k$-кратная кросс-валидация лучше обычной, особенно, если данных немного
+
+## Один из способов оценить качество предсказаний это RMSE - стандартная ошибка предсказания
+
+$$RMSE = \sqrt { \frac {\sum{({y _{i}} - \hat y _{i})^2}} {n} }$$
+
+Чем меньше $RMSE$, тем точнее предсказания и тем лучше модель.
+
+- $RMSE$ - относительная величина, нет жестких границ для  "хорошей" модели.
+- $RMSE$ разных моделей можно сравнивать, только если они в одинаковых единицах (исходные данные моделей преобразованы одинаково, зависимая переменная в одних и тех же единицах)
+- $RMSE$ чувствительна к выбросам
+
+Бывает, что критерии противоречат друг другу, тогда учитываем другие соображения, например, простоту и интерпретируемость. Лучше меньше параметров.
+
+## Этапы сравнения моделей с использованием кросс-валидации
+
+- Делим данные на тренировочное и тестовое подмножества
+
+- Для каждой из моделей-кандидатов повторяем следующие шаги
+  - Подбираем на тренировочном подмножестве модель-кандидат
+  - Используя тестовые данные, предсказываем ожидаемые значение $\hat{y}$, используя модель-кандидат
+  - Рассчитываем $RMSE$ для модели-кандидата (стандартное отклонение наблюдаемого значения $y$ от предсказанного моделью-кандидатом $\hat{y}$)
+
+$$RMSE = \sqrt { \frac {\sum{({y _{i}} - \hat y _{i})^2}} {n} }$$
+
+- Сравниваем $RMSE$ всех моделей кандидатов. Модель, у которой минимальное значение $RMSE$ - лучшая
+
+## Кросс-валидация для линейных моделей
+
+Пакет `caret` позволяет подбирать практически любые модели. В нем много способов оценки предсказательной силы моделей.
+
+```{r, message=FALSE, tidy=FALSE}
+library(caret)
+SEED <- 233
+# Кросс-валидация, 5-кратная
+train_control <- trainControl(method = "cv", number = 5)
+
+f1 <- ABUND ~ AREA + YRISOL + DIST + LDIST + ALT
+set.seed(SEED)
+MCV1 <- train(f1, data = birds, trControl = train_control, method = "lm")
+
+MCV1$resample # результаты на разных фолдах
+MCV1$results # итоговая статистика
+```
+
+## Задание:
+
+Рассчитайте при помощи кросс-валидации $RMSE$ для моделей
+```{r}
+f2 <- ABUND ~ YRISOL + DIST + LDIST + ALT
+f3 <- ABUND ~ YRISOL + DIST + ALT
+```
+
+## Решение
+
+```{r}
+f2 <- ABUND ~ YRISOL + DIST + LDIST + ALT
+set.seed(SEED)
+MCV2 <- train(f2, data = birds, trControl = train_control, method = "lm")
+
+f3 <- ABUND ~ YRISOL + DIST + ALT
+set.seed(SEED)
+MCV3 <- train(f3, data = birds, trControl = train_control, method = "lm")
+
+# Сравниваем три модели
+c(
+MCV1$results$RMSE,
+MCV2$results$RMSE,
+MCV3$results$RMSE
+)
+# самая маленькая RMSE при 5-кратной кросс-валидации
+```
+
+<!-- ## График значений $RMSE$ и $R^2$ для каждого фолда в кросс-валидации трех наших моделей -->
+
+<!-- Каждая линия - фолд -->
+
+<!-- ```{r, echo = FALSE, fig.width=10, fig.height=5} -->
+<!-- allResamples <- resamples(list("M1" = MCV1, "M2" = MCV2, "M3" = MCV3)) -->
+<!-- library(gridExtra) -->
+<!-- grid.arrange( -->
+<!--   parallelplot(allResamples), -->
+<!-- parallelplot(allResamples, metric = "Rsquared"), -->
+<!-- ncol = 2) -->
+<!-- ``` -->
+
+<!-- ## Можем повторить всю процедуру оценки качества модели другим методом - бутстрепом -->
+
+<!-- ```{r, message=FALSE} -->
+<!-- train_control <- trainControl(method = "boot", number = 100) -->
+
+<!-- MCV1b <- train(f1, data = birds, trControl = train_control, method = "lm") -->
+<!-- MCV2b <- train(f2, data = birds, trControl = train_control, method = "lm") -->
+<!-- MCV3b <- train(f3, data = birds, trControl = train_control, method = "lm") -->
+
+<!-- # Сравниваем три модели -->
+<!-- MCV1b$results -->
+<!-- MCV2b$results -->
+<!-- MCV3b$results # Лучшая -->
+<!-- ``` -->
+
+<!-- ## График значений $RMSE$ и $R^2$ для каждой выборки при проверке трех наших моделей при помощи бутстрепа -->
+
+<!-- Каждая линия - отдельная выборка -->
+
+<!-- ```{r, echo = FALSE, fig.width=10, fig.height=5} -->
+<!-- allResamples <- resamples(list("M1b" = MCV1b, "M2b" = MCV2b, "M3b" = MCV3b)) -->
+<!-- grid.arrange( -->
+<!--   parallelplot(allResamples), -->
+<!-- parallelplot(allResamples, metric = "Rsquared"), -->
+<!-- ncol = 2) -->
+<!-- ``` -->
+
+
+
+
+
+
+
+## Takehome messages
+
+- Модели, которые качественно описывают существующие данные включают много параметров, но предсказания с их помощью менее точны из-за переобучения
+- Для выбора оптимальной модели используются разные критерии в зависимости от задачи
+  - Сравнивая вложенные модели можно отбраковать переменные, включение которых в модель не улучшает ее
+  - Оценить предсказательную силу модели на __новых данных__ можно при помощи кросс-валидации или бутстрепа, сравнив ошибки предсказаний
+
+## Дополнительные ресурсы
+
+James, G., Witten, D., Hastie, T., Tibshirani, R., 2013. An introduction to statistical learning. Springer.
+  - 2.1.3 The Trade-Off Between Prediction Accuracy and Model Interpretability
+  - 2.2.2 The Bias-Variance Trade-Off
+  - 3.2.2 Some Important Questions
+
+Kuhn, M., Johnson, K., 2013. Applied Predictive Modeling. Springer.
+  - 1.1 Prediction Versus Interpretation
+  - 1.2 Key Ingredients of Predictive Models
+  - 4 Over-Fitting and Model Tuning
+  - 5 Measuring Performance in Regression Models
+
+Quinn, G.G.P., Keough, M.J., 2002. Experimental design and data analysis for biologists. Cambridge University Press.
+  - 6.1.15 Finding the “best” regression model
+  - 6.1.16 Hierarchical partitioning
