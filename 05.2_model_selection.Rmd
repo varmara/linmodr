@@ -25,8 +25,8 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 - Метод максимального правдоподобия
 - Сравнение линейных моделей разными способами:
     - частный F-критерий
-    - тесты отношения правдоподобий
-    - информационные критерии AIC и BIC
+    - тест отношения правдоподобий
+    - информационный критерий Акаике (AIC)
 
 ### Вы сможете
 
@@ -35,7 +35,7 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 - Определять, какие модели являются вложенными
 - Объяснить, как подбирают параметры линейных моделей методом максимального правдоподобия
 - Сравнивать вложенные модели при помощи частного F-критерия или теста отношения правдоподобий
-- Сравнивать модели при помощи информационных критериев AIC и BIC
+- Сравнивать модели при помощи AIC
 
 
 ```{r, echo=FALSE, message=FALSE, purl=FALSE}
@@ -63,122 +63,220 @@ Georg E. P. Box
     - Выбор оптимальной модели
     - Оценка предсказательной способности модели
 
-## Какую модель можно подобрать для описания этой закономерности?
+```{r echo=FALSE, purl=FALSE}
+library(tidyr)
+library(dplyr)
+
+n <- 30
+max_span <- 0.9
+my_spans <- seq(0.2, max_span, by = 0.1)
+sd_e <- 1.5
+
+# Training set -----------------------------------
+set.seed(329323)
+data_training <- data.frame(x = runif(n, 1, 10)) %>%
+  mutate(y = 2*sin(x) + 1 * x  + rnorm(n, 0, 0.9)) %>%
+  crossing(span = my_spans) %>%
+  group_by(span) %>%
+  nest(x, y, .key = "data")
+
+# Trained models
+mod_training <- data_training %>%
+  mutate(model = purrr::map2(data, span, ~ loess(y ~ x, data = .x, span = .y)))
+
+# Predictions on the training set
+pred_training <- mod_training %>%
+  mutate(pred = purrr::map2(model, data, ~ predict(.x, newdata = .y))) %>%
+  unnest(data, pred, .id = "span") %>%
+  mutate(span = factor(span, labels = my_spans))
+# MSE training
+MSe_training <- pred_training %>%
+  group_by(span) %>%
+  summarise(training = mean(y - pred)^2)
+
+# Testing set ------------------------------------
+set.seed(75)
+data_testing <- data.frame(x = runif(n, 1, 10)) %>%
+  mutate(y = 2 * sin(x) + 1 * x  + rnorm(n, 0, sd_e)) %>%
+  crossing(span = my_spans) %>%
+  group_by(span) %>%
+  nest(x, y, .key = "data")
+# The same model
+data_testing$model <- mod_training$model
+# Predictions on the testing set
+pred_testing <- data_testing %>%
+  mutate(pred = purrr::map2(model, data, ~ predict(.x, newdata = .y))) %>%
+  unnest(data, pred, .id = "span") %>%
+  mutate(span = factor(span, labels = my_spans))
+  # MSE testing
+MSe_testing <- pred_testing %>% group_by(span) %>%
+  summarise(testing = mean(y - pred, na.rm = TRUE)^2)
+
+# All predictions of the smoothers ---------------
+data_all <- data.frame(x = seq(1, 10, length.out = 400)) %>%
+  crossing(span = my_spans) %>%
+  group_by(span) %>%
+  nest(x, .key = "data")
+# The same model
+data_all$model <- mod_training$model
+# Predictions on an artificial grid for plotting
+pred_all <- data_all %>%
+  mutate(pred = purrr::map2(model, data, ~ predict(.x, newdata = .y))) %>%
+  unnest(data, pred, .id = "span") %>%
+  mutate(span = factor(span, labels = my_spans))
+
+# Plot of predictions -----------------------
+gg_dat <- ggplot(pred_all, aes(x = x, y = pred, colour = span, group = span)) +
+  geom_point(data = pred_training, aes(x = x, y = y), colour = "black", shape = 19) +
+  # geom_point(data = pred_testing, aes(x = x, y = y), colour = "black", shape = 21) +
+  # geom_line(size = 1) +
+  # facet_wrap(~as.factor(span), nrow = 2) +
+  labs(colour = "Сложность\nмодели", y = "y") +
+  theme(legend.position = "bottom")
+
+# Plot of predictions with training set -------
+gg_train <- ggplot(pred_all, aes(x = x, y = pred, colour = span, group = span)) +
+  geom_point(data = pred_training, aes(x = x, y = y), colour = "black", shape = 19) +
+  # geom_point(data = pred_testing, aes(x = x, y = y), colour = "black", shape = 21) +
+  geom_line(size = 1) +
+  facet_wrap(~as.factor(span), nrow = 2) +
+  labs(colour = "Сложность\nмодели", y = "y") +
+  theme(legend.position = "bottom")
+
+
+# Plot of predictions with training and testing sets -------
+gg_pred <- ggplot(pred_all, aes(x = x, y = pred, colour = span, group = span)) +
+  geom_point(data = pred_training, aes(x = x, y = y), colour = "black") +
+  geom_point(data = pred_testing, aes(x = x, y = y), colour = "black", shape = 21) +
+  geom_line(size = 1) +
+  facet_wrap(~as.factor(span), nrow = 2) +
+  labs(colour = "Сложность\nмодели", y = "y") +
+  theme(legend.position = "bottom")
+
+# Plot of training and testing MSe -----
+dat_mse <- merge(MSe_training, MSe_testing) %>% gather(Data, MSe, -span) %>%
+  mutate(Complexity = factor(span,
+                             levels = sort(my_spans, decreasing = TRUE),
+                             labels = sort(my_spans, decreasing = TRUE)),
+         Data = factor(Data,
+                levels = c("training", "testing"), 
+                labels = c("испольованные в модели",
+                           "новые")))
+gg_mse <- ggplot(dat_mse, aes(x = Complexity, y = MSe, group = Data)) +
+  geom_line() +
+  geom_point(aes(shape = Data), size = 3) +
+  scale_shape_manual(values = c(21, 19), guide = guide_legend(nrow = 2)) +
+  labs(x = "Сложность модели", y = "Ошибка предсказаний", shape = "Данные") +
+  theme(legend.position = "bottom")
+```
+
+## Зачем может понадобится упрощать модель?
+
+### Какую модель можно подобрать для описания этой закономерности?
+
 
 ```{r, echo=FALSE, fig.height=4, fig.width=3, purl=FALSE}
-library(ggplot2)
-n <- 10
-set.seed(384)
-x <- rnorm(n, 4, 1.2)
-y <- 10 + 0.59*x  + 0.1*x^2+ 0.001425*x^3 + rnorm(n)
-
-lc <- coef(lm(y ~ x))
-cc <- coef(lm(y ~ poly(x, 3, raw = TRUE)))
-fic <- coef(lm(y ~ poly(x, 5, raw = TRUE)))
-
-lin <- function(x){lc[1] + lc[2]*x}
-cub <- function(x){cc[1] + cc[2]*x + cc[3]*x^2 + cc[4]*x^3}
-fif <- function(x){fic[1] + fic[2]*x + fic[3]*x^2 + fic[4]*x^3 + fic[5]*x^4 + fic[6]*x^5}
-
-lm_eqn = function(coeffs){
-if(length(coeffs) == 2) {
-eq <- substitute(italic(y) == a + b %.% italic(x),
-                 list(a = format(coeffs[1], digits = 2),
-                      b = format(coeffs[2], digits = 2)))
-}
-if(length(coeffs) == 4) {
-  eq <- substitute(italic(y) == a + b %.% italic(x) + c %.% italic(x)^2 + d %.% italic(x)^3,
-                 list(a = format(coeffs[1], digits = 2),
-                      b = format(coeffs[2], digits = 2),
-                      c = format(coeffs[3], digits = 2),
-                      d = format(coeffs[4], digits = 2)))
-}
-if(length(coeffs) == 6) {
-  eq <- substitute(italic(y) == a + b %.% italic(x) + c %.% italic(x)^2 + d %.% italic(x)^3 + e %.% italic(x)^4 + f %.% italic(x)^5,
-                 list(a = format(coeffs[1], digits = 2),
-                      b = format(coeffs[2], digits = 2),
-                      c = format(coeffs[3], digits = 2),
-                      d = format(coeffs[4], digits = 2),
-                      e = format(coeffs[5], digits = 2),
-                      f = format(coeffs[6], digits = 2)))
-}
-  as.character(as.expression(eq))
-  }
-
-library(grid)
-
-pp <- ggplot(data.frame(x = x, y = y), aes(x = x, y = y)) + geom_point() + theme(plot.title = element_text(size = 10), plot.margin = unit(c(0.5, 0.5, 0.1, 0.1), "lines"))
-
-under <- pp + stat_function(fun = lin, colour = "blue") +  annotate("text", x=1, y=18.2, label=lm_eqn(lc), hjust=0, size=3, family="Times", fontface="italic", parse=TRUE)
-right <- pp + stat_function(fun = cub, colour = "blue")   + annotate("text", x=1, y=18.2, label=lm_eqn(cc), hjust=0, size=3, family="Times", fontface="italic", parse=TRUE)
-over <- pp + stat_function(fun = fif, colour = "blue")  + annotate("text", x=1, y=18.2, label=lm_eqn(fic), hjust=0, size=3, family="Times", fontface="italic", parse=TRUE)
-
-pp
+gg_dat
 ```
 
-## Начнем с линейной модели
+>- Для этих данных можно подобрать несколько моделей
 
-Все ли хорошо с подобранной моделью?
+## Какая из этих моделей лучше описывает данные? {.smaller}
 
-```{r models-lin, echo=FALSE, fig.height=4, fig.width=3, purl=FALSE}
-pp_lm <- pp + geom_smooth(method = "lm", se = FALSE)
-pp_lm
+```{r models-no-labs, echo=FALSE, fig.height=4, fig.width=10, purl=FALSE}
+gg_train
 ```
 
-## Для этих данных можно подобрать несколько моделей
+- Некоторые модели недообучены (underfitted) --- слишком мало параметров, предсказания неточны.   
+- Другие модели переобучены (overfitted) --- слишком много параметров, предсказывают еще и случайный шум.
 
-Какая из этих моделей лучше описывает данные?
+## Что будет, если оценить точность предсказания моделей на новых данных? {.smaller}
 
-```{r models-no-labs, echo=FALSE, fig.height=3.5, fig.width=10, purl=FALSE}
-grid.arrange(under,
-             right,
-             over,
-             ncol = 3)
+```{r echo=FALSE, purl=FALSE, fig.width=10, fig.height=4.5}
+gg_pred
 ```
 
-## Для этих данных можно подобрать несколько моделей
+На новых данных предсказания моделей не будут идеальными.
 
 
-```{r models-labs, echo=FALSE, fig.height=3.5, fig.width=10, purl=FALSE}
-grid.arrange(under + labs(title = "Высокая погрешность \n(недообучение)"),
-             right + labs(title = "Оптимальая \nмодель"),
-             over + labs(title = "Высокая дисперсия \n(переобучение)"),
-             ncol = 3)
+## Что происходит точностью предсказаний на исходных и новых данных при усложнении модели? {.smaller}
+
+```{r echo=FALSE, purl=FALSE, fig.width=10, fig.height=3.5}
+grid.arrange(gg_pred, gg_mse, nrow = 1, widths = c(0.55, 0.45))
 ```
-В недообученной (underfitted) модели слишком мало параметров, ее предсказания неточны.   
 
-В переобученной (overfitted) модели слишком много параметров, она предсказывает еще и случайный шум. 
+Ошибка предсказаний на новых данных практически всегда больше, чем на исходных данных. Более сложные модели лучше описывают существующие данные, но на новых данных их предсказания хуже.
 
-## Последствия переобучения модели
+При усложнении модели:
 
-Переобучение происходит, когда модель из-за избыточного усложнения описывает уже не только отношения между переменными, но и случайный шум
+- ошибки предсказаний на исходных данных убывают (иногда, до какого-то уровня) (L-образная кривая)
+- ошибки предсказаний на новых данных убывают, затем возрастают из-за переобучения (U-образная кривая) 
 
-При увеличении числа предикторов в модели:
+## Аккуратность и точность предсказаний на новых данных
 
-- более точное описание данных, по которым подобрана модель   
-- низкая точность предсказаний на новых данных из-за переобучения.   
+```{r echo=FALSE, purl=FALSE, fig.height=4}
+library(ggforce)
 
-## Компромисс при подборе оптимальной модели:<br />точность vs. описание шума
+n_reps <- 6
+set.seed(9328)
+dfr <- data.frame(
+  x0 = rep(0, 6),
+  y0 =  rep(0, 6),
+  r = seq(1, 0.1, length.out = 6),
+  fl = rep(1:2, 3)
+)
+dart <- ggplot() + geom_circle(data = dfr, aes(x0 = x0, y0 = y0, r = r, fill = fl)) +
+  scale_fill_gradient(low = "#9ecae1", high = "#deebf7", guide = "none") +
+  coord_equal() + theme_void() + theme(plot.title = element_text(hjust = 0.5))
 
-### Хорошее описание существующих данных
+HvLb <- dart +
+  annotate(geom = "point", size = 3, shape = 21, colour = "black", fill = "orange",
+                x = rnorm(n_reps, 0, 0.25), y = rnorm(n_reps, 0, 0.25)) +
+  labs(title = "Большая дисперсия, \nмаленькая погрешность")
 
-Полный набор переменных:
+LvHb <- dart +
+  annotate(geom = "point", size = 3, shape = 21, colour = "black", fill = "orange",
+                x = rnorm(n_reps, 0, 0.1), y = rnorm(n_reps, 0, 0.1)) +
+labs(title = "Маленькая дисперсия, \nмаленькая погрешность")
 
-- большая объясненная изменчивость ($R^2$),
-- маленькая остаточная дисперсия ($MS_{e}$)
-- большие стандартные ошибки
-- сложная интерпретация
+HvHb <- dart +
+  annotate(geom = "point", size = 3, shape = 21, colour = "black", fill = "orange",
+                x = rnorm(n_reps, 0.4, 0.25), y = rnorm(n_reps, 0.3, 0.25)) +
+labs(title = "Большая дисперсия, \nбольшая погрешность")
 
-### Принцип парсимонии
+LvLb <- dart +
+  annotate(geom = "point", size = 3, shape = 21, colour = "black", fill = "orange",
+                x = rnorm(n_reps, 0.4, 0.1), y = rnorm(n_reps, 0.3, 0.1)) +
+  labs(title = "Маленькая дисперсия, \nбольшая погрешность")
 
-_Entia non sunt multiplicanda praeter necessitatem_
+grid.arrange(HvLb, HvHb, LvHb, LvLb, nrow = 2)
+```
 
-Минимальный набор переменных, который может объяснить существующие данные:
+Источники ошибок для предсказаний:
 
-- объясненная изменчивость меньше ($R^2$),
-- остаточная изменчивость больше ($MS_{e}$)
-- стандартные ошибки меньше
-- интерпретация проще
+$$ошибка = дисперсия + (погрешность)^2 + случайная~неснижаемая~ошибка$$
+
+## Компромисс между погрешностью и разбросом значений предсказаний (Bias-Variance Tradeoff)
+
+```{r echo=FALSE, purl=FALSE}
+ggplot(data = data.frame(x = seq(-2, 2, by = 0.1)), aes(x = x)) +
+  stat_function(fun = function(x) (0.5)^x, 
+                size = 2, aes(colour = "Погрешность2")) +
+  stat_function(fun = function(x) 2^x, 
+                size = 2, aes(colour = "Дисперсия")) +
+  stat_function(fun = function(x) 1.5, 
+                size = 2, aes(colour = "Случайная дисперсия")) +
+  stat_function(fun = function(x) (0.5)^x + 2^x + 1.5, 
+                size = 2, aes(colour = "Полная ошибка")) +
+  scale_colour_manual(values = c("Погрешность2" = "darkcyan",
+                                 "Дисперсия" = "dodgerblue",
+                                 "Случайная дисперсия" = "pink3",
+                                 "Полная ошибка" = "orangered3")) +
+  theme_classic() + theme(axis.text = element_blank())  +
+  labs(x = "Сложность модели", y = "Ошибка", colour = "Источник ошибок")
+```
+
+$$ошибка = дисперсия + (погрешность)^2 + случайная~неснижаемая~ошибка$$
 
 ## Критерии и методы выбора моделей зависят от задачи
 
@@ -195,18 +293,13 @@ _Entia non sunt multiplicanda praeter necessitatem_
 - Парсимония: "информационные" критерии (АIC, BIC, и т.д.)
 - Нужна оценка качества модели на данных, которые не использовались для ее первоначальной подгонки: методы ресамплинга (кросс-валидация, бутстреп)
 
-## Дополнительные критерии для сравнения моделей:
-
 ### Не позволяйте компьютеру думать за вас!
 
-- Хорошая модель должна соответствовать условиям применимости
+- Хорошая модель должна соответствовать условиям применимости, иначе вы не сможете доверять результатам тестов.
 
 - Другие соображения: разумность, целесообразность модели, простота, ценность выводов, важность предикторов.
 
-
 # Знакомство с данными для множественной линейной регрессии
-
-
 
 ## Пример: птицы в лесах Австралии
 
@@ -323,13 +416,13 @@ $y _i = \beta _0 + \epsilon _i$
 
 ### Полная модель 
 
-$y _i = \beta _0 + \beta _1 x _{i1} + ... + \beta _k x _{ik} + \beta _p x _{ip} + \epsilon _i$  
+$y _i = \beta _0 + \beta _1 x _{i1} + \ldots + \beta _k x _{ik} + \beta _p x _{ip} + \epsilon _i$  
 $df _{reduced, full} = p$  
 $df _{error, full} = n - p - 1$
 
 ### Уменьшеная модель  (без фактора $\beta _p x _{ip}$)
 
-$y _i = \beta _0 + \beta _1 x _{i1} + ... + \beta _k x _{ik} + \epsilon _i$  
+$y _i = \beta _0 + \beta _1 x _{i1} + \ldots + \beta _k x _{ik} + \epsilon _i$  
 $df _{reduced, reduced} = k$  
 $df _{error, reduced} = n - k - 1$
 
@@ -343,13 +436,13 @@ $df _{error, reduced} = n - k - 1$
 
 ### Полная модель 
 
-$y _i = \beta _0 + \beta _1 x _{i1} + ... + \beta _k x _{ik} + \beta _p x _{ip} + \epsilon _i$  
+$y _i = \beta _0 + \beta _1 x _{i1} + \ldots + \beta _k x _{ik} + \beta _p x _{ip} + \epsilon _i$  
 $df _{reduced, full} = p$  
 $df _{error, full} = n - p - 1$
 
 ### Уменьшеная модель  (без фактора $\beta _p x _{ip}$)
 
-$y _i = \beta _0 + \beta _1 x _{i1} + ... + \beta _k x _{ik} + \epsilon _i$  
+$y _i = \beta _0 + \beta _1 x _{i1} + \ldots + \beta _k x _{ik} + \epsilon _i$  
 $df _{reduced, reduced} = k$  
 $df _{error, reduced} = n - k - 1$
 
@@ -542,11 +635,11 @@ $$L(\theta| data) = \Pi^n _{i = 1}f(x| \theta)$$
 ## TODO: wrap it into a function and adapt it for use with other distributions
 ## as Markus Gesmann has done here
 ## http://www.magesblog.com/2015/08/visualising-theoretical-distributions.html
-
+set.seed(32981)
 op <- par(mar = c(0, 0, 0, 0))
 n <- 2
 X <- runif(25, 0, 10)
-Y <- 5 + 5 * dfr$x1 + rnorm(25, 0, 5)
+Y <- 5 + 1.2 * X + rnorm(25, 0, 5)
 df <- data.frame(X,Y)
 
 # regression
@@ -554,10 +647,11 @@ reggig <- glm(Y ~ X, data = df, family = gaussian(link = "identity"))
 
 # empty plot
 vX <- seq(min(X) - 0.1, max(X) + 0.1, length = n)
-vY <- seq(min(Y) - 10, max(Y) + 10, length = n)
-mat <- persp(x = vX, y = vY, z = matrix(0, n, n), 
-             zlim = c(0, 0.001),
-             theta =  -30, phi = 20, expand = 0.01,
+dy <- 2 * sd(Y)
+vY <- seq(min(Y) - dy, max(Y) + dy, length = n)
+mat <- persp(x = vX, y = vY, z = matrix(0, n, n),
+             zlim = c(0, 0.03),
+             theta =  -40, phi = 15, expand = 0.1,
              ticktype  = "detailed",  box = FALSE, border = "gray60")
 
 x <- seq(min(X), max(X), length = 501)
@@ -594,13 +688,13 @@ sdgig <- sqrt(summary(reggig)$dispersion)
 for(j in n:1){
   stp <- 251
   x <- rep(vX[j], stp)
-  y <- seq(min(min(Y) - 10, 
+  y <- seq(min(min(Y) - dy, 
                qnorm(.05, 
                      predict(reggig, 
                              newdata = data.frame(X = vX[j]), 
                              type = "response"),  
                      sdgig)), 
-           max(Y) + 10, 
+           max(Y) + dy, 
            length = stp)
   z0 <- rep(0, stp)
   z <- dnorm(y,  mgig[j],  sdgig)
@@ -617,11 +711,11 @@ par(op)
 
 ## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
 
-$y_i = \beta_0 + \beta_1x_1 + ... + \beta_kx_k + \epsilon_i$
+$y_i = \beta_0 + \beta_1x_1 + \ldots + \beta_kx_k + \epsilon_i$
 
 ## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
 
-$y_i = \beta_0 + \beta_1x_1 + ... + \beta_kx_k + \epsilon_i$
+$y_i = \beta_0 + \beta_1x_1 + \ldots + \beta_kx_k + \epsilon_i$
 
 Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
 
@@ -629,19 +723,7 @@ $N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1}
 
 ## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
 
-$y_i = \beta_0 + \beta_1x_1 + ... + \beta_kx_k + \epsilon_i$
-
-Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
-
-$N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1} {2 \sigma^2} \epsilon_i^2)$
-
-Функцию правдоподобия (likelihood, вероятность получения нашего набора данных) можно записать как произведение вероятностей:
-
-$L(\epsilon_i|\mathbf{y}, \mathbf{x}) = \Pi^n _{n = 1} N(\epsilon_i, \sigma^2) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2)$
-
-## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
-
-$y_i = \beta_0 + \beta_1x_1 + ... + \beta_kx_k + \epsilon_i$
+$y_i = \beta_0 + \beta_1x_1 + \ldots + \beta_kx_k + \epsilon_i$
 
 Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
 
@@ -651,23 +733,35 @@ $N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1}
 
 $L(\epsilon_i|\mathbf{y}, \mathbf{x}) = \Pi^n _{n = 1} N(\epsilon_i, \sigma^2) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2)$
 
-Поскольку $\epsilon_i = y_i - (\beta_0 + \beta_1x_1 + ... + \beta_kx_k)$
+## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
+
+$y_i = \beta_0 + \beta_1x_1 + \ldots + \beta_kx_k + \epsilon_i$
+
+Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
+
+$N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1} {2 \sigma^2} \epsilon_i^2)$
+
+Функцию правдоподобия (likelihood, вероятность получения нашего набора данных) можно записать как произведение вероятностей:
+
+$L(\epsilon_i|\mathbf{y}, \mathbf{x}) = \Pi^n _{n = 1} N(\epsilon_i, \sigma^2) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2)$
+
+Поскольку $\epsilon_i = y_i - (\beta_0 + \beta_1x_1 + \ldots + \beta_kx_k)$
 
 то функцию правдоподобия можно переписать так:
 
-$L(\beta_1...\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (\beta_0 + \beta_1x_1 + ... + \beta_kx_k))^2)$
+$L(\beta_1\ldots\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (\beta_0 + \beta_1x_1 + \ldots + \beta_kx_k))^2)$
 
 ## Подбор параметров модели методом максимального правдоподобия
 
 Чтобы найти параметры модели
 
-$$y_i = \beta_0 + \beta_1x_1 + ... + \beta_kx_k + \epsilon_i$$
+$$y_i = \beta_0 + \beta_1x_1 + \ldots + \beta_kx_k + \epsilon_i$$
 
-нужно найти такое сочетание параметров  $\beta_0$, $\beta_1$, ... $\beta_k$, и $\sigma^2$, при котором функция правдоподобия будет иметь максимум:
+нужно найти такое сочетание параметров  $\beta_0$, $\beta_1$, \ldots $\beta_k$, и $\sigma^2$, при котором функция правдоподобия будет иметь максимум (именно поэтому метод называется метод максимального правдоподобия:
 
 $\begin{array}{l}
-L(\beta_1...\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2) = \\
-&= \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (\beta_0 + \beta_1x_1 + ... ...\beta_kx_k))^2)
+L(\beta_1\ldots\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2) = \\
+&= \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (\beta_0 + \beta_1x_1 + \ldots + \beta_kx_k))^2)
 \end{array}$
 
 
@@ -678,20 +772,20 @@ L(\beta_1...\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= \frac {1} {\sqrt{(2\pi
 Если функция правдоподобия
 
 $\begin{array}{l}
-L(\beta_1...\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2) = \\
-&= \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (\beta_0 + \beta_1x_1 + ... + \beta_kx_k))^2)
+L(\beta_1\ldots\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2) = \\
+&= \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (\beta_0 + \beta_1x_1 + \ldots + \beta_kx_k))^2)
 \end{array}$
 
 то логарифм правдоподобия
 
 $\begin{array}{l}
-logLik(\beta_1...\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= & \\
-ln L(\beta_1...\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= &- \frac{n}{2} (ln2\pi + ln\sigma^2) - \frac{1}{2\sigma^2}(\sum \epsilon^2_i) = \\
+logLik(\beta_1\ldots\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= & \\
+ln L(\beta_1\ldots\beta_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= &- \frac{n}{2} (ln2\pi + ln\sigma^2) - \frac{1}{2\sigma^2}(\sum \epsilon^2_i) = \\
 &= &- \frac{n}{2} (ln2\pi + ln\sigma^2) - \\
-& &- \frac{1}{2\sigma^2}(\sum (y_i - (\beta_0 + \beta_1x_1 + ... + \beta_kx_k))^2)
+& &- \frac{1}{2\sigma^2}(\sum (y_i - (\beta_0 + \beta_1x_1 + \ldots + \beta_kx_k))^2)
 \end{array}$
 
-Чем больше логарифм правдоподобия тем лучше модель
+Чем больше логарифм правдоподобия тем лучше модель.
 
 ## Подбор параметров модели методом максимального правдоподобия
 
@@ -722,7 +816,7 @@ $LogLik$ для модели можно найти с помощью функц�
 logLik(Mod_glm)
 ```
 
-## Логарифм правдоподобия вручную
+## Логарифм правдоподобия вручную {.smaller}
 
 
 ```{r}
@@ -737,7 +831,6 @@ dat$LogProb <- log(dat$Prob)
 # Логарифм произведения, равный сумме логарифмов
 sum(dat$LogProb)
 ```
-
 
 
 ## Тест отношения правдоподобий (Likelihood Ratio Test)
@@ -818,10 +911,11 @@ summary(GLM4)
 $AIC = -2 logLik + 2p$
 
 - $logLik$ - логарифм правдоподобия для модели
-- $2p$ - штраф за введение в модель $p$ параметров
+- $2p$ - штраф за введение в модель $p$ параметров, т.е. за "сложность" модели
 
-Чем меньше AIC - тем лучше модель
+AIC --- это мера потери информации, которая происходит, если реальность описывать этой моделью (Akaike 1974)
 
+AIC --- относительная мера качества модели. Т.е. не бывает какого-то "хорошего" AIC. Значения AIC можно интерпретировать только в сравнении с AIC для других моделей: чем меньше AIC --- тем лучше модель.
 
 __Важно!__   Информационные критерии можно использовать для сравнения __даже для невложенных моделей__. Но модели должны быть __подобраны с помощью ML__ и __на одинаковых данных__!
 
@@ -869,24 +963,12 @@ lm_equation <- function(fit, strict = TRUE, rnd = 2){
 AIC(GLM1, GLM2, GLM3, GLM4)
 ```
 
->- Судя по AIC, лучшая модель GLM2 или GLM3. Но если значения AIC различаются всего на 1-2 единицу --- такими различиями можно пренебречь и выбрать более простую модель (GLM3).
-
-Уравнение модели:
-
-$`r lm_equation(GLM3, strict = FALSE)`$
-
-
-## Рассчитаем BIC для наших моделей
-
-```{r purl=FALSE}
-BIC(GLM1, GLM2, GLM3, GLM4)
-```
-
->- Судя по BIC, нужно выбрать модель GLM4
+>- Судя по AIC, лучшая модель GLM3 или GLM4. Если значения AIC различаются всего на 1-2 единицу --- такими различиями можно пренебречь и выбрать более простую модель (GLM4).
 
 Уравнение модели:
 
 $`r lm_equation(GLM4, strict = FALSE)`$
+
 
 ## Как выбрать способ подбора оптимальной модели?
 
