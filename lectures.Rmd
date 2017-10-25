@@ -61,9 +61,21 @@ install.packages("readxl")
 
 ## 5. Множественная линейная регрессия 
 
+```{r eval=FALSE}
+install.packages(c("gridExtra", "ISwR"))
+```
+
 ### Множественная линейная регрессия
 
+- Презентация: [05.1_multiple_LM.html](05.1_multiple_LM.html)
+- Код: [05.1_multiple_LM_code.R](05.1_multiple_LM_code.R)
+- Данные: [loyn.csv](data/loyn.csv)
+
 ### Выбор оптимальной модели
+
+- Презентация: [05.2_model_selection.html](05.2_model_selection.html)
+- Код: [05.2_model_selection_code.R](05.2_model_selection_code.R)
+- Данные: [loyn.csv](data/loyn.csv)
 
 ## 6. Линейные модели с непрерывными и дискретными предикторами 
 
