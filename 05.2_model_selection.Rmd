@@ -61,7 +61,7 @@ Georg E. P. Box
 
 - __Построение моделей__ для предсказания значений в новых условиях:
     - Выбор оптимальной модели
-    - Оценка предсказательной способности модели
+    - Оценка предсказательной способности модели **на новых данных**
 
 ```{r echo=FALSE, purl=FALSE}
 library(tidyr)
@@ -88,7 +88,7 @@ mod_training <- data_training %>%
 pred_training <- mod_training %>%
   mutate(pred = purrr::map2(model, data, ~ predict(.x, newdata = .y))) %>%
   unnest(data, pred, .id = "span") %>%
-  mutate(span = factor(span, labels = my_spans))
+  mutate(span = factor(span, labels = sort(my_spans, decreasing = TRUE), levels = sort(my_spans, decreasing = TRUE)))
 # MSE training
 MSe_training <- pred_training %>%
   group_by(span) %>%
@@ -107,7 +107,7 @@ data_testing$model <- mod_training$model
 pred_testing <- data_testing %>%
   mutate(pred = purrr::map2(model, data, ~ predict(.x, newdata = .y))) %>%
   unnest(data, pred, .id = "span") %>%
-  mutate(span = factor(span, labels = my_spans))
+  mutate(span = factor(span, labels = sort(my_spans, decreasing = TRUE), levels = sort(my_spans, decreasing = TRUE)))
   # MSE testing
 MSe_testing <- pred_testing %>% group_by(span) %>%
   summarise(testing = mean(y - pred, na.rm = TRUE)^2)
@@ -123,7 +123,7 @@ data_all$model <- mod_training$model
 pred_all <- data_all %>%
   mutate(pred = purrr::map2(model, data, ~ predict(.x, newdata = .y))) %>%
   unnest(data, pred, .id = "span") %>%
-  mutate(span = factor(span, labels = my_spans))
+  mutate(span = factor(span, labels = sort(my_spans, decreasing = TRUE), levels = sort(my_spans, decreasing = TRUE)))
 
 # Plot of predictions -----------------------
 gg_dat <- ggplot(pred_all, aes(x = x, y = pred, colour = span, group = span)) +
@@ -146,11 +146,12 @@ gg_train <- ggplot(pred_all, aes(x = x, y = pred, colour = span, group = span)) 
 
 # Plot of predictions with training and testing sets -------
 gg_pred <- ggplot(pred_all, aes(x = x, y = pred, colour = span, group = span)) +
-  geom_point(data = pred_training, aes(x = x, y = y), colour = "black") +
-  geom_point(data = pred_testing, aes(x = x, y = y), colour = "black", shape = 21) +
+  geom_point(data = pred_training, aes(x = x, y = y, shape = "использованные в модели"), colour = "black") +
+  geom_point(data = pred_testing, aes(x = x, y = y, shape = "новые"), colour = "black") +
   geom_line(size = 1) +
   facet_wrap(~as.factor(span), nrow = 2) +
-  labs(colour = "Сложность\nмодели", y = "y") +
+  scale_shape_manual(values = c(19, 21), guide = FALSE) +
+  labs(colour = "Сложность\nмодели", y = "y", shape = "Данные") +
   theme(legend.position = "bottom")
 
 # Plot of training and testing MSe -----
@@ -175,13 +176,17 @@ gg_mse <- ggplot(dat_mse, aes(x = Complexity, y = MSe, group = Data)) +
 ### Какую модель можно подобрать для описания этой закономерности?
 
 
-```{r, echo=FALSE, fig.height=4, fig.width=3, purl=FALSE}
+```{r, echo=FALSE, fig.height=3, fig.width=5, purl=FALSE}
 gg_dat
 ```
 
->- Для этих данных можно подобрать несколько моделей
+>- Для этих данных можно подобрать несколько моделей. Попробуем посмотреть, как это будет выглядеть на примере loess--- локальной полиномиальной регрессии. (Если интересно, [подробнее о loess-регрессии](https://www.mathworks.com/help/curvefit/smoothing-data.html#bq_6ys3-4))
 
 ## Какая из этих моделей лучше описывает данные? {.smaller}
+
+На этих графиках показаны предсказания loess-регрессии для одних и тех же исходных данных.
+
+Cложность модели --- в общем случае, это число параметров. Для loess-регрессии сложность модели отражает степень сглаживания: у более сложных моделей маленькая степень сглаживания. 
 
 ```{r models-no-labs, echo=FALSE, fig.height=4, fig.width=10, purl=FALSE}
 gg_train
@@ -190,19 +195,22 @@ gg_train
 - Некоторые модели недообучены (underfitted) --- слишком мало параметров, предсказания неточны.   
 - Другие модели переобучены (overfitted) --- слишком много параметров, предсказывают еще и случайный шум.
 
-## Что будет, если оценить точность предсказания моделей на новых данных? {.smaller}
+## Что будет, если получить предсказания моделей на новых данных? {.smaller}
 
-```{r echo=FALSE, purl=FALSE, fig.width=10, fig.height=4.5}
-gg_pred
+```{r echo=FALSE, purl=FALSE, message=FALSE, warining=FALSE, fig.width=10, fig.height=4}
+gg_pred +   scale_shape_manual(values = c(19, 21), guide = guide_legend(nrow = 2))
 ```
 
 На новых данных предсказания моделей не будут идеальными.
 
 
-## Что происходит точностью предсказаний на исходных и новых данных при усложнении модели? {.smaller}
+## Как при усложнении модели меняется качество предсказаний? {.smaller}
 
 ```{r echo=FALSE, purl=FALSE, fig.width=10, fig.height=3.5}
-grid.arrange(gg_pred, gg_mse, nrow = 1, widths = c(0.55, 0.45))
+grid.arrange(
+  gg_pred, 
+  gg_mse, 
+  nrow = 1, widths = c(0.55, 0.45))
 ```
 
 Ошибка предсказаний на новых данных практически всегда больше, чем на исходных данных. Более сложные модели лучше описывают существующие данные, но на новых данных их предсказания хуже.
@@ -212,9 +220,9 @@ grid.arrange(gg_pred, gg_mse, nrow = 1, widths = c(0.55, 0.45))
 - ошибки предсказаний на исходных данных убывают (иногда, до какого-то уровня) (L-образная кривая)
 - ошибки предсказаний на новых данных убывают, затем возрастают из-за переобучения (U-образная кривая) 
 
-## Аккуратность и точность предсказаний на новых данных
+## Погрешность и точность
 
-```{r echo=FALSE, purl=FALSE, fig.height=4}
+```{r echo=FALSE, purl=FALSE, fig.height=3.5}
 library(ggforce)
 
 n_reps <- 6
@@ -252,45 +260,46 @@ LvLb <- dart +
 grid.arrange(HvLb, HvHb, LvHb, LvLb, nrow = 2)
 ```
 
-Источники ошибок для предсказаний:
+- Погрешность (accuracy, точность)--- отсутствие погрешности (bias).
+- Точность (precision, тоже точность --- другой аспект) --- разброс значений
 
-$$ошибка = дисперсия + (погрешность)^2 + случайная~неснижаемая~ошибка$$
+Предсказания, сделанные на новых данных, будут отличаться от истинных значений не только из-за погрешности или неточности. Еще один источник отличий --- это так называемая неснижаемая ошибка.
 
 ## Компромисс между погрешностью и разбросом значений предсказаний (Bias-Variance Tradeoff)
 
 ```{r echo=FALSE, purl=FALSE}
 ggplot(data = data.frame(x = seq(-2, 2, by = 0.1)), aes(x = x)) +
   stat_function(fun = function(x) (0.5)^x, 
-                size = 2, aes(colour = "Погрешность2")) +
+                size = 2, aes(colour = "Погрешность^2")) +
   stat_function(fun = function(x) 2^x, 
                 size = 2, aes(colour = "Дисперсия")) +
   stat_function(fun = function(x) 1.5, 
-                size = 2, aes(colour = "Случайная дисперсия")) +
+                size = 2, aes(colour = "Неснижаемая ошибка")) +
   stat_function(fun = function(x) (0.5)^x + 2^x + 1.5, 
                 size = 2, aes(colour = "Полная ошибка")) +
-  scale_colour_manual(values = c("Погрешность2" = "darkcyan",
+  scale_colour_manual(values = c("Погрешность^2" = "darkcyan",
                                  "Дисперсия" = "dodgerblue",
-                                 "Случайная дисперсия" = "pink3",
-                                 "Полная ошибка" = "orangered3")) +
+                                 "Неснижаемая ошибка" = "pink3",
+                                 "Полная ошибка" = "orangered3"),
+                      breaks = c("Полная ошибка", "Дисперсия",
+                                 "Погрешность^2", "Неснижаемая ошибка")) +
   theme_classic() + theme(axis.text = element_blank())  +
   labs(x = "Сложность модели", y = "Ошибка", colour = "Источник ошибок")
 ```
 
-$$ошибка = дисперсия + (погрешность)^2 + случайная~неснижаемая~ошибка$$
+$$Полная~ошибка = Дисперсия + (Погрешность)^2 + Неснижаемая~ошибка$$
+При увеличении сложности модели снижается погрешность предсказаний, но возрастает их разброс. Поэтому общая ошибка предсказаний велика у недообученных или переобученных моделей, а у моделей средней сложности она будет минимальной.
 
 ## Критерии и методы выбора моделей зависят от задачи
 
-### Объяснение закономерностей
-
-- Нужны точные тесты влияния предикторов: F-тесты или тесты отношения правдоподобий (likelihood-ratio tests)
-
-### Описание функциональной зависимости
+__Объяснение закономерностей, описание функциональной зависимости__
 
 - Нужна точность оценки параметров
+- Нужны точные тесты влияния предикторов: F-тесты или тесты отношения правдоподобий (likelihood-ratio tests)
 
-### Предсказание значений зависимой переменной
+__Предсказание значений зависимой переменной__
 
-- Парсимония: "информационные" критерии (АIC, BIC, и т.д.)
+- Нужна простая модель: "информационные" критерии (АIC, BIC, и т.д.)
 - Нужна оценка качества модели на данных, которые не использовались для ее первоначальной подгонки: методы ресамплинга (кросс-валидация, бутстреп)
 
 ### Не позволяйте компьютеру думать за вас!
@@ -605,7 +614,7 @@ grid.arrange(res_1, res_2, res_3, res_4,
 
 - Отклонения от нормального распределения остатков не выявляются
 
-```{r solution-3a, purl=FALSE, fig.width=4, fig.height=4}
+```{r solution-3a, purl=FALSE, fig.width=4, fig.height=4, message=false}
 library(car)
 qqPlot(mod5)
 ```
@@ -970,11 +979,17 @@ AIC(GLM1, GLM2, GLM3, GLM4)
 $`r lm_equation(GLM4, strict = FALSE)`$
 
 
-## Как выбрать способ подбора оптимальной модели?
+## Недостатки и ограничения методологии отбора моделей
 
-Вы видели, что разные способы подбора оптимальной модели могут приводить к разным результатам.
+- Разные способы подбора оптимальной модели могут приводить к разным результатам. Не важно, какой из способов выбрать, но важно сделать это заранее, __до анализа__, чтобы не поддаваться соблазну подгонять результаты.
 
-Не важно, какой из способов выбрать, но важно сделать это заранее, __до анализа__, чтобы не поддаваться соблазну подгонять результаты.
+- При выборе моделей на основании F-тестов или тестов отношения правдоподобий приходится делать множество тестов, поэтому увеличивается риск ошибок I рода (подробнее на занятии про дисперсионный анализ). Чтобы хоть как-то себя обезопасить, лучше не включать в модель все подряд --- только самое необходимое.
+
+- Оптимальную модель лучше применять для тестирования гипотез на независимых данных, иначе получаются заниженные стандартные ошибки и завышенные эффекты. Обычно эту проблему игнорируют, но если у вас есть возможность, лучше сделать хотябы [кросс-валидацию](https://en.wikipedia.org/wiki/Cross-validation_(statistics)).
+
+- Какой-то одной "лучшей" модели как правило нет.
+
+
 
 ## Take-home messages
 
