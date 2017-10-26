@@ -137,7 +137,6 @@ gg_dat <- ggplot(pred_all, aes(x = x, y = pred, colour = span, group = span)) +
 # Plot of predictions with training set -------
 gg_train <- ggplot(pred_all, aes(x = x, y = pred, colour = span, group = span)) +
   geom_point(data = pred_training, aes(x = x, y = y), colour = "black", shape = 19) +
-  # geom_point(data = pred_testing, aes(x = x, y = y), colour = "black", shape = 21) +
   geom_line(size = 1) +
   facet_wrap(~as.factor(span), nrow = 2) +
   labs(colour = "Сложность\nмодели", y = "y") +
@@ -166,7 +165,7 @@ dat_mse <- merge(MSe_training, MSe_testing) %>% gather(Data, MSe, -span) %>%
 gg_mse <- ggplot(dat_mse, aes(x = Complexity, y = MSe, group = Data)) +
   geom_line() +
   geom_point(aes(shape = Data), size = 3) +
-  scale_shape_manual(values = c(21, 19), guide = guide_legend(nrow = 2)) +
+  scale_shape_manual(values = c(19, 21), guide = guide_legend(nrow = 2)) +
   labs(x = "Сложность модели", y = "Ошибка предсказаний", shape = "Данные") +
   theme(legend.position = "bottom")
 ```
@@ -192,13 +191,13 @@ Cложность модели --- в общем случае, это число
 gg_train
 ```
 
-- Некоторые модели недообучены (underfitted) --- слишком мало параметров, предсказания неточны.   
-- Другие модели переобучены (overfitted) --- слишком много параметров, предсказывают еще и случайный шум.
+- Простые модели недообучены (underfitted) --- слишком мало параметров, предсказания неточны.   
+- Сложные модели переобучены (overfitted) --- слишком много параметров, предсказывают еще и случайный шум.
 
 ## Что будет, если получить предсказания моделей на новых данных? {.smaller}
 
 ```{r echo=FALSE, purl=FALSE, message=FALSE, warining=FALSE, fig.width=10, fig.height=4}
-gg_pred +   scale_shape_manual(values = c(19, 21), guide = guide_legend(nrow = 2))
+gg_pred + scale_shape_manual(values = c(19, 21), guide = guide_legend(nrow = 2))
 ```
 
 На новых данных предсказания моделей не будут идеальными.
@@ -210,7 +209,7 @@ gg_pred +   scale_shape_manual(values = c(19, 21), guide = guide_legend(nrow = 2
 grid.arrange(
   gg_pred, 
   gg_mse, 
-  nrow = 1, widths = c(0.55, 0.45))
+  nrow = 1, widths = c(0.6, 0.4))
 ```
 
 Ошибка предсказаний на новых данных практически всегда больше, чем на исходных данных. Более сложные модели лучше описывают существующие данные, но на новых данных их предсказания хуже.
@@ -530,7 +529,7 @@ drop1(mod3, test = "F")
 
 ```{r purl=FALSE}
 # Убрали logLDIST 
-mod4 <- update(mod3, . ~ . - logLDIST )
+mod4 <- update(mod2, . ~ . - logLDIST )
 drop1(mod4, test = "F")
 # Нужно убрать ALT
 ```
@@ -539,7 +538,7 @@ drop1(mod4, test = "F")
 
 ```{r purl=FALSE}
 # Убрали ALT
-mod5 <- update(mod4, . ~ . - ALT)
+mod5 <- update(mod2, . ~ . - ALT)
 drop1(mod5, test = "F")
 # Больше ничего не убрать
 ```
