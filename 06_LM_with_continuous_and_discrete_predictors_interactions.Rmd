@@ -489,7 +489,6 @@ wt$ftv <- factor(wt$ftv)
 ```{r fig.show='hold', fig.height=2.5}
 gg_dot <- ggplot(wt, aes(y = 1:nrow(wt))) + geom_point()
 gg_dot + aes(x = age)
-gg_dot + aes(x = lwt)
 gg_dot + aes(x = bwt)
 ```
 
