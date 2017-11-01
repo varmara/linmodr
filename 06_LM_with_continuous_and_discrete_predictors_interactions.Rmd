@@ -177,127 +177,127 @@ $$y_i = \beta_0 + \beta_1x_1 + \big(\beta_2x_2 + ... + \beta_l x_l\big) + \big(\
 - $\beta_{l+1}, ..., \beta_m$ --- коррекция коэффициентов угла наклона для других уровней (всего их $p = k - 1$)
 
 
-## Пример: Пуромицин
+<!-- ## Пример: Пуромицин -->
 
-Пуромицин - антибиотик пуринового ряда, ингибитор синтеза белков. 
-Эти данные --- о том, как меняется активность фермента галактозил трансферазы под воздействием пуромицина (Treloar 1974). Измеряли скорость реакции в зависимости от концентрации субстрата на мембранах аппарата Гольджи из богатых мембранами фракций из печени крыс.
+<!-- Пуромицин - антибиотик пуринового ряда, ингибитор синтеза белков.  -->
+<!-- Эти данные --- о том, как меняется активность фермента галактозил трансферазы под воздействием пуромицина (Treloar 1974). Измеряли скорость реакции в зависимости от концентрации субстрата на мембранах аппарата Гольджи из богатых мембранами фракций из печени крыс. -->
 
-- `conc` --- концентрация пуромицина
-- `rate` --- скорость химической реакции
-- `state` --- индикатор того, обработаны ли клетки пуромицином
+<!-- - `conc` --- концентрация пуромицина -->
+<!-- - `rate` --- скорость химической реакции -->
+<!-- - `state` --- индикатор того, обработаны ли клетки пуромицином -->
 
-```{r}
-library(readxl)
-Puromycin <- read_excel("data/Puromycin.xlsx")
-head(Puromycin)
-```
+<!-- ```{r} -->
+<!-- library(readxl) -->
+<!-- Puromycin <- read_excel("data/Puromycin.xlsx") -->
+<!-- head(Puromycin) -->
+<!-- ``` -->
 
-## Знакомимся с данными
+<!-- ## Знакомимся с данными -->
 
-```{r}
-sapply(Puromycin, class)
-colSums(is.na(Puromycin))
-nrow(Puromycin)
-```
+<!-- ```{r} -->
+<!-- sapply(Puromycin, class) -->
+<!-- colSums(is.na(Puromycin)) -->
+<!-- nrow(Puromycin) -->
+<!-- ``` -->
 
-## Знакомимся с данными
+<!-- ## Знакомимся с данными -->
 
-```{r}
-table(Puromycin$state, Puromycin$conc)
-library(ggplot2)
-ggplot(Puromycin, aes(x = state, y = conc)) + geom_boxplot()
-```
+<!-- ```{r} -->
+<!-- table(Puromycin$state, Puromycin$conc) -->
+<!-- library(ggplot2) -->
+<!-- ggplot(Puromycin, aes(x = state, y = conc)) + geom_boxplot() -->
+<!-- ``` -->
 
-## Задание
+<!-- ## Задание -->
 
-Постройте график зависимости скорости химической реакции от концентрации
+<!-- Постройте график зависимости скорости химической реакции от концентрации -->
 
-## Решение
-
-
-На самом деле, зависимость скорости химической реакции от концентрации нелинейна, но мы попробуем использовать трансформацию
-
-```{r purl=FALSE, eval=FALSE}
-library(ggplot2)
-ggplot(Puromycin, aes(x = conc, y = rate, colour = state)) + 
-  geom_point()
-ggplot(Puromycin, aes(x = log(conc), y = rate, colour = state)) + 
-  geom_point()
-```
-
-```{r gg-transformation, purl=FALSE, eval=TRUE, fig.width=10, echo=FALSE}
-library(gridExtra)
-grid.arrange(
-ggplot(Puromycin, aes(x = conc, y = rate, colour = state)) + geom_point(),
-ggplot(Puromycin, aes(x = log(conc), y = rate, colour = state)) + geom_point(),
-ncol = 2)
-```
-
-## Запись формулы линейной модели со взаимодействием в R
-
-`Response ~ Continuous + Categorical + Continuous : Categorical` (полная запись)
-
-`Response ~ Continuous * Categorical`(сокращенная запись)
-
-`Continuous : Categorical` --- Кодовое обозначение взаимодействия. Добавление взаимодействия непрерывного и дискретного факторов в модель означает, что возможен разный угол наклона прямых для разных групп.
-
-## Подберем
-
-```{r}
-Puromycin$lc <- log(Puromycin$conc)
-M1 <- lm(rate ~ lc + state + lc:state, data = Puromycin)
-# M1 <- lm(rate ~ lc * state, data = Puromycin) # То же самое
-summary(M1)
-```
-
->- Взаимодействие достоверно!
-
-## Проверяем выполнение условий применимости 
-
-## Решение
-
-```{r purl=FALSE}
-# Данные для графиков остатков
-M1_diag <- fortify(M1)
-```
-### 1) График расстояния Кука
-
-```{r purl=FALSE}
-ggplot(M1_diag, aes(x = 1:nrow(M1_diag), y = .cooksd)) +
-  geom_bar(stat = "identity")
-```
-
-## Решение
-
-### 2) График остатков от предсказанных значений
-```{r purl=FALSE}
-gg_resid <- ggplot(data = M1_diag, aes(x = .fitted, y = .stdresid)) +
-  geom_point() + geom_hline(yintercept = 0)
-grid.arrange(gg_resid, gg_resid + geom_smooth(),
-             gg_resid + geom_smooth(method = "lm"), nrow = 1)
-```
-
-## Решение
-
-### 3) Графики остатков от предикторов в модели и не в модели
-
-```{r fig.width=10,  purl=FALSE}
-library(gridExtra)
-grid.arrange(gg_resid + aes(x = lc), 
-             ggplot(M1_diag, aes(x = state, y = .stdresid)) + geom_boxplot(), 
-             nrow = 1)
-```
-
-## Решение
-
-### 4) Квантильный график остатков
-```{r fig.height=4,  purl=FALSE}
-library(car)
-qqPlot(M1)
-```
+<!-- ## Решение -->
 
 
-## Рисуем график предсказаний
+<!-- На самом деле, зависимость скорости химической реакции от концентрации нелинейна, но мы попробуем использовать трансформацию -->
+
+<!-- ```{r purl=FALSE, eval=FALSE} -->
+<!-- library(ggplot2) -->
+<!-- ggplot(Puromycin, aes(x = conc, y = rate, colour = state)) +  -->
+<!--   geom_point() -->
+<!-- ggplot(Puromycin, aes(x = log(conc), y = rate, colour = state)) +  -->
+<!--   geom_point() -->
+<!-- ``` -->
+
+<!-- ```{r gg-transformation, purl=FALSE, eval=TRUE, fig.width=10, echo=FALSE} -->
+<!-- library(gridExtra) -->
+<!-- grid.arrange( -->
+<!-- ggplot(Puromycin, aes(x = conc, y = rate, colour = state)) + geom_point(), -->
+<!-- ggplot(Puromycin, aes(x = log(conc), y = rate, colour = state)) + geom_point(), -->
+<!-- ncol = 2) -->
+<!-- ``` -->
+
+<!-- ## Запись формулы линейной модели со взаимодействием в R -->
+
+<!-- `Response ~ Continuous + Categorical + Continuous : Categorical` (полная запись) -->
+
+<!-- `Response ~ Continuous * Categorical`(сокращенная запись) -->
+
+<!-- `Continuous : Categorical` --- Кодовое обозначение взаимодействия. Добавление взаимодействия непрерывного и дискретного факторов в модель означает, что возможен разный угол наклона прямых для разных групп. -->
+
+<!-- ## Подберем -->
+
+<!-- ```{r} -->
+<!-- Puromycin$lc <- log(Puromycin$conc) -->
+<!-- M1 <- lm(rate ~ lc + state + lc:state, data = Puromycin) -->
+<!-- # M1 <- lm(rate ~ lc * state, data = Puromycin) # То же самое -->
+<!-- summary(M1) -->
+<!-- ``` -->
+
+<!-- >- Взаимодействие достоверно! -->
+
+<!-- ## Проверяем выполнение условий применимости  -->
+
+<!-- ## Решение -->
+
+<!-- ```{r purl=FALSE} -->
+<!-- # Данные для графиков остатков -->
+<!-- M1_diag <- fortify(M1) -->
+<!-- ``` -->
+<!-- ### 1) График расстояния Кука -->
+
+<!-- ```{r purl=FALSE} -->
+<!-- ggplot(M1_diag, aes(x = 1:nrow(M1_diag), y = .cooksd)) + -->
+<!--   geom_bar(stat = "identity") -->
+<!-- ``` -->
+
+<!-- ## Решение -->
+
+<!-- ### 2) График остатков от предсказанных значений -->
+<!-- ```{r purl=FALSE} -->
+<!-- gg_resid <- ggplot(data = M1_diag, aes(x = .fitted, y = .stdresid)) + -->
+<!--   geom_point() + geom_hline(yintercept = 0) -->
+<!-- grid.arrange(gg_resid, gg_resid + geom_smooth(), -->
+<!--              gg_resid + geom_smooth(method = "lm"), nrow = 1) -->
+<!-- ``` -->
+
+<!-- ## Решение -->
+
+<!-- ### 3) Графики остатков от предикторов в модели и не в модели -->
+
+<!-- ```{r fig.width=10,  purl=FALSE} -->
+<!-- library(gridExtra) -->
+<!-- grid.arrange(gg_resid + aes(x = lc),  -->
+<!--              ggplot(M1_diag, aes(x = state, y = .stdresid)) + geom_boxplot(),  -->
+<!--              nrow = 1) -->
+<!-- ``` -->
+
+<!-- ## Решение -->
+
+<!-- ### 4) Квантильный график остатков -->
+<!-- ```{r fig.height=4,  purl=FALSE} -->
+<!-- library(car) -->
+<!-- qqPlot(M1) -->
+<!-- ``` -->
+
+
+<!-- ## Рисуем график предсказаний -->
 
 <!-- Что не так с этим графиком? Это наша модель? -->
 
@@ -311,64 +311,64 @@ qqPlot(M1)
 
 <!-- ## Задание -->
 
-Постройте график предсказаний модели по этим данным
+<!-- Постройте график предсказаний модели по этим данным -->
 
-### Данные для графика
+<!-- ### Данные для графика -->
 
-```{r}
-library(plyr)
-NewData <- ddply(
-  Puromycin, .variables = .(state), .fun = summarise, 
-  lc = seq(min(lc), max(lc), length = 100))
+<!-- ```{r} -->
+<!-- library(plyr) -->
+<!-- NewData <- ddply( -->
+<!--   Puromycin, .variables = .(state), .fun = summarise,  -->
+<!--   lc = seq(min(lc), max(lc), length = 100)) -->
 
-# предсказанные значения
-Predictions <- predict(M1, newdata = NewData, se.fit = TRUE)
-NewData$fit <- Predictions$fit
+<!-- # предсказанные значения -->
+<!-- Predictions <- predict(M1, newdata = NewData, se.fit = TRUE) -->
+<!-- NewData$fit <- Predictions$fit -->
 
-# стандартные ошибки
-NewData$SE <- Predictions$se.fit
+<!-- # стандартные ошибки -->
+<!-- NewData$SE <- Predictions$se.fit -->
 
-# доверительный интервал
-NewData$upr <- NewData$fit + 1.96 * NewData$SE
-NewData$lwr <- NewData$fit - 1.96 * NewData$SE
+<!-- # доверительный интервал -->
+<!-- NewData$upr <- NewData$fit + 1.96 * NewData$SE -->
+<!-- NewData$lwr <- NewData$fit - 1.96 * NewData$SE -->
 
-# Обратная трансформация предиктора
-NewData$conc <- exp(NewData$lc)
-```
+<!-- # Обратная трансформация предиктора -->
+<!-- NewData$conc <- exp(NewData$lc) -->
+<!-- ``` -->
 
-## Рисуем график предсказаний 
- 
-```{r gg-M1-predictions-backtrans, purl=FALSE}
-ggplot(NewData, aes(x = conc, y = fit)) + 
-  geom_ribbon(alpha = 0.2, aes(ymin = lwr, ymax = upr, group = state)) +
-  geom_line(aes(colour = state)) +
-  geom_point(data = Puromycin, aes(x = conc, y = rate, colour = state))
-```
+<!-- ## Рисуем график предсказаний  -->
+
+<!-- ```{r gg-M1-predictions-backtrans, purl=FALSE} -->
+<!-- ggplot(NewData, aes(x = conc, y = fit)) +  -->
+<!--   geom_ribbon(alpha = 0.2, aes(ymin = lwr, ymax = upr, group = state)) + -->
+<!--   geom_line(aes(colour = state)) + -->
+<!--   geom_point(data = Puromycin, aes(x = conc, y = rate, colour = state)) -->
+<!-- ``` -->
 
 
-##  Задание
+<!-- ##  Задание -->
 
-Запишите уравнение этой модели и уравнения для каждой группы
-```{r}
-coef(M1)
-```
+<!-- Запишите уравнение этой модели и уравнения для каждой группы -->
+<!-- ```{r} -->
+<!-- coef(M1) -->
+<!-- ``` -->
 
-```{r gg-not-ancova, echo=FALSE, purl=FALSE}
-ggplot(Puromycin, aes(x = lc, y = rate, colour = state)) + 
-  geom_point() + 
-  geom_smooth(method = "lm")
-```
+<!-- ```{r gg-not-ancova, echo=FALSE, purl=FALSE} -->
+<!-- ggplot(Puromycin, aes(x = lc, y = rate, colour = state)) +  -->
+<!--   geom_point() +  -->
+<!--   geom_smooth(method = "lm") -->
+<!-- ``` -->
 
-## Решение
+<!-- ## Решение -->
 
-$rate = 209.2 + 37.1 * lc - 44.6 * stateuntreated - 10.1 * lc * stateuntreated$
+<!-- $rate = 209.2 + 37.1 * lc - 44.6 * stateuntreated - 10.1 * lc * stateuntreated$ -->
 
-$stateuntreated = 1$ если $state = untreated$ и ноль в остальных случаях
+<!-- $stateuntreated = 1$ если $state = untreated$ и ноль в остальных случаях -->
 
-Уравнение для treated: $rate = 209.2 + 37.1 * lc$
+<!-- Уравнение для treated: $rate = 209.2 + 37.1 * lc$ -->
 
-Уравнение для untreated: $rate = (209.2- 44.6) + (37.1 - 10.1) * lc$,  
-то есть $rate = 164.6 + 27 * lc$
+<!-- Уравнение для untreated: $rate = (209.2- 44.6) + (37.1 - 10.1) * lc$,   -->
+<!-- то есть $rate = 164.6 + 27 * lc$ -->
 
 ```{r echo=FALSE, purl=FALSE}
 lm_equation <- function(fit, strict = TRUE, rnd = 2){
@@ -393,43 +393,44 @@ lm_equation <- function(fit, strict = TRUE, rnd = 2){
 }
 ```
 
-## Тестируем гомогенность углов наклона
+<!-- ## Тестируем гомогенность углов наклона -->
 
-Это делается как обычно при выборе моделей: при помощи `anova()` или `drop1()`
+<!-- Это делается как обычно при выборе моделей: при помощи `anova()` или `drop1()` -->
 
-```{r}
-M2 <- lm(rate ~ lc + state, data = Puromycin)
+<!-- ```{r} -->
+<!-- M2 <- lm(rate ~ lc + state, data = Puromycin) -->
 
-# anova(M1, M2, test="F")
-drop1(M1, test = "F")
-```
+<!-- # anova(M1, M2, test="F") -->
+<!-- drop1(M1, test = "F") -->
+<!-- ``` -->
 
->- Если убрать взаимодействие, то модель становится значительно хуже. Поэтому взаимодействие сохраняем
+<!-- >- Если убрать взаимодействие, то модель становится значительно хуже. Поэтому взаимодействие сохраняем -->
 
-## Представляем результаты в виде таблицы {.smaller}
+<!-- ## Представляем результаты в виде таблицы {.smaller} -->
 
-### Вариант 1. Последовательное тестирование (SS type I)
+<!-- ### Вариант 1. Последовательное тестирование (SS type I) -->
 
-Факторы тестируются в порядке включения в модель. __Результат тестирования зависит от порядка включения__
+<!-- Факторы тестируются в порядке включения в модель. __Результат тестирования зависит от порядка включения__ -->
 
-```{r}
-anova(M1)
-M3 <- lm(rate ~ state + lc + state:lc, data = Puromycin)
-anova(M3)
-```
+<!-- ```{r} -->
+<!-- anova(M1) -->
+<!-- M3 <- lm(rate ~ state + lc + state:lc, data = Puromycin) -->
+<!-- anova(M3) -->
+<!-- ``` -->
 
-## Представляем результаты в виде таблицы  {.smaller}
+<!-- ## Представляем результаты в виде таблицы  {.smaller} -->
 
-### Вариант 2. Иерархическое тестирование (SS type III)
+<!-- ### Вариант 2. Иерархическое тестирование (SS type III) -->
 
-Каждый из факторов по отношению к модели только без него, но со всеми остальными.
-Нужно, если много факторов и выборки разного размера. Тогда результат не будет зависеть от порядка включения факторов в модель.
+<!-- Каждый из факторов по отношению к модели только без него, но со всеми остальными. -->
+<!-- Нужно, если много факторов и выборки разного размера. Тогда результат не будет зависеть от порядка включения факторов в модель. -->
 
-```{r}
-# library(car)
-Anova(M1, type = 3) 
-# Anova(M3, type = 3) # сравните
-```
+<!-- ```{r} -->
+<!-- # library(car) -->
+<!-- Anova(M1, type = 3)  -->
+<!-- # Anova(M3, type = 3) # сравните -->
+<!-- ``` -->
+
 
 # Модель со взаимодействием на примере данных о весе новорожденных
 
@@ -503,9 +504,9 @@ vif(wt_mod_1)
 
 >- Колинеарности нет
 
-## Решение
 
-### Проверка на гомогенность углов наклона
+
+## Проверка на гомогенность углов наклона
 
 Подберем полную модель.
 
@@ -626,7 +627,7 @@ NewData$lwr <- NewData$fit - 1.96 * NewData$SE
 
 
 
-Рисуем график предсказаний
+##Рисуем график предсказаний
 
 ```{r wt-mod-2-predict, purl=FALSE}
 ggplot(NewData, aes(x = age, y = fit)) +

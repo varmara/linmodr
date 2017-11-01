@@ -40,50 +40,7 @@ bird$YRISOL
 
 # Первичный анализ данных мы провели на предыдущих лекциях
 
-
-Mod_1 <- lm(ABUND ~ logAREA + YRISOL + logDIST + logLDIST + GRAZE + logAREA:GRAZE + YRISOL:GRAZE + logDIST:GRAZE + logLDIST:GRAZE, data = bird)
-
-drop1(Mod_1, test = "F")
-
-Mod_2 <- update(Mod_1, .~.-YRISOL:GRAZE)
-drop1(Mod_2, test = "F")
-
-Mod_3 <- update(Mod_2, .~.-logLDIST:GRAZE)
-drop1(Mod_3, test = "F")
-
-Mod_4 <- update(Mod_3, .~.-logDIST:GRAZE)
-drop1(Mod_4, test = "F")
-
-
-Mod_5 <- update(Mod_4, .~.-logAREA:GRAZE)
-drop1(Mod_5, test = "F")
-
-
-Mod_6 <- update(Mod_5, .~.-logDIST)
-drop1(Mod_6, test = "F")
-
-
-Mod_7 <- update(Mod_6, .~.-YRISOL)
-drop1(Mod_7, test = "F")
-
-Mod_8 <- update(Mod_7, .~.-logLDIST)
-drop1(Mod_8, test = "F")
-
-
-summary(Mod_8)
-
-# Визуализация финальной модели
-
-MyData <- unique(bird[,c("logAREA", "GRAZE")])
-
-MyData$Predict <- predict(Mod_8, newdata = MyData, se.fit = TRUE )$fit
-MyData$SE <- predict(Mod_8, newdata = MyData, se.fit = TRUE )$se.fit
-
-library(ggplot2)
-
-ggplot(MyData, aes(x = logAREA, y = Predict, color = GRAZE)) + geom_line() + geom_ribbon(aes(ymin = Predict - 1.96*SE, ymax = Predict + 1.96*SE), alpha = 0.2) + geom_point(data = bird, aes(x = logAREA, y = ABUND, color = GRAZE))
-
-
+# Постройте модель, проведите ее анализ и постройте визуализайию
 
 
 

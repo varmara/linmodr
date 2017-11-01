@@ -70,7 +70,45 @@ Mod_8 <- update(Mod_7, .~.-logLDIST)
 drop1(Mod_8, test = "F")
 
 
+
+# Проверка валидности модели
+
+Mod_8_diag <- fortify(Mod_8)
+
+ggplot(Mod_8_diag, aes(x = 1:nrow(Mod_8_diag), y = .cooksd)) + geom_bar(stat = "identity")
+
+
+# График остатков от предсказанных значений
+
+
+gg_resid <- ggplot(data = Mod_8_diag, aes(x = .fitted, y = .stdresid)) +  geom_point() + geom_hline(yintercept = 0)
+
+grid.arrange(gg_resid, gg_resid + geom_smooth(),
+             gg_resid + geom_smooth(method = "lm"), nrow = 1)
+
+
+
+### 3) Графики остатков от предикторов в модели и не в модели
+
+gg_resid + aes(x = bird$logDIST)
+
+gg_resid + aes(x = bird$logLDIST)
+
+gg_resid + aes(x = bird$YRISOL)
+
+
+ggplot(Mod_8_diag, aes(x = GRAZE, y = .stdresid)) + geom_boxplot()
+
+library(car)
+qqPlot(Mod_8)
+
+
+
 summary(Mod_8)
+
+
+
+
 
 # Визуализация финальной модели
 
