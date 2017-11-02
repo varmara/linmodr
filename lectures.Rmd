@@ -90,7 +90,7 @@ install.packages("readxl")
 <!-- - Презентация: [06_LM_with_continuous_and_discrete_predictors.html](06_LM_with_continuous_and_discrete_predictors.html) -->
 - Код: [06_LM_with_continuous_and_discrete_predictors_code.R](06_LM_with_continuous_and_discrete_predictors_code.R)
 - Данные: [goats.xlsx](data/goats.xlsx)
-- Данные: [vitcap.csv](data/vitcap2.csv)
+- Данные: [vitcap2.csv](data/vitcap2.csv)
 - Данные: [Puromycin.xlsx](data/Puromycin.xlsx)
 - Данные: [birthwt.csv](data/birthwt.csv)
 
