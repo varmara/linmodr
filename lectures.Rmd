@@ -109,9 +109,20 @@ install.packages("readxl")
 
 ## 7. Линейные модели только с дискретными предикторами (дисперсионный анализ) 
 
+```{r eval=FALSE}
+install.packages(c("DAAG", "multcomp"))
+```
+
 ### Однофакторный дисперсионный анализ
 
+- Презентация:
+- Код: [07.1_anova_code.R](07.1_anova_code.R)
+
 ### Многофакторный дисперсионный анализ 
+
+- Презентация:
+- Код: [07.2_two-way_anova_and_interactions_code.R](07.2_two-way_anova_and_interactions_code.R)
+- Данные: [hall.csv](data/hall.csv)
 
 ## 8. Обобщенные линейные модели (GLM) для бинарных данных (=логистическая регрессия) 
 

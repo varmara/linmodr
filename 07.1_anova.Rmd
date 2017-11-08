@@ -19,9 +19,7 @@ institute: "Кафедра Зоологии беспозвоночных, Био
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# to render
-# rmarkdown::render("09_anova.Rmd", output_format = "beamer_presentation")
-options(width = 70, scipen = 6, digits = 3)
+options(width = 70, scipen = 6)
 library(knitr)
 # chunk default options
 opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
@@ -35,8 +33,8 @@ source("support_linmodr.R")
 
 - Объяснить, в чем опасность множественных сравнений, и как с ними можно бороться
 - Рассказать, как в дисперсионном анализе моделируются значения зависимой переменной
-- Перечислить и проверить условия применимости дисперсионного анализа
 - Интерпретировать и описать результаты, записанные в таблице дисперсионного анализа
+- Перечислить и проверить условия применимости дисперсионного анализа
 - Провести множественные попарные сравнения при помощи post hoc теста Тьюки, представить и описать их результаты
 - Построить график результатов дисперсионного анализа
 
@@ -63,7 +61,7 @@ head(cu, 3)
 
 ```{r}
 # Пропущенных значений нет
-sum(is.na(cu))
+colSums(is.na(cu))
 
 # Данные не сбалансированы (размеры групп разные)
 table(cu$species)
@@ -77,70 +75,90 @@ levels(cu$species) <- c("лес_зав", "луг_кон", "бел_тряс",
                         "малин", "лес_кон", "крапив")
 ```
 
-## Задание: Постройте график
+## Задание 1
 
-Постройте график зависимости размера яиц кукушек от вида птиц-хозяев, в гнездах которых были обнаружены яйца (используйте `geom_boxplot`).
+Дополните код, чтобы построить график зависимости размера яиц кукушек (`length`) от вида птиц-хозяев (`species`), в гнездах которых были обнаружены яйца. На графике должны быть изображены средние значения и их 95% доверительные интервалы, а цвет должен соответствовать виду птиц-хозяев.
 
-Раскрасьте график в зависимости от вида птиц-хозяев (используйте эстетики `fill` или `colour`)
+```{r eval=FALSE}
+theme_set( )
+ggplot(data = , aes()) + 
+  stat_summary(geom = "pointrange", fun.data = mean_se)
+```
 
-### Дополнительное задание:
-
-Попробуйте сменить палитру раскраски, используя `scale_colour_brewer` (варианты можно посмотреть в справке в подразделе примеров или в интернете [Colors (ggplot2): раздел RColorBrewer palette chart](http://www.cookbook-r.com/Graphs/Colors_(ggplot2\)/#palettes-color-brewer ))
+```{r gg-mean-conf-limit, echo=FALSE, purl=FALSE}
+library(ggplot2)
+theme_set(theme_bw())
+ggplot(data = cu, aes(x = species, y = length, colour = species)) + 
+  stat_summary(geom = "pointrange", fun.data = mean_se)
+```
 
 ## Решение
 
-```{r purl=FALSE}
-library(ggplot2)
-theme_set(theme_bw())
-ggplot(data = cu, aes(x = species, y = length)) + 
-  geom_boxplot(aes(fill = species))
+```{r gg-mean-conf-limit, echo=TRUE, purl=FALSE}
 ```
 
->- Сейчас боксы расположены в беспорядке. Хорошо бы поменять порядок уровней
+## "Некрасивый" порядок уровней на графике
+
+На этом графике некрасивый порядок уровней: средние для разных способов запоминания `cu$species` расположены, как кажется, хаотично.
+
+Порядок групп на графике определяется порядком уровней фактора
+
+```{r purl=FALSE}
+# "старый" порядок уровней
+levels(cu$species)
+```
+
+```{r gg-mean-conf-limit, echo=FALSE, purl=FALSE}
+```
 
 ## Меняем порядок уровней
 
- Упорядочим уровни по убыванию средней длины яиц.
-
-1) при помощи функции `reorder()` упорядочиваем по возрастанию средней длины яиц  
-2) меняем порядок уровней на противоположный при помощи функции `rev()`.
-
-
+Давайте изменим порядок уровней в факторе `cu$species` так, чтобы он соответствовал возрастанию средних значений длины яиц `cu$length`.
 
 ```{r}
+# "старый" порядок уровней
+levels(cu$species)
+# переставляем уровни в порядке следования средних значений 
 cu$species <- reorder(cu$species, cu$length, FUN = mean)
-cu$species <- factor(cu$species, levels = rev(levels(cu$species)))
+# "новый" порядок уровней стал таким
+levels(cu$species)
 ```
 
 ## График с новым порядком уровней
 
-Поскольку изменив порядок уровней мы внесли изменения в исходные данные, придется полностью обновить график (т.к.`ggplot()` хранит данные внутри графика).
+С новым порядком уровней нам легче визуально сравнивать друг с другом число запомненных слов при разных способах запоминания.
+
+Поскольку, изменив порядок уровней, мы внесли изменения в исходные данные, придется полностью обновить график (т.к.`ggplot()` хранит данные внутри графика).
 
 ```{r}
-ggplot(data = cu, aes(x = species, y = length)) + 
-  geom_boxplot(aes(fill = species))
+ggplot(data = cu, aes(x = species, y = length, colour = species)) + 
+  stat_summary(geom = "pointrange", fun.data = mean_se)
 ```
 
 ## Понравившийся график, если понадобится, можно в любой момент довести до ума, а остальные удалить
 
-```{r purl=FALSE}
-ggplot(data = cu, aes(x = species, y = length)) + 
-  geom_boxplot(aes(fill = species)) +
+```{r gg-mean-conf-limit-coloured-labs, purl=FALSE}
+ggplot(data = cu, aes(x = species, y = length, colour = species)) + 
+  stat_summary(geom = "pointrange", fun.data = mean_se) +
   labs(x = "Вид хозяев", y = "Длина яиц кукушек, мм") + 
-  scale_fill_brewer(name = "Вид \nхозяев", palette = "Dark2") + 
-  scale_x_discrete(labels = c("Лесная\nзавирушка", "Лесной\nконек",
-"Белая\nтрясогузка", "Малиновка", "Луговой\nконек", "Крапивник")) + 
+  scale_colour_brewer(name = "Вид \nхозяев", palette = "Dark2") + 
+  scale_x_discrete(labels = c("Крапивник", "Луговой\nконек", "Малиновка",
+"Белая\nтрясогузка", "Лесной\nконек", "Лесная\nзавирушка")) + 
   theme(legend.position = "none")
 ```
 
 ## Множественные сравнения
 
-Мы могли бы сравнить длину яиц в гнездах резных хозяев при помощи t-критерия.
+Мы могли бы сравнить длину яиц в гнездах резных хозяев при помощи t-критерия. У нас всего 6 групп. Сколько возможно между ними попарных сравнений?
 
-- 6 групп
-- 15 сравнений
+```{r gg-mean-conf-limit-coloured-labs, echo=FALSE, purl=FALSE}
+```
 
-Если для каждого сравнения вероятность ошибки первого рода будет $\alpha_{per\ comparison} = 0.05$, то для группы --- ?
+\pause
+
+Всего возможно 15 сравнений.
+
+Если для каждого сравнения вероятность ошибки первого рода будет $\alpha_{per\ comparison} = 0.05$, то для группы из 15 сравнений --- ?
 
 \pause
 
@@ -150,7 +168,7 @@ $\alpha_{family\ wise} = 0.05 * 15 = 0.75$
 
 ## Поправка Бонферрони
 
-Если нужно много сравнений, можно снизить $\alpha _{per\ comparison}$
+Если нужно много сравнений, можно снизить $\alpha _{per\ comparison}$ до общепринятого уровня
 
 $$\alpha _{per\ comparison} = \frac{\alpha _{family\ wise}}{n}$$
 
@@ -161,65 +179,63 @@ $$\alpha _{per\ comparison} = \frac{\alpha _{family\ wise}}{n}$$
 
 С поправкой Бонферрони $\alpha _{per\ comparison} = 0.05 / 15 = 0.003$
 
-Очень жесткий критерий!
+Это очень жесткая поправка! Мы рискуем не найти достоверных различий, даже там, где они есть...
+
+Но есть выход. Вместо множества попарных сравнений можно использовать один тест --- дисперсионный анализ (analysis of variation, ANOVA).
 
 \vskip0pt plus 1filll
 
-# Модель однофакторного дисперсионного анализа
+# Линейная модель с одним дискретным предиктором
 
-$$y _{ij} = \mu + \alpha _i + \varepsilon _{ij}$$
+## Линейная модель с одним дискретным предиктором
 
-$\alpha$ --- фактор с _i_ = 1, ..., _I_ группами  
-$\mu$ --- общее среднее  
-_j_ = 1, ..., $J _i$ --- число наблюдений на каждом из уровней фактора  
+<!-- $$y _{ij} = \mu + \alpha _i + \varepsilon _{ij}$$ -->
 
-Чтобы можно было найти параметры такой модели, приходится вводить ограничения одним из способов:
+<!-- - $\alpha$ --- дискретный фактор с _i_ = 1, ..., _I_ группами   -->
+<!-- - $\mu$ --- общее среднее   -->
+<!-- -_j_ = 1, ..., $J _i$ --- число наблюдений на каждом из уровней фактора   -->
 
-\resizebox{1\textwidth}{!}{
-\begin{tabular}{L{0.2\textwidth} C{0.4\textwidth} C{0.4\textwidth}}
-\hline\noalign{\smallskip}
-$\mu = 0$ & $\alpha_1 = 0$ & $\sum_i{J_i\alpha_i} = 0$  \\
-\hline\noalign{\smallskip}
- & Модель фиктивных переменных & Модель эффектов \\
- & Dummy (indicator) coding = Treatment parametrization = reference cell model &Deviation (effects) coding = Sum to zero parametrization \\
- & по-умолчанию используется в R & часто используется в книгах и в др. программах \\
- & contr.treatment & contr.sum \\
-\hline\noalign{\smallskip}
-\end{tabular}
-}
+<!-- Чтобы можно было найти параметры такой модели, приходится вводить ограничения одним из способов: -->
 
-## Модель фиктивных переменных, contr.treatment
+<!-- \resizebox{1\textwidth}{!}{ -->
+<!-- \begin{tabular}{L{0.2\textwidth} C{0.4\textwidth} C{0.4\textwidth}} -->
+<!-- \hline\noalign{\smallskip} -->
+<!-- $\mu = 0$ & $\alpha_1 = 0$ & $\sum_i{J_i\alpha_i} = 0$  \\ -->
+<!-- \hline\noalign{\smallskip} -->
+<!--  & Модель фиктивных переменных & Модель эффектов \\ -->
+<!--  & Dummy (indicator) coding = Treatment parametrization = reference cell model &Deviation (effects) coding = Sum to zero parametrization \\ -->
+<!--  & по-умолчанию используется в R & часто используется в книгах и в др. программах \\ -->
+<!--  & contr.treatment & contr.sum \\ -->
+<!-- \hline\noalign{\smallskip} -->
+<!-- \end{tabular} -->
+<!-- } -->
 
-Модель $y _{ij} = \mu + \alpha _i + \varepsilon _{ij}$, если  $\alpha_1 = 0$ примет уже знакомую нам форму
+<!-- ## Модель фиктивных переменных, contr.treatment -->
 
-$$y _{ij} = \beta _0 + \beta _1 x _1 + ... + \beta _i x _{i} + \varepsilon _{ij}$$
+<!-- Модель $y _{ij} = \mu + \alpha _i + \varepsilon _{ij}$, если  $\alpha_1 = 0$ примет уже знакомую нам форму -->
 
-Коэффициенты линейной модели обозначают отклонения от базового уровня
+$$y _{ij} = \beta _0 + \beta _1 x _1 + \beta _2 \beta _2 + ... + \beta _i x _{i} + \varepsilon _{ij}$$
 
-\resizebox{1\textwidth}{!}{
-\begin{tabular}{L{0.1\textwidth} C{0.3\textwidth} C{0.3\textwidth} C{0.3\textwidth}}
-\hline\noalign{\smallskip}
-Группа & Среднее на базовом уровне & Эффект для данного уровня & Случайная изменчивость \\
-\hline\noalign{\smallskip}
-A1 & $\beta_0$ &  & $\varepsilon _{1j}$ \\
-A2 & $\beta_0$ & $\beta_1$ & $\varepsilon _{2j}$ \\
-... & ... & ... & ... \\
-Ai & $\beta_0$ & $\beta_{i}$ & $\varepsilon _{ij}$ \\
-\hline\noalign{\smallskip}
-\end{tabular}
-}
+Коэффициенты линейной модели обозначают отклонения от базового уровня. Такой способ кодирования называется __параметризация фиктивных переменных__ или __параметризация тритментов__ (dummy (indicator) coding = treatment parametrization = reference cell model), и он вам уже знаком по предыдущим двум лекциям. В R этот способ используется по-умолчанию и обозначается __contr.treatment__.
 
-<!-- ## Модель эффектов, contr.sum -->
+Переменные-индикаторы (= переменные-болванки):
 
-## Задание: 
+Если у дискретного фактора $k$ уровней, уравнение модели будет включать $i = k - 1$ переменных, кодирующих принадлежность к этим уровням ($x_1, ..., x_i$). Первый уровень фактора считается базовым и для его кодирования не нужна отдельная переменная.
 
-- Сколько переменных-болванок нужно, чтобы записать модель зависимости длины яиц кукушек от вида птиц-хозяев?
+Коэффициенты:
+
+- $\beta_0$ --- значение свободного члена для базового уровня дискретного фактора (это среднее значение для базового уровня).
+- $\beta_1, ..., \beta_i$ --- коррекция свободного члена для других уровней (это отклонения средних для других уровней фактора от базового уровня).
+
+## Задание 2
+
+- Сколько переменных нужно, чтобы записать модель зависимости длины яиц кукушек от вида птиц-хозяев, если использовать параметризацию тритментов?
 
 ## Решение:
 
-### Сколько переменных-болванок нужно, чтобы записать модель зависимости длины яиц кукушек от вида птиц-хозяев?
+- Сколько переменных нужно, чтобы записать модель зависимости длины яиц кукушек от вида птиц-хозяев?
 
-- 5 переменных-болванок, т.к. 6 уровней у фактора species
+- Понадобится 5 переменных, т.к. 6 уровней у фактора `species`
 
 ```{r purl=FALSE}
 levels(cu$species)
@@ -227,14 +243,14 @@ levels(cu$species)
 
 Уровень `r levels(cu$species)[1]` будет базовым, и для его кодирования не нужна отдельная переменная).
 
-## Дисперсионный анализ в матричном виде
+## Модель с одним дискретным предиктором в матричном виде
 
 Уравнение линейной модели для этого примера (в параметризации фиктивных переменных, contr.treatment):
 
 $$y _{i} = \beta _0 + \beta _1 x _{1i} + \cdots + \beta _5 x _{5i} + \varepsilon _{i}$$
 
 - Здесь $i = 1, ..., n$, т.е. порядковый номер наблюдения,
-- $x _{1i}, ..., x _{5i}$ --- переменные-болванки для фактора `species`
+- $x _{1i}, ..., x _{5i}$ --- переменные-индикаторы для фактора `species`
 
 Если расписать эту формулу, получится по отдельному уравнению для каждого из наблюдений:
 
@@ -298,135 +314,238 @@ y_1 \\ y_2 \\ \vdots \\ y_n
 
 $$\mathbf{Y} = \mathbf{X} \mathbf{\beta} + \mathbf{\varepsilon}$$
 
-- $\mathbf{Y}$ - матрица предсказанных значений, 1 столбец в _n_ строк (_n_ - число наблюдений)
+- $\mathbf{Y}$ - матрица значений зависимой переменной, один столбец в _n_ строк (_n_ - число наблюдений)
 - $\mathbf{X}$ - матрица независимых переменных с _n_ строк, ее первый столбец содержит единицы, далее по столбцу для каждой из переменных в модели
 - $\mathbf{\beta}$ - матрица коэффициентов линейной модели, столбец
-- $\mathbf{\varepsilon}$ - матрица остатков, 1 столбец в _n_ строк
+- $\mathbf{\varepsilon}$ - матрица остатков, один столбец в _n_ строк
 
 ## Модельная матрица $\mathbf{X}$ в дисперсионном анализе
 
-Посмотреть своими глазами на эти переменные-болванки можно так:
+Посмотреть своими глазами на эти переменные-индикаторы можно так:
 
 ```{r purl=FALSE}
 X <- model.matrix(~ species, data = cu)
 head(X)
 ```
 
-
-
-# Условия примененимости дисперсионного анализа
-
-## Условия применимости дисперсионного анализа:
-
-- Случайность и независимость  наблюдений внутри групп
-- Нормальное распределение остатков
-- Гомогенность дисперсий остатков
-- Отсутствие колинеарности факторов (независимость групп)
-
-### Другие ограничения:
-
-- Лучше работает, если размеры групп примерно одинаковы (т.наз. сбалансированный дисперсионный комплекс)
-- Устойчив к отклонениям от нормального распределения (при равных объемах групп или при больших выборках)
-
-## Задание: 
+## Задание 3
 
 - Подберите линейную модель зависимости длины яиц кукушек в гнездах от вида птиц-хозяев
-
-- Проверьте условия применимости
+- Вспомните, что означают коэффициенты этой линейной модели, и вычислите, чему равен ожидаемый размер яиц в гнездах каждого из видов-хозяев.
 
 ## Решение:
 
 ```{r purl=FALSE}
 cmod <- lm(length ~ species, data = cu)
-library(car)
-op <- par(mfrow = c(1, 3))
-plot(cmod, which = 4)
-plot(cmod, which = 1)
-qqPlot(cmod)
-par(op)
+coef(cmod)
+```
+```{r echo=FALSE}
+cf <- round(coef(cmod), 2)
 ```
 
-\pause
+Первый коэффициент --- средний размер яиц кукушек в гнездах крапивников (на базовом уровне):
 
-- Выбросов нет
-- Дисперсии почти одинаковые. Может быть, в одной из групп чуть меньше
-- Распределение остатков отличается от нормального
+- Крапивник --- $length = b_0 = `r cf[1]`$
 
-## Полезно стоить графики остатков от переменных в модели
+Другие коэффициенты --- разницу размеров яиц кукушек в гнездах других хозяев и в гнездах крапивников (отклонения от базового уровня):
 
-...и не в модели, если такие есть
+- Луговой конек --- $length = b_0 + b_1= `r sum(cf[1:2])`$
+- Малиновка --- $length = b_0 + b_2= `r sum(cf[c(1, 3)])`$
+- Белая трясогузка --- $length = b_0 + b_3= `r sum(cf[c(1, 4)])`$
+- Лесной конек --- $length = b_0 + b_4= `r sum(cf[c(1, 5)])`$
+- Лесная завирушка --- $length = b_0 + b_5= `r sum(cf[c(1, 6)])`$
 
-```{r}
-residualPlots(cmod)
-```
 
-\pause
-
-- Разброс остатков практически одинаков для разных видов птиц-хозяев 
-
-## Коэффициенты линейной модели
-
-Влияет ли вид птиц-хозяев на длину яиц кукушек?
+## t-тесты значимости коэффициентов линейной модели с одним дискретным предиктором
 
 \small
+
+- t-тест для первого коэффициента показывает отличается ли от нуля среднее на базовом уровне
+
+- t-тесты значимости других коэффициентов показывают достоверность отличий средних значений в группах от среднего на базовом уровне.
+
+По значениям коэффициентов нельзя сказать влияет ли дискретный фактор целиком (исключение --- фактор с двумя градациями).
 
 ```{r}
 coef(summary(cmod))
 ```
 
 \normalsize
-\pause
 
-По коэффициентам это сложно сказать. Было бы удобнее, если бы ответ был из одного числа, вместо пачки коэффициентов. Дисперсионный анализ позволит оценить влияние каждого из факторов.
+
+# Дисперсионный анализ
+
+```{r purl=FALSE, echo = FALSE, warning=FALSE}
+library(dplyr)
+dat_smr <- cu %>% group_by(species) %>% summarise(mean = mean(length)) 
+dat <- merge(cu, dat_smr)
+dat$species <- as.numeric(dat$species) + runif(nrow(dat), -0.15, 0.15)
+d_lev <- levels(cu$species)
+dat_smr$species <- as.numeric(dat_smr$species)
+
+lims <- range(cu$length) + c(-1, 1)
+yannot <- lims[1] + 0.5
+set.seed(832)
+gmean <- mean(cu$length, na.rm = TRUE)
+
+# 35
+id <- 9
+Y <- dat$length[id]
+Y_hat <-dat$mean[id]
+X <- dat$species[id]
+
+
+
+pl <- ggplot(data = dat, aes(x = species, y = length)) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8)) + ylim(lims[1], lims[2]) + scale_x_continuous(breaks = 1:6, labels = d_lev)
+
+# # Общая изменчивость (отклонения от общего среднего)
+pl_tot <- pl + 
+  geom_segment(aes(xend = species, yend = gmean), colour = "grey70") +
+    geom_hline(yintercept = gmean, linetype = "dashed") + 
+    geom_point() +
+  ggtitle("Общая изменчивость\n(отклонения от общего среднего)") +
+    annotate("text", label = "Общее\nсреднее", 
+           x = 0,  y = gmean, hjust = -0.1, size = 4) + 
+  annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = 6,  y = yannot, hjust = 1, size = 6) 
+
+pl_all <- pl + 
+  geom_segment(aes(xend = species, yend = gmean), colour = "grey70") +
+  geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = "dodgerblue1") + 
+  geom_hline(yintercept = gmean, linetype = "dashed") + 
+  # annotate("segment", x = X, y = Y, xend = X, yend = gmean, colour = "grey70", size = 2) + 
+  annotate("segment", x = X, y = Y, xend = X, yend = Y_hat, colour = "#009E73", size = 2) +
+  annotate("segment", x = X, y = Y_hat, xend = X, yend = gmean, colour = "#E69F00", size = 2) +
+  geom_point() +
+  annotate("text", label = "Общее\nсреднее", 
+           x = 0,  y = gmean, hjust = -0.1, size = 4)
+
+pl_no <- pl + 
+  geom_hline(yintercept = gmean, linetype = "dashed") + 
+  geom_point(data = dat_smr, y = gmean, size = 20, shape = 45, colour = "dodgerblue1") +
+    annotate("segment", x = X, y = Y, xend = X, yend = gmean, colour = "grey70", size = 2) + 
+  annotate("segment", x = X + 0.05, y = Y, xend = X + 0.05, yend = gmean, colour = "#009E73", size = 2) +
+    geom_point() +
+  annotate("text", label = "Общее\nсреднее", 
+           x = 0,  y = gmean, hjust = -0.1, size = 4)
+
+
+# library(plyr)
+# Межгрупповая изменчивость (связанная с фактором)
+pl_x <- pl + 
+  geom_hline(aes(yintercept = gmean), linetype = "dashed") + 
+  geom_segment(data = dat_smr, aes(x = species, y = mean, xend = species, yend = gmean), colour = "#E69F00", size = 2) +
+  geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = "dodgerblue1") + 
+    geom_point() +
+  ggtitle("Факторная изменчивость\n(межгрупповая)")+
+    annotate("text", label = "SS[x] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = 6,  y = yannot, hjust = 1, size = 6)
+
+# Внутригрупповая изменчивость (случайная)
+pl_res <- pl + 
+  geom_segment(data = dat, aes(xend = species, yend = mean), colour = "#009E73") +
+    geom_hline(yintercept = gmean, linetype = "dashed") + 
+    geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = "dodgerblue1") + 
+    geom_point() +
+  ggtitle("Случайная изменчивость\n(внутригрупповая)")+
+    annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = 6,  y = yannot, hjust = 1, size = 6)
+```
+
+## Общая изменчивость
+
+Общая изменчивость SS~t~ --- это сумма квадратов отклонений наблюдаемых значений $y_i$ от общего среднего $\bar y$
+
+```{r gg-tot, echo=FALSE, fig.height=3.5, purl=FALSE}
+pl_tot
+```
+
+## Отклонения от общего среднего
+
+Отклонения от общего среднего складываются из двух составляющих:
+
+- Внутригрупповые отклонения --- отклонения наблюдаемых значений от внутригрупповых средних
+- Межгрупповые отклонения --- отклонения внутригрупповых средних от общего среднего ("эффекты" групп)
+
+```{r gg-all, echo=FALSE, fig.height=3, purl=FALSE}
+pl_all
+```
 
 ## Структура общей изменчивости
 
-Общая изменчивость (SSt) = Факторная (SSx) + Случайная (SSe)
+Общая изменчивость $SS_t$ складывается из изменчивости связанной с фактором $SS_x$ и случайной изменчивости $SS_e$
 
-```{r echo = FALSE, warning=FALSE, fig.width = 10.5, fig.height=5}
-lims <- range(cu$length) + c(-1, 1)
-yannot <- lims[1] + 0.5
-pos <- position_jitter(width = 0.2)
-gmean <- mean(cu$length, na.rm = TRUE)
+$$SS_t = SS_x + SS_e$$
 
-
-
-gg_cu <- ggplot(data = cu, aes(x = species, y = length, colour = species)) +
-  labs(x = "Вид хозяев", y = "Длина яиц кукушек, мм") +
-  theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8)) + ylim(lims[1], lims[2])
-
-# # Общая изменчивость (отклонения от общего среднего)
-gg_cu_total <- gg_cu + 
-  geom_jitter(position = pos) +
-  geom_hline(yintercept = gmean, linetype = "dashed") + 
-  ggtitle("Общая изменчивость\n(отклонения от общего среднего)") +
-  annotate("text", label = "Общее\nсреднее", 
-           x = 0,  y = gmean, hjust = -0.1, size = 4) + 
-  annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6) 
-
-library(plyr)
-# Межгрупповая изменчивость (связанная с фактором)
-gg_cu_factor <- gg_cu + 
-  geom_hline(aes(yintercept = gmean), linetype = "dashed") + 
-  stat_summary(fun.y = "mean", geom = "point", size = 20, shape = 45) + 
-  ggtitle("Факторная изменчивость\n(межгрупповая)")+
-    annotate("text", label = "SS[x] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
-
-# Внутригрупповая изменчивость (случайная)
-gg_cu_error <- gg_cu + 
-  geom_jitter(position = position_jitter(width = 0.3)) +
-  stat_summary(fun.y = "mean", geom = "point", size = 20, shape = 45, colour = "black") + 
-  ggtitle("Случайная изменчивость\n(внутригрупповая)")+
-    annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
-
+```{r gg-ss, echo=FALSE, fig.height=3.5, fig.width=10, purl=FALSE}
 library(gridExtra)
-grid.arrange(gg_cu_total, gg_cu_factor, gg_cu_error, ncol = 3, widths = c(0.38, 0.31, 0.31))
+grid.arrange(pl_tot, pl_x, pl_res, nrow = 1)
 ```
 
-Если выборки из одной совокупности, то
-Факторная изменчивость = Случайная изменчивость
+## Средние квадраты отклонений
 
-## Таблица дисперсионного анализа
+Если поделить суммы квадратов отклонений ($SS$) на их число степеней свободы, то получатся средние квадраты отклонений ($MS$) --- дисперсии
+
+```{r gg-ss, echo=FALSE, fig.height=3, fig.width=10, purl=FALSE}
+```
+
+
+\resizebox{1\textwidth}{!}{
+{\small
+\begin{tabular}{c c c}
+\hline\noalign{\smallskip}
+$MS_t$ полная дисперсия  & 
+$MS_x$ факторная дисперсия & 
+$MS_e$ остаточная дисперсия  \\
+\hline\noalign{\smallskip}
+$MS_{t} =\frac{SS_{t}}{df_{t}}$ & $MS_{x} =\frac{SS_{x}}{df_{x}}$ & $MS_{e} =\frac{SS_{e}}{df_{e}}$ \\
+$SS_{t}=\sum{(\bar{y}-y_i)^2}$ & $SS_{x}=\sum{(\hat{y}-\bar{y})^2}$ & $SS_{e}=\sum{(\hat{y}-y_i)^2}$ \\
+$df_{t} = N - 1$ & $df_{x} = a - 1$ & $df_{e} = N - a$  \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
+}
+
+
+
+##  Если выборки из одной совокупности, то  
+
+Если выборки из одной совокупности, то наблюдения из разных групп будут отличаться друг от друга не больше, чем наблюдения из одной группы,  
+т.е. факторная дисперсия будет близка к случайной дисперсии $MS_x \sim MS_e$. Их равенство можно проверить при помощи F-критерия
+
+$$ F_{df_x, df_e} = \frac{MS _{x}}{MS_{e}}$$
+
+
+```{r gg-ss, echo=FALSE, fig.height=3.5, fig.width=10, purl=FALSE}
+```
+
+## F-критерий
+
+$$ F_{df_x, df_e} = \frac{MS _{x}}{MS_{e}}$$
+Гипотезы: 
+
+$H _0$: все выборки взяты из одной совокупности --- $\bar X_1 = \bar X_2  = \dots = \bar X_a$. Тогда $MS _x = MS _e$
+
+$H _A$: какая-то из выборок из другой совокупности, т.е. какое-то среднее значение $\bar X_i$ отличается от других. Тогда $MS _x \ne MS _e$
+
+F-статистика подчиняется F-распределению. Форма F-распределения зависит от двух параметров: $df_{x} = a - 1$ и $df_{e} = N - a$
+
+```{r f-distribution, echo=FALSE, purl=FALSE, fig.width=7, fig.height=2}
+df_1 <- 5
+df_2 <- 114
+F_val <- Anova(cmod)[1, 3]
+F_crit <- qf(p = 0.05, df1 = df_1, df2 = df_2, lower.tail = F)
+
+dfr <- data.frame(f = seq(-0.3, 9, 0.01))
+ggplot(dfr, aes(x = f)) + 
+  stat_function(fun = df, args = list(df1 = df_1, df2 = 114), size = 1.3) + 
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = qf(p = 0.95, df1 = df_1, df2 = 114), color = "red", linetype = "dashed") + 
+  annotate("text", label = "F при α = 0.05", x = qf(p = 0.95, df1 = df_1, df2 = 114), y = 1, hjust = 1.1) +
+  geom_vline(xintercept = 8.0523, linetype = "dashed") +
+  annotate("text", label = "F", x = F_val, y = 1, hjust = -1) +
+  labs(title = paste0("F-распределение, df1 = ", df_1, ", df2 = ", df_2), x = "F", y = "Плотность вероятности") + theme_bw(base_size = 10)
+```
+
+
+## Таблица дисперсионного анализа 
 
 \resizebox{1\textwidth}{!}{
 \begin{tabular}{L{2.2cm} c c c c}
@@ -440,13 +559,12 @@ grid.arrange(gg_cu_total, gg_cu_factor, gg_cu_error, ncol = 3, widths = c(0.38, 
 \end{tabular}
 }
 
-Гипотезы: $H _0: MS _x = MS _e$, $H _A: MS _x ≠ MS _e$
-
 \large Минимальное упоминание результатов в тексте должно содержать $F _{df _x, df _e}$ и $p$.
+
 
 ## Делаем дисперсионный анализ в R
 
-В R есть много функций для дисперсионного анализа. Мы рекомендуем `Anova()` из пакета `car`. Зачем? Когда факторов будет больше одного, эта функция сможет правильно оценить достоверность каждого из них независимо от других.
+В R есть много функций для дисперсионного анализа. Мы рекомендуем `Anova()` (__с большой буквы__) из пакета `car`. Зачем? Эта функция умеет тестировать влияние факторов в определенном порядке. Когда факторов будет больше одного, это станет важно для результатов.
 
 ```{r, message=FALSE}
 cu_anova <- Anova(cmod)
@@ -484,7 +602,62 @@ xtb <- xtable(
 print.xtable(xtb, comment = F, caption.placement = "top")
 ```
 
+# Условия примененимости дисперсионного анализа
 
+## Результатам тестов можно верить, если выполняются условия применимости
+
+Условия применимости дисперсионного анализа:
+
+- Случайность и независимость  наблюдений внутри групп
+- Нормальное распределение остатков
+- Гомогенность дисперсий остатков
+- Отсутствие колинеарности факторов (независимость групп)
+
+### Другие ограничения:
+
+- Лучше работает, если размеры групп примерно одинаковы (т.наз. сбалансированный дисперсионный комплекс)
+- Устойчив к отклонениям от нормального распределения (при равных объемах групп или при больших выборках)
+
+## Проверяем выполнение условий применимости
+
+```{r}
+# Данные для графиков остатков
+cmod_diag <- fortify(cmod)
+```
+### 1) График расстояния Кука
+
+```{r}
+ggplot(cmod_diag, aes(x = 1:nrow(cmod_diag), y = .cooksd)) +
+  geom_bar(stat = "identity")
+```
+
+- Выбросов нет
+
+## 2) График остатков от предсказанных значений
+
+```{r eval=FALSE, purl=FALSE}
+ggplot(cmod_diag, aes(x = .fitted, y = .stdresid)) + geom_jitter()
+```
+
+У нас один единственный дискретный предиктор, поэтому удобнее сразу боксплот
+
+
+### 3) Графики остатков от предикторов в модели и не в модели
+
+```{r}
+ggplot(cmod_diag, aes(x = species, y = .stdresid)) + geom_boxplot()
+```
+- Дисперсии почти одинаковые. Может быть, в одной из групп чуть больше
+
+## 4) Квантильный график остатков
+```{r}
+library(car)
+qqPlot(cmod)
+```
+
+- Распределение остатков отличается от нормального
+
+# Пост хок тесты
 
 ## Как понять, какие именно группы различаются
 
@@ -493,8 +666,6 @@ print.xtable(xtb, comment = F, caption.placement = "top")
 Коэффициенты линейной модели в `summary(cmod)` содержат лишь часть ответа --- сравнение средних значених всех групп со средним на базовом уровне.
 
 Если нас интересуют другие возможные попарные сравнения, нужно сделать пост хок тест.
-
-# Пост хок тесты
 
 ## Post hoc тесты
 
@@ -523,7 +694,7 @@ library(multcomp)
 cu_ph <- glht(cmod, linfct = mcp(species = "Tukey"))
 ```
 
-## Результаты попарных сравнений (тест Тьюки)
+## Результаты попарных сравнений (тест Тьюки) {.smaller}
 
 Таблица результатов пост хок теста практически нечитабельна. 
 \small
@@ -546,18 +717,36 @@ summary(cu_ph)
 MyData <- data.frame(
   species = factor(levels(cu$species), 
                    levels = levels(cu$species)))
-MyData <- data.frame(MyData, predict(cmod, newdata = MyData, 
-                                     interval = "confidence"))
+
+MyData <- data.frame(
+  MyData, 
+  predict(cmod, newdata = MyData, interval = "confidence")
+  )
+
 MyData
 ```
 
-## Задание:
+## Задание 4
 
 Создайте MyData вручную:
 
 - предсказанные значения 
 - стандартные ошибки
 - верхнюю и нижнюю границы доверительных интервалов
+
+```{r eval=FALSE}
+MyData <- data.frame(
+  species = factor(levels(cu$species), 
+                   levels = levels(cu$species)))
+
+X <- model.matrix()
+betas <- 
+MyData$fit <-  %*% 
+MyData$se <- sqrt(diag(X %*% vcov(cmod) %*% t(X)))
+MyData$lwr <- MyData$ - 1.96 * MyData$
+MyData$upr <- MyData$ + 1.96 * MyData$
+
+```
 
 ## Решение:
 
@@ -569,26 +758,10 @@ X <- model.matrix(~species, data = MyData)
 betas <- coef(cmod)
 MyData$fit <- X %*% betas
 MyData$se <- sqrt(diag(X %*% vcov(cmod) %*% t(X)))
-MyData$lwr <- MyData$fit - qnorm(0.975) * MyData$se
-MyData$upr <- MyData$fit + qnorm(0.975) * MyData$se
+MyData$lwr <- MyData$fit - 1.96 * MyData$se
+MyData$upr <- MyData$fit + 1.96 * MyData$se
 MyData
 ```
-
-
-## Точечный график
-
-```{r}
-gg_points <- ggplot(data = MyData, aes(x = species, y = fit)) + 
-  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) + 
-  geom_point(aes(colour = species), size = 3) +
-  labs(x = "Вид хозяев", y = "Длина яиц кукушек, мм") + 
-  scale_fill_brewer(name = "Вид \nхозяев", palette = "Dark2") + 
-  scale_x_discrete(labels = c("Лесная\nзавирушка", "Лесной\nконек",
-                              "Белая\nтрясогузка", "Малиновка", "Луговой\nконек", "Крапивник")) + 
-  theme(legend.position = "none")
-gg_points
-```
-
 
 ## Столбчатый график
 
@@ -610,7 +783,7 @@ gg_bars
 
 ```{r}
 gg_bars_coded <- gg_bars + 
-  geom_text(aes(y = 1.6,  label = c("A", "A", "AB", "AB", "B", "C")), 
+  geom_text(aes(y = 1.6,  label = c("A", "B", "BC", "BC", "C", "C")), 
             colour = "white", size = 7)
 gg_bars_coded
 ```
