@@ -81,11 +81,9 @@ install.packages(c("gridExtra", "ISwR"))
 
 ### Модели с разными значениями интерсепта для групп
 
-
 ```{r eval=FALSE}
 install.packages("readxl")
 ```
-
 
 - Презентация: [06_LM_with_continuous_and_discrete_predictors.html](06_LM_with_continuous_and_discrete_predictors.html)
 - Код: [06_LM_with_continuous_and_discrete_predictors_code.R](06_LM_with_continuous_and_discrete_predictors_code.R)
@@ -93,8 +91,6 @@ install.packages("readxl")
 - Данные: [vitcap2.csv](data/vitcap2.csv)
 - Данные: [Puromycin.xlsx](data/Puromycin.xlsx)
 - Данные: [birthwt.csv](data/birthwt.csv)
-
-
 
 ### Модели с разными значениями угла наклона для групп
 
@@ -104,7 +100,6 @@ install.packages("readxl")
 - Код: [06_LM_with_continuous_and_discrete_predictors_Practicum.R](06_LM_with_continuous_and_discrete_predictors_Practicum.R)
 
 - Код: [06_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](06_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R)
-
 
 
 ## 7. Линейные модели только с дискретными предикторами (дисперсионный анализ) 
