@@ -14,8 +14,7 @@ install.packages("readxl")
 - Код R
     - [01_code_intro_to_r](01_code_intro_to_r.R)
     - [01_intro_ggplot.R](01_intro_ggplot.R)
-- Данные:
-    - [fev.xls](data/fev.xls)
+- Данные: [fev.xls](data/fev.xls)
 
 ## 2. Базовая статистика на R
 
@@ -95,11 +94,8 @@ install.packages("readxl")
 
 ### Модели с разными значениями угла наклона для групп
 
-- Презентация: 
-[06_LM_with_continuous_and_discrete_predictors_interactions.html](06_LM_with_continuous_and_discrete_predictors_interactions.html)
-
+- Презентация: [06_LM_with_continuous_and_discrete_predictors_interactions.html](06_LM_with_continuous_and_discrete_predictors_interactions.html)
 - Код: [06_LM_with_continuous_and_discrete_predictors_Practicum.R](06_LM_with_continuous_and_discrete_predictors_Practicum.R)
-
 - Код: [06_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](06_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R)
 
 
