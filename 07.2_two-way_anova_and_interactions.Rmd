@@ -79,7 +79,7 @@ levels(fert$time)
 ## Пропущенные значения
 
 ```{r}
-colSums(is.na(x))
+colSums(is.na(fert))
 ```
 
 > - Нет пропущенных значений
@@ -98,7 +98,7 @@ table(fert$time, fert$treat)
 library(ggplot2)
 theme_set(theme_bw())
 gg_rich <- ggplot(data = fert, aes(x = time, y = richness, colour = treat)) + 
-  stat_summary(geom = "pointrange", fun.data = mean_se)
+  stat_summary(geom = "pointrange", fun.data = mean_cl_normal)
 gg_rich
 ```
 
@@ -110,7 +110,9 @@ gg_rich
 
 Правильно было бы воспользоваться обобщенными линейными моделями с Пуассоновским распределением ошибок вместо нормального.
 
-Но пока что мы попробуем преобразовать зависимую переменную, чтобы ее распределение стало больше походить на нормальное. Это может помочь, а может и нет.
+Но сейчас мы с вами попробуем действовать грубее (пока еще не разобрались, как это делать правильно). 
+
+Давайте мы попробуем  преобразовать зависимую переменную, чтобы ее распределение стало больше походить на нормальное. Это может помочь, а может и нет.
 
 ```{r}
 fert$log_rich <- log10(fert$richness + 1)
@@ -261,7 +263,7 @@ contr.treatment(levels(fert$time))
 
 ```{r}
 X_trt <- model.matrix(~ treat*time, data = fert)
-X_trt
+head(X_trt)
 ```
 
 ## Для параметризации эффектов (contr.sum) дискретные предикторы кодируются иначе
@@ -287,7 +289,7 @@ contr.sum(levels(fert$time))
 ```{r}
 X_sum <- model.matrix(~ treat*time, data = fert, 
   contrasts = list(treat = "contr.sum", time = "contr.sum"))
-X_sum
+head(X_sum)
 ```
 
 

@@ -42,7 +42,7 @@ levels(cu$species) <- c("лес_зав", "луг_кон", "бел_тряс",
 
 theme_set( )
 ggplot(data = , aes()) +
-  stat_summary(geom = "pointrange", fun.data = mean_se)
+  stat_summary(geom = "pointrange", fun.data = mean_cl_normal)
 
 
 # "старый" порядок уровней
@@ -162,9 +162,9 @@ gg_bars <- ggplot(data = MyData, aes(x = species, y = fit)) +
   geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
   labs(x = "Вид хозяев", y = "Длина яиц кукушек, мм") +
   scale_fill_brewer(name = "Вид \nхозяев", palette = "Dark2") +
-  scale_x_discrete(labels = c("Лесная\nзавирушка", "Лесной\nконек",
-                              "Белая\nтрясогузка", "Малиновка",
-                              "Луговой\nконек", "Крапивник")) +
+  scale_x_discrete(labels = c("Крапивник", "Луговой\nконек", "Малиновка",
+                              "Белая\nтрясогузка", "Лесной\nконек",
+                              "Лесная\nзавирушка")) +
   theme(legend.position = "none")
 gg_bars
 

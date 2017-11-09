@@ -82,14 +82,14 @@ levels(cu$species) <- c("лес_зав", "луг_кон", "бел_тряс",
 ```{r eval=FALSE}
 theme_set( )
 ggplot(data = , aes()) + 
-  stat_summary(geom = "pointrange", fun.data = mean_se)
+  stat_summary(geom = "pointrange", fun.data = mean_cl_normal)
 ```
 
 ```{r gg-mean-conf-limit, echo=FALSE, purl=FALSE}
 library(ggplot2)
 theme_set(theme_bw())
 ggplot(data = cu, aes(x = species, y = length, colour = species)) + 
-  stat_summary(geom = "pointrange", fun.data = mean_se)
+  stat_summary(geom = "pointrange", fun.data = mean_cl_normal)
 ```
 
 ## Решение
@@ -132,14 +132,14 @@ levels(cu$species)
 
 ```{r}
 ggplot(data = cu, aes(x = species, y = length, colour = species)) + 
-  stat_summary(geom = "pointrange", fun.data = mean_se)
+  stat_summary(geom = "pointrange", fun.data = mean_cl_normal)
 ```
 
 ## Понравившийся график, если понадобится, можно в любой момент довести до ума, а остальные удалить
 
 ```{r gg-mean-conf-limit-coloured-labs, purl=FALSE}
 ggplot(data = cu, aes(x = species, y = length, colour = species)) + 
-  stat_summary(geom = "pointrange", fun.data = mean_se) +
+  stat_summary(geom = "pointrange", fun.data = mean_cl_normal) +
   labs(x = "Вид хозяев", y = "Длина яиц кукушек, мм") + 
   scale_colour_brewer(name = "Вид \nхозяев", palette = "Dark2") + 
   scale_x_discrete(labels = c("Крапивник", "Луговой\nконек", "Малиновка",
@@ -214,7 +214,7 @@ $$\alpha _{per\ comparison} = \frac{\alpha _{family\ wise}}{n}$$
 
 <!-- Модель $y _{ij} = \mu + \alpha _i + \varepsilon _{ij}$, если  $\alpha_1 = 0$ примет уже знакомую нам форму -->
 
-$$y _{ij} = \beta _0 + \beta _1 x _1 + \beta _2 \beta _2 + ... + \beta _i x _{i} + \varepsilon _{ij}$$
+$$y _{ij} = \beta _0 + \beta _1 x _1 + \beta _2 x _2 + ... + \beta _i x _{i} + \varepsilon _{ij}$$
 
 Коэффициенты линейной модели обозначают отклонения от базового уровня. Такой способ кодирования называется __параметризация фиктивных переменных__ или __параметризация тритментов__ (dummy (indicator) coding = treatment parametrization = reference cell model), и он вам уже знаком по предыдущим двум лекциям. В R этот способ используется по-умолчанию и обозначается __contr.treatment__.
 
@@ -284,7 +284,7 @@ y_1 \\ y_2 \\ \vdots \\ y_n
 1 & x_{1n} & \cdots & x_{5n}
 \end{bmatrix} \cdot
 \begin{bmatrix}
-\beta _0 \\ \beta _1 \\ \beta _3 \\ \beta _4 \\ \beta _5
+\beta _0 \\ \beta _1 \\ \beta _2 \\ \beta _3 \\ \beta _4 \\ \beta _5
 \end{bmatrix} +
 \begin{bmatrix}
 \varepsilon _1 \\ \varepsilon _2 \\ \vdots \\ \varepsilon _n
@@ -771,8 +771,8 @@ gg_bars <- ggplot(data = MyData, aes(x = species, y = fit)) +
   geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) + 
   labs(x = "Вид хозяев", y = "Длина яиц кукушек, мм") +
   scale_fill_brewer(name = "Вид \nхозяев", palette = "Dark2") + 
-  scale_x_discrete(labels = c("Лесная\nзавирушка", "Лесной\nконек",
-                              "Белая\nтрясогузка", "Малиновка", "Луговой\nконек", "Крапивник")) + 
+  scale_x_discrete(labels = c("Крапивник", "Луговой\nконек", "Малиновка",
+                            "Белая\nтрясогузка", "Лесной\nконек", "Лесная\nзавирушка")) + 
   theme(legend.position = "none")
 gg_bars
 ```

@@ -105,17 +105,17 @@ install.packages("readxl")
 ## 7. Линейные модели только с дискретными предикторами (дисперсионный анализ) 
 
 ```{r eval=FALSE}
-install.packages(c("DAAG", "multcomp"))
+install.packages(c("DAAG", "multcomp", "Hmisc"))
 ```
 
 ### Однофакторный дисперсионный анализ
 
-- Презентация:
+- Презентация: [07.1_anova.pdf](07.1_anova.pdf)
 - Код: [07.1_anova_code.R](07.1_anova_code.R)
 
 ### Многофакторный дисперсионный анализ 
 
-- Презентация:
+- Презентация: [07.2_two-way_anova_and_interactions.pdf](07.2_two-way_anova_and_interactions.pdf)
 - Код: [07.2_two-way_anova_and_interactions_code.R](07.2_two-way_anova_and_interactions_code.R)
 - Данные: [hall.csv](data/hall.csv)
 

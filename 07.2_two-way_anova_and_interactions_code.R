@@ -32,7 +32,7 @@ fert$time <- factor(fert$time)
 levels(fert$time)
 
 # ## Пропущенные значения
-colSums(is.na(x))
+colSums(is.na(fert))
 
 # ## Объемы выборок в группах
 table(fert$time, fert$treat)
@@ -40,7 +40,7 @@ table(fert$time, fert$treat)
 library(ggplot2)
 theme_set(theme_bw())
 gg_rich <- ggplot(data = fert, aes(x = time, y = richness, colour = treat)) +
-  stat_summary(geom = "pointrange", fun.data = mean_se)
+  stat_summary(geom = "pointrange", fun.data = mean_cl_normal)
 gg_rich
 
 # Преобразовываем данные
