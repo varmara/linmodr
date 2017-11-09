@@ -87,10 +87,11 @@ install.packages("readxl")
 
 - Презентация: [06_LM_with_continuous_and_discrete_predictors.html](06_LM_with_continuous_and_discrete_predictors.html)
 - Код: [06_LM_with_continuous_and_discrete_predictors_code.R](06_LM_with_continuous_and_discrete_predictors_code.R)
-- Данные: [goats.xlsx](data/goats.xlsx)
-- Данные: [vitcap2.csv](data/vitcap2.csv)
-- Данные: [Puromycin.xlsx](data/Puromycin.xlsx)
-- Данные: [birthwt.csv](data/birthwt.csv)
+- Данные:
+    + [goats.xlsx](data/goats.xlsx)
+    + [vitcap2.csv](data/vitcap2.csv)
+    + [Puromycin.xlsx](data/Puromycin.xlsx)
+    + [birthwt.csv](data/birthwt.csv)
 
 ### Модели с разными значениями угла наклона для групп
 
