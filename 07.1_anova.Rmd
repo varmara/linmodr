@@ -304,7 +304,7 @@ y_1 \\ y_2 \\ \vdots \\ y_n
 1 & x_{1n} & \cdots & x_{5n}
 \end{bmatrix} \cdot
 \begin{bmatrix}
-\beta _0 \\ \beta _1 \\ \beta _3 \\ \beta _4 \\ \beta _5
+\beta _0 \\ \beta _1 \\ \beta _2 \\ \beta _3 \\ \beta _4 \\ \beta _5
 \end{bmatrix} +
 \begin{bmatrix}
 \varepsilon _1 \\ \varepsilon _2 \\ \vdots \\ \varepsilon _n
