@@ -90,8 +90,8 @@ $$ \pi(x) = \frac{e^{\beta_0+\beta_1x}}{1+e^{\beta_0+\beta_1x}} $$
 
 ## Зависимую величину можно преобразовать в более удобную для моделирования форму 
 
-> 1. Дискретный резульат: 1 или 0
-> 2. Дискретные данные можно преобразовать в форму оценки вероятности события: $\pi = \frac{N_i}{N_{total}}$, непрерывная аеличина, варьирующая от 0 до 1
+> 1. Дискретный результат: 1 или 0
+> 2. Дискретные данные можно преобразовать в форму оценки вероятности события: $\pi = \frac{N_i}{N_{total}}$, непрерывная величина, варьирующая от 0 до 1
 > 3. Вероятность события можно выразить в форме шансов (odds): $odds=\frac{\pi}{1-\pi}$ варьируют от 0 до $+\infty$. *NB: Если шансы > 1, то вероятность события, что $y_i=1$ выше, чем вероятность события $y_i = 0$.  Если шансы < 1, то наоборот*. В обыденной речи мы часто использем фразы, наподобие такой "*шансы на победу 1 к 3*"
 > 4. Шансы преобразуются в _Логиты_ (logit):  $ln(odds)=\ln(\frac{\pi}{1-\pi})$ варьируют от  $-\infty$ до $+\infty$. Логиты гораздо удобнее для построения моделей.
 
@@ -128,6 +128,207 @@ $$ g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})=\beta_0 + \beta_1x$$
 $$ Lik(x_1, ..., x_n) = \Pi^n _{i = 1}f(x_i; \theta)$$
 
 где $f(x; \theta)$ - функция плотности вероятности с параметрами $\theta$
+
+
+# Кратко о методе макcимального правдоподобия
+
+##Правдоподобие для нормального распределения {.columns-2}
+Симулированный пример, в котором 
+
+$$
+y_i = 10x_i + \varepsilon_i \\
+\varepsilon \in N(0, 15)
+$$
+
+Точки (данные) - это выборки из нескольких "локальных" генеральных совокупностей с нормальным распределением зависимой переменной (каждая совокупность соответствует одному значению предиктора).    
+
+Линия регрессии проходит через средние значения нормальных распределений.   
+
+Параметры прямой подбираются так, чтобы вероятность существования данных при таких параметрах была бы максимальной.   
+```{r gg-norm-tunnel, echo=FALSE, fig.height=7, purl=FALSE}
+## Based on code by Arthur Charpentier:
+## http://freakonometrics.hypotheses.org/9593
+## TODO: wrap it into a function and adapt it for use with other distributions
+## as Markus Gesmann has done here
+## http://www.magesblog.com/2015/08/visualising-theoretical-distributions.html
+
+n <- 2
+
+
+xy <- data.frame(X = rep(1:10, 3))
+
+xy$Y <- 10*xy$X + rnorm(30, 0, 15)
+
+xy$predicted <- predict(lm(Y ~ X, data = xy))
+
+
+# X <- sqrt(brain$MRINACount) 
+# Y <- sqrt(brain$PIQ)
+
+X <- xy$X
+Y <- (xy$Y)
+
+
+df <- data.frame(X , Y)
+
+# regression
+reggig <- glm(Y ~ X, data = df, family = gaussian(link = "identity"))
+
+# empty plot
+vX <- seq(min(X) - 0.1, max(X) + 0.1, length = n)
+vY <- seq(min(Y) - 10, max(Y) + 10, length = n)
+mat <- persp(x = vX, y = vY, z = matrix(0, n, n), 
+             zlim = c(0, 0.1),
+             theta =  - 45, phi = 20, expand = 0.1,
+             ticktype  = "detailed",  box = FALSE, border = "gray60")
+
+x <- seq(min(X), max(X), length = 501)
+
+# expected values
+C <- trans3d(x, predict(reggig, newdata = data.frame(X = x), type = "response"), rep(0, length(x)), mat)
+lines(C, lwd = 2)
+
+sdgig <- sqrt(summary(reggig)$dispersion)
+
+# 1SD
+y1 <- qnorm(.95, predict(reggig, newdata = data.frame(X = x), type = "response"),  sdgig)
+C <- trans3d(x, y1, rep(0, length(x)), mat)
+lines(C, lty = 2, col = "#d95f02")
+y2 <- qnorm(.05, predict(reggig, newdata = data.frame(X = x), type = "response"),  sdgig)
+C <- trans3d(x, y2, rep(0, length(x)), mat)
+lines(C, lty = 2, col = "#d95f02")
+
+# C <- trans3d(c(x, rev(x)), c(y1, rev(y2)), rep(0, 2 * length(x)), mat)
+# polygon(C, border = NA, col = "yellow")
+
+# data points
+C <- trans3d(X, Y, rep(0, length(X)), mat)
+points(C,  pch = 16, col = "red", cex = 0.6)
+
+# density curves
+n <- 10
+vX <- seq(min(X), max(X), length = n)
+
+mgig <- predict(reggig, newdata = data.frame(X = vX))
+
+sdgig <- sqrt(summary(reggig)$dispersion)
+
+for(j in n:1){
+  stp <- 251
+  x <- rep(vX[j], stp)
+  y <- seq(min(min(Y) - 10, 
+               qnorm(.05, 
+                     predict(reggig, 
+                             newdata = data.frame(X = vX[j]), 
+                             type = "response"),  
+                     sdgig)), 
+           max(Y) + 10, 
+           length = stp)
+  z0 <- rep(0, stp)
+  z <- dnorm(y,  mgig[j],  sdgig)
+  C <- trans3d(c(x, x), c(y, rev(y)), c(z, z0), mat)
+  polygon(C, border = NA, col = "light blue", density = 40)
+  C <- trans3d(x, y, z0, mat)
+  lines(C, lty = 2, col = "grey60")
+  C <- trans3d(x, y, z, mat)
+  lines(C, col = "steelblue")
+}
+
+```
+
+
+
+
+## Правдоподобие для нормального распределения 
+Аналогичная картинка, но с использованием `geom_violin()`
+```{r, echo=FALSE, fig.height=5.5}
+
+# xy <- data.frame(X = rep(1:10, 3))
+# xy$Y <- 10*xy$X + rnorm(30, 0, 10)
+# xy$predicted <- predict(lm(Y ~ X, data = xy))
+# 
+
+rand_df <- matrix(rep(NA,100000), ncol = 10)
+for(i in 1:10) rand_df[,i] <- rnorm(10000, xy$predicted[i], 10)
+
+rand_df <- data.frame(X = rep(xy$X, each = 10000), Y = as.vector(rand_df))
+
+
+
+ggplot(xy, aes(x = X, y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), adjust = 5 ) + geom_point() + geom_smooth(method = "lm", se = F) + geom_point(data = xy, aes(x = X, y = predicted), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная") 
+```
+ 
+ 
+##Нормальное распределение
+То, что мы в быту привыкли называть **распределением** - это функция плотности вероятности.
+
+**Плотность вероятности** - это функция, описывающая вероятность получения разных значений случайной величины
+
+
+
+
+## Нормальное распределение {.columns-2}
+
+$$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^2}}$$
+
+### Два параметра ($\mu$, $\sigma$)
+
+Среднее: &emsp; $E(Y)  = \mu$
+
+Дисперсия: $var(Y) = \sigma^2$
+
+### Пределы варьирования   
+
+$-\infty \le Y \le +\infty$    
+
+```{r, echo=FALSE, fig.width=5, fig.height=6, warning=FALSE}
+library(ggplot2)
+mu1 <- 10
+mu2 <- 20
+sigma1 <- 5
+sigma2 <- 10
+y <- -20:50
+pi <- data.frame(y = rep(y, 4), pi = c(dnorm(y, mu1, sigma1), dnorm(y, mu1, sigma2), dnorm(y, mu2, sigma1), dnorm(y, mu2, sigma2)), mu = rep(c(mu1, mu2), each = 2*length(y)), sigma = rep(c(sigma1, sigma2, sigma1, sigma2), each = length(y)) )
+
+ggplot(pi, aes(x = y, y = pi)) + geom_line(stat = "identity") + facet_grid(mu~sigma, labeller = label_both, scales = "free_y") + ggtitle("Нормальное распределение \nпри разных параметрах") + ylab("Плотность вероятности (f)")
+
+```
+
+
+## Биномиальное распределение
+
+$f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}$
+
+<div class="columns-2">
+<small>
+
+### Два параметра ($N$, $\pi$)
+
+Среднее: &emsp;&emsp; $E(Y)  = N \times \pi$  
+Дисперсия: $var(Y) = N \times \pi \times (1-\pi)$  
+Параметр $N$ определяет количество объектов в испытании  
+Параметр $\pi$ - вероятность события ($y = 1$)
+
+### Пределы варьирования
+
+$0 \le Y \le +\infty$, &emsp; $Y$ **целочисленные**
+</small>
+
+
+```{r, echo=FALSE, fig.width=5, fig.height=5}
+mu1 <- 0.1
+mu2 <- 0.5
+N1 <- 10
+N2 <- 30
+
+y <-seq(0, 30, 1)
+
+pi <- data.frame(y = rep(y, 4), pi = c(dbinom(y, size = N1, prob = mu1), dbinom(y,  size = N2, prob = mu1), dbinom(y,  size = N1, prob = mu2), dbinom(y,  size = N2, prob = mu2)),  mu = rep(c(mu1, mu2), each = 2*length(y)), N = rep(c(N1, N2, N1, N2), each = length(y)))
+
+ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu,  scales = "free_y", labeller = label_both) + ggtitle("Биномиальное распрделение \n при разных параметрах") + ylab("Плотность вероятности (f)")
+
+```
+</div>
 
 
 ## Правдоподобие для биномиального распределения
@@ -270,7 +471,7 @@ $$ LRT = 2ln(Lik_1/Lik_2) = 2(logLik_1 - logLlik_2)$$
 
 >- $G^2$ - это девианса полной (предложенной) и редуцированной модели (нулевой)  
 >- $G^2$ - аналог частного F критерия в обычном регрессионном анализе  
->- $G^2$ - подчиняется $\chi^2$ распределению (с параметом df = 1) если нулевая модель и предложенная модель не отличаются друг от друга.
+>- $G^2$ - подчиняется $\chi^2$ распределению (с параметром df = 1) если нулевая модель и предложенная модель не отличаются друг от друга.
 >- $G^2$ можно использовать для проверки гипотезы о равенстве нулевой и остаточной девианс.
 
 ## Задание
@@ -499,7 +700,7 @@ ggplot(MyData, aes(x = PARATIO, y = Pi)) +
 - RACE: Раса  
 - SER: Тип мероприятий в реанимации (0 = Medical, 1 = Surgical)  
 - CAN: Присутствует ли онкология? (0 = No, 1 = Yes)  
-- CRN: Присутсвует ли почечная недостаточность (0 = No, 1 = Yes)  
+- CRN: Присутствует ли почечная недостаточность (0 = No, 1 = Yes)  
 - INF: Возможность инфекции (0 = No, 1 = Yes)  
 - CPR: CPR prior to ICU admission (0 = No, 1 = Yes)  
 - SYS: Давление во время поступления в реанимацию (in mm Hg)  
@@ -512,7 +713,7 @@ ggplot(MyData, aes(x = PARATIO, y = Pi)) +
 - FRA: Присутствие переломов (0 = No, 1 = Yes)  
 - PO2: Концентрация кислорода в крови (0 = >60, 1 = ²60)  
 - PH: Уровень кислотности крови (0 = ³7.25, 1 < 7.25)  
-- PCO: Концентрция углекислого газа в крови (0 = ²45, 1 = > 45)  
+- PCO: Концентрация углекислого газа в крови (0 = ²45, 1 = > 45)  
 - BIC: Bicarbonate from initial blood gases (0 = ³18, 1 = < 18)  
 - CRE: Уровень креатина (0 = ²2.0, 1 = > 2.0)  
 - LOC: Уровень сознания пациента при реанимации (0 = no coma or stupor, 1= deep stupor, 2 = coma)  
@@ -555,21 +756,145 @@ anova(M1, test = "Chi")
 
 ```
 
-##Упростим модель с помощью функции `step()`
 
-```{r, eval = FALSE}
+##Задание
+Подберите оптимальную модель в соответствии с протоколом обратного пошагового отбора
 
-step(M1, direction = "backward")
 
+##Решение 
+
+```{r}
+drop1(M1, test = "Chi")
+M2 <- update(M1, .~.-CRE)
 ```
-Эта фукнция автоматически применяет функцию `drop1()`, пошагово отбрасывая избыточные предикторы.
+
+
+##Решение 
+
+```{r}
+drop1(M2, test = "Chi")
+M3 <- update(M2, .~.-CRN)
+```
+
+
+
+##Решение 
+
+```{r}
+drop1(M3, test = "Chi")
+M4 <- update(M3, .~.-INF)
+```
+
+
+
+##Решение 
+
+```{r}
+drop1(M4, test = "Chi")
+M5 <- update(M4, .~.-BIC)
+```
+
+
+##Решение 
+
+```{r}
+drop1(M5, test = "Chi")
+M6 <- update(M5, .~.-PO2)
+```
+
+
+
+##Решение 
+
+```{r}
+drop1(M6, test = "Chi")
+M7 <- update(M6, .~.-HRA)
+```
+
+
+
+##Решение 
+
+```{r}
+drop1(M7, test = "Chi")
+M8 <- update(M7, .~.-SER)
+```
+
+
+##Решение 
+
+```{r}
+drop1(M8, test = "Chi")
+M9 <- update(M8, .~.-FRA)
+```
+
+
+
+##Решение 
+
+```{r}
+drop1(M9, test = "Chi")
+M10 <- update(M9, .~.-RAC)
+```
+
+
+
+##Решение 
+
+```{r}
+drop1(M10, test = "Chi")
+M11 <- update(M10, .~.-SEX)
+```
+
+
+##Решение 
+
+```{r}
+drop1(M11, test = "Chi")
+M12 <- update(M11, .~.-CPR)
+```
+
+
+
+
+##Решение 
+
+```{r}
+drop1(M12, test = "Chi")
+M13 <- update(M12, .~.-PRE)
+```
+
+
+##Решение 
+
+```{r}
+drop1(M13, test = "Chi")
+M14 <- update(M13, .~.-PH)
+```
+
+
+
+##Решение 
+
+```{r}
+drop1(M14, test = "Chi")
+M15 <- update(M14, .~.-PCO)
+```
+
+##Решение 
+
+```{r}
+drop1(M15, test = "Chi")
+```
+
 
 ##Рассмотрим финальную модель {.smaller}
-```{r}
-M2 <- glm(formula = STA ~ AGE + CAN + SYS + TYP + PH + PCO + LOC, family = "binomial",   data = surviv)
 
-# M2 вложена в M1 следовательно их можно сравнить тестом отношения правдоподобий
-anova(M1, M2, test = "Chi")
+M15 вложена в M1 следовательно их можно сравнить тестом отношения правдоподобий
+
+
+```{r}
+anova(M1, M15, test = "Chi")
 ```
 
 
@@ -580,19 +905,19 @@ anova(M1, M2, test = "Chi")
 ## Решение
 
 ```{r}
-exp(coef(M2)[3])
+exp(coef(M15)[3])
 ```
 
 ##Визуализируем предсказания модели
 
 ```{r, echo=FALSE, fig.height=6, fig.width=8}
-MyData = expand.grid(AGE = seq(min(surviv$AGE), max(surviv$AGE), 1), CAN = levels(surviv$CAN),  SYS = seq(min(surviv$SYS), max(surviv$SYS), 10),  TYP =  "Emergency", PH = "1", PCO = "1", LOC ="1") 
+MyData = expand.grid(AGE = seq(min(surviv$AGE), max(surviv$AGE), 1), CAN = levels(surviv$CAN),  SYS = seq(min(surviv$SYS), max(surviv$SYS), 10),  LOC =  levels(surviv$LOC), TYP = "Emergency") 
 
-MyData$Predicted <- predict(M2, newdata = MyData, type = "response")
+MyData$Predicted <- predict(M15, newdata = MyData, type = "response")
 
 
 
-ggplot(MyData, aes(x=SYS, y = Predicted, color = AGE, group = AGE)) + geom_line() + facet_grid(~ CAN, labeller = label_both) + scale_color_gradient(low = "green",  high = "red") + labs(label = list(x = "Давление в момент реанимации (SYS)", y = "Вероятность гибели", color = "Возраст", title = "Предсказания модели"))
+ggplot(MyData, aes(x=SYS, y = Predicted, color = AGE, group = AGE)) + geom_line() + facet_grid(LOC~ CAN, labeller = label_both) + scale_color_gradient(low = "green",  high = "red") + labs(label = list(x = "Давление в момент реанимации (SYS)", y = "Вероятность гибели", color = "Возраст", title = "Предсказания модели"))
 
 
 ```
@@ -601,63 +926,74 @@ ggplot(MyData, aes(x=SYS, y = Predicted, color = AGE, group = AGE)) + geom_line(
 ## Диагностика модели {.smaller}
 
 ```{r, message=FALSE}
-M2_diag <- data.frame(.fitted = predict(M2), 
-    .pears_resid = residuals(M2, type = "pearson"))
+M15_diag <- data.frame(.fitted = predict(M15), 
+    .pears_resid = residuals(M15, type = "pearson"))
 
-ggplot(M2_diag, aes(x = .fitted, y = .pears_resid)) + 
-  geom_point() + geom_smooth(se = FALSE)
+ggplot(M15_diag, aes(x = .fitted, y = .pears_resid)) + 
+  geom_point() + geom_smooth(se = T)
 ```
 
-Явного паттерна в остатках нет, но есть другая проблема
+Явного паттерна в остатках нет
 
-## Zero inflation   
+ 
+<!-- но есть другая проблема -->
 
-```{r, echo=FALSE, message=FALSE}
-ggplot(M2_diag, aes(x = .pears_resid)) + geom_histogram(fill = "blue", color = "black", binwidth = 0.2) + geom_vline(aes(xintercept = 0), size = 1.2)
-```
+<!-- ## Zero inflation    -->
 
-Преобладают отрицательные остатки.  
-Это связано с проблемой, называемой _"zero inflation"_, - в зависимой переменной слишком много нулей.
+<!-- ```{r, echo=FALSE, message=FALSE} -->
+<!-- ggplot(M15_diag, aes(x = .pears_resid)) + geom_histogram(fill = "blue", color = "black", binwidth = 0.2) + geom_vline(aes(xintercept = 0), size = 1.2) -->
+<!-- ``` -->
 
-##Сколько должно быть нулей? {.smaller .columns-2}
+<!-- Преобладают отрицательные остатки.   -->
+<!-- Это связано с проблемой, называемой _"zero inflation"_, - в зависимой переменной слишком много нулей. -->
+
+<!-- ##Сколько должно быть нулей? {.smaller .columns-2} -->
 
 
-```{r, tidy=FALSE}
-#Формируем искусственный набор данных
-MyData = expand.grid(
-  AGE = seq(min(surviv$AGE), 
-            max(surviv$AGE), 1), 
-  CAN = levels(surviv$CAN),
-  SYS = seq(min(surviv$SYS), 
-            max(surviv$SYS), 10),  
-  TYP =  levels(surviv$TYP), 
-  PH = levels(surviv$PH), 
-  PCO = levels(surviv$PCO), 
-  LOC =levels(surviv$LOC)
-  )
+<!-- ```{r, tidy=FALSE} -->
+<!-- #Формируем искусственный набор данных -->
 
-# Предсказываем для этих данных вероятности 
-# гибели в соответствии с моделью M2
-Predicted <-predict(M2, newdata = MyData, 
-                    type ="response") 
 
-# Вычисляем долю нулей, ожидаемую 
-# в соответствии с биномиальным 
-# распределением
-Zero_perc <- sum((1-Predicted))/
-  (sum((1-Predicted)) + 
-    sum((Predicted))) * 100
-```
 
-Нулей должно быть `r round(Zero_perc)` %
+<!-- MyData = expand.grid(AGE = seq(min(surviv$AGE), max(surviv$AGE), 1), CAN = levels(surviv$CAN),  SYS = seq(min(surviv$SYS), max(surviv$SYS), 10),  LOC =  levels(surviv$LOC), TYP = "Emergency")  -->
 
-А в наших данных доля нулей составляет `r mean(surviv$STA==0)*100 ` %.
 
-Это больше, чем должно быть в соответствии с биномиальным распределением.
 
-**Нужна более сложная модель!** 
 
-<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<!-- MyData = expand.grid( -->
+<!--   AGE = seq(min(surviv$AGE),  -->
+<!--             max(surviv$AGE), 1),  -->
+<!--   CAN = levels(surviv$CAN), -->
+<!--   SYS = seq(min(surviv$SYS),  -->
+<!--             max(surviv$SYS), 10),   -->
+<!--   TYP =  levels(surviv$TYP),  -->
+<!--   PH = levels(surviv$PH),  -->
+<!--   PCO = levels(surviv$PCO),  -->
+<!--   LOC =levels(surviv$LOC) -->
+<!--   ) -->
+
+<!-- # Предсказываем для этих данных вероятности  -->
+<!-- # гибели в соответствии с моделью M2 -->
+<!-- Predicted <-predict(M15, newdata = MyData,  -->
+<!--                     type ="response")  -->
+
+<!-- # Вычисляем долю нулей, ожидаемую  -->
+<!-- # в соответствии с биномиальным  -->
+<!-- # распределением -->
+<!-- Zero_perc <- sum((1-Predicted))/ -->
+<!--   (sum((1-Predicted)) +  -->
+<!--     sum((Predicted))) * 100 -->
+<!-- ``` -->
+
+<!-- Нулей должно быть `r round(Zero_perc)` % -->
+
+<!-- А в наших данных доля нулей составляет `r mean(surviv$STA==0)*100 ` %. -->
+
+<!-- Это больше, чем должно быть в соответствии с биномиальным распределением. -->
+
+<!-- **Нужна более сложная модель!**  -->
+
+<!-- <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /> -->
 
 
 ## Summary
