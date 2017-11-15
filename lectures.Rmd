@@ -118,6 +118,16 @@ install.packages(c("DAAG", "multcomp", "Hmisc"))
 
 ## 8. Обобщенные линейные модели (GLM) для бинарных данных (=логистическая регрессия) 
 
+```{r eval=FALSE}
+install.packages(c("ISwR"))
+```
+
+
+- Презентация: [08_GLM_binary.html](08_GLM_binary.html)
+- Код: [08_GLM_binary_code.R](08_GLM_binary_code.R)
+- Данные: [polis.csv](data/polis.csv)
+
+
 ## 9. Обобщенные линейные модели (GLM) для счетных данных 
 
 ## 10. Смешанные модели (GLMM) для нормально-распределенных данных
