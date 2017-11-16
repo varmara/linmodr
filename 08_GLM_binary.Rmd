@@ -96,14 +96,19 @@ $$ \pi(x) = \frac{e^{\beta_0+\beta_1x}}{1+e^{\beta_0+\beta_1x}} $$
 > 4. Шансы преобразуются в _Логиты_ (logit):  $ln(odds)=\ln(\frac{\pi}{1-\pi})$ варьируют от  $-\infty$ до $+\infty$. Логиты гораздо удобнее для построения моделей.
 
 
-## Что станет с логистической моделью после логит-преобразования?
+## Логистическая модель после логит-преобразования становится привычной линейной моделью!
 ###Немного алгебры
 Обозначим для краткости $\beta_0 + \beta_1x \equiv z$  
 
-Тогда 
+Тогда, логистическая модель примет такую форму 
 $$ g(x)=\ln(\frac{\pi(x)}{1-\pi(x)})= \ln(\frac{\frac{e^z}{1+e^z}}{1-\frac{e^z}{1+e^z}}) $$
 
->- $$ g(x)=\ln(\frac{e^z}{1+e^z}) - \ln({1-\frac{e^z}{1+e^z}}) $$
+##Немного алгебры
+
+Из курса алгебры мы помним, что логарифм отношения равен разности логарифмов
+$$ g(x)=\ln(\frac{e^z}{1+e^z}) - \ln({1-\frac{e^z}{1+e^z}}) $$
+
+Тогда...     
 
 >- $$ g(x)=\ln(\frac{e^z}{1+e^z}) - \ln({\frac{1+e^z - e^z}{1+e^z}}) = \ln(\frac{e^z}{1+e^z}) - \ln({\frac{1}{1+e^z}})  $$ 
 >- $$ g(x)=\ln(e^z) - \ln(1+e^z) - (\ln(1) -\ln(1+e^z))  $$ 
@@ -133,19 +138,8 @@ $$ Lik(x_1, ..., x_n) = \Pi^n _{i = 1}f(x_i; \theta)$$
 # Кратко о методе макcимального правдоподобия
 
 ##Правдоподобие для нормального распределения {.columns-2}
-Симулированный пример, в котором 
 
-$$
-y_i = 10x_i + \varepsilon_i \\
-\varepsilon \in N(0, 15)
-$$
-
-Точки (данные) - это выборки из нескольких "локальных" генеральных совокупностей с нормальным распределением зависимой переменной (каждая совокупность соответствует одному значению предиктора).    
-
-Линия регрессии проходит через средние значения нормальных распределений.   
-
-Параметры прямой подбираются так, чтобы вероятность существования данных при таких параметрах была бы максимальной.   
-```{r gg-norm-tunnel, echo=FALSE, fig.height=7, purl=FALSE}
+```{r gg-norm-tunnel, echo=FALSE, fig.height=6, fig.align='left', purl=FALSE}
 ## Based on code by Arthur Charpentier:
 ## http://freakonometrics.hypotheses.org/9593
 ## TODO: wrap it into a function and adapt it for use with other distributions
@@ -236,7 +230,18 @@ for(j in n:1){
 
 ```
 
+Симулированный пример, в котором 
 
+$$
+y_i = 10x_i + \varepsilon_i \\
+\varepsilon \in N(0, 15)
+$$
+
+Точки (данные) - это выборки из нескольких "локальных" генеральных совокупностей с нормальным распределением зависимой переменной (каждая совокупность соответствует одному значению предиктора).    
+
+Линия регрессии проходит через средние значения нормальных распределений.   
+
+Параметры прямой подбираются так, чтобы вероятность существования данных при таких параметрах была бы максимальной.   
 
 
 ## Правдоподобие для нормального распределения 
@@ -269,17 +274,6 @@ ggplot(xy, aes(x = X, y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), 
 
 ## Нормальное распределение {.columns-2}
 
-$$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^2}}$$
-
-### Два параметра ($\mu$, $\sigma$)
-
-Среднее: &emsp; $E(Y)  = \mu$
-
-Дисперсия: $var(Y) = \sigma^2$
-
-### Пределы варьирования   
-
-$-\infty \le Y \le +\infty$    
 
 ```{r, echo=FALSE, fig.width=5, fig.height=6, warning=FALSE}
 library(ggplot2)
@@ -294,12 +288,39 @@ ggplot(pi, aes(x = y, y = pi)) + geom_line(stat = "identity") + facet_grid(mu~si
 
 ```
 
+$$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^2}}$$
+
+### Два параметра ($\mu$, $\sigma$)
+
+Среднее: &emsp; $E(Y)  = \mu$
+
+Дисперсия: $var(Y) = \sigma^2$
+
+### Пределы варьирования   
+
+$-\infty \le Y \le +\infty$    
+
 
 ## Биномиальное распределение
 
 $f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}$
 
 <div class="columns-2">
+
+```{r, echo=FALSE, fig.width=5, fig.height=5}
+mu1 <- 0.1
+mu2 <- 0.5
+N1 <- 10
+N2 <- 30
+
+y <-seq(0, 30, 1)
+
+pi <- data.frame(y = rep(y, 4), pi = c(dbinom(y, size = N1, prob = mu1), dbinom(y,  size = N2, prob = mu1), dbinom(y,  size = N1, prob = mu2), dbinom(y,  size = N2, prob = mu2)),  mu = rep(c(mu1, mu2), each = 2*length(y)), N = rep(c(N1, N2, N1, N2), each = length(y)))
+
+ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu,  scales = "free_y", labeller = label_both) + ggtitle("Биномиальное распрделение \n при разных параметрах") + ylab("Плотность вероятности (f)")
+
+```
+
 <small>
 
 ### Два параметра ($N$, $\pi$)
@@ -315,19 +336,6 @@ $0 \le Y \le +\infty$, &emsp; $Y$ **целочисленные**
 </small>
 
 
-```{r, echo=FALSE, fig.width=5, fig.height=5}
-mu1 <- 0.1
-mu2 <- 0.5
-N1 <- 10
-N2 <- 30
-
-y <-seq(0, 30, 1)
-
-pi <- data.frame(y = rep(y, 4), pi = c(dbinom(y, size = N1, prob = mu1), dbinom(y,  size = N2, prob = mu1), dbinom(y,  size = N1, prob = mu2), dbinom(y,  size = N2, prob = mu2)),  mu = rep(c(mu1, mu2), each = 2*length(y)), N = rep(c(N1, N2, N1, N2), each = length(y)))
-
-ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu,  scales = "free_y", labeller = label_both) + ggtitle("Биномиальное распрделение \n при разных параметрах") + ylab("Плотность вероятности (f)")
-
-```
 </div>
 
 
@@ -456,7 +464,7 @@ $Dev_{nul} = 2(logLik_{satur} - logLik_{nul})=-2logLik_{nul}$
 
 В основе анализа девиансы лежит критерий $G^2$
 
-$$ G^2 = -2(logLik_{nul} - logLik_{prop})$$
+$$ G^2 = Dev_{nul} - Dev_{resid} = -2(logLik_{nul} - logLik_{prop})$$
 
 ```{r}
 (G2 <- Dev_nul - Dev_resid)
@@ -471,7 +479,7 @@ $$ LRT = 2ln(Lik_1/Lik_2) = 2(logLik_1 - logLlik_2)$$
 
 >- $G^2$ - это девианса полной (предложенной) и редуцированной модели (нулевой)  
 >- $G^2$ - аналог частного F критерия в обычном регрессионном анализе  
->- $G^2$ - подчиняется $\chi^2$ распределению (с параметром df = 1) если нулевая модель и предложенная модель не отличаются друг от друга.
+>- $G^2$ - подчиняется $\chi^2$ распределению если нулевая модель и предложенная модель не отличаются друг от друга. Параметр df - разница числа параметров предложенной и нулевой моделей.
 >- $G^2$ можно использовать для проверки гипотезы о равенстве нулевой и остаточной девианс.
 
 ## Задание
@@ -498,10 +506,11 @@ Dev_nul <- -2*as.numeric(logLik(update(liz_model, ~-PARATIO)))
 ```
 
 
-## Решение с помощью функции `anova()`
+## Решение с помощью функции `Anova()`
 
 ```{r}
-anova(liz_model, test="Chi")
+library(car)
+Anova(liz_model)
 
 
 ```
@@ -684,6 +693,73 @@ ggplot(MyData, aes(x = PARATIO, y = Pi)) +
   ylab("Вероятность встречи")
 ```
 
+#Диагностика модели
+
+##Проблема избыточности дисперсии (overdispersion)
+Если данные подчиняются биномиальному распределению, 
+то Среднее: &emsp;&emsp; $E(Y)  = N \times \pi$  
+Дисперсия: $var(Y) = N \times \pi \times (1-\pi)$ 
+
+То есть, дисперсия связана со средним. 
+Если это нарушается, то мы не можем доверять результатам, так как модель, основанная на биномиальном распределении, применяется к данным, которые не подчиняются этому распределению. 
+
+
+##Проблема избыточности дисперсии (overdispersion)
+
+Причины изботочности дисперсии 
+
+- При одном и том же значении предиктора вероятности событий не одинаковы (not identically distributed)
+
+- События зависимы друг от друга (события при одном значении предиктора зависят от событий при другом зачении предиктора)
+
+
+  
+
+##Проверка на избыточность дисперсии
+
+Пирсоновские остатки $E_i = \frac{\varepsilon_i}{\sqrt{Var(\hat{y_i})}}$
+
+```{r}
+E <- resid(liz_model, type = "pearson") #Пирсоновские остатки
+p <- length(coef(liz_model)) #число параметров в модели  
+df <-   nrow(model.frame(liz_model)) - p #число степеней свободы
+Overdisp <- sum(E^2) / df
+
+Overdisp
+```
+Здесь проблем нет!
+
+Как поступать в случае присутствия избфточности дисперсии будет отдельный разговор.
+
+
+##Есть ли паттерн в остатках?
+
+В случае бинарных переменных появляется некоторая проблема...
+```{r}
+
+library(ggplot2)
+liz_mod_diagn <- fortify(liz_model)
+ggplot(liz_mod_diagn, aes(x = .fitted, y = .stdresid)) + geom_point()
+```
+
+
+##Есть ли паттерн в остатках?
+Для оценки присутствия паттерна надо разделить все .fitted на группы и посчитать среденее значение остатков
+
+```{r}
+library(dplyr)
+liz_mod_diagn$group <- ntile(liz_mod_diagn$.fitted, 8)
+
+resi_and_fit <- liz_mod_diagn %>%  group_by(group) %>%  summarise(mean_fit = mean(.fitted), mean_res = mean(.stdresid))
+
+qplot(resi_and_fit$mean_fit, resi_and_fit$mean_res ) + geom_smooth(method = "lm")
+
+
+```
+
+
+
+
 
 # Множественная логистическая регрессия
 
@@ -752,7 +828,7 @@ summary(M1)
 
 ##Решение {.smaller}
 ```{r}
-anova(M1, test = "Chi")
+Anova(M1)
 
 ```
 
@@ -898,6 +974,38 @@ anova(M1, M15, test = "Chi")
 ```
 
 
+## Диагностика модели {.smaller}
+
+```{r, message=FALSE}
+M15_diag <- data.frame(.fitted = predict(M15), 
+    .pears_resid = residuals(M15, type = "pearson"))
+
+M15_diag$group <- ntile(M15_diag$.fitted, 10)
+
+
+resi_and_fit <- M15_diag %>%  group_by(group) %>%  summarise(mean_fit = mean(.fitted), mean_res = mean(.pears_resid))
+
+qplot(resi_and_fit$mean_fit, resi_and_fit$mean_res ) + geom_smooth(method = "lm")
+
+```
+
+Явного паттерна в остатках нет
+
+##Проверяем на избыточность дисперсии
+```{r}
+E <- resid(M15, type = "pearson") #Пирсоновские остатки
+p <- length(coef(M15)) #число параметров в модели  
+df <-   nrow(model.frame(M15)) - p #число степеней свободы
+Overdisp <- sum(E^2) / df
+
+Overdisp
+```
+
+Признаков избыточности дисперсии нет!
+
+
+
+
 ## Вопрос 
 Во сколько раз изменяется отношение шансов на выживание при условии, что пациент онкологический больной (при прочих равных условиях)?
 
@@ -923,77 +1031,28 @@ ggplot(MyData, aes(x=SYS, y = Predicted, color = AGE, group = AGE)) + geom_line(
 ```
 
 
-## Диагностика модели {.smaller}
 
-```{r, message=FALSE}
-M15_diag <- data.frame(.fitted = predict(M15), 
-    .pears_resid = residuals(M15, type = "pearson"))
+##Код для графика
 
-ggplot(M15_diag, aes(x = .fitted, y = .pears_resid)) + 
-  geom_point() + geom_smooth(se = T)
+```{r, eval=F}
+MyData = expand.grid(AGE = seq(min(surviv$AGE), max(surviv$AGE), 1), 
+                     CAN = levels(surviv$CAN),  
+                     SYS = seq(min(surviv$SYS), max(surviv$SYS), 10),  
+                     LOC =  levels(surviv$LOC), 
+                     TYP = "Emergency") 
+
+MyData$Predicted <- predict(M15, newdata = MyData, type = "response")
+
+
+
+ggplot(MyData, aes(x=SYS, y = Predicted, color = AGE, group = AGE)) + 
+  geom_line() + 
+  facet_grid(LOC~ CAN, labeller = label_both) + 
+  scale_color_gradient(low = "green",  high = "red") + 
+  labs(label = list(x = "Давление в момент реанимации (SYS)", y = "Вероятность гибели", color = "Возраст", title = "Предсказания модели"))
+
 ```
 
-Явного паттерна в остатках нет
-
- 
-<!-- но есть другая проблема -->
-
-<!-- ## Zero inflation    -->
-
-<!-- ```{r, echo=FALSE, message=FALSE} -->
-<!-- ggplot(M15_diag, aes(x = .pears_resid)) + geom_histogram(fill = "blue", color = "black", binwidth = 0.2) + geom_vline(aes(xintercept = 0), size = 1.2) -->
-<!-- ``` -->
-
-<!-- Преобладают отрицательные остатки.   -->
-<!-- Это связано с проблемой, называемой _"zero inflation"_, - в зависимой переменной слишком много нулей. -->
-
-<!-- ##Сколько должно быть нулей? {.smaller .columns-2} -->
-
-
-<!-- ```{r, tidy=FALSE} -->
-<!-- #Формируем искусственный набор данных -->
-
-
-
-<!-- MyData = expand.grid(AGE = seq(min(surviv$AGE), max(surviv$AGE), 1), CAN = levels(surviv$CAN),  SYS = seq(min(surviv$SYS), max(surviv$SYS), 10),  LOC =  levels(surviv$LOC), TYP = "Emergency")  -->
-
-
-
-
-<!-- MyData = expand.grid( -->
-<!--   AGE = seq(min(surviv$AGE),  -->
-<!--             max(surviv$AGE), 1),  -->
-<!--   CAN = levels(surviv$CAN), -->
-<!--   SYS = seq(min(surviv$SYS),  -->
-<!--             max(surviv$SYS), 10),   -->
-<!--   TYP =  levels(surviv$TYP),  -->
-<!--   PH = levels(surviv$PH),  -->
-<!--   PCO = levels(surviv$PCO),  -->
-<!--   LOC =levels(surviv$LOC) -->
-<!--   ) -->
-
-<!-- # Предсказываем для этих данных вероятности  -->
-<!-- # гибели в соответствии с моделью M2 -->
-<!-- Predicted <-predict(M15, newdata = MyData,  -->
-<!--                     type ="response")  -->
-
-<!-- # Вычисляем долю нулей, ожидаемую  -->
-<!-- # в соответствии с биномиальным  -->
-<!-- # распределением -->
-<!-- Zero_perc <- sum((1-Predicted))/ -->
-<!--   (sum((1-Predicted)) +  -->
-<!--     sum((Predicted))) * 100 -->
-<!-- ``` -->
-
-<!-- Нулей должно быть `r round(Zero_perc)` % -->
-
-<!-- А в наших данных доля нулей составляет `r mean(surviv$STA==0)*100 ` %. -->
-
-<!-- Это больше, чем должно быть в соответствии с биномиальным распределением. -->
-
-<!-- **Нужна более сложная модель!**  -->
-
-<!-- <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /> -->
 
 
 ## Summary
