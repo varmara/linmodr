@@ -7,6 +7,8 @@ output:
     widescreen: yes
     css: assets/my_styles.css
     logo: assets/Linmod_logo.png
+editor_options: 
+  chunk_output_type: console
 ---
 
 
@@ -720,16 +722,16 @@ ggplot(MyData, aes(x = PARATIO, y = Pi)) +
 Пирсоновские остатки $E_i = \frac{\varepsilon_i}{\sqrt{Var(\hat{y_i})}}$
 
 ```{r}
-E <- resid(liz_model, type = "pearson") #Пирсоновские остатки
+EP <- resid(liz_model, type = "pearson") #Пирсоновские остатки
 p <- length(coef(liz_model)) #число параметров в модели  
 df <-   nrow(model.frame(liz_model)) - p #число степеней свободы
-Overdisp <- sum(E^2) / df
+Overdisp <- sum(EP^2) / df
 
 Overdisp
 ```
 Здесь проблем нет!
 
-Как поступать в случае присутствия избфточности дисперсии будет отдельный разговор.
+Как поступать в случае присутствия избыточности дисперсии будет отдельный разговор.
 
 
 ##Есть ли паттерн в остатках?
@@ -740,6 +742,9 @@ Overdisp
 library(ggplot2)
 liz_mod_diagn <- fortify(liz_model)
 ggplot(liz_mod_diagn, aes(x = .fitted, y = .stdresid)) + geom_point()
+
+
+
 ```
 
 
@@ -985,7 +990,8 @@ M15_diag$group <- ntile(M15_diag$.fitted, 10)
 
 resi_and_fit <- M15_diag %>%  group_by(group) %>%  summarise(mean_fit = mean(.fitted), mean_res = mean(.pears_resid))
 
-qplot(resi_and_fit$mean_fit, resi_and_fit$mean_res ) + geom_smooth(method = "lm")
+
+ggplot(fortify(M15), aes(x = .fitted, y = .stdresid)) + geom_point() +  geom_smooth()
 
 ```
 
