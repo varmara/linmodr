@@ -19,18 +19,20 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 ```
 
 
-## Мы рассмотрим 
+## Мы рассмотрим
+
 + Регрессионный анализ для бинарных зависимых переменных
 
 ### Вы сможете
+
 + Построить логистическую регрессионную модель, подобранную методом максимального правдоподобия
 + Дать трактовку параметрам логистической регрессионной модели 
 + Провести анализ девиансы, основанный на логистической регрессии
 
 
-## Бинарные данные - очень распространенный тип зависимых переменных
+## Бинарные данные --- очень распространенный тип зависимых переменных
 
-+ Вид есть - вида нет
++ Вид есть или вида нет
 + Кто-то в результате эксперимента выжил или умер
 + Пойманное животное заражено паразитами или здорово
 + Команда выиграла или проиграла 
@@ -48,6 +50,7 @@ head(liz)
 ```
 
 ## Зависит ли встречаемость ящериц от размера острова? 
+
 <div class = 'columns-2'>
 
 <small>
@@ -135,9 +138,9 @@ $$ Lik(x_1, ..., x_n) = \Pi^n _{i = 1}f(x_i; \theta)$$
 где $f(x; \theta)$ - функция плотности вероятности с параметрами $\theta$
 
 
-# Кратко о методе макcимального правдоподобия
+# Кратко вспомним о методе макcимального правдоподобия
 
-##Правдоподобие для нормального распределения {.columns-2}
+## Правдоподобие для нормального распределения {.columns-2}
 
 ```{r gg-norm-tunnel, echo=FALSE, fig.height=6, fig.align='left', purl=FALSE}
 ## Based on code by Arthur Charpentier:
@@ -244,10 +247,11 @@ $$
 Параметры прямой подбираются так, чтобы вероятность существования данных при таких параметрах была бы максимальной.   
 
 
-## Правдоподобие для нормального распределения 
-Аналогичная картинка, но с использованием `geom_violin()`
-```{r, echo=FALSE, fig.height=5.5}
+## Правдоподобие для нормального распределения
 
+Аналогичная картинка, но с использованием `geom_violin()`
+
+```{r, echo=FALSE, fig.height=5.5}
 # xy <- data.frame(X = rep(1:10, 3))
 # xy$Y <- 10*xy$X + rnorm(30, 0, 10)
 # xy$predicted <- predict(lm(Y ~ X, data = xy))
@@ -258,37 +262,45 @@ for(i in 1:10) rand_df[,i] <- rnorm(10000, xy$predicted[i], 10)
 
 rand_df <- data.frame(X = rep(xy$X, each = 10000), Y = as.vector(rand_df))
 
-
-
 ggplot(xy, aes(x = X, y = Y)) + geom_violin(data = rand_df, aes(x = factor(X)), adjust = 5 ) + geom_point() + geom_smooth(method = "lm", se = F) + geom_point(data = xy, aes(x = X, y = predicted), color = "red", size = 3) + labs(x = "Предиктор", y = "Зависимая переменная") 
 ```
  
  
-##Нормальное распределение
+## Распределение
+
 То, что мы в быту привыкли называть **распределением** - это функция плотности вероятности.
 
 **Плотность вероятности** - это функция, описывающая вероятность получения разных значений случайной величины
 
 
+## Нормальное распределение
+
+$$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^2}}$$
 
 
-## Нормальное распределение {.columns-2}
+<div class="columns-2">
 
-
-```{r, echo=FALSE, fig.width=5, fig.height=6, warning=FALSE}
+```{r, echo=FALSE, fig.width=5, fig.height=5, warning=FALSE}
 library(ggplot2)
 mu1 <- 10
 mu2 <- 20
 sigma1 <- 5
 sigma2 <- 10
 y <- -20:50
-pi <- data.frame(y = rep(y, 4), pi = c(dnorm(y, mu1, sigma1), dnorm(y, mu1, sigma2), dnorm(y, mu2, sigma1), dnorm(y, mu2, sigma2)), mu = rep(c(mu1, mu2), each = 2*length(y)), sigma = rep(c(sigma1, sigma2, sigma1, sigma2), each = length(y)) )
 
-ggplot(pi, aes(x = y, y = pi)) + geom_line(stat = "identity") + facet_grid(mu~sigma, labeller = label_both, scales = "free_y") + ggtitle("Нормальное распределение \nпри разных параметрах") + ylab("Плотность вероятности (f)")
+pi <- data.frame(
+  y = rep(y, 4), 
+  pi = c(dnorm(y, mu1, sigma1), dnorm(y, mu1, sigma2), 
+         dnorm(y, mu2, sigma1), dnorm(y, mu2, sigma2)), 
+  mu = rep(c(mu1, mu2), each = 2*length(y)), 
+  sigma = rep(c(sigma1, sigma2, sigma1, sigma2), each = length(y)) )
 
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_line(stat = "identity") + 
+  facet_grid(mu~sigma, labeller = label_both, scales = "free_y") + 
+  ggtitle("Нормальное распределение \nпри разных параметрах") + 
+  ylab("Плотность вероятности (f)")
 ```
-
-$$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^2}}$$
 
 ### Два параметра ($\mu$, $\sigma$)
 
@@ -300,10 +312,11 @@ $$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^
 
 $-\infty \le Y \le +\infty$    
 
+</div>
 
 ## Биномиальное распределение
 
-$f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}$
+$$f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}$$
 
 <div class="columns-2">
 
@@ -312,16 +325,24 @@ mu1 <- 0.1
 mu2 <- 0.5
 N1 <- 10
 N2 <- 30
-
 y <-seq(0, 30, 1)
 
-pi <- data.frame(y = rep(y, 4), pi = c(dbinom(y, size = N1, prob = mu1), dbinom(y,  size = N2, prob = mu1), dbinom(y,  size = N1, prob = mu2), dbinom(y,  size = N2, prob = mu2)),  mu = rep(c(mu1, mu2), each = 2*length(y)), N = rep(c(N1, N2, N1, N2), each = length(y)))
+pi <- data.frame(
+  y = rep(y, 4), 
+  pi = c(dbinom(y, size = N1, prob = mu1), 
+         dbinom(y,  size = N2, prob = mu1), 
+         dbinom(y,  size = N1, prob = mu2), 
+         dbinom(y,  size = N2, prob = mu2)),  
+  mu = rep(c(mu1, mu2), each = 2*length(y)), 
+  N = rep(c(N1, N2, N1, N2), each = length(y)))
 
-ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu,  scales = "free_y", labeller = label_both) + ggtitle("Биномиальное распрделение \n при разных параметрах") + ylab("Плотность вероятности (f)")
-
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(N~mu,  scales = "free_y", labeller = label_both) + 
+  ggtitle("Биномиальное распрделение \n при разных параметрах") + 
+  ylab("Плотность вероятности (f)")
 ```
 
-<small>
 
 ### Два параметра ($N$, $\pi$)
 
@@ -333,8 +354,6 @@ ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu, 
 ### Пределы варьирования
 
 $0 \le Y \le +\infty$, &emsp; $Y$ **целочисленные**
-</small>
-
 
 </div>
 
@@ -708,7 +727,7 @@ ggplot(MyData, aes(x = PARATIO, y = Pi)) +
 
 Причины изботочности дисперсии 
 
-- При одном и том же значении предиктора вероятности событий не одинаковы (not identically distributed)
+- При разных значениях предикторов вероятности событий подчиняются разным распределениям (not identically distributed)
 
 - События зависимы друг от друга (события при одном значении предиктора зависят от событий при другом зачении предиктора)
 
@@ -720,10 +739,11 @@ ggplot(MyData, aes(x = PARATIO, y = Pi)) +
 Пирсоновские остатки $E_i = \frac{\varepsilon_i}{\sqrt{Var(\hat{y_i})}}$
 
 ```{r}
-E <- resid(liz_model, type = "pearson") #Пирсоновские остатки
+pear_res <- resid(liz_model, type = "pearson") #Пирсоновские остатки
 p <- length(coef(liz_model)) #число параметров в модели  
-df <-   nrow(model.frame(liz_model)) - p #число степеней свободы
-Overdisp <- sum(E^2) / df
+N <- nrow(model.frame(liz_model)) # объем выборки
+df <-   N - p #число степеней свободы
+Overdisp <- sum(pear_res^2) / df
 
 Overdisp
 ```
