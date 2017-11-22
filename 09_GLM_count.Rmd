@@ -457,7 +457,7 @@ Plot_Poiss
 Как зависит опыление гадючьего лука от присутствия вида-вселенца и разнообразия флоры в ближайшей окрестности (Montero-Castaño, Vilà, 2015)?
 
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Muscari_comosum_08-05-2010_%281%29.JPG/265px-Muscari_comosum_08-05-2010_%281%29.JPG" alt="Leopoldia comosa" style="height: 275px;"/>
-<img src="images/Montero-Castaño, Vilà M, 2015_fig.2.png" alt="Fig.2" style="height: 275px;"/>
+<img src="images/Montero-Castano_Vila_2015_fig.2.png" alt="Fig.2" style="height: 275px;"/>
 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Hedysarum_coronarium_%28plant%29.jpg/265px-Hedysarum_coronarium_%28plant%29.jpg" alt="Hedysarum coronarium" style="height: 275px;"/>
 
 
