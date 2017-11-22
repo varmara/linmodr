@@ -85,7 +85,7 @@ ggplot(liz, aes(x=PARATIO, y=PA)) + geom_smooth(method="glm", method.args = list
 
 Логистическая кривая описывается такой формулой
 
-$$ \pi(x) = \frac{e^{\beta_0+\beta_1x}}{1+e^{\beta_0+\beta_1x}} $$
+$$ \pi(x) = \frac{e^{\beta_0 + \beta_1x}}{1 + e^{\beta_0 + \beta_1x}}$$
 
 
 ## Зависимую величину можно преобразовать в более удобную для моделирования форму 
@@ -875,7 +875,7 @@ M5 <- update(M4, .~.-BIC)
 
 ```{r}
 drop1(M5, test = "Chi")
-M6 <- update(M5, .~.-PO2)
+M6 <- update(M5, .~.-HRA)
 ```
 
 
@@ -884,7 +884,7 @@ M6 <- update(M5, .~.-PO2)
 
 ```{r}
 drop1(M6, test = "Chi")
-M7 <- update(M6, .~.-HRA)
+M7 <- update(M6, .~.-PO2)
 ```
 
 
