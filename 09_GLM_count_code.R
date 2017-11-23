@@ -74,9 +74,9 @@ Anova(M0)
 library(plyr)
 NewData <- ddply(
   .data = pol, .variables = .(Treatment), .fun = summarise,
-  DiversityD_1 = seq(min(DiversityD_1), max(DiversityD_1), length = 100))
-NewData$Flowers = mean(pol$Flowers)
-NewData$Hours = mean(pol$Hours)
+  Flowers = seq(min(Flowers), max(Flowers), length = 100))
+NewData$DiversityD_1 = mean(pol$DiversityD_1)
+NewData$Hours = max(pol$Hours)
 # модельная матрица
 X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
 # коэффициенты
@@ -90,7 +90,7 @@ NewData$SE <- sqrt(diag(X %*% vcov(M0) %*% t(X)))
 NewData$upr <- NewData$mu + 1.96 * NewData$SE
 NewData$lwr <- NewData$mu - 1.96 * NewData$SE
 # график предсказаний
-ggplot(NewData, aes(x = DiversityD_1, y = fit, group = Treatment)) +
+ggplot(NewData, aes(x = Flowers, y = fit, group = Treatment)) +
   geom_ribbon(aes(ymin = lwr, ymax = upr, fill = Treatment), alpha = 0.3) +
   geom_line(aes(colour = Treatment)) +
   geom_hline(yintercept = 0)

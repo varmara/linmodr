@@ -136,7 +136,7 @@ install.packages("ISwR")
 install.packages("AER")
 ```
 
-<!-- - Презентация: [09_GLM_count.html](09_GLM_count.html) -->
+- Презентация: [09_GLM_count.html](09_GLM_count.html)
 - Код: [09_GLM_count_code.R](09_GLM_count_code.R)
 - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx)
 

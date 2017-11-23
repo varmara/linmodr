@@ -568,8 +568,8 @@ Anova(M0)
 library(plyr)
 NewData <- ddply(
   .data = pol, .variables = .(Treatment), .fun = summarise,
-  DiversityD_1 = seq(min(DiversityD_1), max(DiversityD_1), length = 100))
-NewData$Flowers = mean(pol$Flowers)
+  Flowers = seq(min(Flowers), max(Flowers), length = 100))
+NewData$DiversityD_1 = mean(pol$DiversityD_1)
 NewData$Hours = mean(pol$Hours)
 # модельная матрица
 X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
@@ -584,7 +584,7 @@ NewData$SE <- sqrt(diag(X %*% vcov(M0) %*% t(X)))
 NewData$upr <- NewData$mu + 1.96 * NewData$SE
 NewData$lwr <- NewData$mu - 1.96 * NewData$SE
 # график предсказаний
-ggplot(NewData, aes(x = DiversityD_1, y = fit, group = Treatment)) +
+ggplot(NewData, aes(x = Flowers, y = fit, group = Treatment)) +
   geom_ribbon(aes(ymin = lwr, ymax = upr, fill = Treatment), alpha = 0.3) +
   geom_line(aes(colour = Treatment)) + 
   geom_hline(yintercept = 0)
@@ -681,7 +681,7 @@ Anova(M1)
     
 >- Можем ли мы доверять этим результатам? Пока не известно.
 
-## Задание 2
+## Задание 2 {.smaller}
 
 Постройте график предсказаний модели
 
@@ -1090,7 +1090,7 @@ Anova(Mod_nb)
 
 ## Подбираем оптимальную модель {.smaller}
 
-```{r, eval=FALSE, purl=FALSE}
+```{r, purl=FALSE}
 Mod_nb_final <- step(Mod_nb, direction = "backward", trace = 0)
 summary(Mod_nb_final)
 ```
@@ -1100,7 +1100,7 @@ summary(Mod_nb_final)
 ```{r, warning=FALSE, message=FALSE, purl=FALSE}
 Mod_nb_diag <- data.frame(
   af,
-  .fitted = predict(Mod_nb_final), 
+  .fitted = predict(Mod_nb_final, type = "response"), 
   .pears_resid = residuals(Mod_nb, type = "pearson"))
 
 ggplot(Mod_nb_diag, aes(x = .fitted, y = .pears_resid)) + geom_point() +
@@ -1109,16 +1109,17 @@ ggplot(Mod_nb_diag, aes(x = .fitted, y = .pears_resid)) + geom_point() +
 
 ## Графики остатков от предикторов в модели и нет
 
-```{r, warning=FALSE, message=FALSE, purl=FALSE}
-gg_res <- ggplot(Mod_nb_diag, aes(y = .pears_resid))
-grid.arrange(gg_res + geom_point(aes(x = yearsmarried)),
-             gg_res + geom_point(aes(x = religiousness)),
-             gg_res + geom_point(aes(x = gender)),
-             gg_res + geom_point(aes(x = children)),
-             gg_res + geom_point(aes(x = education)),
-             gg_res + geom_point(aes(x = occupation)),
-             gg_res + geom_point(aes(x = education)),
-             nrow = 3)
+```{r, warning=FALSE, message=FALSE, purl=FALSE, fig.width=8, fig.height=3.3}
+gg_res <- ggplot(Mod_nb_diag, aes(y = .pears_resid)) +
+  geom_boxplot()
+
+grid.arrange(gg_res + aes(x = factor(yearsmarried)),
+             gg_res + aes(x = factor(religiousness)),
+             gg_res + aes(x = factor(gender)),
+             gg_res + aes(x = factor(children)),
+             gg_res + aes(x = factor(education)),
+             gg_res + aes(x = factor(occupation)),
+             nrow = 2)
 ```
 
 ## Проверим на избыточность дисперсии
