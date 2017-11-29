@@ -143,6 +143,15 @@ install.packages("AER")
 
 ## 10. Смешанные модели (GLMM) для нормально-распределенных данных
 
+```{r eval=FALSE}
+install.packages("tidyr")
+```
+
+<!-- - Презентация: [10_GLMM_gaussian.pdf](10_GLMM_gaussian.pdf) -->
+- Код: [10_GLMM_gaussian_code.R](10_GLMM_gaussian_code.R)
+- Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx)
+
+
 ## 11. Моделирование структуры дисперсии в смешаных моделях
 
 ## 12. Смешанные линейные модели (GLMM) для бинарных данных
