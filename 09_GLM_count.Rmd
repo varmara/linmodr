@@ -456,7 +456,52 @@ ggplot(M2_diag, aes(x = .fitted, y = .stdresid)) + geom_point() +
 M3 <- glm(Juv ~ Adult * factor(Year), 
           data = juv_ad, family = "poisson")
 library(car)
+<<<<<<< HEAD
 Anova(M3)
+=======
+Anova(M0)
+```
+
+>- Число визитов опылителей на цветки гадючьего лука 
+    - НЕ зависит от присутствия вида вселенца и его цветов
+    - НЕ зависит от разнообразия флоры на участке
+    - зависит от числа цветов самого гадючьего лука
+    
+>- Можем ли мы доверять этим результатам? Пока не известно.
+
+## Визуализируем предсказания простой линейной модели
+
+```{r, m0-viz, eval=TRUE, echo=FALSE, fig.height=5, fig.width=10}
+library(plyr)
+NewData <- ddply(
+  .data = pol, .variables = .(Treatment), .fun = summarise,
+  Flowers = seq(min(Flowers), max(Flowers), length = 100))
+NewData$DiversityD_1 = mean(pol$DiversityD_1)
+NewData$Hours = mean(pol$Hours)
+# модельная матрица
+X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
+# коэффициенты
+betas <- coef(M0)
+# предсказанные значения
+NewData$mu <- X %*% betas  # в масштабе функции связи
+NewData$fit <- NewData$mu  # в масштабе значений отклика
+# стандартные ошибки
+NewData$SE <- sqrt(diag(X %*% vcov(M0) %*% t(X)))
+# доверительный интервал
+NewData$upr <- NewData$mu + 1.96 * NewData$SE
+NewData$lwr <- NewData$mu - 1.96 * NewData$SE
+# график предсказаний
+ggplot(NewData, aes(x = Flowers, y = fit, group = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = Treatment), alpha = 0.3) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0)
+```
+
+
+## Код для графика {.smaller}
+
+```{r, m0-viz, eval=FALSE, tidy=TRUE, tidy.opts=list(width=50), purl=FALSE}
+>>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 ```
 
 ## Диагностика модели
@@ -498,7 +543,72 @@ fi <- sum(Resid_M3^2) /df  #Величина fi показывает во ско
 fi
 ```
 
+<<<<<<< HEAD
 Дисперсия в `r fi` раза больше среднего!
+=======
+>- Число визитов опылителей на цветки гадючьего лука
+    - зависит от присутствия вида вселенца и его цветов
+    - зависит от разнообразия флоры на данном участке
+    - зависит от числа цветов самого гадючьего лука
+    
+>- Можем ли мы доверять этим результатам? Пока не известно.
+
+## Задание 2 {.smaller}
+
+Постройте график предсказаний модели
+
+```{r eval=FALSE, purl=TRUE}
+NewData <- ddply(
+  .data = , .variables = .(), .fun = summarise,
+  DiversityD_1 = seq(min(), max(), length = 100))
+NewData$Flowers = mean(pol$Flowers)
+NewData$Hours = mean(pol$Hours)
+# модельная матрица
+X <- model.matrix(, data = NewData)
+# коэффициенты
+betas <- 
+# предсказанные значения
+NewData$mu <-       # в масштабе функции связи
+NewData$fit <-  # в масштабе значений отклика
+# стандартные ошибки
+NewData$SE <- sqrt(diag(X %*% vcov(M1) %*% t(X)))
+# доверительный интервал в масштабе значений отклика
+NewData$upr <- (NewData$mu + 1.96 * NewData$SE)
+NewData$lwr <- (NewData$mu - 1.96 * NewData$SE)
+# график предсказаний
+ggplot(NewData, aes(x = , y = , group = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = ), alpha = 0.3) +
+  geom_line(aes(colour = )) + 
+  geom_hline(yintercept = 0)
+```
+
+## Визуализируем предсказания модели с Пуассоновским распределением отклика
+
+```{r, m1-viz, eval=TRUE, echo=FALSE, fig.height=5, fig.width=10, purl=FALSE}
+NewData <- ddply(
+  .data = pol, .variables = .(Treatment), .fun = summarise,
+  DiversityD_1 = seq(min(DiversityD_1), max(DiversityD_1), length = 100))
+NewData$Flowers = mean(pol$Flowers)
+NewData$Hours = mean(pol$Hours)
+# модельная матрица
+X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
+# коэффициенты
+betas <- coef(M1)
+# предсказанные значения
+NewData$mu <- X %*% betas      # в масштабе функции связи
+NewData$fit <- exp(NewData$mu) # в масштабе значений отклика
+# стандартные ошибки
+NewData$SE <- sqrt(diag(X %*% vcov(M1) %*% t(X)))
+# доверительный интервал
+NewData$upr <- exp(NewData$mu + 1.96 * NewData$SE)
+NewData$lwr <- exp(NewData$mu - 1.96 * NewData$SE)
+# график предсказаний
+ggplot(NewData, aes(x = DiversityD_1, y = fit, group = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = Treatment), alpha = 0.3) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0)
+```
+>>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 
 
 ## Избыточность дисперсии (Overdispersion)
@@ -737,20 +847,50 @@ Anova(Mod_nb)
 
 ## Подбираем оптимальную модель
 
+<<<<<<< HEAD
 ```{r, eval=FALSE}
 step(Mod_nb)
+=======
+```{r, purl=FALSE}
+Mod_nb_final <- step(Mod_nb, direction = "backward", trace = 0)
+summary(Mod_nb_final)
+>>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 ```
 
 
+<<<<<<< HEAD
 ## Сморим на результаты оптимальной модели
+=======
+```{r, warning=FALSE, message=FALSE, purl=FALSE}
+Mod_nb_diag <- data.frame(
+  af,
+  .fitted = predict(Mod_nb_final, type = "response"), 
+  .pears_resid = residuals(Mod_nb, type = "pearson"))
+>>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 
 ```{r, tidy=TRUE, tidy.opts=list(width = 50)}
 Mod_nb_final <- glm.nb(formula = affairs ~ yearsmarried +  children + religiousness +  yearsmarried:children, data = af, init.theta = 0.1346363532, link = log)
 ```
 
+<<<<<<< HEAD
 <small>
 ```{r}
 summary(Mod_nb_final)
+=======
+## Графики остатков от предикторов в модели и нет
+
+```{r, warning=FALSE, message=FALSE, purl=FALSE, fig.width=8, fig.height=3.3}
+gg_res <- ggplot(Mod_nb_diag, aes(y = .pears_resid)) +
+  geom_boxplot()
+
+grid.arrange(gg_res + aes(x = factor(yearsmarried)),
+             gg_res + aes(x = factor(religiousness)),
+             gg_res + aes(x = factor(gender)),
+             gg_res + aes(x = factor(children)),
+             gg_res + aes(x = factor(education)),
+             gg_res + aes(x = factor(occupation)),
+             nrow = 2)
+>>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 ```
 </small>
 
