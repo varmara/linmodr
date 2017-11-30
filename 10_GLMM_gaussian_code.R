@@ -52,7 +52,6 @@ ggplot(sl, aes(x = Reaction, y = Subject, colour = Days)) +
   geom_point()
 
 
-
 ## Не учитываем группирующий фактор
 Wrong1 <- lm(Reaction ~ Days, data = sl)
 
@@ -73,7 +72,8 @@ Wrong2_diag <- fortify(Wrong2)
 ggplot(Wrong2_diag, aes(x = Days, colour = Subject)) +
   geom_line(aes(y = .fitted, group = Subject)) +
   geom_point(data = sl, aes(y = Reaction)) +
-  guides(colour = guide_legend(ncol = 2))
+  guides(colour = guide_legend(ncol = 2)) +
+  facet_wrap(~Subject)
 
 
 
@@ -112,7 +112,8 @@ M1_diag <- data.frame(sl,
                       .fitted <- fitted(M1))
 gg_resid <- ggplot(M1_diag, aes(y = .resid)) +
   guides(colour = guide_legend(ncol = 2))
-gg_resid + geom_point(aes(x = .fitted, colour = Subject))
+gg_resid + geom_point(aes(x = .fitted, colour = Subject)) + geom_smooth(method = "loess", aes(x = .fitted)) +
+  geom_hline(yintercept = 0)
 
 ## Графики остатков от ковариат в модели и не в модели
 library(gridExtra)
@@ -164,7 +165,7 @@ VarCorr(M1_fin)  # Случайные эффекты
 ## Внутриклассовая корреляция
 # $\sigma_{effect}^2 / (\sigma_{effect}^2 + \sigma^2)$
 
-
+37.12383^2 / (37.12383^2 + 30.99123^2)
 
 ## Данные для графика предсказаний фиксированной части модели #############
 
@@ -221,7 +222,8 @@ ggplot(NewData_M1, aes(x = Days, y = fit_subj, group = Subject)) +
                   ymax = fit_subj + 1.98*se)) +
   geom_line() +
   geom_point(data = sl, aes(x = Days, y = Reaction))  +
-  guides(fill = guide_legend(ncol = 2))
+  guides(fill = guide_legend(ncol = 2)) +
+  facet_wrap(~Subject)
 
 
 ## Смешанная модель со случайным отрезком и углом наклона #################
@@ -336,15 +338,17 @@ Anova(MN1)
 
 
 ## Задание 3 -------------------------------------
-#
+
+MN1_fin <- lme(height ~ graze_f*AspectCat + year_f + nativecov_sq + slope,
+           random = ~ 1|Park/plotID,
+           data = graz, method = "REML")
+
 # Рассчитайте внутриклассовую корреляцию
 #
 # - Для наблюдений на одном и том же участке
+3.3702^2 / (1.574143^2 + 3.3702^2 + 5.133291^2)
 # - Для наблюдений в одном и том же парке
-
-
-
-
+1.574143^2 / (1.574143^2 + 3.3702^2 + 5.133291^2)
 
 
 
@@ -361,11 +365,11 @@ NewData_MN1$slope <- mean(graz$slope)
 
 # Предсказанные значения при помощи матриц
 X <- model.matrix(~ graze_f * AspectCat + year_f + nativecov_sq + slope, data = NewData_MN1)
-betas = fixef(MN1)
+betas = fixef(MN1_fin)
 NewData_MN1$fitted <- X %*% betas
 
 # Cтандартные ошибки и дов. интервалы
-NewData_MN1$se <- sqrt( diag(X %*% vcov(MN1) %*% t(X)) )
+NewData_MN1$se <- sqrt( diag(X %*% vcov(MN1_fin) %*% t(X)) )
 NewData_MN1$lwr <- NewData_MN1$fit - 1.98 * NewData_MN1$se
 NewData_MN1$upr <- NewData_MN1$fit + 1.98 * NewData_MN1$se
 

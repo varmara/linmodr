@@ -1,0 +1,522 @@
+---
+title: "Смешанные линейные модели (вложенные случайные факторы)"
+subtitle: "Линейные модели..."
+author: "Марина Варфоломеева, Вадим Хайтов"
+output:
+  beamer_presentation:
+    colortheme: beaver
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: default
+    toc: no
+institute: "СПбГУ"
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# to render
+# rmarkdown::render("10_GLMM_gaussian.Rmd", output_format = "beamer_presentation")
+# options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+# library("extrafont")
+source("support_linmodr.R")
+```
+
+## Вы узнаете
+
+- Что такое вложенные случайные факторы и в каких случаях они применяются
+
+### Вы сможете
+
+- Объяснить, что такое вложенные случайные факторы
+- Привести примеры иерархических случайных факторов
+- Вычислить коэффициент внутриклассовой корреляции для  случая с двумя вложенными случайными факторами
+- Подобрать смешаную линейную модель со вложенными случайными факторами
+
+# Смешанные модели со вложенными случайными факторами
+
+
+## Вложенные факторы (Nested effects)
+
+\pause
+
+### Факторы образуют иерархическую последовательность вложенности
+
+- лес -->  дерево в лесу --> ветка на дереве --> наблюдение (личинки насекомых)
+
+\pause
+
+### Внутри каждого уровня главного фактора будут разные (нестрого сопоставимые) уровни вложенного фактора
+
+Деревья, с которых собирали личинок, будут разные в разных лесах (разные экземпляры).  
+
+\pause
+
+### Уровни вложенных факторов описывают иерархию взаимного сходства наблюдений
+
+Личинки с разных деревьев из одного леса имеют право быть похожими друг на друга больше, чем на личинок из другого леса  
+Личинки на одном дереве имеют право быть похожими друг на друга больше, чем на личинок с другого дерева  
+И т.п.
+
+## Другие примеры вложенных факторов
+
+- регион --> город --> больница --> наблюдение (пациент)
+
+- самка --> выводок --> наблюдение (особь)
+
+- лес --> дерево в лесу --> гнездо на дереве --> наблюдение (птенец)
+
+- улитка --> спороциста в улитке --> наблюдение (редия)
+
+
+## Пример: Высота растений и выпас скота
+
+Вообще-то, статья Gennet et al. 2017 о птицах, но чтобы про них что-то лучше понять, нужно разобраться с их местообитанием.
+
+Как в разные годы высота растительного покрова зависит от выпаса скота, экспозиции склона и проективного покрытия местных растений?
+
+\small
+
+Зависимая переменная:
+
+- **height** - высота растительного покрова
+
+Предикторы:
+
+- **graze** - выпас коров (0, 1)
+- **AspectCat** - экспозиция (S, N)
+- **nativecov** - покрытие местной флоры %
+- **slope** - наклон
+- **year** - год наблюдений
+- **Park** - парк
+- **plotID** - уникальный идентификатор участка
+
+\tiny
+
+Данные:
+Gennet, S., Spotswood, E., Hammond, M. and Bartolome, J.W., 2017. Livestock grazing supports native plants and songbirds in a California annual grassland. PloS one, 12(6), p.e0176367.
+
+## Открываем данные
+
+Откроем и переформатируем данные так, чтобы не было дублирования и каждому участку соответствовала одна строчка.
+
+```{r}
+library(readxl)
+library(tidyr)
+gr <- read_excel("data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx")
+graz <- gr %>% spread(Species, presence)
+```
+
+## Знакомство с данными
+
+Есть ли пропущенные значения?
+
+```{r}
+sum(is.na(graz))
+```
+
+Сколько участков было в каждом парке в каждый год?
+
+```{r}
+with(graz, table(Park, year))
+```
+
+## Наводим порядок
+
+Сделаем факторами переменные, которые понадобятся для модели
+
+```{r}
+graz$graze_f <- factor(graz$graze)
+graz$AspectCat <- factor(graz$AspectCat)
+graz$year_f <- factor(graz$year)
+```
+
+Извлечем корень из обилия местных видов
+
+```{r}
+graz$nativecov_sq <- sqrt(graz$nativecov) 
+```
+
+## Модель
+
+Вспомним главный вопрос исследования и подберем модель
+
+Как в разные годы высота растительного покрова зависит от выпаса скота, экспозиции склона и проективного покрытия местных растений?
+
+\pause
+
+Нам нужно учесть, что в разные годы из-за кучи разных причин высота растений может различаться
+
+Кроме того, нужно учесть, что в разных парках и на разных участках растения будут расти сходным образом в разные годы. У нас есть иерархические факторы парк и участок в парке
+
+\pause
+
+```{r}
+library(nlme)
+MN1 <- lme(height ~ graze_f*AspectCat + year_f + nativecov_sq + slope,
+          random = ~ 1|Park/plotID, 
+          data = graz, method = "ML")
+```
+
+## Анализ остатков
+
+```{r}
+# Данные для анализа остатков
+MN1_diag <- data.frame(
+  graz,
+  pear_res = residuals(MN1, type = "pearson"),
+  fitted = fitted(MN1, type = "response"))
+```
+
+## График остатков
+
+```{r}
+library(ggplot2)
+gg_res <- ggplot(data = MN1_diag, aes(y = pear_res))
+gg_res + geom_point(aes(x = fitted)) +
+  geom_smooth(aes(x = fitted))
+```
+
+## Графики остатков от переменных в модели
+
+```{r}
+library(gridExtra)
+grid.arrange(gg_res + geom_boxplot(aes(x = graze_f)),
+gg_res + geom_boxplot(aes(x = AspectCat)),
+gg_res + geom_boxplot(aes(x = year_f)),
+gg_res + geom_point(aes(x = nativecov_sq)),
+gg_res + geom_point(aes(x = slope)),
+ncol = 3)
+```
+
+>- Паттерн на графике `nativecov_sq`. Возможно, здесь нужно использовать GAMM.
+
+## Графики остатков от переменных не в модели
+
+```{r}
+grid.arrange(
+  gg_res + geom_point(aes(x = heatloadrel)),
+  gg_res + geom_point(aes(x = sqrt(litt))),
+  gg_res + geom_point(aes(x = sqrt(bare))),
+  ncol = 3)
+```
+- Паттерн на графике `heatloadrel`
+- Возможно, есть тренд на графике `sqrt(litt)`
+
+
+## Тесты отношения правдоподобий для полной модели
+
+Модель `MN1` была подобрана при помощи ML, поэтому можно применять тесты отношения правдоподобий прямо к ней
+
+```{r}
+library(car)
+Anova(MN1)
+```
+
+Высота растительного покрова:
+
+- на склонах разной экспозиции по-разному зависит от выпаса скота (достоверное взаимодействие)
+- различается в разные годы
+- не зависит от покрытия местных растений и крутизны склона
+
+## Задание 3
+
+Рассчитайте внутриклассовую корреляцию
+
+- Для наблюдений на одном и том же участке
+- Для наблюдений в одном и том же парке
+
+## Внутриклассовая корреляция
+
+Для расчета внутриклассовой корреляции нужна модель, подобранная при помощи REML
+
+\small
+
+```{r purl=FALSE}
+MN1_fin <-  lme(height ~ graze_f*AspectCat + year_f + nativecov_sq + slope,
+           random = ~ 1|Park/plotID,
+           data = graz, method = "REML")
+```
+
+\tiny
+
+```{r purl=FALSE}
+MN1_fin
+```
+
+## Внутриклассовая корреляция
+
+\small
+
+Для наблюдений на одном и том же участке $\sigma_{plotID}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)$
+
+```{r purl=FALSE}
+3.3702^2 / (1.574143^2 + 3.3702^2 + 5.133291^2)
+```
+
+Для наблюдений в одном и том же парке $\sigma_{Park}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)$
+
+```{r purl=FALSE}
+1.574143^2 / (1.574143^2 + 3.3702^2 + 5.133291^2)
+```
+
+```
+В результатах
+Random effects:
+ Formula: ~1 | Park
+        (Intercept)
+StdDev:    1.574143
+
+ Formula: ~1 | plotID %in% Park
+        (Intercept) Residual
+StdDev:      3.3702 5.133291
+```
+
+- Значения высоты травяного покрова похожи внутри участка. Сходство наблюдений внутри одного парка слабее.
+
+## Результаты полной модели
+
+\tiny
+
+```{r}
+summary(MN1_fin)
+```
+
+## Данные для графика предсказаний фиксированной части модели
+
+Используем для визуализации модель, подобранную при помощи REML
+
+```{r}
+# Исходные данные
+NewData_MN1_fin <- expand.grid(graze_f = levels(graz$graze_f),
+            AspectCat = levels(graz$AspectCat),
+            year_f = levels(graz$year_f))
+NewData_MN1_fin$nativecov_sq <- mean(graz$nativecov_sq)
+NewData_MN1_fin$slope <- mean(graz$slope)
+
+# Предсказанные значения при помощи матриц
+X <- model.matrix(~ graze_f * AspectCat + year_f + nativecov_sq + slope, 
+                  data = NewData_MN1_fin)
+betas = fixef(MN1_fin)
+NewData_MN1_fin$fitted <- X %*% betas
+
+# Cтандартные ошибки и дов. интервалы
+NewData_MN1_fin$se <- sqrt( diag(X %*% vcov(MN1_fin) %*% t(X)) )
+NewData_MN1_fin$lwr <- NewData_MN1_fin$fit - 1.96 * NewData_MN1_fin$se
+NewData_MN1_fin$upr <- NewData_MN1_fin$fit + 1.96 * NewData_MN1_fin$se
+```
+
+## График предсказаний фиксированной части модели
+
+На южных склонах высота травы выше там, где не пасут скот, а на северных нет. (Строго говоря, нужен еще пост хок тест, чтобы это утверждать.)
+
+```{r}
+ggplot(data = NewData_MN1_fin, aes(x = year_f, y = fitted, colour = graze_f)) +
+  geom_pointrange(aes(ymin = lwr, ymax = upr)) +
+  facet_wrap(~ AspectCat) +
+  geom_jitter(data = graz, aes(y = height), alpha = 0.35, size = 1) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+# Вариант решения с подбором оптимальной модели (самостоятельно)
+
+## Задание 4
+
+Оптимизируйте модель с предыдущего шага
+
+Сделайте анализ остатков
+
+Опишите и визуализируйте финальную модель
+
+## Решение: Подбор оптимальной модели (1)
+
+Для подбора оптимальной модели воспользуемся тестами отношения правдоподобий. Для него нужно использовать модели, подобранные при помощи ML
+
+```{r purl=FALSE}
+drop1(MN1, test = "Chi")
+```
+
+
+## Решение: Подбор оптимальной модели (2)
+
+```{r purl=FALSE}
+MN1.1 <- update(MN1, .~.-slope)
+drop1(MN1.1, test = "Chi")
+```
+
+
+## Решение: Подбор оптимальной модели (3)
+
+```{r purl=FALSE}
+MN1.2 <- update(MN1.1, .~.-nativecov_sq)
+drop1(MN1.2, test = "Chi")
+```
+
+## Решение: Анализ остатков
+
+```{r purl=FALSE}
+# Данные для анализа остатков
+MN1.2_diag <- data.frame(
+  graz,
+  pear_res = residuals(MN1.2, type = "pearson"),
+  fitted = fitted(MN1.2, type = "response"))
+```
+
+## Решение: График остатков
+
+```{r purl=FALSE}
+gg_res <- ggplot(data = MN1.2_diag, aes(y = pear_res))
+gg_res + geom_point(aes(x = fitted)) +
+  geom_smooth(aes(x = fitted))
+```
+
+## Решение: Графики остатков от переменных в модели
+
+```{r purl=FALSE}
+grid.arrange(gg_res + geom_boxplot(aes(x = graze_f)),
+gg_res + geom_boxplot(aes(x = AspectCat)),
+gg_res + geom_boxplot(aes(x = year_f)),
+ncol = 3)
+```
+
+
+## Решение: Графики остатков от переменных не в модели
+
+```{r purl=FALSE}
+grid.arrange(
+  gg_res + geom_point(aes(x = heatloadrel)),
+  gg_res + geom_point(aes(x = sqrt(litt))),
+  gg_res + geom_point(aes(x = sqrt(bare))),
+  gg_res + geom_point(aes(x = nativecov_sq)),
+  gg_res + geom_point(aes(x = slope)),
+  ncol = 3)
+```
+- Паттерн на графике `heatloadrel`, `nativecov_sq`
+
+
+## Решение: Тестируем влияние факторов в финальной модели
+
+Для тестов отношения правдоподобий используем финальную модель, подобранную при помощи ML
+
+```{r purl=FALSE}
+Anova(MN1.2)
+```
+
+Высота растительного покрова:
+
+- на склонах разной экспозиции по-разному зависит от выпаса скота (достоверное взаимодействие)
+- различается в разные годы
+- не зависит от покрытия местных растений и крутизны склона
+
+
+## Решение: Описываем результаты
+
+Для описания результатов используем модель, подобранную при помощи REML, т.к. он дает больее точные оценки случайных эффектов
+
+```{r purl=FALSE}
+MN1.2_fin <- update(MN1.2, method = "REML")
+```
+
+## Решение: Результаты
+
+\tiny
+
+```{r purl=FALSE}
+summary(MN1.2_fin)
+```
+
+## Решение: Внутриклассовая корреляция
+
+\small
+
+Для расчета нужна модель, подобранная при помощи REML
+
+```{r, eval=FALSE, purl=FALSE}
+MN1.2_fin
+```
+
+Для наблюдений на одном и том же участке $\sigma_{plotID}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)$
+
+```{r purl=FALSE}
+3.709642^2 / (1.176709^2 + 3.709642^2 + 5.090746^2)
+```
+
+Для наблюдений в одном и том же парке $\sigma_{Park}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)$
+
+```{r purl=FALSE}
+1.176709^2 / (1.176709^2 + 3.709642^2 + 5.090746^2)
+```
+
+```
+В результатах
+Random effects:
+ Formula: ~1 | Park
+        (Intercept)
+StdDev:    1.176709
+
+ Formula: ~1 | plotID %in% Park
+        (Intercept) Residual
+StdDev:    3.709642 5.090746
+```
+
+- Значения высоты травяного покрова похожи внутри участка. Сходство наблюдений внутри одного парка слабее.
+
+## Решение: Данные для графика предсказаний фиксированной части модели
+
+Используем для визуализации модель, подобранную при помощи REML
+
+```{r purl=FALSE}
+# Исходные данные
+NewData_MN1.2_fin <- expand.grid(graze_f = levels(graz$graze_f),
+            AspectCat = levels(graz$AspectCat),
+            year_f = levels(graz$year_f))
+NewData_MN1.2_fin$nativecov_sq <- mean(graz$nativecov_sq)
+NewData_MN1.2_fin$slope <- mean(graz$slope)
+
+# Предсказанные значения при помощи матриц
+X <- model.matrix(~ graze_f * AspectCat + year_f, data = NewData_MN1.2_fin)
+betas = fixef(MN1.2_fin)
+NewData_MN1.2_fin$fitted <- X %*% betas
+
+# Cтандартные ошибки и дов. интервалы
+NewData_MN1.2_fin$se <- sqrt( diag(X %*% vcov(MN1.2_fin) %*% t(X)) )
+NewData_MN1.2_fin$lwr <- NewData_MN1.2_fin$fit - 1.96 * NewData_MN1.2_fin$se
+NewData_MN1.2_fin$upr <- NewData_MN1.2_fin$fit + 1.96 * NewData_MN1.2_fin$se
+```
+
+## Решение: График предсказаний фиксированной части модели
+
+На южных склонах высота травы выше там, где не пасут скот, а на северных нет. (Строго говоря, нужен еще пост хок тест, чтобы это утверждать)
+
+Не удивляйтесь тому, что график похож на предыдущий, т.к. те факторы, которые мы удалили из модели и так не влияли.
+
+```{r purl=FALSE}
+ggplot(data = NewData_MN1.2_fin, aes(x = year_f, y = fitted, colour = graze_f)) +
+  geom_pointrange(aes(ymin = lwr, ymax = upr)) +
+  facet_wrap(~ AspectCat) +
+  geom_jitter(data = graz, aes(y = height), alpha = 0.35, size = 1) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+
+## Take-home messages
+
+- Случайные факторы в смешанных моделях могут быть вложены друг в друга
+- Есть два способа подбора коэффициентов в смешанных моделях: ML и REML. Для разных этапов анализа важно, каким именно способом подобрана модель.
+
+
+## Дополнительные ресурсы
+
+- Crawley, M.J. (2007). The R Book (Wiley).
+- Zuur, A. F., Hilbe, J., & Ieno, E. N. (2013). A Beginner's Guide to GLM and GLMM with R: A Frequentist and Bayesian Perspective for Ecologists. Highland Statistics.
+- Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer)
+- Pinheiro, J., Bates, D. (2000). Mixed-Effects Models in S and S-PLUS. Springer
+
+
