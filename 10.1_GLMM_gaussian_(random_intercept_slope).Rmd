@@ -1,5 +1,5 @@
 ---
-title: "Смешанные линейные модели"
+title: "Смешанные линейные модели (случайный интерсепт и случайный угол наклона)"
 subtitle: "Линейные модели..."
 author: "Марина Варфоломеева, Вадим Хайтов"
 output:
@@ -14,7 +14,7 @@ output:
     - -V lang=russian
     slide_level: 2
     theme: default
-    toc: yes
+    toc: no
 institute: "СПбГУ"
 ---
 
@@ -684,30 +684,30 @@ M1_fin
 ```{r}
 # Исходные данные
 library(plyr)
-NewData_M1 <- ddply(
+NewData_M1_fin <- ddply(
   sl, .(Subject), summarise,
   Days = seq(min(Days), max(Days), length = 10)
   )
 
 # Предсказанные значения при помощи predict()
 # level = 0 - для фиксированных эффектов (т.е. без учета субъекта)
-NewData_M1$fitted <- predict(M1_fin, NewData_M1, level = 0)
+NewData_M1_fin$fitted <- predict(M1_fin, NewData_M1_fin, level = 0)
 
 # Предсказанные значения при помощи матриц
-X <- model.matrix(~ Days, data = NewData_M1)
+X <- model.matrix(~ Days, data = NewData_M1_fin)
 betas <- fixef(M1_fin)
-NewData_M1$fitted <- X %*% betas
+NewData_M1_fin$fitted <- X %*% betas
 
 # Cтандартные ошибки и дов. интервалы
-NewData_M1$se <- sqrt( diag(X %*% vcov(M1_fin) %*% t(X)) )
-NewData_M1$lwr <- NewData_M1$fitted - 1.98 * NewData_M1$se
-NewData_M1$upr <- NewData_M1$fitted + 1.98 * NewData_M1$se
+NewData_M1_fin$se <- sqrt( diag(X %*% vcov(M1_fin) %*% t(X)) )
+NewData_M1_fin$lwr <- NewData_M1_fin$fitted - 1.96 * NewData_M1_fin$se
+NewData_M1_fin$upr <- NewData_M1_fin$fitted + 1.96 * NewData_M1_fin$se
 ```
 
 ## График предсказаний фиксированной части модели
 
 ```{r}
-ggplot(data = NewData_M1, aes(x = Days, y = fitted)) +
+ggplot(data = NewData_M1_fin, aes(x = Days, y = fitted)) +
   geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) +
   geom_line() +
   geom_point(data = sl, aes(x = Days, y = Reaction))
@@ -722,15 +722,15 @@ ggplot(data = NewData_M1, aes(x = Days, y = fitted)) +
 $\beta_0 + \beta_1 \cdot Days_{ij} + b_i$
 
 ```{r}
-NewData_M1$fit_subj <- predict(M1_fin, NewData_M1, level = 1)
+NewData_M1_fin$fit_subj <- predict(M1_fin, NewData_M1_fin, level = 1)
 # или то же самое при помощи матриц
 # случайные эффекты для каждого субъекта
 # это датафрейм с одним столбцом
 rand <- ranef(M1_fin)
 # "разворачиваем" для каждой строки данных
-all_rand <- rand[as.numeric(NewData_M1$Subject), 1]
+all_rand <- rand[as.numeric(NewData_M1_fin$Subject), 1]
 # прибавляем случайные эффекты к предсказаниям фикс. части
-NewData_M1$fit_subj <- X %*% betas + all_rand
+NewData_M1_fin$fit_subj <- X %*% betas + all_rand
 ```
 
 
@@ -738,9 +738,9 @@ NewData_M1$fit_subj <- X %*% betas + all_rand
 
 
 ```{r gg_M1_subj}
-ggplot(NewData_M1, aes(x = Days, y = fit_subj, group = Subject)) +
-  geom_ribbon(alpha = 0.5, aes(fill = Subject, ymin = fit_subj - 1.98*se, 
-                  ymax = fit_subj + 1.98*se)) + 
+ggplot(NewData_M1_fin, aes(x = Days, y = fit_subj, group = Subject)) +
+  geom_ribbon(alpha = 0.5, aes(fill = Subject, ymin = fit_subj - 1.96*se, 
+                  ymax = fit_subj + 1.96*se)) + 
   geom_line() +
   geom_point(data = sl, aes(x = Days, y = Reaction))  +
   guides(fill = guide_legend(ncol = 2))
@@ -902,30 +902,30 @@ VarCorr(MS1_fin)  # Случайные эффекты
 
 ```{r purl=FALSE}
 # Исходные данные
-NewData_MS1 <- ddply(
+NewData_MS1_fin <- ddply(
   sl, .(Subject), summarise,
   Days = seq(min(Days), max(Days), length = 10)
   )
 
 # Предсказанные значения при помощи predict()
 # level = 0 - для фиксированных эффектов (т.е. без учета субъекта)
-NewData_MS1$fitted <- predict(MS1_fin, NewData_MS1, level = 0)
+NewData_MS1_fin$fitted <- predict(MS1_fin, NewData_MS1_fin, level = 0)
 
 # Предсказанные значения при помощи матриц
-X <- model.matrix(~ Days, data = NewData_MS1)
+X <- model.matrix(~ Days, data = NewData_MS1_fin)
 betas = fixef(MS1_fin)
-NewData_MS1$fit <- X %*% betas
+NewData_MS1_fin$fit <- X %*% betas
 
 # Cтандартные ошибки и дов. интервалы
-NewData_MS1$se <- sqrt( diag(X %*% vcov(MS1_fin) %*% t(X)) )
-NewData_MS1$lwr <- NewData_MS1$fit - 1.98 * NewData_MS1$se
-NewData_MS1$upr <- NewData_MS1$fit + 1.98 * NewData_MS1$se
+NewData_MS1_fin$se <- sqrt( diag(X %*% vcov(MS1_fin) %*% t(X)) )
+NewData_MS1_fin$lwr <- NewData_MS1_fin$fit - 1.96 * NewData_MS1_fin$se
+NewData_MS1_fin$upr <- NewData_MS1_fin$fit + 1.96 * NewData_MS1_fin$se
 ```
 
 ## Решение: График предсказаний фиксированной части модели
 
 ```{r purl=FALSE}
-ggplot(data = NewData_MS1, aes(x = Days, y = fitted)) +
+ggplot(data = NewData_MS1_fin, aes(x = Days, y = fitted)) +
   geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) +
   geom_line() +
   geom_point(data = sl, aes(x = Days, y = Reaction))
@@ -940,375 +940,37 @@ ggplot(data = NewData_MS1, aes(x = Days, y = fitted)) +
 $\beta_0 + \beta_1 \cdot Days_{ij} + b_i + c_{ij} \cdot Days_{ij}$
 
 ```{r purl=FALSE}
-NewData_MS1$fit_subj <- predict(MS1_fin, NewData_MS1, level = 1)
+NewData_MS1_fin$fit_subj <- predict(MS1_fin, NewData_MS1_fin, level = 1)
 # или то же самое при помощи матриц
 # случайные эффекты для каждого субъекта
 # это датафрейм с двумя столбцами
 rand <- ranef(MS1_fin)
 # "разворачиваем" для каждой строки данных
-all_rand <- rand[as.numeric(NewData_MS1$Subject), ]
+all_rand <- rand[as.numeric(NewData_MS1_fin$Subject), ]
 # прибавляем случайные эффекты к предсказаниям фикс. части
-NewData_MS1$fit_subj <- (betas[1] + all_rand[, 1]) + (betas[2] + all_rand[, 2]) * NewData_MS1$Days
+NewData_MS1_fin$fit_subj <- (betas[1] + all_rand[, 1]) + (betas[2] + all_rand[, 2]) * NewData_MS1_fin$Days
 ```
 
 
 ## Решение: График предсказаний для индивидуальных уровней случайного фактора
 
 ```{r purl=FALSE}
-ggplot(NewData_MS1, aes(x = Days, y = fit_subj, group = Subject)) +
-  geom_ribbon(alpha = 0.5, aes(fill = Subject, ymin = fit_subj - 1.98*se,
-                  ymax = fit_subj + 1.98*se)) +
+ggplot(NewData_MS1_fin, aes(x = Days, y = fit_subj, group = Subject)) +
+  geom_ribbon(alpha = 0.5, aes(fill = Subject, ymin = fit_subj - 1.96*se,
+                  ymax = fit_subj + 1.96*se)) +
   geom_line() +
   geom_point(data = sl, aes(x = Days, y = Reaction)) +
   guides(fill = guide_legend(ncol = 2))
 ```
-
-# Смешанные модели со вложенными случайными факторами
-
-
-## Вложенные факторы (Nested effects)
-
-### Факторы образуют иерархическую последовательность вложенности
-
-- лес -->  дерево в лесу --> ветка на дереве --> наблюдение (личинки насекомых)
-
-### Внутри каждого уровня главного фактора будут разные (нестрого сопоставимые) уровни вложенного фактора
-
-Деревья, с которых собирали личинок, будут разные в разных лесах (разные экземпляры).  
-
-### Уровни вложенных факторов описывают иерархию взаимного сходства наблюдений
-
-Личинки с разных деревьев из одного леса имеют право быть похожими друг на друга больше, чем на личинок из другого леса  
-Личинки на одном дереве имеют право быть похожими друг на друга больше, чем на личинок с другого дерева  
-И т.п.
-
-## Другие примеры вложенных факторов
-
-- регион --> город --> больница --> наблюдение (пациент)
-
-- самка --> выводок --> наблюдение (особь)
-
-- лес --> дерево в лесу --> гнездо на дереве --> наблюдение (птенец)
-
-- улитка --> спороциста в улитке --> наблюдение (редия)
-
-
-## Пример: Высота растений и выпас скота
-
-Вообще-то, статья Gennet et al. 2017 о птицах, но чтобы про них что-то лучше понять, нужно разобраться с их местообитанием.
-
-Как в разные годы высота растительного покрова зависит от выпаса скота, экспозиции склона и проективного покрытия местных растений?
-
-\small
-
-Зависимая переменная:
-
-- **height** - высота растительного покрова
-
-Фиксированные предикторы:
-
-- **graze** - выпас коров (0, 1)
-- **AspectCat** - экспозиция (S, N)
-- **nativecov** - покрытие местной флоры %
-- **slope** - наклон
-- **year** - год наблюдений
-
-Случайные предикторы:
-
-- **Park** - парк
-- **plotID** - уникальный идентификатор участка
-
-\tiny
-
-Данные:
-Gennet, S., Spotswood, E., Hammond, M. and Bartolome, J.W., 2017. Livestock grazing supports native plants and songbirds in a California annual grassland. PloS one, 12(6), p.e0176367.
-
-## Открываем данные
-
-Откроем и переформатируем данные так, чтобы не было дублирования и каждому участку соответствовала одна строчка.
-
-```{r}
-library(readxl)
-library(tidyr)
-gr <- read_excel("data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx")
-graz <- gr %>% spread(Species, presence)
-```
-
-## Знакомство с данными
-
-Есть ли пропущенные значения?
-
-```{r}
-sum(is.na(graz))
-```
-
-Сколько участков было в каждом парке в каждый год?
-
-```{r}
-with(graz, table(Park, year))
-```
-
-## Наводим порядок
-
-Сделаем факторами переменные, которые понадобятся для модели
-
-```{r}
-graz$graze_f <- factor(graz$graze)
-graz$AspectCat <- factor(graz$AspectCat)
-graz$year_f <- factor(graz$year)
-```
-
-Извлечем корень из обилия местных видов
-
-```{r}
-graz$nativecov_sq <- sqrt(graz$nativecov) 
-```
-
-## Модель
-
-Вспомним главный вопрос исследования и подберем модель
-
-Как в разные годы высота растительного покрова зависит от выпаса скота, экспозиции склона и проективного покрытия местных растений?
-
-Нам нужно учесть, что в разные годы из-за кучи разных причин высота растений может различаться
-
-Кроме того, нужно учесть, что в разных парках и на разных участках растения будут расти сходным образом в разные годы. У нас есть иерархические факторы парк и участок в парке
-
-```{r}
-MN1 <- lme(height ~ graze_f*AspectCat + year_f + nativecov_sq + slope,
-          random = ~ 1|Park/plotID, 
-          data = graz, method = "ML")
-```
-
-## Анализ остатков
-
-```{r}
-# Данные для анализа остатков
-MN1_diag <- data.frame(
-  graz,
-  pear_res = residuals(MN1, type = "pearson"),
-  fitted = fitted(MN1, type = "response"))
-```
-
-## График остатков
-
-```{r}
-gg_res <- ggplot(data = MN1_diag, aes(y = pear_res))
-gg_res + geom_point(aes(x = fitted)) +
-  geom_smooth(aes(x = fitted))
-```
-
-## Графики остатков от переменных в модели
-
-```{r}
-library(gridExtra)
-grid.arrange(gg_res + geom_boxplot(aes(x = graze_f)),
-gg_res + geom_boxplot(aes(x = AspectCat)),
-gg_res + geom_boxplot(aes(x = year_f)),
-gg_res + geom_point(aes(x = nativecov_sq)),
-gg_res + geom_point(aes(x = slope)),
-ncol = 3)
-```
-
->- Паттерн на графике `nativecov_sq`. Возможно, здесь нужно использовать GAMM.
-
-## Графики остатков от переменных не в модели
-
-```{r}
-grid.arrange(
-  gg_res + geom_point(aes(x = heatloadrel)),
-  gg_res + geom_point(aes(x = sqrt(litt))),
-  gg_res + geom_point(aes(x = sqrt(bare))),
-  ncol = 3)
-```
-- Паттерн на графике `heatloadrel`
-
-## Результаты полной модели
-
-\tiny
-
-```{r}
-summary(MN1)
-```
-
-## Тесты отношения правдоподобий для полной модели
-
-```{r}
-library(car)
-Anova(MN1)
-```
-
-Высота растительного покрова:
-
-- на склонах разной экспозиции по-разному зависит от выпаса скота (достоверное взаимодействие)
-- различается в разные годы
-- не зависит от покрытия местных растений и крутизны склона
-
-## Задание 3
-
-Рассчитайте внутриклассовую корреляцию
-
-- Для наблюдений на одном и том же участке
-- Для наблюдений в одном и том же парке
-
-## Внутриклассовая корреляция
-
-$\sigma_{effect}^2 / (\sigma_{effect}^2 + \sigma^2)$
-
-```{r purl=FALSE}
-# Для наблюдений на одном и том же участке
-3.087577^2 / (1.022106^2 + 3.087577^2 + 5.053857^2)
-# Для наблюдений в одном и том же парке
-1.022106^2 / (1.022106^2 + 3.087577^2 + 5.053857^2)
-```
-
-\small
-\vfill
-
-```{r, eval=FALSE, purl=FALSE}
-MN1
-```
-
-В результатах
-```
-Random effects:
- Formula: ~1 | Park
-        (Intercept)
-StdDev:    1.022106
- Formula: ~1 | plotID %in% Park
-        (Intercept) Residual
-StdDev:    3.087577 5.053857
-```
-
-- Значения высоты травяного покрова похожи внутри участка. Сходство наблюдений с разных участков одного парка слабее.
-
-## Данные для графика предсказаний фиксированной части модели
-
-```{r}
-# Исходные данные
-NewData_MN1 <- expand.grid(graze_f = levels(graz$graze_f),
-            AspectCat = levels(graz$AspectCat),
-            year_f = levels(graz$year_f))
-NewData_MN1$nativecov_sq <- mean(graz$nativecov_sq)
-NewData_MN1$slope <- mean(graz$slope)
-
-# Предсказанные значения при помощи матриц
-X <- model.matrix(~ graze_f * AspectCat + year_f + nativecov_sq + slope, data = NewData_MN1)
-betas = fixef(MN1)
-NewData_MN1$fitted <- X %*% betas
-
-# Cтандартные ошибки и дов. интервалы
-NewData_MN1$se <- sqrt( diag(X %*% vcov(MN1) %*% t(X)) )
-NewData_MN1$lwr <- NewData_MN1$fit - 1.98 * NewData_MN1$se
-NewData_MN1$upr <- NewData_MN1$fit + 1.98 * NewData_MN1$se
-```
-
-## График предсказаний фиксированной части модели
-
-На южных склонах высота травы выше там, где не пасут скот, а на северных нет. (Строго говоря, нужен еще пост хок тест, чтобы это утверждать.)
-
-```{r}
-ggplot(data = NewData_MN1, aes(x = year_f, y = fitted, colour = graze_f)) +
-  geom_pointrange(aes(ymin = lwr, ymax = upr)) +
-  facet_wrap(~ AspectCat) +
-  geom_jitter(data = graz, aes(y = height), alpha = 0.35, size = 1) +
-  theme(axis.text.x = element_text(angle = 90))
-```
-
-# Вариант решения с подбором оптимальной модели (самостоятельно)
-
-## Подбор оптимальной модели (1)
-
-```{r purl=FALSE}
-drop1(MN1, test = "Chi")
-```
-
-
-## Подбор оптимальной модели (2)
-
-```{r purl=FALSE}
-MN1.1 <- update(MN1, .~.-slope)
-drop1(MN1.1, test = "Chi")
-```
-
-
-## Подбор оптимальной модели (3)
-
-```{r purl=FALSE}
-MN1.2 <- update(MN1.1, .~.-nativecov_sq)
-drop1(MN1.2, test = "Chi")
-```
-
-## Анализ остатков
-
-```{r purl=FALSE}
-# Данные для анализа остатков
-MN1.2_diag <- data.frame(
-  graz,
-  pear_res = residuals(MN1.2, type = "pearson"),
-  fitted = fitted(MN1.2, type = "response"))
-```
-
-## График остатков
-
-```{r purl=FALSE}
-gg_res <- ggplot(data = MN1.2_diag, aes(y = pear_res))
-gg_res + geom_point(aes(x = fitted)) +
-  geom_smooth(aes(x = fitted))
-```
-
-## Графики остатков от переменных в модели
-
-```{r purl=FALSE}
- library(gridExtra)
-grid.arrange(gg_res + geom_boxplot(aes(x = graze_f)),
-gg_res + geom_boxplot(aes(x = AspectCat)),
-gg_res + geom_boxplot(aes(x = year_f)),
-ncol = 3)
-```
-
-
-## Графики остатков от переменных не в модели
-
-```{r purl=FALSE}
-grid.arrange(
-  gg_res + geom_point(aes(x = heatloadrel)),
-  gg_res + geom_point(aes(x = sqrt(litt))),
-  gg_res + geom_point(aes(x = sqrt(bare))),
-  gg_res + geom_point(aes(x = nativecov_sq)),
-  gg_res + geom_point(aes(x = slope)),
-  ncol = 3)
-```
-- Паттерн на графике `heatloadrel`, `nativecov_sq`
-
-## Результаты после оптимизации
-
-\tiny
-
-```{r purl=FALSE}
-summary(MN1.2)
-```
-
-## Тесты отношения правдоподобий
-
-```{r purl=FALSE}
-Anova(MN1.2)
-```
-
-Высота растительного покрова:
-
-- на склонах разной экспозиции по-разному зависит от выпаса скота (достоверное взаимодействие)
-- различается в разные годы
-- не зависит от покрытия местных растений и крутизны склона
-
-
-
 
 ## Take-home messages
 
 - Смешанные модели могут включать случайные и фиксированные факторы.
     - Градации фиксированных факторов заранее определены, а выводы можно экстраполировать только на такие уровни, которые были задействованы в анализе. Тестируется гипотеза о равенстве средних в группах.
     - Градации случайных факторов --- выборка из возможных уровней, а выводы можно экстраполировать на другие уровни. Тестируется гипотеза о дисперсии между группами.
+    
+- Есть два способа подбора коэффициентов в смешанных моделях: ML и REML. Для разных этапов анализа важно, каким именно способом подобрана модель.
+
 - Коэффициент внутриклассовой корреляции оценивает, насколько коррелируют друг с другом наблюдения из одной и той же группы случайного фактора.
 - Случайные факторы могут описывать вариацию как интерсептов, так и коэффициентов угла наклона.
 - Модели со смешанными эффектами позволяют получить предсказания как общем уровне, так и на уровне отдельных субъектов.
@@ -1317,6 +979,7 @@ Anova(MN1.2)
 
 - Crawley, M.J. (2007). The R Book (Wiley).
 - Zuur, A. F., Hilbe, J., & Ieno, E. N. (2013). A Beginner's Guide to GLM and GLMM with R: A Frequentist and Bayesian Perspective for Ecologists. Highland Statistics.
-- Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer).
+- Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer)
+- Pinheiro, J., Bates, D. (2000). Mixed-Effects Models in S and S-PLUS. Springer
 
 
