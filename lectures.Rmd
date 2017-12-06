@@ -131,8 +131,6 @@ install.packages(c("ISwR"))
 
 ## 9. Обобщенные линейные модели (GLM) для счетных данных 
 
-<<<<<<< HEAD
-=======
 ```{r eval=FALSE}
 install.packages("AER")
 ```
@@ -141,8 +139,6 @@ install.packages("AER")
 - Код: [09_GLM_count_code.R](09_GLM_count_code.R)
 - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx)
 
-
->>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 ## 10. Смешанные модели (GLMM) для нормально-распределенных данных
 
 ```{r eval=FALSE}
@@ -161,6 +157,15 @@ install.packages("tidyr")
 
 
 ## 11. Моделирование структуры дисперсии в смешаных моделях
+
+- Презентация: 
+    <!-- + [10.1_GLMM_gaussian__random_intercept_slope_.pdf](10.1_GLMM_gaussian__random_intercept_slope_.pdf) -->
+    <!-- + [10.2_GLMM_gaussian__nested_.pdf](10.2_GLMM_gaussian__nested_.pdf) -->
+- Код: 
+    + [11_variance_structure_code.R](11_variance_structure_code.R)
+- Данные: [Khaitov_2013_myt.csv](data/myt.csv)
+
+
 
 ## 12. Смешанные линейные модели (GLMM) для бинарных данных
 
