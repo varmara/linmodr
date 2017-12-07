@@ -1,12 +1,13 @@
 ---
 title: "Линейные модели для счетных данных"
-subtitle    : "Линейные модели..."
-author: Вадим Хайтов, Марина Варфоломеева
+author: Марина Варфоломеева, Вадим Хайтов
 output:
   ioslides_presentation:
     widescreen: yes
     css: assets/my_styles.css
     logo: assets/Linmod_logo.png
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
@@ -19,29 +20,52 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 
 
 ## Мы рассмотрим 
-+ Различные варианты анализа, применяющегося для тех случаев, когда зависимая перменная - счетная величина (целые неотрицательные числа)
+
++ Варианты анализа для случаев, когда зависимая перменная --- счетная величина (целые неотрицательные числа)
 
 ###  Вы сможете
+
 + Объяснить особенности разных типов распределений, принадлежащих экспоненциальному семейству. 
 + Построить пуасоновскую и квази-пуассоновскую линейную модель
 + Объяснить проблемы, связанные с избыточностью дисперсии в модели
 + Построить модель, основанную на отрицательном биномиальном распределении
 
 
-# Различные типы распределений 
+# Статистические распределения
 
-## Распределение
+## Основные распределения для непрерывных данных
 
-То, что мы в быту привыкли называть **распределением** - это функция плотности вероятности.
+- Нормальное распределение (уже знакомо)
+- Гамма-распределение
 
-**Плотность вероятности** - это функция, описывающая вероятность получения разных значений случайной величины
-
-
-
-
-## Нормальное распределение {.columns-2}
+## Нормальное распределение
 
 $$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^2}}$$
+
+
+<div class="columns-2">
+
+```{r, echo=FALSE, fig.width=5, fig.height=5, warning=FALSE, purl=FALSE}
+library(ggplot2)
+mu1 <- 10
+mu2 <- 20
+sigma1 <- 5
+sigma2 <- 10
+y <- -20:50
+
+pi <- data.frame(
+  y = rep(y, 4), 
+  pi = c(dnorm(y, mu1, sigma1), dnorm(y, mu1, sigma2), 
+         dnorm(y, mu2, sigma1), dnorm(y, mu2, sigma2)), 
+  mu = rep(c(mu1, mu2), each = 2*length(y)), 
+  sigma = rep(c(sigma1, sigma2, sigma1, sigma2), each = length(y)) )
+
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_line(stat = "identity") + 
+  facet_grid(mu~sigma, labeller = label_both, scales = "free_y") + 
+  ggtitle("Нормальное распределение \nпри разных параметрах") + 
+  ylab("Плотность вероятности (f)")
+```
 
 ### Два параметра ($\mu$, $\sigma$)
 
@@ -53,25 +77,131 @@ $$f(y;\mu, \sigma)= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(y-\mu)^2}{2\sigma^
 
 $-\infty \le Y \le +\infty$    
 
-```{r, echo=FALSE, fig.width=5, fig.height=6, warning=FALSE}
-library(ggplot2)
-mu1 <- 10
-mu2 <- 20
-sigma1 <- 5
-sigma2 <- 10
-y <- -20:50
-pi <- data.frame(y = rep(y, 4), pi = c(dnorm(y, mu1, sigma1), dnorm(y, mu1, sigma2), dnorm(y, mu2, sigma1), dnorm(y, mu2, sigma2)), mu = rep(c(mu1, mu2), each = 2*length(y)), sigma = rep(c(sigma1, sigma2, sigma1, sigma2), each = length(y)) )
+</div>
 
-ggplot(pi, aes(x = y, y = pi)) + geom_line(stat = "identity") + facet_grid(mu~sigma, labeller = label_both, scales = "free_y") + ggtitle("Нормальное распределение \nпри разных параметрах") + ylab("Плотность вероятности (f)")
+## Гамма-распределение
+
+$$f(y; \mu, \nu) = \frac{1}{\Gamma(\nu)}\times (\frac{\nu}{\mu})^{\nu} \times y^{\nu-1} \times e^{\frac{y \times \nu}{\mu}}$$
+
+<div class="columns-2">
+
+```{r, fig.width=5, fig.height=5, echo=FALSE, fig.align='right', purl=FALSE}
+mu1 <- 1
+mu2 <- 0.1
+nu1 <- 0.1
+nu2 <- 2
+y <- 0:30
+
+pi <- data.frame(
+  y = rep(y, 4), 
+  pi = c(dgamma(y, nu1, mu1), dgamma(y, nu1, mu2), 
+         dgamma(y, nu2, mu1), dgamma(y, nu2, mu2)), 
+  mu = rep(c(mu1, mu2), each = 2*length(y)), 
+  nu = rep(c(nu1, nu2, nu1, nu2), each = length(y)) )
+
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_line(stat = "identity") + 
+  facet_grid(mu~nu, labeller = label_both, scales = "free_y") + 
+  ggtitle("Гамма распределение при разных параметрах") + 
+  ylab("Плотность вероятности (f)")
 
 ```
 
+### Два параметра ($\mu$, $\nu$)
 
-## Распределение Пуассона {.columns-2}
+Среднее: $E(Y)  = \mu$
 
+Дисперсия: $var(Y) = \frac {\mu^2}{\nu}$
+
+Параметр $\nu$ определяет степень избыточности дисперсии
+
+### Пределы варьирования
+
+$0 < Y \le +\infty$
+
+Внимание! $Y$ строго больше 0
+
+</div>
+
+## Распределения для дискретных данных
+
+- Биномиальное распределение (знакомство было в прошлый раз)
+- Распределение Пуассона
+- Отрицательное биномиальное распределение
+
+
+## Биномиальное распределение
+
+$$f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}$$
+
+<div class="columns-2">
+
+```{r, echo=FALSE, fig.width=5, fig.height=5, purl=FALSE}
+mu1 <- 0.1
+mu2 <- 0.5
+N1 <- 10
+N2 <- 30
+y <-seq(0, 30, 1)
+
+pi <- data.frame(
+  y = rep(y, 4), 
+  pi = c(dbinom(y, size = N1, prob = mu1), 
+         dbinom(y,  size = N2, prob = mu1), 
+         dbinom(y,  size = N1, prob = mu2), 
+         dbinom(y,  size = N2, prob = mu2)),  
+  mu = rep(c(mu1, mu2), each = 2*length(y)), 
+  N = rep(c(N1, N2, N1, N2), each = length(y)))
+
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(N~mu,  scales = "free_y", labeller = label_both) + 
+  ggtitle("Биномиальное распрделение \n при разных параметрах") + 
+  ylab("Плотность вероятности (f)")
+```
+
+
+### Два параметра ($N$, $\pi$)
+
+Среднее: &emsp;&emsp; $E(Y)  = N \times \pi$
+
+Дисперсия: $var(Y) = N \times \pi \times (1-\pi)$
+
+Параметр $N$ определяет количество объектов в испытании
+
+Параметр $\pi$ - вероятность события ($y = 1$)
+
+### Пределы варьирования
+
+$0 \le Y \le +\infty$, &emsp; $Y$ **целочисленные**
+
+</div>
+
+
+## Распределение Пуассона 
 
 $$f(y;\mu)= \frac{\mu^y \times e{-\mu}}{y!}$$
 
+<div class="columns-2">
+
+```{r, echo=FALSE, warning=FALSE, fig.width=5, fig.height=5, purl=FALSE}
+mu1 <- 1
+mu2 <- 5
+mu3 <- 10
+mu4 <- 20
+y <- 0:30
+
+pi <- data.frame(
+  y = rep(y, 4), 
+  pi = c(dpois(y, mu1), dpois(y, mu2), dpois(y, mu3), dpois(y, mu4)), 
+  mu = rep(c(mu1, mu2, mu3, mu4), each = length(y))
+)
+
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_bar(stat = "identity") + 
+  facet_wrap(~ mu, nrow = 2, scales = "free_y", labeller = label_both) + 
+  ggtitle("Распределение Пуассона \nпри разных параметрах") + 
+  ylab("Плотность вероятности (f)")
+```
 
 ### Один параметр ($\mu$)
 
@@ -83,129 +213,71 @@ $$f(y;\mu)= \frac{\mu^y \times e{-\mu}}{y!}$$
 
 ### Пределы варьирования
 
-$0 \le Y \le +\infty$,  
-$Y$ **целочисленные**
+$0 \le Y \le +\infty$, $Y$ **целочисленные**
 
-
-```{r, echo=FALSE, warning=FALSE, fig.width=5, fig.height=6}
-mu1 <- 1
-mu2 <- 5
-mu3 <- 10
-mu4 <- 20
-y <- 0:30
-pi <- data.frame(y = rep(y, 4), pi = c(dpois(y, mu1), dpois(y, mu2), dpois(y, mu3), dpois(y, mu4)), mu = rep(c(mu1, mu2, mu3, mu4), each = length(y)) )
-
-ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_wrap(~mu, nrow = 2, scales = "free_y") + ggtitle("Распределение Пуассона \nпри разных параметрах") + ylab("Плотность вероятности (f)")
-
-```
-
-## Гамма-распределение {.columns-2}
-
-$f(y; \mu, \nu) = \frac{1}{\Gamma(\nu)}\times (\frac{\nu}{\mu})^{\nu} \times y^{\nu-1} \times e^{\frac{y \times \nu}{\mu}}$
-
-### Два параметра ($\mu$, $\nu$)
-
-Среднее: &emsp; $E(Y)  = \mu$
-
-Дисперсия: $var(Y) = \frac {\mu^2}{\nu}$
-
-Параметр $\nu$ определяет степень избыточности дисперсии
-
-### Пределы варьирования
-
-$0 < Y \le +\infty$  
-Внимание! $Y$ строго больше 0
-
-
-```{r, fig.width=5, fig.height=6, echo=FALSE, fig.align='right'}
-mu1 <- 1
-mu2 <- 0.1
-nu1 <- 0.1
-nu2 <- 2
-y <- 0:30
-pi <- data.frame(y = rep(y, 4), pi = c(dgamma(y, nu1, mu1), dgamma(y, nu1, mu2), dgamma(y, nu2, mu1), dgamma(y, nu2, mu2)), mu = rep(c(mu1, mu2), each = 2*length(y)), nu = rep(c(nu1, nu2, nu1, nu2), each = length(y)) )
-
-ggplot(pi, aes(x = y, y = pi)) + geom_line(stat = "identity") + facet_grid(mu~nu, labeller = label_both, scales = "free_y") + ggtitle("Гамма распределение при разных параметрах") + ylab("Плотность вероятности (f)")
-
-```
+</div>
 
 
 ## Отрицательное биномиальное распределение
 
-$f(y; k, \mu) = \frac{\Gamma(y + k)}{\Gamma(k) \times \Gamma(y+1)} \times (\frac{k}{\mu + k})^k \times (1 - \frac{k}{\mu + k})^y$
+$$f(y; k, \mu) = \frac{\Gamma(y + k)}{\Gamma(k) \times \Gamma(y+1)} \times (\frac{k}{\mu + k})^k \times (1 - \frac{k}{\mu + k})^y$$
 
 <div class="columns-2">
-<small>Это смесь Пуассоновского и Гамма распределений: $Y$ демонстрируют распределение Пуассона с $\mu$, подчиняющимися Гамма-распределению.
-
-### Два параметра ($\mu$, $k$)
-Среднее: &emsp; $E(Y)  = \mu$  
-Дисперсия: $var(Y) = \mu + \frac {\mu^2}{k}$   
-Параметр $k$ определяет степень избыточности дисперсии.   
-**Важное свойство**: Приближается к распр. Пуассона при очень больших $k$.
-
-### Пределы варьирования
-$0 \le Y \le +\infty$, &emsp; $Y$ **целочисленные**</small>
 
 
-```{r, echo=FALSE, fig.width=5, fig.height=5}
+```{r, echo=FALSE, fig.width=5, fig.height=5, purl=FALSE}
 mu1 <- 1
 mu2 <- 10
 k1 <- 0.1
 k2 <- 1000000
 y <- 0:30
-pi <- data.frame(y = rep(y, 4), pi = c(dnbinom(y, size = k1, mu = mu1), dnbinom(y, size = k1, mu = mu2), dnbinom(y, size = k2, mu = mu1), dnbinom(y, size = k2, mu = mu2)), mu = rep(c(mu1, mu2), each = 2*length(y)), k = rep(c(k1, k2, k1, k2), each = length(y)) )
 
+pi <- data.frame(
+  y = rep(y, 4), 
+  pi = c(dnbinom(y, size = k1, mu = mu1), 
+         dnbinom(y, size = k1, mu = mu2), 
+         dnbinom(y, size = k2, mu = mu1), 
+         dnbinom(y, size = k2, mu = mu2)), 
+  mu = rep(c(mu1, mu2), each = 2*length(y)), 
+  k = rep(c(k1, k2, k1, k2), each = length(y)) )
 
-ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(mu~k, labeller = label_both, scales = "free_y") + ggtitle("Отрицательное биномиальное распределение \nпри разных параметрах") + ylab("Плотность вероятности (f)")
-
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_bar(stat = "identity") + 
+  facet_grid(mu~k, labeller = label_both, scales = "free_y") + 
+  ggtitle("Отрицательное биномиальное распределение \nпри разных параметрах") + 
+  ylab("Плотность вероятности (f)")
 ```
-</div>
 
-## Биномиальное распределение
+Это смесь Пуассоновского и Гамма распределений: $Y$ подчиняется распределению Пуассона с Гамма-распределенным $\mu$.
 
-$f(y; N, \pi) = \frac{N!}{y! \times (N-y)!} \times \pi^y \times (1 - \pi)^{N-y}$
+### Два параметра ($\mu$, $k$)
 
-<div class="columns-2">
-<small>
+Среднее: &emsp; $E(Y)  = \mu$
 
-### Два параметра ($N$, $\pi$)
+Дисперсия: $var(Y) = \mu + \frac {\mu^2}{k}$
 
-Среднее: &emsp;&emsp; $E(Y)  = N \times \pi$  
-Дисперсия: $var(Y) = N \times \pi \times (1-\pi)$  
-Параметр $N$ определяет количество объектов в испытании  
-Парметр $\pi$ - вероятность события ($y = 1$)
+Параметр $k$ определяет степень избыточности дисперсии.
+
+**Свойство**: Приближается к распр. Пуассона при очень больших $k$.
 
 ### Пределы варьирования
 
 $0 \le Y \le +\infty$, &emsp; $Y$ **целочисленные**
-</small>
 
-
-```{r, echo=FALSE, fig.width=5, fig.height=5}
-mu1 <- 0.1
-mu2 <- 0.5
-N1 <- 10
-N2 <- 30
-
-y <- 0:30
-pi <- data.frame(y = rep(y, 4), pi = c(dbinom(y, size = N1, prob = mu1), dbinom(y,  size = N1, prob = mu2), dbinom(y,  size = N2, prob = mu1), dbinom(y,  size = N2, prob = mu2)),  mu = rep(c(mu1, mu2), each = 2*length(y)), N = rep(c(N1, N2, N1, N2), each = length(y)))
-
-ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu,  scales = "free_y", labeller = label_both) + ggtitle("Биномиальное распрделение \n при разных параметрах") + ylab("Плотность вероятности (f)")
-
-```
 </div>
 
-#Распределение зависимой переменной и линия регрессии
 
-##Связующая функция (Link function)
+# Распределение зависимой переменной и линия регрессии
+
+## Связующая функция (Link function)
 
 Предсказаные значения, т.е. $E(Y_i) = \mu_i$, лежат на линии регрессии.   
 
-Линейные модели основаны на линейной связи между зависимой переменной и предиктором. Но для некоторых типов распределений это невозможно по природе величин (например, они лежат в интервале [0,1]).
+Для линейных моделей с нормальным распределением отклика связь между $E(Y_i)$ и предикторами линейна. 
 
-Поэтому  для каждого типа распределения наиболее "естественным" будет свой ообый характер связи.  
+Для других типов распределений эта связь нелинейна.
 
-Функция, описывающая связь между $\mu_i$ и значениями предикторов, называется *связующей функцией*
+Функция, при помощи которой удается линеаризовать связь между $E(Y_i)$ и предикторами называется *связующей функцией*. (Иными словами, связующая функция описывает связь между $\mu_i$ и значениями предикторов в виде линейной функции).
 
 ## Наиболее распространенные (канонические) связующие функции
 
@@ -216,12 +288,10 @@ ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity") + facet_grid(N~mu, 
 Счетные величины (0, 1, 2, 3...)  |  Распределение Пуассона или Отрицательное биномиальное распределение  |log $X\beta = ln(\mu)$  
 
 
-**NB!** Есть и другие связующие функции
+Есть и другие, неканонические связующие функции
 
 
-```{r, echo=FALSE, fig.height=5, fig.width=8, warning=FALSE, message=FALSE}
-
-
+```{r, echo=FALSE, fig.height=4.5, fig.width=8, warning=FALSE, message=FALSE, purl=FALSE}
 library(gridExtra)
 
 theme_set(theme_bw())
@@ -350,9 +420,9 @@ Plot_Poiss <-  ggplot(data = xy, aes(x = factor(X), y = Y)) + geom_violin(data =
 
 В случае с нормальным распределением, предсказанные значения лежат на прямой линии, связывающей значения предиктора $x_i$ и предсказанное значение $\mu_i$. 
 
-`link = "identity"`   
+Т.к. зависимость и так линейная, то связующая функция не выполняет никакой работы --- описывает идентичность (`link = "identity"`).
 
-```{r, echo=FALSE, fig.height=5}
+```{r, echo=FALSE, fig.height=4.5, purl=FALSE}
 Plot_Norm
 ```
 
@@ -360,105 +430,128 @@ Plot_Norm
 
 В случае с биномиальным распределением, предсказанные значения лежат на логистической кривой, связывающей значения предиктора $x_i$ и предсказанное значение $\mu_i$.  
 
-`link = "logit"`  
+Связующая функция логит (`link = "logit"`) линеаризует эту зависимость.
 
-```{r, echo=FALSE, fig.height=5}
+```{r, echo=FALSE, fig.height=4.5, purl=FALSE}
 grid.arrange(Plot_Binom1, Plot_Binom2, ncol = 2)
 ```
 
 
 ##Связующая функция (Link function)
 
-В случае с пуассоновским распределением, предсказанные значения лежат експоненциальной кривой, связывающей значения предиктора $x_i$ и предсказанное значение $\mu_i$.  
+В случае с пуассоновским распределением, предсказанные значения лежат на экспоненциальной кривой, связывающей значения предиктора $x_i$ и предсказанное значение $\mu_i$.
 
-`link = "log"`
-```{r, echo=FALSE, fig.height=5}
+Связующая функция логарифм (`link = "log"`) линеаризует эту зависимость.
+
+```{r, echo=FALSE, fig.height=4.5, purl=FALSE}
 Plot_Poiss
 ```
 
 
+# Пример
+
+## Пример: Гадючий лук, копеечник и визиты опылителей
+
+[Гадючий лук](https://ru.wikipedia.org/wiki/Гадючий_лук_хохлатый) (_Leopoldia comosa_, сем. спаржевые) --- представитель родной флоры острова Менорка (Балеарские острова, Средиземное море). В 18-19вв на остров завезли [копеечник венечный](https://ru.wikipedia.org/wiki/Копеечник_венечный) (_Hedysarum coronarium_, сем. бобовые), который быстро натурализовался. Оба вида цветут одновременно и нуждаются в опылении насекомыми.
+
+Как зависит опыление гадючьего лука от присутствия вида-вселенца и разнообразия флоры в ближайшей окрестности (Montero-Castaño, Vilà, 2015)?
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Muscari_comosum_08-05-2010_%281%29.JPG/265px-Muscari_comosum_08-05-2010_%281%29.JPG" alt="Leopoldia comosa" style="height: 275px;"/>
+<img src="images/Montero-Castano_Vila_2015_fig.2.png" alt="Fig.2" style="height: 275px;"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Hedysarum_coronarium_%28plant%29.jpg/265px-Hedysarum_coronarium_%28plant%29.jpg" alt="Hedysarum coronarium" style="height: 275px;"/>
 
 
+<small>
+Muscari à toupet (Muscari comosum), Dordogne, France --- Père Igor  
+Fig.2 из [Montero-Castaño, Vilà, 2015](https://doi.org/10.1371/journal.pone.0128595)  
+French-honeysuckle. Close to Santadi Basso, Sardinia, Italy --- Hans Hillewaert  
+</small>
 
-# Модели, основанные на распределении Пуассона и отрицательном биномиальном распределении
 
-## Способствуют ли взрослые мидии притоку молоди?
+## Данные {.smaller}
 
-Даные взяты из работы Khaitov, 2013
+- `Visits` --- число визитов всех опылителей на цветок _Leopoldia_
+- `Treatment` ---   `Invaded` --- _Leopoldia_ в смеси с видом-вселенцем _Hedysarum_;  `Removal` --- _Leopoldia_ в смеси с видом-вселенцем с удаленными цветками; `Control` --- _Leopoldia_ без вида вселенца
+- `DiversityD_1` --- Разнообразие флоры --- $exp(H’)$,  где $H'$ --- индекс Шеннона, расчитанный с использованием натурального логарифма
+- `Flowers` --- число цветков _Leopoldia_
+- `Hours` --- продолжительность наблюдений
 
-```{r muss-data, eval=FALSE}
-juv_ad <- read.table("data/mussel_juv_ad.csv", sep=";", header =T)
-head(juv_ad, 12)
+
+```{r data}
+library(readxl)
+pol <- read_excel("data/Pollinators_Montero-Castano, Vila, 2015.xlsx", sheet = 1)
+head(pol)
 ```
 
-<div class="columns-2">
+<small>[Montero-Castaño A., Vilà M. 2015](https://doi.org/10.1371/journal.pone.0128595)</small>
 
-<img src="images/mussel_bed.png" width="400" height="400" >
+## Знакомство с данными
 
-```{r, eval=TRUE, echo=FALSE}
-juv_ad <- read.table("data/mussel_juv_ad.csv", sep=";", header =T)
-head(juv_ad, 12)
-```
-
-</div>
-## В этих данных ожидается проблема автокорреляции остатков
-
-### Вопрос:
-Как можно учесть в модели многолетний характер сбора материала? 
-
-
-## Построим простую линейную модель
+Есть ли пропущенные значения?
 
 ```{r}
-M1 <- glm(Juv ~ Adult * factor(Year), data = juv_ad)
-drop1(M1, test = "F")
+sum(is.na(pol))
 ```
 
-## Можно убрать взаимодействие
+Сколько площадок в каждом тритменте?
 ```{r}
-M2 <- lm(Juv ~ Adult  +  factor(Year), data = juv_ad)
-library(car)
-Anova(M2)
+table(pol$Treatment)
 ```
 
-## Посмотрим на предсказания этой модели
+## Знакомство с данными
 
-```{r, echo=FALSE, fig.height=4.5}
+Как распределено число визитов насекомых?
+
+```{r}
 library(ggplot2)
-MyData <- expand.grid(Year = factor(seq(min(juv_ad$Year), max(juv_ad$Year))), Adult = seq(min(juv_ad$Adult), max(juv_ad$Adult)))
-
-MyData$Predicted <- predict(M2, newdata = MyData)
-
-ggplot(MyData, aes(x=Adult, y = Predicted, group = Year)) + geom_line(color = "blue") + geom_hline(yintercept = 0) + ylab("Ожидаемое количество молоди")
+ggplot(pol, aes(x = Visits)) + geom_histogram()
 ```
 
->- Модель предсказывает, что взрослые негативно влияют на обилие молоди.    
->- Модель предсказывает отрицательные значения!  
+## Знакомство с данными
 
-## Диагностика модели
+Нет ли выбросов?
 
-```{r, warning=FALSE, message=FALSE}
-M2_diag <- fortify(M2)
-
-ggplot(M2_diag, aes(x = .fitted, y = .stdresid)) + geom_point() +
-  geom_hline(yintercept = 0) + geom_smooth(se = FALSE)
+```{r}
+gg_dot <- ggplot(pol, aes(y = 1:nrow(pol))) + geom_point()
+library(gridExtra)
+grid.arrange(gg_dot + aes(x = DiversityD_1),
+             gg_dot + aes(x = Flowers),
+             gg_dot + aes(x = Hours),
+             nrow = 1)
 ```
 
->- Явные признаки гетероскедастичности!
+>- Выбросов нет
 
-## Два способа решения проблем с моделью
-1. Провести логарифмирование зависимой переменной и построить модель для логарифмированных величин. 
-2. Построить модель, основанную на распределении Пуассона.
 
-## Модель, основанная на распределении Пуассона
+# Простая линейная модель
 
-```{r, echo=TRUE, warning=FALSE, fig.width= 7}
-M3 <- glm(Juv ~ Adult * factor(Year), 
-          data = juv_ad, family = "poisson")
+## GLM с Гауссовым распределением отклика
+
+$Visits_i \sim N(\mu_i, \sigma)$
+
+$E(Visits_i) = mu_i$, $var(Visits_i) = \sigma$
+
+Функция связи --- идентичность, т.е.
+
+$\mu_i = b_0 + b_1 TreatmentInvaded + b_2 TreatmentRemoval +$  
+$+ b_3 DiversityD1 + b_4 Flowers + b_5 Hours$
+
+
+## Что будет, если мы (ошибочно) подберем простую линейную модель? {.smaller}
+
+```{r}
+M0 <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol)
+## Результаты
+summary(M0)
+```
+
+
+## Анализ девиансы для гауссовой модели {.smaller}
+
+К какому бы мы пришли выводу, глядя на этот анализ?
+
+```{r}
 library(car)
-<<<<<<< HEAD
-Anova(M3)
-=======
 Anova(M0)
 ```
 
@@ -501,51 +594,86 @@ ggplot(NewData, aes(x = Flowers, y = fit, group = Treatment)) +
 ## Код для графика {.smaller}
 
 ```{r, m0-viz, eval=FALSE, tidy=TRUE, tidy.opts=list(width=50), purl=FALSE}
->>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 ```
 
-## Диагностика модели
+## Задание 1
 
-```{r, warning=FALSE, message=FALSE}
-M3_diag <- data.frame(.fitted = predict(M3),
-                      .pears_resid = residuals(M3, type = "pearson"))
+Постройте график пирсоновских остатков этой модели.
+
+Какие нарушения условий применимости вы на нем увидите?
+
+Дополните код
+
+```{r eval=FALSE}
+# Данные для анализа остатков
+M0_diag <- data.frame(.fitted = ,
+                      .pears_resid = )
+# График остатков
+ggplot(M0_diag, aes(x=, y = )) + 
+  geom_ + geom_(yintercept = 0) + 
+  geom_(se = FALSE, method = "loess")
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
-ggplot(M3_diag, aes(x=.fitted, y = .pears_resid)) + geom_point() + geom_hline(yintercept = 0) + geom_smooth(se = F)
+## Решение
 
+```{r fig.height=2.4}
+# Данные для анализа остатков
+M0_diag <- data.frame(.fitted = predict(M0, type = "response"),
+                      .pears_resid = residuals(M0, type = "pearson"))
+# График остатков
+ggplot(M0_diag, aes(x=.fitted, y = .pears_resid)) + 
+  geom_point() + geom_hline(yintercept = 0) + 
+  geom_smooth(se = FALSE, method = "loess")
 ```
 
-Рассеяние остатков выглядит лучше!
+>- Гетерогенность дисперсий остатков
+>- Отрицательные предсказания
 
-## Избыточность дисперсии (Overdispersion)
+## Два способа решения проблем с моделью
 
-В Пуассоновской регрессии мы моделируем изменение распределения Пуассона в зависимости от каких-то предикторов.
-
-В распределении Пуассона $E(Y) = \mu$ и $var(Y) = \mu$
-
-Если в имеющихся данных $var(Y) > \mu$,  то нарушается условие применимости пуассоновской регрессии. 
+1. Плохой способ: провести логарифмирование зависимой переменной и построить модель для логарифмированных величин. 
+2. Лучше построить модель, основанную на распределении Пуассона.
 
 
-## Избыточность дисперсии (Overdispersion)
-### Первый способ оценки избыточности дисперсии 
+# GLM с Пуассоновским распределением отклика
+
+## GLM с Пуассоновским распределением отклика
+
+$Visits_i \sim Poisson(\mu_i)$
+
+$E(Visits_i) = mu_i$, $var(Visits_i) = mu_i$
+
+Функция связи --- логарифм, т.е.
+
+$\ln(\mu_i) = b_0 + b_1 TreatmentInvaded + b_2 TreatmentRemoval +$  
+$+ b_3 DiversityD1 + b_4 Flowers + b_5 Hours$
+
+## GLM с Пуассоновским распределением отклика {.smaller}
+
 ```{r}
-Resid_M3 <- resid(M3, type = "pearson") # Пирсоновские остатки
-
-N <- nrow(juv_ad) # Объем выборки
-
-p <- length(coef(M3))   # Число параметров в модели
-
-df <- (N - p) # число степенейсвободы
-
-fi <- sum(Resid_M3^2) /df  #Величина fi показывает во сколько раз в среднем sigma > mu для данной модели
-
-fi
+M1 <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol,  family = "poisson")
+## Результаты
+summary(M1)
 ```
 
-<<<<<<< HEAD
-Дисперсия в `r fi` раза больше среднего!
-=======
+## Уравнение модели с Пуассоновским распределением отклика
+
+$Visits_i ~ Poisson(\mu_i)$
+
+$E(Visits_i) = mu_i$, $var(Visits_i) = mu_i$
+
+$\ln(\mu_i) = -2.66 + 0.71 TreatmentInvaded - 0.22 TreatmentRemoval -$  
+$- 0.46 DiversityD1 + 0.04  Flowers + 4.69 Hours$
+
+
+## Анализ девиансы для Пуассоновской модели
+
+К какому бы мы пришли выводу, глядя на этот анализ?
+
+```{r}
+Anova(M1)
+```
+
 >- Число визитов опылителей на цветки гадючьего лука
     - зависит от присутствия вида вселенца и его цветов
     - зависит от разнообразия флоры на данном участке
@@ -608,151 +736,281 @@ ggplot(NewData, aes(x = DiversityD_1, y = fit, group = Treatment)) +
   geom_line(aes(colour = Treatment)) + 
   geom_hline(yintercept = 0)
 ```
->>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 
+## Код для графика {.smaller}
 
-## Избыточность дисперсии (Overdispersion)
-### Второй способ оценки избыточности дисперсии 
-```{r, warning=FALSE, message=FALSE}
-library(qcc)
-qcc.overdispersion.test(juv_ad$Juv, type = "poisson")
-```
-
-
-## Избыточность дисперсии (Overdispersion) {.smaller}
-### Очень маленькие стандартные ошибки (и все очень достоверно) - это явный признак избыточности дисперсии
-```{r}
-summary(M3)
-```
-
-## Источники избыточности дисперсии
-1. Мнимая избыточность дисперсии
-    + Наличие отскакивающих значений   
-    + Как следствие пропущенных ковариат или взаимодействий предикторов  
-    + Наличие внутригрупповых корреляций (нарушение независимости выборок)
-    + Нелинейный характер взаимосвязи между ковариатами и зависимой переменной
-    + Неверно подобранная связывающая функция
-    + Количество нулей больше, чем предсказывает распределение Пуассона (Zero inflation)   
-2. Истинная избыточность дисперсии, как следствие природы данных.
-
-## Как бороться с избыточностью дисперсии
-
-Если избыточнсть дисперсии *мнимая*, то ее надо устранить, введя в модель соответствующие поправки.
-
-Если избыточность дисперсии *истинная*, то необходима более серьезная коррекция модели. 
-
-
-## Два пути решения проблемы при истинной избыточности дисперсии
-
-1. Построить квази-пуассоновскую модель
-2. Построить модель, основанную на отрицательном биномиальном распределении
-
-## Квази-пуассоновские модели
-
-Отличие от пуассоновсой модели заключается лишь в том, что в квази-пуассоновских моделях вводится поправка для связи дисперсии и матожидания. 
-
-В этой модели матожидание $E(Y) = \mu$ и дисперсия $var(Y) =  \phi \times \mu$
-
-<br>
-
-Величина $\phi$ показывает во сколько раз дисперсия превышает матожидание.
-
-$$\phi =  \frac{var(Y)}{\mu}=\frac {\frac{\sum{(\epsilon_i)^2}}{N - p}}  {\mu} =  \frac{\sum{(\epsilon_{pearson})^2}}{N - p}$$
-
->- Модель, по сути, остается той же, что и пуассоновская, но изменяются стандартные ошибки оценок параметров, они домножаются на $\sqrt{\phi}$
->- Для квази-пуассоновских моделй не определена функция максимального правдоподобия и, следовательно, нельзя вычислить AIC
-
-
-
-## Квази-пуассоновская модель
-
-```{r}
-M4 <- glm(Juv ~ Adult * factor(Year), data = juv_ad, family = "quasipoisson")
-Anova(M4)
-```
-**Важно:** Распределение разности девианс лишь приблизительно описывается распределением $\chi^2$. Поэтому уровни значимости близкие к 0.05 нельзя рассматривать как надежные.  <br>        
-Уровень значимости для взаимодействия в данной модели близок к 0.05. Можно подумать об упрощении модели!   
-
-
-## Квази-пуассоновская модель
-Упрощенная модель   
-```{r}
-M4a <- glm(Juv ~ Adult  + factor(Year), data = juv_ad, family = "quasipoisson")
-Anova(M4a)
-```
-
-
-
-## Предсказания упрощенной модели
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.width=10}
-MyData <-unique(juv_ad)
-
-MyData$Predicted <- predict(M4a, newdata = MyData, type = "response")
-
-ggplot(MyData, aes(x=Adult, y = Predicted, group = Year)) + geom_line(color = "blue") + geom_hline(yintercept = 0) + ylab("Ожидаемое количество молоди") +ylab("Ожидаемое количество молоди") + geom_point(data = juv_ad, aes(x = Adult, y = Juv, color = factor(Year) )) + facet_wrap(~Year, ncol = 5) + guides(color=FALSE)
-
-```
-
->- **Биологический вывод: взрослые мидии препятствуют пополнению молодью**
-
-## Модель, основанная на отрицательном биномиальном распределении  
-```{r}
-library(MASS)
-M5 <- glm.nb(Juv ~ Adult*factor(Year) , data = juv_ad, link = "log")
-Anova(M5)
-```
-
-Уровень значимости для взаимодействия заметно ниже 0.05. Взаимодействие факторов отбросить нельзя! 
-
-
-## Задание 
-Проверьте на избыточность дисперсии модель, основанную на отрицательном биномиальном распеделении
-
-## Решение
-
-```{r}
-Resid_M5 <- resid(M5, type = "pearson") # Пирсоновские остатки
-N <- nrow(juv_ad) # Объем выборки
-p <- length(coef(M5)) +1   # Число параметров в модели
-df <- (N - p) # число степенейсвободы
-fi <- sum(Resid_M5^2) /df  #Величина fi показывает
-# во сколько раз в среднем sigma > mu для данной модели
-fi
-
+```{r, m1-viz, eval=FALSE, tidy=TRUE, tidy.opts=list(width=50), purl=FALSE}
 ```
 
 ## Диагностика модели
 
-```{r, warning=FALSE, message=FALSE}
-M5_diag <- data.frame(.fitted = predict(M5), 
-                      .pears_resid = residuals(M5, type = "pearson"))
+### График остатков
 
-ggplot(M5_diag, aes(x=.fitted, y = .pears_resid)) + geom_point() +
-  geom_hline(yintercept = 0) + geom_smooth(se = F)
+```{r}
+M1_diag <- data.frame(.fitted = predict(M1, type = "response"),
+                      .pears_resid = residuals(M1, type = "pearson"))
+ggplot(M1_diag, aes(x=.fitted, y = .pears_resid)) + geom_point() +
+  geom_hline(yintercept = 0) + geom_smooth(se = FALSE, method = "loess")
 
 ```
 
-## Задание
+## Проблема избыточности дисперсии (overdispersion)
+
+Если данные подчиняются распределению Пуассона, то
+
+- Среднее: &emsp; $E(Y)  = \mu$
+- Дисперсия: $var(Y) = \mu$
+
+То есть, дисперсия должна быть равна среднему значению.
+
+Если это нарушается, то мы не можем доверять результатам, так как модель, основанная на Пуассоновском распределении, применяется к данным, которые не подчиняются этому распределению. 
+
+## Проверка на сверхдисперсию
+
+```{r}
+pear_res <- resid(M1, type = "pearson") # Пирсоновские остатки
+p <- length(coef(M1))                   # число параметров в модели  
+N <- nrow(model.frame(M1)) # объем выборки
+df <- N - p       # число степеней свободы
+Overdisp <- sum(pear_res^2) / df
+
+Overdisp
+```
+
+>- Избыточность дисперсии есть! Дисперсия в `r round(Overdisp, 1)` раза выше среднего
+
+## Если есть избыточность дисперсии, то 
+
+### Доверительные интервалы будут занижены
+
+Если предполагать, что данные подчиняются распределению Пуассона (среднее $E(Y)  = \mu$, дисперсия --- $var(Y) = \mu$), то $var(\bar Y) = {\mu} / n$ и доверительный интервал к среднему будет оценен как $\bar Y \pm z_{\alpha/2}\sqrt {var(\bar Y)}$.
+
+Если на самом деле дисперсия в $\varphi$ раз больше среднего ($\varphi > 1$): $var^*(Y) = \varphi\mu$
+
+Тогда на самом деле $var(\bar Y) = {\varphi\mu} / n$, а доверительный интервал к среднему должен быть в $\sqrt\varphi$ раз больше:  $\bar Y \pm z_{\alpha/2}\sqrt {\varphi~var(\bar Y)}$.
+
+### Стандартные ошибки будут занижены
+
+(аналогично предыдущему пункту)
+
+### Тесты, основанные на сравнении правдоподобий будут давать смещенные результаты
+
+Т.к. на самом деле соотношение девианс будет подчиняться не $\chi^2$-распределению, а масштабированному $\chi^2$-распределению
+
+
+
+## Причины избыточности дисперсии 
+
+1. Мнимая избыточность дисперсии
+    + Наличие выбросов
+    + В модель не включен важный предиктор или взаимодействие предикторов
+    + Наличие внутригрупповых корреляций (нарушение независимости выборок)
+    + Нелинейный характер взаимосвязи между ковариатами и зависимой переменной
+    + Неверно выбрана связывающая функция
+    + Количество нулей больше, чем предсказывает выбранное распределение (Zero inflation) 
+2. Истинная избыточность дисперсии, как следствие природы данных
+
+## Как бороться с избыточностью дисперсии
+
+Если избыточнсть дисперсии *мнимая*, то ее надо устранить, введя в модель соответствующие изменения
+
+Если избыточность дисперсии *истинная*, то необходима более серьезная коррекция модели:
+
+- Можно построить квази-пуассоновскую модель
+- Можно построить модель, основанную на отрицательном биномиальном распределении
+
+# Квазипуассоновская модель
+
+## Квази-пуассоновские модели
+
+Единственное отличие от пуассоновской модели в том, что в квази-пуассоновских моделях вводится поправка для связи дисперсии и среднего
+
+- Среднее: $E(Y) = \mu$
+- Дисперсия: $var(Y) =  \varphi \times \mu$
+
+<br>
+
+Величина $\varphi$ показывает во сколько раз дисперсия превышает среднее
+
+Вот такой вариант оценки используется в R (рекомендован McCullagh, Nelder, 1989):
+
+$$\varphi =  \frac{var(Y)}{\mu}=\frac {\frac{\sum{(\epsilon_i)^2}}{N - p}}  {\mu} =  \frac{\sum{(\epsilon_{pearson})^2}}{N - p}$$
+
+
+
+Квазипуассоновская модель, по сути, по-прежнему пуассоновская, но стандартные ошибки оценок параметров домножаются на $\sqrt{\varphi}$
+
+## Особенности работы с квази-моделями
+
+<!-- По лекции Марка Ирвина. TODO: нужны ссылки -->
+
+1.В тестах параметров используются $t$-тесты (и $t$-распределение) вместо $z$ тестов (и стандартного нормального распределения)
+
+2.Для квази-пуассоновских моделей не определена функция максимального правдоподобия, поэтому нельзя вычислить AIC (но иногда считают квази-AIC = QAIC)
+
+3.Для тестов изменения девиансы используются $F$-тесты
+
+$$F = \frac{\Delta/d} {\varphi}$$
+Эта $F$-статистика подчиняется $F$-распределению со степенями свободы $d$ и $df$
+
+- $\Delta$ --- разница девианс
+- $d$ --- разница числа параметров сравниваемых моделей
+- $df$ --- остаточное число степеней свободы для более полной модели 
+
+
+## Квазипуассоновская модель {.smaller}
+
+```{r}
+M2 <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol, family = "quasipoisson")
+## Результаты
+summary(M2)
+```
+
+## Анализ девиансы для квази-пуассоновской модели {.smaller}
+
+К какому бы мы пришли выводу, глядя на этот анализ?
+
+```{r}
+Anova(M2, test = "F")
+```
+
+>- Число визитов опылителей на цветки гадючьего лука 
+    - зависит от присутствия вида вселенца и его цветов
+    - зависит от разнообразия флоры на данном участке
+    - зависит от числа цветов самого гадючьего лука
+    
+>- Можем ли мы доверять этим результатам? Это приблизительные результаты. Доверительным вероятностям близким к 0.05 не стоит доверять.
+
+
+# GLM с отрицательным биномиальным распределением отклика
+
+## GLM с отрицательным биномиальным распределением отклика
+
+$Visits_i \sim NB(\mu_i, k)$
+
+$E(Visits_i) = mu_i$, $var(Visits_i) = mu_i + \frac{\mu_i^2}{k}$
+
+Функция связи --- логарифм, т.е.
+
+$\ln(\mu_i) = b_0 + b_1 TreatmentInvaded + b_2 TreatmentRemoval +$  
+$+ b_3 DiversityD1 + b_4 Flowers + b_5 Hours$
+
+## GLM с отрицательным биномиальным распределением отклика {.smaller}
+
+```{r}
+library(MASS)
+M3 <- glm.nb(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol, link = "log")
+## Результаты
+summary(M3)
+```
+
+## Уравнение модели с отрицательным биномиальным распределением отклика
+
+$Visits_i \sim NB(\mu_i, 1.936)$
+
+$E(Visits_i) = mu_i$, $var(Visits_i) = mu_i + \frac{\mu_i^2}{1.936}$
+
+Функция связи --- логарифм, т.е.
+
+$\ln(\mu_i) = -1.97 + 0.57 TreatmentInvaded - 0.11 TreatmentRemoval -$  
+$- 0.49 DiversityD1 + 0.03 Flowers + 4.10 Hours$
+
+## Анализ девиансы для модели с отрицательным биномиальным распределением отклика {.smaller}
+
+К какому бы мы пришли выводу, глядя на этот анализ?
+
+```{r}
+Anova(M3)
+```
+
+>- Число визитов опылителей на цветки гадючьего лука
+    - НЕ зависит от присутствия вида вселенца и его цветов
+    - зависит от разнообразия флоры на данном участке
+    - зависит от числа цветов самого гадючьего лука
+    
+>- Можем ли мы доверять этим результатам? Да, теперь можем
+
+
+## Диагностика модели
+
+### График остатков
+
+```{r}
+M3_diag <- data.frame(.fitted = predict(M3, type = "response"),
+                      .pears_resid = residuals(M3, type = "pearson"))
+ggplot(M3_diag, aes(x = .fitted, y = .pears_resid)) + geom_point() + 
+  geom_hline(yintercept = 0) + geom_smooth(se = FALSE, method = "loess")
+```
+
+## Проверка на сверхдисперсию
+
+Обратите внимание, у моделей с отрицательным биномиальным распределением добавляется еще один параметр
+
+```{r}
+pear_res <- resid(M3, type = "pearson") # Пирсоновские остатки
+p <- length(coef(M3))  + 1             # число параметров в модели
+N <- nrow(model.frame(M3))             # объем выборки
+df <- N - p                            # число степеней свободы
+Overdisp <- sum(pear_res^2) / df
+
+Overdisp
+```
+
+>- Избыточности дисперсии нет
+
+## Задание 3
 
 Визуализируйте предсказания модели, основанной на отрицательном биномиальном распределении 
 
-## Визуализируем предсказание модели
+```{r eval=FALSE, purl=TRUE}
+NewData <- ddply(
+  .data = , .variables = .(), .fun = summarise,
+  DiversityD_1 = )
+NewData$Flowers = mean(pol$Flowers)
+NewData$Hours = mean(pol$Hours)
+# предсказанные значения
+Predictions <- predict()
+NewData$fit <- Predictions$fit
+# стандартные ошибки
+NewData$SE <- Predictions$se.fit
+# доверительный интервал
+NewData$upr <- NewData$fit + 1.96 * NewData$SE
+NewData$lwr <- NewData$fit - 1.96 * NewData$SE
 
-```{r, m-viz, eval=TRUE, echo=FALSE, fig.height=5, fig.width=10}
-MyData <-unique(juv_ad)
-
-
-MyData$Predicted <- predict(M5, newdata = MyData, type = "response")
-ggplot(MyData, aes(x = Adult, y = Predicted, group = Year)) + geom_line(color = "blue") + geom_hline(yintercept = 0) + ylab("Ожидаемое количество молоди") + geom_point(data = juv_ad, aes(x = Adult, y = Juv, color = factor(Year) )) + facet_wrap(~Year, ncol = 5) + guides(color=FALSE)
+ggplot(NewData, aes(x = , y = , group = )) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.3) +
+  geom_line() + 
+  geom_hline(yintercept = 0)
 ```
 
->- **Биологический вывод: В разные годы харакер взаимосвязи молоди и взрослых мидий может быть разным**
+## Визуализируем предсказания модели
 
-## Код для графика
+```{r, m3-viz, eval=TRUE, echo=FALSE, fig.height=5, fig.width=10, purl=FALSE}
+NewData <- ddply(
+  .data = pol, .variables = .(Treatment), .fun = summarise,
+  DiversityD_1 = seq(min(DiversityD_1), max(DiversityD_1), length = 100))
+NewData$Flowers = mean(pol$Flowers)
+NewData$Hours = mean(pol$Hours)
+# предсказанные значения
+Predictions <- predict(M3, newdata = NewData, se.fit = TRUE, type = "response")
+NewData$fit <- Predictions$fit
+# стандартные ошибки
+NewData$SE <- Predictions$se.fit
+# доверительный интервал
+NewData$upr <- NewData$fit + 1.96 * NewData$SE
+NewData$lwr <- NewData$fit - 1.96 * NewData$SE
 
-```{r, m-viz, eval=FALSE, tidy=TRUE, tidy.opts=list(width=50)}
+ggplot(NewData, aes(x = DiversityD_1, y = fit, group = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = Treatment), alpha = 0.3) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0)
 ```
+
+## Код для графика {.smaller}
+
+```{r, m3-viz, eval=FALSE, tidy=TRUE, tidy.opts=list(width=50), purl=FALSE}
+```
+
 
 ## Таким образом
 
@@ -786,97 +1044,69 @@ Fair, R.C. (1978). A Theory of Extramarital Affairs. Journal of Political Econom
 
 
 
-## Задание: 
+## Задание 4
 
 1. Постройте оптимальную модель, описывающую зависимость количества внебрачных связей в зависимости от пола, времени, проведенного в браке, наличия детей, уровня религиозности и уровня образованности.  
 2. Проверьте валидность данной модели
 
-## Решение
+## Решение {.smaller}
 
-```{r, tidy=TRUE, tidy.opts=list(width = 60)}
-Mod <- glm(affairs ~ gender * yearsmarried * children * religiousness + education, data = af, family = "poisson")
-
-```
-
-<small>
-```{r}
+```{r, tidy=TRUE, tidy.opts=list(width = 60), purl=FALSE}
+Mod <- glm(affairs ~ gender + yearsmarried + children + religiousness + education, data = af, family = "poisson")
+# Результаты
 summary(Mod)
 ```
-</small>
 
 ## Проверка на избыточность дисперсии
 
-```{r}
-# Проверка на Overdispersion
-Resid_Mod <- resid(Mod, type = "pearson") 
-N <- nrow(af) 
-p <- length(coef(Mod)) 
-df <- (N - p) 
-fi <- sum(Resid_Mod^2) /df  
-fi
+```{r purl=FALSE}
+# Проверка на избыточность дисперсии
+pear_res <- resid(Mod, type = "pearson") # Пирсоновские остатки
+p <- length(coef(Mod))                   # число параметров в модели  
+N <- nrow(model.frame(Mod)) # объем выборки
+df <- N - p       # число степеней свободы
+Overdisp <- sum(pear_res^2) / df
+
+Overdisp
 ```
 
-## Строим квази-пуассоновскую модель
+## Можно построить квази-пуассоновскую модель {.smaller}
 
-```{r, tidy=TRUE, tidy.opts=list(width = 60)}
-Mod1 <- glm(affairs ~ gender*yearsmarried*children*religiousness * education, data = af, family = "quasipoisson")
+Это грубое приближение
 
-```
-<small>
-```{r}
+```{r, tidy=TRUE, tidy.opts=list(width = 60),purl=FALSE}
+Mod1 <- glm(affairs ~ gender + yearsmarried + children + religiousness + education, data = af, family = "quasipoisson")
+# Результаты
 summary(Mod1)
 ```
-</small>
-
-## Подбираем оптимальную модель
-
-```{r, eval=FALSE}
-step(Mod1) #Для квази-пуассоновских моделей эта функция работать
-# не будет, так как не определен AIC
-
-```
-
 
 ## Строим модель, основанную на отрицательном биномиальном распределении {.smaller}
 
-```{r, tidy=TRUE, tidy.opts=list(width = 60)}
-Mod_nb <- glm.nb(affairs ~ gender*yearsmarried*children*religiousness + education, data = af)
+```{r, tidy=TRUE, tidy.opts=list(width = 60), purl=FALSE}
+Mod_nb <- glm.nb(affairs ~ gender + yearsmarried + children + religiousness + education, data = af)
 Anova(Mod_nb)
 ```
 
 
-## Подбираем оптимальную модель
+## Подбираем оптимальную модель {.smaller}
 
-<<<<<<< HEAD
-```{r, eval=FALSE}
-step(Mod_nb)
-=======
 ```{r, purl=FALSE}
 Mod_nb_final <- step(Mod_nb, direction = "backward", trace = 0)
 summary(Mod_nb_final)
->>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 ```
 
+## Диагностика модели
 
-<<<<<<< HEAD
-## Сморим на результаты оптимальной модели
-=======
 ```{r, warning=FALSE, message=FALSE, purl=FALSE}
 Mod_nb_diag <- data.frame(
   af,
   .fitted = predict(Mod_nb_final, type = "response"), 
   .pears_resid = residuals(Mod_nb, type = "pearson"))
->>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
 
-```{r, tidy=TRUE, tidy.opts=list(width = 50)}
-Mod_nb_final <- glm.nb(formula = affairs ~ yearsmarried +  children + religiousness +  yearsmarried:children, data = af, init.theta = 0.1346363532, link = log)
+ggplot(Mod_nb_diag, aes(x = .fitted, y = .pears_resid)) + geom_point() +
+  geom_smooth(se = FALSE)
 ```
 
-<<<<<<< HEAD
-<small>
-```{r}
-summary(Mod_nb_final)
-=======
 ## Графики остатков от предикторов в модели и нет
 
 ```{r, warning=FALSE, message=FALSE, purl=FALSE, fig.width=8, fig.height=3.3}
@@ -890,29 +1120,19 @@ grid.arrange(gg_res + aes(x = factor(yearsmarried)),
              gg_res + aes(x = factor(education)),
              gg_res + aes(x = factor(occupation)),
              nrow = 2)
->>>>>>> e92a52d0fc00374c3f8488769bb250d53ec636e8
-```
-</small>
-
-## Проводим диагностику оптимальной модели
-
-```{r, warning=FALSE, message=FALSE}
-Mod_nb_test <- data.frame(.fitted = predict(Mod_nb_final), 
-                          .pears_resid = residuals(Mod_nb, type = "pearson"))
-
-ggplot(Mod_nb_test, aes(x=.fitted, y = .pears_resid)) + geom_point() +
-  geom_smooth(se = FALSE)
 ```
 
 ## Проверим на избыточность дисперсии
 
-```{r}
-Resid_Mod <- resid(Mod_nb_final, type = "pearson") 
-N <- nrow(af) 
-p <- length(coef(Mod_nb_final)) 
-df <- (N - p) 
-fi <- sum(Resid_Mod^2) /df  
-fi
+```{r, purl=FALSE}
+# Проверка на избыточность дисперсии
+pear_res <- resid(Mod_nb_final, type = "pearson") # Пирсоновские остатки
+p <- length(coef(Mod_nb_final)) + 1               # число параметров в модели  
+N <- nrow(model.frame(Mod_nb_final)) # объем выборки
+df <- N - p       # число степеней свободы
+Overdisp <- sum(pear_res^2) / df
+
+Overdisp
 ```
 
 
@@ -920,30 +1140,43 @@ fi
 ## Визуализируем предсказание модели
 
 ```{r af-viz, echo=FALSE, fig.height=5}
-MyData <- expand.grid(yearsmarried = seq(min(af$yearsmarried), max(af$yearsmarried)), children = c("yes", "no"), religiousness = seq(min(af$religiousness), max(af$religiousness)))
-MyData$Predicted <- predict(Mod_nb_final, newdata = MyData, type = "response")
+NewData <- expand.grid(
+  yearsmarried = seq(min(af$yearsmarried), max(af$yearsmarried)), 
+  religiousness = seq(min(af$religiousness), max(af$religiousness), length.out = 3))
 
-ggplot(MyData, aes(x=yearsmarried, y = Predicted, color = religiousness)) + geom_line(aes(group = religiousness), size = 1.5) + facet_grid(~ children, labeller = label_both) + scale_color_gradient(low = "yellow", high = "red") + geom_point(data = af, aes(x = yearsmarried, y = affairs), position = position_jitter(width = 1, height =1))
-
+# предсказанные значения
+Predictions <- predict(Mod_nb_final, newdata = NewData, se.fit = TRUE, type = "response")
+NewData$fit <- Predictions$fit
+# стандартные ошибки
+NewData$SE <- Predictions$se.fit
+# доверительный интервал
+NewData$upr <- NewData$fit + 1.96 * NewData$SE
+NewData$lwr <- NewData$fit - 1.96 * NewData$SE
+# график предсказаний модели
+ggplot(NewData, aes(x = yearsmarried, y = fit, group = religiousness)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = religiousness), alpha = 0.2) +
+  geom_line(aes(colour = religiousness), size = 1.5) + 
+  geom_hline(yintercept = 0) +
+  scale_color_gradient(low = "yellow2", high = "red") + 
+  scale_fill_gradient(low = "yellow2", high = "red")
 ```
 
-## Код для графика
+## Код для графика {.smaller}
 
 ```{r af-viz, eval=FALSE, tidy=TRUE, tidy.opts=list(width = 50)}
 ```
 
 
-
 ## Summary
 
->- В случае счетных зависимых перменных (неотрицательных целочисленных величин) применяются модели, основанные на распределении Пуассона или отрицаетльном биномиальном распределении.   
->- Важным ограничивающим условием применения этих моделей является отсутствие избыточности дисперсии.  
+>- В случае счетных зависимых перменных (неотрицательных целочисленных величин) применяются модели, основанные на распределении Пуассона или отрицательном биномиальном распределении.   
+>- Важным ограничением применения этих моделей является отсутствие избыточности дисперсии.  
 >- Избыточность дисперсии может быть истинной и мнимой.   
 >- При истинной избыточности дисперсии модель можно скорректировать, поcтроив квази-пуассоновскую модель (вводятся поправки для ошибок оценок коэффициентов модели).
->- Другой подход - построение моделей, основанных на отрицательном биномиальном распределении. 
+>- Другой подход --- построение моделей, основанных на отрицательном биномиальном распределении. 
 
 ## Что почитать
 + Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014.
-+ Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. - Statistics for biology and health. Springer, New York, NY. 
++ Zuur, A.F. et al. 2009. Mixed effects models and extensions in ecology with R. Statistics for biology and health. Springer, New York, NY. 
 
 
