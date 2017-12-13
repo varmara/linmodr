@@ -165,5 +165,22 @@ install.packages("tidyr")
 
 ## 12. Смешанные линейные модели (GLMM) для бинарных данных
 
+
+```{r eval=FALSE}
+install.packages("MASS")
+install.packages("glmmML")
+install.packages("lme4")
+install.packages("doBy")
+```
+
+<!-- - Презентация: [12_GLMM_binary.html](12_GLMM_binary.html) -->
+- Код: [12_GLMM_binary_code.R](12_GLMM_binary_code.R)
+- Данные: [myt_gen_morph.csv](data/myt_gen_morph.csv)
+- Данные: [Gannet_etal_2017.csv](data/Gannet_etal_2017.csv)
+
+
+
+
+
 ## 13. Смешанные линейные модели (GLMM) для счетных данных
 
