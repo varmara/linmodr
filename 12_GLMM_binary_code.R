@@ -133,3 +133,59 @@ MyData$Predicted <- predict(M3_glmer,newdata = MyData, re.form = NA)
 
 ggplot(MyData, aes(x = ALength, y = Predicted, color = BorN)) + geom_line(aes(group = BorN), size = 1.5) + facet_grid(~Position, labeller = label_both) + scale_color_gradient(low = "green", high = "red")
 
+
+
+#Строим модель для идентификации криптических видов
+# Данные взяты из работы M.Katolikova, V.Khaitov, R.Väinölä, M.Gantsevich, P.Strelkov "Genetic, Ecological and Morphological Distinctness of the Blue Mussels Mytilus trossulus Gould and M. edulis L. in the White Sea" PLOS ONE DOI:10.1371/journal.pone.0152963
+
+myt <- read.table("data/myt_gen_morph.csv", header = TRUE, sep = ";")
+head(myt)
+
+
+
+
+
+##Вводим бинарную переменную
+
+myt$Sp
+
+
+
+# Строим модели
+
+
+
+
+
+
+
+
+
+# Визуализация модели
+
+MyData <- unique(myt[, c("Z", "population")])
+
+MyData$L <- mean(myt$L)
+
+
+MyData$Predict_random <- predict(    , newdata = MyData, type =     )
+
+
+
+MyData2 <- data.frame (Z = seq(0, max(myt$Z), length.out = 100), L = mean(myt$L))
+
+MyData2$Predict_fix <- predict(    , newdata =     , re.form =    , type =     )
+
+ggplot(MyData, aes(x = Z)) + geom_line(aes(y = Predict_random, group = population), color = "gray") + geom_line(data = MyData2, aes(x = Z, y = Predict_fix), color = "red", size = 2) + theme_bw() + labs(x = "Z-индекс", y = "Вероятость быть M.trossulus")
+
+
+#Самостоятельная работа
+
+
+
+
+
+
+
+
+
