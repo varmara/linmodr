@@ -182,6 +182,20 @@ ggplot(MyData, aes(x = Z)) + geom_line(aes(y = Predict_random, group = populatio
 #Самостоятельная работа
 
 
+# ▶ graze - выпас коров (0, 1)
+# ▶ AspectCat - экспозиция (S, N)
+# ▶ nativecov - покрытие местной флоры %
+# ▶ slope - наклон
+# ▶ year - год наблюдений
+# ▶ Park - парк
+# ▶ plotID - уникальный идентификатор участка
+
+# Моделируем встречаемость разных видов птиц
+
+# Western Meadowlark (Sturnella neglecta)
+# Horned Lark (Eremophila alpestris)
+# Grasshopper Sparrow (Ammodramus savannarum)
+
 
 
 
