@@ -167,13 +167,10 @@ install.packages("tidyr")
 
 
 ```{r eval=FALSE}
-install.packages("MASS")
-install.packages("glmmML")
-install.packages("lme4")
-install.packages("doBy")
+install.packages(c("MASS", "glmmML", "lme4", "doBy"))
 ```
 
-<!-- - Презентация: [12_GLMM_binary.html](12_GLMM_binary.html) -->
+- Презентация: [12_GLMM_binary.html](12_GLMM_binary.html)
 - Код: [12_GLMM_binary_code.R](12_GLMM_binary_code.R)
 - Данные:
     + [myt_gen_morph.csv](data/myt_gen_morph.csv)
