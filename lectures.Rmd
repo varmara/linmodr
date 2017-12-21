@@ -180,7 +180,7 @@ install.packages(c("MASS", "glmmML", "lme4", "doBy"))
 
 ## 13. Смешанные линейные модели (GLMM) для счетных данных
 
-<!-- - Презентация: [13_GLMM_count.html](13_GLMM_count.html) -->
+- Презентация: [13_GLMM_count.html](13_GLMM_count.html)
 - Код: 
     + [13_GLMM_count_code.R](13_GLMM_count_code.R)
     + [13_Morris_2015_Ants.R](13_Morris_2015_Ants.R)
