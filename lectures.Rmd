@@ -2,13 +2,15 @@
 title: Презентации и данные
 ---
 
-## 1. Знакомство с R
+## Знакомство с R и базовая статистика
+
+### Знакомство с R (24 сент.)
 
 <!-- - Презентация: [Знакомство с R](01_intro_to_r.html) -->
 <!-- - Код: [01_code_intro_to_r](01_code_intro_to_r.R) -->
 <!-- - Данные: [fev.xls](data/fev.xls) -->
 
-## 2. Основы ggplot2
+### Основы ggplot2 (27 сент. и 1 окт. 1 пара)
 
 ```{r eval=FALSE}
 install.packages("ggplot2")
@@ -19,23 +21,21 @@ install.packages("readxl")
 <!-- - Код: [01_intro_ggplot.R](01_intro_ggplot.R) -->
 <!-- - Данные: [fev.xls](data/fev.xls) -->
 
-## 3. Базовая статистика
-
-### Описательная статистика
+### Описательная статистика (1 окт 2 пара и 4 окт.)
 
 <!-- - Презентация [02.1_descriptive_statistics.html](02.1_descriptive_statistics.html) -->
 <!-- - Код [02.1_descriptive_statistics_code.R](02.1_descriptive_statistics_code.R) -->
 <!-- - Данные [2.1_diatome_count.csv](data/2.1_diatome_count.csv) -->
 
-### Тестирование гипотез
+### Тестирование гипотез (8 окт 1-2 пары)
 
 <!-- - Презентация [02.2_hypothesis_testing.html](02.2_hypothesis_testing.html) -->
 <!-- - Код [02.2_hypothesis_testing_code.R](02.2_hypothesis_testing_code.R) -->
 <!-- - Данные [aml.csv](data/aml.csv) -->
 
-## 4. Простая линейная регрессия 
+## Линейная регрессия
 
-### Простая линейная регрессия 
+### Простая линейная регрессия  (11 окт)
 
 <!-- - Презентация: [03.1_LM.html](03.1_LM.html) -->
 <!-- - Код: [03.1_LM_code.R](03.1_LM_code.R) -->
@@ -43,12 +43,12 @@ install.packages("readxl")
 <!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
 <!--     + [secher.xls](data/secher.xls) -->
 
-### Краткое введение в мир матричной алгебры
+### Краткое введение в мир матричной алгебры (15 окт. 1 пара)
 
 <!-- - Презентация: [03.2_Introduction_to_matrix_algebra.html](03.2_Introduction_to_matrix_algebra.html) -->
 <!-- - Код: [03.2_Introduction_to_matrix_algebra_code.R](03.2_Introduction_to_matrix_algebra_code.R) -->
 
-## 5. Описание, проверка значимости и валидности линейной модели
+### Описание, проверка значимости и валидности линейной модели (15 окт. 2 пара и 18 окт.)
 
 <!-- - Презентация: [04_model_description_testing_and_validation.html](04_model_description_testing_and_validation.html) -->
 <!-- - Код:  -->
@@ -61,27 +61,25 @@ install.packages("readxl")
 <!--     + [catsM.xlsx](data/catsM.xlsx) -->
 <!--     + [GAGurine.xlsx](data/GAGurine.xlsx) -->
 
-## 6. Множественная линейная регрессия 
+### Множественная линейная регрессия (22 окт 1 пара)
 
 ```{r eval=FALSE}
 install.packages(c("gridExtra", "ISwR"))
 ```
 
-### Множественная линейная регрессия
-
 <!-- - Презентация: [05.1_multiple_LM.html](05.1_multiple_LM.html) -->
 <!-- - Код: [05.1_multiple_LM_code.R](05.1_multiple_LM_code.R) -->
 <!-- - Данные: [loyn.csv](data/loyn.csv) -->
 
-### Выбор оптимальной модели
+### Выбор оптимальной модели (22 окт 2 пара)
 
 <!-- - Презентация: [05.2_model_selection.html](05.2_model_selection.html) -->
 <!-- - Код: [05.2_model_selection_code.R](05.2_model_selection_code.R) -->
 <!-- - Данные: [loyn.csv](data/loyn.csv) -->
 
-## 7. Линейные модели с непрерывными и дискретными предикторами 
+## Общие линейные модели
 
-### Модели с разными значениями интерсепта для групп
+### Модели с разными значениями интерсепта для групп (25 окт)
 
 ```{r eval=FALSE}
 install.packages("readxl")
@@ -95,17 +93,14 @@ install.packages("readxl")
 <!--     + [Puromycin.xlsx](data/Puromycin.xlsx) -->
 <!--     + [birthwt.csv](data/birthwt.csv) -->
 
-### Модели с разными значениями угла наклона для групп
+### Модели с разными значениями угла наклона для групп (29 окт 1-2 пары)
 
 <!-- - Презентация: [06_LM_with_continuous_and_discrete_predictors_interactions.html](06_LM_with_continuous_and_discrete_predictors_interactions.html) -->
 <!-- - Код: -->
 <!--     + [06_LM_with_continuous_and_discrete_predictors_Practicum.R](06_LM_with_continuous_and_discrete_predictors_Practicum.R) -->
 <!--     + [06_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](06_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R) -->
 
-
-## 8. Линейные модели только с дискретными предикторами
-
-### Однофакторный дисперсионный анализ
+### Однофакторный дисперсионный анализ (1 нояб)
 
 ```{r eval=FALSE}
 install.packages(c("DAAG", "multcomp", "Hmisc"))
@@ -114,13 +109,29 @@ install.packages(c("DAAG", "multcomp", "Hmisc"))
 <!-- - Презентация: [07.1_anova.pdf](07.1_anova.pdf) -->
 <!-- - Код: [07.1_anova_code.R](07.1_anova_code.R) -->
 
-### Многофакторный дисперсионный анализ 
+### Многофакторный дисперсионный анализ (5 нояб 1-2 пары)
 
 <!-- - Презентация: [07.2_two-way_anova_and_interactions.pdf](07.2_two-way_anova_and_interactions.pdf) -->
 <!-- - Код: [07.2_two-way_anova_and_interactions_code.R](07.2_two-way_anova_and_interactions_code.R) -->
 <!-- - Данные: [hall.csv](data/hall.csv) -->
 
-## 9. Обобщенные линейные модели (GLM) для бинарных данных (=логистическая регрессия) 
+## Обобщенные линейные модели (GLM)
+
+### GLM для нормально распределенных данных (8 нояб, 12 нояб 1 пара)
+
+
+
+### GLM для счетных данных (12 нояб 2 пара и 15 нояб)
+
+```{r eval=FALSE}
+install.packages("AER")
+```
+
+<!-- - Презентация: [09_GLM_count.html](09_GLM_count.html) -->
+<!-- - Код: [09_GLM_count_code.R](09_GLM_count_code.R) -->
+<!-- - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx) -->
+
+### GLM для бинарных данных (=логистическая регрессия) (19 нояб 1-2 пары)
 
 ```{r eval=FALSE}
 install.packages("ISwR")
@@ -134,17 +145,9 @@ install.packages("ISwR")
 <!--     + [ICU.csv](data/ICU.csv) -->
 
 
-## 10. Обобщенные линейные модели (GLM) для счетных данных 
+## Смешанные модели (GLMM)
 
-```{r eval=FALSE}
-install.packages("AER")
-```
-
-<!-- - Презентация: [09_GLM_count.html](09_GLM_count.html) -->
-<!-- - Код: [09_GLM_count_code.R](09_GLM_count_code.R) -->
-<!-- - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx) -->
-
-## 11. Смешанные модели (GLMM) для нормально-распределенных данных
+### GLMM для нормально-распределенных данных (22 нояб и 26 нояб 1 пара)
 
 ```{r eval=FALSE}
 install.packages("tidyr")
@@ -159,14 +162,23 @@ install.packages("tidyr")
 <!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
 
 
-## 12. Моделирование структуры дисперсии в смешаных моделях
+### Моделирование структуры дисперсии в смешаных моделях (26 нояб 2 пара и 29 нояб)
 
 <!-- - Презентация: [11_variance_structure.pdf](11_variance_structure.pdf) -->
 <!-- - Код: [11_variance_structure_code.R](11_variance_structure_code.R) -->
 <!-- - Данные: [Khaitov_2013_myt.csv](data/myt.csv) -->
 
+### GLMM для счетных данных (3 дек 1-2 пары)
 
-## 13. Смешанные линейные модели (GLMM) для бинарных данных
+<!-- - Презентация: [13_GLMM_count.html](13_GLMM_count.html) -->
+<!-- - Код:  -->
+<!--     + [13_GLMM_count_code.R](13_GLMM_count_code.R) -->
+<!--     + [13_Morris_2015_Ants.R](13_Morris_2015_Ants.R) -->
+<!-- - Данные: -->
+<!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
+<!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
+
+### GLMM для бинарных данных (10 дек 1-2 пары)
 
 ```{r eval=FALSE}
 install.packages(c("MASS", "glmmML", "lme4", "doBy"))
@@ -178,14 +190,3 @@ install.packages(c("MASS", "glmmML", "lme4", "doBy"))
 <!--     + [myt_gen_morph.csv](data/myt_gen_morph.csv) -->
 <!--     + [Gannet_etal_2017.csv](data/Gannet_etal_2017.csv) -->
 <!--     + [Yakovis2.csv](data/Yakovis2.csv) -->
-
-
-## 14. Смешанные линейные модели (GLMM) для счетных данных
-
-<!-- - Презентация: [13_GLMM_count.html](13_GLMM_count.html) -->
-<!-- - Код:  -->
-<!--     + [13_GLMM_count_code.R](13_GLMM_count_code.R) -->
-<!--     + [13_Morris_2015_Ants.R](13_Morris_2015_Ants.R) -->
-<!-- - Данные: -->
-<!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
-<!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
