@@ -548,7 +548,7 @@ df3 <- data.frame(x = rep(x, 3), y = c(y1, y2, y3), label = label)
 df3a <- data.frame(intercept = c(30, 0, 60), slope = c(0, 0, 0))
 pl_3 <- ggplot(data = df3, aes(x = x, y = y, color=label)) + geom_point() + xlab("Independent (X)") + ylab("Dependent (Y)") + xlim(0, 25) + guides(color=F) + geom_abline(data = df3a, aes(intercept = intercept, slope = slope), size=1) + ggtitle("Different intercepts \n Zero slopes")
 
-grid.arrange(pl_1, pl_2, pl_3, nrow=1)
+grid.arrange(pl_1, pl_2, pl_3, nrow = 1)
 
 ```
 
@@ -744,7 +744,7 @@ pl_brain +
 
 ## Важно!
 
-<dev class="columns-2">
+<div class="columns-2">
 *Модель "работает" только в том диапазоне значений независимой переменной ($x$), для которой она построена (интерполяция). Экстраполяцию надо применять с большой осторожностью.*
 
 ```{r, fig.align='center', fig.height=5, fig.width=9, echo=FALSE}
@@ -757,7 +757,7 @@ geom_text(label="Extrapolation", aes(x=1200000, y=70))
 
 ``` 
 
-</dev>
+</div>
 
 
 ## Итак, что означают следующие величины?
