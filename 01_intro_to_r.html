@@ -11,7 +11,7 @@
 
 
 
-<title>Знакомство с R</title>
+<title>Знакомство с R (молниеносное и поверхностное)</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -27,36 +27,62 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #0000ff; } /* Keyword */
-code > span.ch { color: #008080; } /* Char */
-code > span.st { color: #008080; } /* String */
-code > span.co { color: #008000; } /* Comment */
-code > span.ot { color: #ff4000; } /* Other */
-code > span.al { color: #ff0000; } /* Alert */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #008000; font-weight: bold; } /* Warning */
-code > span.cn { } /* Constant */
-code > span.sc { color: #008080; } /* SpecialChar */
-code > span.vs { color: #008080; } /* VerbatimString */
-code > span.ss { color: #008080; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { } /* Variable */
-code > span.cf { color: #0000ff; } /* ControlFlow */
-code > span.op { } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #ff4000; } /* Preprocessor */
-code > span.do { color: #008000; } /* Documentation */
-code > span.an { color: #008000; } /* Annotation */
-code > span.cv { color: #008000; } /* CommentVar */
-code > span.at { } /* Attribute */
-code > span.in { color: #008000; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; } /* Alert */
+code span.an { color: #008000; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #0000ff; } /* ControlFlow */
+code span.ch { color: #008080; } /* Char */
+code span.cn { } /* Constant */
+code span.co { color: #008000; } /* Comment */
+code span.cv { color: #008000; } /* CommentVar */
+code span.do { color: #008000; } /* Documentation */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.im { } /* Import */
+code span.in { color: #008000; } /* Information */
+code span.kw { color: #0000ff; } /* Keyword */
+code span.op { } /* Operator */
+code span.ot { color: #ff4000; } /* Other */
+code span.pp { color: #ff4000; } /* Preprocessor */
+code span.sc { color: #008080; } /* SpecialChar */
+code span.ss { color: #008080; } /* SpecialString */
+code span.st { color: #008080; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #008080; } /* VerbatimString */
+code span.wa { color: #008000; font-weight: bold; } /* Warning */
 </style>
 <style type="text/css">
   pre:not([class]) {
@@ -114,6 +140,9 @@ img {
 }
 .tabbed-pane {
   padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
 }
 button.code-folding-btn:focus {
   outline: none;
@@ -305,7 +334,6 @@ div.tocify {
       <ul class="nav navbar-nav">
         <li><a href="index.html">О курсе</a></li>
         <li><a href="lectures.html">Презентации и данные</a></li>
-        <li><a href="evaluation_criteria.html">Критерии оценки домашних заданий</a></li>
         <li class="dropdown">
           <a href="appendix" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Полезности<span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
@@ -323,15 +351,52 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Знакомство с R</h1>
+<h1 class="title toc-ignore">Знакомство с R (молниеносное и поверхностное)</h1>
 
 </div>
 
 
+<style type="text/css">
+.spoiler {
+  visibility: hidden;
+}
+
+.spoiler::before {
+  visibility: visible;
+  content: "ОТВЕТ (наведите указатель, чтобы увидеть)"
+}
+
+.spoiler:hover {
+  visibility: visible;
+}
+
+.spoiler:hover::before {
+  display: none;
+}
+</style>
+<div id="--" class="section level1">
+<h1>Организация рабочего пространства</h1>
+<ol style="list-style-type: decimal">
+<li>Создайте папку, где будут храниться ВСЕ материалы курса. Например: Мы будем ее называть <strong>рабочей директорией</strong>. В эту папку помещайте ВСЕ файлы с кодом (с расширением .R).</li>
+<li>Внутри папки <code>linmodr</code> создайте папку <code>data</code>, где будут храниться все файлы с данными для анализа.</li>
+</ol>
+<p>В итоге у вас должно получиться примерно это:</p>
+<pre><code>C:\linmodr\
+C:\linmodr\data\</code></pre>
+</div>
+<div id="-rstudio" class="section level1">
+<h1>Настройка RStudio</h1>
+<p>Все настройки RStudio находятся меню Tools -&gt; Global Options</p>
+<ul>
+<li>Восстановление рабочено пространства из прошлого сеанса — это лучше отменить, т.к. обычно переменные-призраки очень мешают. На вкладке <code>General</code> убираем галочку <code>Restore .RData into workspace at startup</code>, и меняем <code>Save workspace to .RData on exit</code> - <code>Never</code></li>
+<li>Перенос длинных строк в окне кода — это удобно. На вкладке <code>Code</code> ставим галочку рядом с опцией <code>Soft-wrap R source files</code></li>
+<li>Источник для установки пакетов. На вкладке <code>Packages</code> выбираем подходящее зеркало сайта CRAN (<code>CRAN mirror</code>)</li>
+</ul>
+</div>
 <div class="section level1">
 <h1>Комментарии</h1>
 <p>Комментарии в текстах программ обозначаются символом #</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># это комментарии, они не будут выполняться</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># это комментарии, они не будут выполняться</span></a></code></pre></div>
 </div>
 <div id="----rstudio" class="section level1">
 <h1>Полезные клавиатурные сокращения в RStudio</h1>
@@ -341,51 +406,69 @@ div.tocify {
 <li><code>Tab</code> или <code>Ctrl + Space</code> - нажмите после того как начали набирать название функции или переменной, и появится список автоподстановки. Это помогает печатать код быстро и с меньшим количеством ошибок.</li>
 </ul>
 </div>
-<div id="--" class="section level1">
-<h1>Устанавливаем рабочую директорию</h1>
-<p>Есть несколько способов установки пути к рабочей директории:</p>
-<ol style="list-style-type: decimal">
-<li>Выберите в меню <code>Session -&gt; Set working Directory... -&gt; To Source File Location</code> (Если вы уже сохранили код).</li>
-<li>На вкладке <code>Files</code> в одной из рабочих областей RStudio выберите многоточие <code>...</code> -&gt; в открывшемся системном диалоге выбора файлов найдите директорию, в которой лежит ваш код и нажмите OK</li>
-<li>Можно вручную прописать путь к рабочей директории в кавычках в качестве аргумента функции <code>setwd()</code></li>
-</ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="st">&quot;~/lect-linmodr/Intro&quot;</span>)</code></pre></div>
+<div id="r----" class="section level1">
+<h1>R как калькулятор, математические операции</h1>
+<p>Математические операторы <code>+ - / * ^</code></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span></a></code></pre></div>
+<pre><code>## [1] 4</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="dv">1024</span> <span class="op">/</span><span class="st"> </span><span class="dv">2</span></a></code></pre></div>
+<pre><code>## [1] 512</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="dv">1</span><span class="op">:</span><span class="dv">10</span></a></code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="dv">34</span> <span class="op">*</span><span class="st"> </span><span class="dv">4</span></a></code></pre></div>
+<pre><code>## [1] 136</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="dv">2</span> <span class="op">^</span><span class="st"> </span><span class="dv">4</span></a></code></pre></div>
+<pre><code>## [1] 16</code></pre>
+<p>Для некоторых операций в R есть функции, например:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">sqrt</span>(<span class="dv">27</span>)</a></code></pre></div>
+<pre><code>## [1] 5.196152</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">log</span>(<span class="dv">100</span>)</a></code></pre></div>
+<pre><code>## [1] 4.60517</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">log10</span>(<span class="dv">100</span>)</a></code></pre></div>
+<pre><code>## [1] 2</code></pre>
 </div>
 <div id="--" class="section level1">
 <h1>Как получить помощь</h1>
 <ol style="list-style-type: decimal">
-<li>В RStudio можно поставить курсор на слово <code>setwd</code> и нажать <code>F1</code></li>
-<li>Перед названием функции можно напечатать знак вопроса и выполнить эту строку <code>?setwd</code></li>
+<li>В RStudio можно поставить курсор на слово <code>sqrt</code> и нажать <code>F1</code></li>
+<li>Перед названием функции можно напечатать знак вопроса и выполнить эту строку <code>?sqrt</code></li>
 <li>Можно воспользоваться функцией <code>help()</code></li>
 </ol>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">help</span>(<span class="st">&quot;setwd&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">help</span>(<span class="st">&quot;sqrt&quot;</span>)</a></code></pre></div>
+<div id="-1" class="section level4">
+<h4>Задание 1</h4>
+<p>Найдите длину гипотенузы прямоугольного треугольника со сторонами 3 и 5 см.</p>
+<div class="spoiler">
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># </span><span class="al">TODO</span></a></code></pre></div>
 </div>
-<div id="r----" class="section level1">
-<h1>R как калькулятор, математические операции</h1>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2</span> +<span class="st"> </span><span class="dv">2</span></code></pre></div>
-<pre><code>## [1] 4</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1024</span> /<span class="st"> </span><span class="dv">2</span></code></pre></div>
-<pre><code>## [1] 512</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1</span>:<span class="dv">10</span></code></pre></div>
-<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">34</span> *<span class="st"> </span><span class="dv">4</span></code></pre></div>
-<pre><code>## [1] 136</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2</span> ^<span class="st"> </span><span class="dv">4</span></code></pre></div>
-<pre><code>## [1] 16</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(<span class="dv">27</span>)</code></pre></div>
-<pre><code>## [1] 5.196152</code></pre>
+</div>
+<div id="-2" class="section level4">
+<h4>Задание 2</h4>
+<p>Поэкспериментируйте с другими математическими операторами (+ - / * ^).</p>
+<div class="spoiler">
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co"># </span><span class="al">TODO</span></a></code></pre></div>
+</div>
+</div>
 </div>
 <div class="section level1">
 <h1>Переменные</h1>
-<p>Оператор присваивания это символ стрелочки <code>&lt;-</code>. Он работает справа налево, это значит, что значение выражения в его правой части присваивается объекту в левой части.</p>
-<p>Переменные - это такие контейнеры, в которые можно положить разные данные и даже функции.</p>
+<p>Переменные - это “контейнеры” для числовых (и разных других) значений.</p>
 <p>Имена переменных могут содержать латинские буквы обоих регистров, символы точки . и подчеркивания _ , а так же цифры. Имена переменных должны начинаться с латинских букв. Создавайте понятные и “говорящие” имена переменных.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">var_1 &lt;-<span class="st"> </span><span class="dv">1024</span> /<span class="st"> </span><span class="dv">2</span>
-<span class="dv">1238</span> *<span class="st"> </span><span class="dv">3</span> -&gt;<span class="st"> </span>var_2
-var_2</code></pre></div>
-<pre><code>## [1] 3714</code></pre>
-<div id="---" class="section level2">
-<h2>Как выбрать название переменной?</h2>
+<p>Оператор присваивания это символ стрелочки <code>&lt;-</code>. Он работает справа налево, это значит, что значение выражения в его правой части присваивается объекту в левой части.</p>
+<p>Создаем переменную a и присваиваем ей значение 2, и переменную b со значением 5:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">a &lt;-<span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb22-2" data-line-number="2">b &lt;-<span class="st"> </span><span class="dv">5</span></a></code></pre></div>
+<p>Переменные можно вызвать по имени:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">a</a></code></pre></div>
+<pre><code>## [1] 2</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">b</a></code></pre></div>
+<pre><code>## [1] 5</code></pre>
+<p>С переменными можно проводить разные операции</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">a <span class="op">^</span><span class="st"> </span>b</a></code></pre></div>
+<pre><code>## [1] 32</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">a <span class="op">*</span><span class="st"> </span><span class="dv">3</span> <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">9</span>) <span class="op">/</span><span class="st"> </span>b</a></code></pre></div>
+<pre><code>## [1] 6.6</code></pre>
+<p>Как выбрать название переменной?</p>
 <ul>
 <li><code>a</code> - плохо, и даже <code>b</code>, или <code>х</code>. Но в некоторых случаях допустимо:)</li>
 <li><code>var1</code> - плохо, но уже лучше</li>
@@ -393,203 +476,186 @@ var_2</code></pre></div>
 <li><code>shelllength</code> - говорящее, но плохо читается</li>
 <li><code>shell_length</code>, <code>wing_colour</code> или <code>leg_num</code> - хорошие говорящие и читабельные названия</li>
 </ul>
+<p>Переменные можно использовать только после того, как они были созданы.</p>
+<p>Пример 1</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">box_weight &lt;-<span class="st"> </span><span class="fl">1.5</span></a>
+<a class="sourceLine" id="cb31-2" data-line-number="2">apples &lt;-<span class="st"> </span><span class="dv">6</span></a>
+<a class="sourceLine" id="cb31-3" data-line-number="3">box <span class="op">/</span><span class="st"> </span>apples <span class="co"># ошибка. переменная box еще не была создана.</span></a>
+<a class="sourceLine" id="cb31-4" data-line-number="4"><span class="co"># нужная переменная называется box_weight.</span></a></code></pre></div>
+<p>Пример 2</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1">box &lt;-<span class="st"> </span><span class="fl">1.3</span></a>
+<a class="sourceLine" id="cb32-2" data-line-number="2">box <span class="op">/</span><span class="st"> </span>fruits <span class="co"># ошибка. переменная fruits еще не была создана.</span></a>
+<a class="sourceLine" id="cb32-3" data-line-number="3">fruits &lt;-<span class="st"> </span><span class="dv">7</span></a></code></pre></div>
+<div id="-3" class="section level4">
+<h4>Задание 3</h4>
+<p>Переставьте строки так, чтобы код можно было выполнить без ошибки.</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">distance &lt;-<span class="st"> </span><span class="dv">149</span></a>
+<a class="sourceLine" id="cb33-2" data-line-number="2">speed &lt;-<span class="st"> </span>distance <span class="op">/</span><span class="st"> </span>time</a>
+<a class="sourceLine" id="cb33-3" data-line-number="3">time &lt;-<span class="st"> </span><span class="dv">5</span></a></code></pre></div>
+<div class="spoiler">
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1"><span class="co"># </span><span class="al">TODO</span></a></code></pre></div>
 </div>
-<div id="---" class="section level2">
-<h2>Использование переменных в рассчетах</h2>
-<p>Задача: Представьте прямоугольный треугольник с вершинами A B и С. Пусть известны длины его катетов: AB = 3, BC = 4. Вычислите длину его гипотенузы AC (используйте переменные).</p>
-<p>Решение:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">AB &lt;-<span class="st"> </span><span class="dv">3</span>
-BC &lt;-<span class="st"> </span><span class="dv">4</span>
-AC &lt;-<span class="st"> </span><span class="kw">sqrt</span>(AB^<span class="dv">2</span> +<span class="st"> </span>BC^<span class="dv">2</span>)
-AC</code></pre></div>
-<pre><code>## [1] 5</code></pre>
+</div>
+<div id="-4" class="section level4">
+<h4>Задание 4</h4>
+<p>Представьте прямоугольник. Его ширина 3 см, а длина на 5 см больше. Чему равен периметр? (В решении используйте переменные).</p>
+<div class="spoiler">
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="co"># </span><span class="al">TODO</span></a></code></pre></div>
+</div>
 </div>
 </div>
 <div id="-" class="section level1">
 <h1>Структуры данных</h1>
 <p>Данные в R можно хранить в виде разных объектов.</p>
 <p>В результате выполнения следующих команд числа. Одно выражение - одно значение.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">23</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="dv">23</span></a></code></pre></div>
 <pre><code>## [1] 23</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(<span class="dv">25</span>)</code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="kw">sqrt</span>(<span class="dv">25</span>)</a></code></pre></div>
 <pre><code>## [1] 5</code></pre>
 <p>На самом деле, эти величины - просто векторы единичной длины</p>
-<div class="section level2">
-<h2>Векторы</h2>
-<p><em>Векторы</em> - один объект, внутри которого несколько значений.</p>
-<div id="--" class="section level3">
-<h3>Способы создания векторов:</h3>
+<p>Сначала разберемся с векторами, а другие структуры данных (датафреймы, списки, матрицы) будем изучать по мере знакомства с R .</p>
+</div>
+<div class="section level1">
+<h1>Векторы</h1>
+<p><em>Вектор</em> - один объект, внутри которого несколько значений.</p>
+<div id="----" class="section level2">
+<h2>Создание и работа с векторами</h2>
 <ul>
-<li>Оператор: используется для создания целочисленных векторов, где значения следуют одно за другим без пропусков</li>
+<li>Оператор <code>:</code> (двоеточие) используется для создания векторов, где значения следуют одно за другим с шагом 1 без пропусков.</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1</span>:<span class="dv">10</span> <span class="co"># от одного до 10</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" data-line-number="1"><span class="dv">1</span><span class="op">:</span><span class="dv">10</span> <span class="co"># от одного до 10</span></a></code></pre></div>
 <pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">-<span class="dv">5</span>:<span class="dv">3</span> <span class="co"># от -5 до 3</span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1"><span class="dv">-5</span><span class="op">:</span><span class="dv">3</span> <span class="co"># от -5 до 3</span></a></code></pre></div>
 <pre><code>## [1] -5 -4 -3 -2 -1  0  1  2  3</code></pre>
+<div id="-5" class="section level4">
+<h4>Задание 5</h4>
+<p>Создайте вектор из целых чисел от 1 до 100. Как вы думаете, что означают номера в квадратных скобках в начале каждой строки?</p>
+<div class="spoiler">
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="dv">1</span><span class="op">:</span><span class="dv">100</span></a></code></pre></div>
+<pre><code>##   [1]   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17
+##  [18]  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34
+##  [35]  35  36  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51
+##  [52]  52  53  54  55  56  57  58  59  60  61  62  63  64  65  66  67  68
+##  [69]  69  70  71  72  73  74  75  76  77  78  79  80  81  82  83  84  85
+##  [86]  86  87  88  89  90  91  92  93  94  95  96  97  98  99 100</code></pre>
+</div>
 <ul>
 <li>Функция <code>c()</code> - от англ. concatenate. Следите, чтобы было английское си, а не русское эс:).</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">?c <span class="co"># посмотрите хелп к функции</span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1">?c <span class="co"># посмотрите хелп к функции</span></a></code></pre></div>
 <p>Функция <code>c</code> принимает несколько (произвольное количество) аргументов, разделенных запятыми. Она собирает из них вектор.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>)</code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1"><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>)</a></code></pre></div>
 <pre><code>## [1] 2 4 6</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(-<span class="fl">9.3</span>, <span class="dv">0</span>, <span class="fl">2.17</span>, <span class="fl">21.3</span>)</code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1"><span class="kw">c</span>(<span class="op">-</span><span class="fl">9.3</span>, <span class="dv">0</span>, <span class="fl">2.17</span>, <span class="fl">21.3</span>)</a></code></pre></div>
 <pre><code>## [1] -9.30  0.00  2.17 21.30</code></pre>
-<p>Векторы можно хранить в переменных для последующего использования</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num &lt;-<span class="st"> </span>-<span class="dv">11</span>:<span class="dv">12</span> <span class="co"># численный вектор от -11 до 12 сохранен в переменной vect_num</span>
-vect_num_1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1.3</span>, <span class="fl">1.7</span>, <span class="fl">1.2</span>, <span class="fl">0.9</span>, <span class="fl">1.6</span>, <span class="fl">1.4</span>) <span class="co"># численный вектор, сохранен в переменной vect_num_1</span></code></pre></div>
-<p>Задача: Создайте вектор <code>vect_num_2</code>, в котором сначала следуют все элементы вектора <code>vect_num</code>, а затем все элементы вектора <code>vect_num_1</code></p>
-<p>Решение:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Вариант 1. Можно просто перечислить все элементы</span>
-vect_num_2 &lt;-<span class="st"> </span><span class="kw">c</span>(-<span class="dv">11</span>:<span class="dv">12</span>, <span class="fl">1.3</span>, <span class="fl">1.7</span>, <span class="fl">1.2</span>, <span class="fl">0.9</span>, <span class="fl">1.6</span>, <span class="fl">1.4</span>)
-<span class="co"># Вариант 2. Можно использовать сами векторы</span>
-vect_num_2 &lt;-<span class="st"> </span><span class="kw">c</span>(vect_num, vect_num_1)
-vect_num_2</code></pre></div>
-<pre><code>##  [1] -11.0 -10.0  -9.0  -8.0  -7.0  -6.0  -5.0  -4.0  -3.0  -2.0  -1.0
-## [12]   0.0   1.0   2.0   3.0   4.0   5.0   6.0   7.0   8.0   9.0  10.0
-## [23]  11.0  12.0   1.3   1.7   1.2   0.9   1.6   1.4</code></pre>
 </div>
-<div id="--" class="section level3">
-<h3>Адресация внутри векторов</h3>
-<p>При помощи оператора <code>[]</code>, мужно обратится к некоторым элементам вектора. В квадратных скобках вам нужно указать один или несколько порядковых номеров элементов</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">1</span>] <span class="co"># первый элемент в векторе vect_num</span></code></pre></div>
-<pre><code>## [1] -11</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">10</span>] <span class="co"># 10-й элемент</span></code></pre></div>
-<pre><code>## [1] -2</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">22</span>]</code></pre></div>
-<pre><code>## [1] 10</code></pre>
-<p>Если вам нужно несколько элементов, то их нужно передать квадратным скобкам в виде вектора. Например, нам нужны элементы с 3 по 5. Вот вектор, который содержит значения 3, 4 и 5.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">3</span>:<span class="dv">5</span></code></pre></div>
-<pre><code>## [1] 3 4 5</code></pre>
-<p>Если мы его напишем в квадратных скобках, то добудем элементы с такими порядковыми номерами</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">3</span>:<span class="dv">5</span>]</code></pre></div>
-<pre><code>## [1] -9 -8 -7</code></pre>
-<p>Аналогично, если вам нужны элементы не подряд, то передайте вектор с номерами элементов, который вы создали при помощи функции c() c(2, 4, 6) # это вектор содержащий 2, 4 и 6, поэтому</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>)] <span class="co"># возвращает 2-й, 4-й и 6-й элементы</span></code></pre></div>
-<pre><code>## [1] -10  -8  -6</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">20</span>)] <span class="co"># возвращает 1-й, 10-й и 20-й элементы</span></code></pre></div>
-<pre><code>## [1] -11  -2   8</code></pre>
-<p>Вектор - одномерный объект. У его элементов только один порядковый номер (индекс). Поэтому при обращении к элементам вектора нужно указывать только одно число или один вектор с адресами.</p>
-<p>Правильно:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>)] <span class="co"># возвращает 1-й, 3-й и 5-й элементы</span></code></pre></div>
-<pre><code>## [1] -11 -10  -7</code></pre>
-<p>Но R выдаст ошибку, если при обращении к вектору, вы не создавали вектор, а просто перечислили номера элементов через запятую.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>] <span class="co"># ошибка</span>
-vect_num[<span class="dv">15</span>, <span class="dv">9</span>, <span class="dv">1</span>] <span class="co"># ошибка</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">15</span>, <span class="dv">9</span>, <span class="dv">1</span>)] <span class="co"># правильно</span></code></pre></div>
-<pre><code>## [1]   3  -3 -11</code></pre>
-<p>При помощи функции c() можно объединять несколько векторов и скаляров в один вектор</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">5</span>:<span class="dv">9</span>)</code></pre></div>
-<pre><code>## [1] 1 1 5 6 7 8 9</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(vect_num, vect_num)</code></pre></div>
-<pre><code>##  [1] -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4   5
-## [18]   6   7   8   9  10  11  12 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2
-## [35]  -1   0   1   2   3   4   5   6   7   8   9  10  11  12</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="dv">100</span>, vect_num)</code></pre></div>
-<pre><code>##  [1] 100 -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4
-## [18]   5   6   7   8   9  10  11  12</code></pre>
-<p>Добываем 1, 3, 5 и с 22 по 24 элементы</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">22</span>:<span class="dv">24</span>)]</code></pre></div>
-<pre><code>## [1] -11  -9  -7  10  11  12</code></pre>
+<div id="-6" class="section level4">
+<h4>Задание 6</h4>
+<p>Создайте вектор, в котором будет три наименьших отрицательных простых числа в порядке возрастания.</p>
+<div class="spoiler">
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="kw">c</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">-3</span>, <span class="dv">-1</span>)</a></code></pre></div>
+<pre><code>## [1] -5 -3 -1</code></pre>
 </div>
-</div>
-</div>
-<div id="---r" class="section level1">
-<h1>Типы данных в R</h1>
-<div id="-" class="section level2">
-<h2>Числовые данные</h2>
-<p>только что видели</p>
-</div>
-<div id="-" class="section level2">
-<h2>Текстовые данные</h2>
-<p>Каждый текстовый элемент (говорят “строка” - string) должен быть окружен кавычками - двойными или одинарными</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">&quot;это текст&quot;</span></code></pre></div>
-<pre><code>## [1] &quot;это текст&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="st">&#39;это тоже текст&#39;</span></code></pre></div>
-<pre><code>## [1] &quot;это тоже текст&quot;</code></pre>
-<p>Текстовые значения можно объединять в вектора.</p>
-<p>Это текстовый вектор</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;violet&quot;</span>)
-rainbow <span class="co"># весь вектор</span></code></pre></div>
-<pre><code>## [1] &quot;red&quot;    &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
-<p>Добываем первый и последний элементы</p>
-<p>В данном случае я точно знаю, что их 6, мне нужны 1 и 6.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">6</span>)]</code></pre></div>
-<pre><code>## [1] &quot;red&quot;    &quot;violet&quot;</code></pre>
-<p>Добываем элементы с 3 по 6</p>
-<p>Если у вас вдруг слишком короткий вектор в этом задании, то можно склеить новый из двух</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">double_rainbow &lt;-<span class="st"> </span><span class="kw">c</span>(rainbow, rainbow)
-double_rainbow</code></pre></div>
-<pre><code>##  [1] &quot;red&quot;    &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot; &quot;red&quot;   
-##  [8] &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow[<span class="dv">3</span>:<span class="dv">6</span>] <span class="co"># элементы с 3 по 6</span></code></pre></div>
-<pre><code>## [1] &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
-</div>
-<div id="-" class="section level2">
-<h2>Логические данные</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="ot">TRUE</span> <span class="co"># истина</span></code></pre></div>
-<pre><code>## [1] TRUE</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="ot">FALSE</span> <span class="co"># ложь</span></code></pre></div>
-<pre><code>## [1] FALSE</code></pre>
-<p>Для ленивых - можно сокращать первыми заглавными буквами. Но лучше так не делать, чтобы читать программы было легче</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(T, T, T, T, F, F, T, T)</code></pre></div>
-<pre><code>## [1]  TRUE  TRUE  TRUE  TRUE FALSE FALSE  TRUE  TRUE</code></pre>
-<p>Логический вектор</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">c</span>(<span class="ot">TRUE</span>, <span class="ot">TRUE</span>, <span class="ot">TRUE</span>, <span class="ot">FALSE</span>, <span class="ot">FALSE</span>, <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1]  TRUE  TRUE  TRUE FALSE FALSE  TRUE</code></pre>
-<p>Еще логический вектор</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">short_logical_vector &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="ot">FALSE</span>, <span class="ot">TRUE</span>)</code></pre></div>
-<p>Создаем длинный логический вектор.</p>
-<p>Чтобы создавать длинные вектора из повторяющихся элементов, можно использовать функцию rep()</p>
-<pre><code>?rep</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rep</span>(<span class="dt">x =</span> <span class="dv">1</span>, <span class="dt">times =</span> <span class="dv">3</span>) <span class="co"># 1 повторяется 3 раза</span></code></pre></div>
-<pre><code>## [1] 1 1 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rep</span>(<span class="dt">x =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">times =</span> <span class="dv">5</span>) <span class="co"># &quot;red&quot; повторяется 5 раз</span></code></pre></div>
-<pre><code>## [1] &quot;red&quot; &quot;red&quot; &quot;red&quot; &quot;red&quot; &quot;red&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rep</span>(<span class="dt">x =</span> <span class="ot">TRUE</span>, <span class="dt">times =</span> <span class="dv">2</span>) <span class="co"># TRUE повторяется 2 раза</span></code></pre></div>
-<pre><code>## [1] TRUE TRUE</code></pre>
-<p>В R названия аргументов функций можно не указывать, если вы используете аргументы в том же порядке, что прописан в help к этой функции.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">5</span>) <span class="co"># TRUE повторяется 5 раз, аргументы без названий</span></code></pre></div>
-<pre><code>## [1] TRUE TRUE TRUE TRUE TRUE</code></pre>
-<p>Создаем логический вектор, где TRUE повторяется 3 раза, FALSE 3 раза и TRUE 4 раза. Результат сохраняем в переменной vect_log</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_log &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="ot">FALSE</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">4</span>))
-vect_log</code></pre></div>
-<pre><code>##  [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE</code></pre>
-</div>
-<div class="section level2">
-<h2>Факторы</h2>
-<p>Факторы - это способ хранения дискретных (=категориальных данных). Например, если вы поймали 10 улиток и посмотрели их цвет. У большого количества улиток небольшое счетное количество возможных цветов.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">snail_colours &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;yellow&quot;</span>)
-snail_colours <span class="co"># это текстовый вектор.</span></code></pre></div>
-<pre><code>## [1] &quot;red&quot;    &quot;green&quot;  &quot;green&quot;  &quot;green&quot;  &quot;yellow&quot; &quot;yellow&quot; &quot;yellow&quot; &quot;yellow&quot;</code></pre>
-<p>Но цвет “желтый” обозначает одно и то же для каждой из улиток. Поэтому в целях экономии места можно записать цвета этих улиток в виде вектора, в котором численным значениям будут сопоставлены “этикетки” (называются “уровни” - levels) - названия цветов. Мы можем создать “фактор” цвет улиток.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">factor</span>(snail_colours)</code></pre></div>
-<pre><code>## [1] red    green  green  green  yellow yellow yellow yellow
-## Levels: green red yellow</code></pre>
-<p>уровни этого фактора</p>
 <ul>
-<li>1 - green,</li>
-<li>2 - red,</li>
-<li>3 - yellow</li>
+<li>Функция <code>seq()</code> создает последовательности с заданным шагом или заданной длины.</li>
 </ul>
-<p>По умолчанию, R назначает порядок уровней по алфавиту. Можно изменить порядок (см. <code>help(&quot;factor&quot;)</code>). Нам это пригодится позже</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">double_rainbow <span class="co"># текстовый вектор</span></code></pre></div>
-<pre><code>##  [1] &quot;red&quot;    &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot; &quot;red&quot;   
-##  [8] &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
-<p>Создаем фактор из текстового вектора и складываем его в переменную</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_double_rainbow &lt;-<span class="st"> </span><span class="kw">factor</span>(double_rainbow)</code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="kw">seq</span>(<span class="dt">from =</span> <span class="dv">1</span>, <span class="dt">to =</span> <span class="dv">5</span>, <span class="dt">by =</span> <span class="fl">0.5</span>)</a></code></pre></div>
+<pre><code>## [1] 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0</code></pre>
 </div>
-<div id="-------" class="section level2">
-<h2>Как узнать, что за данные хранятся в переменной?</h2>
-<p>Чтобы узнать, что за данные хранятся в переменной, используйте функцию <code>class()</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(f_double_rainbow)</code></pre></div>
-<pre><code>## [1] &quot;factor&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(vect_log)</code></pre></div>
-<pre><code>## [1] &quot;logical&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(vect_num)</code></pre></div>
-<pre><code>## [1] &quot;integer&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">class</span>(rainbow)</code></pre></div>
-<pre><code>## [1] &quot;character&quot;</code></pre>
+<div id="-7" class="section level4">
+<h4>Задание 7</h4>
+<p>Посмотрите в справку к функции <code>seq()</code> и выясните, как создавать последовательности заданной длины. Создайте последовательность от -1 до 1 из 9 элементов.</p>
+<div class="spoiler">
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="kw">seq</span>(<span class="dt">from =</span> <span class="dv">-1</span>, <span class="dt">to =</span> <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="dv">9</span>)</a></code></pre></div>
+<pre><code>## [1] -1.00 -0.75 -0.50 -0.25  0.00  0.25  0.50  0.75  1.00</code></pre>
+</div>
+<p>Векторы можно хранить в переменных для последующего использования</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1">my_num &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">12</span> <span class="co"># численный вектор от -11 до 12 сохранен в переменной my_num</span></a>
+<a class="sourceLine" id="cb57-2" data-line-number="2">my_num</a></code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10 11 12</code></pre>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb59-1" data-line-number="1">my_num_<span class="dv">1</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">300</span>, <span class="dv">400</span>) <span class="co"># численный вектор, сохранен в переменной my_num_1</span></a>
+<a class="sourceLine" id="cb59-2" data-line-number="2">my_num_<span class="dv">1</span></a></code></pre></div>
+<pre><code>## [1] 100 200 300 400</code></pre>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb61-1" data-line-number="1">my_num_<span class="dv">2</span> &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">1.3</span>, <span class="fl">1.7</span>, <span class="fl">1.2</span>, <span class="fl">0.4</span>)</a>
+<a class="sourceLine" id="cb61-2" data-line-number="2">my_num_<span class="dv">2</span></a></code></pre></div>
+<pre><code>## [1] 1.3 1.7 1.2 0.4</code></pre>
+</div>
+<div id="-8" class="section level4">
+<h4>Задание 8</h4>
+<p>Создайте вектор <code>nums</code>, в котором сначала следуют все элементы вектора <code>my_num</code>, а затем все элементы вектора <code>my_num_1</code></p>
+<div class="spoiler">
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb63-1" data-line-number="1"><span class="co"># Вариант 1. Можно просто перечислить все элементы</span></a>
+<a class="sourceLine" id="cb63-2" data-line-number="2">nums &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">12</span>, <span class="fl">1.3</span>, <span class="fl">1.7</span>, <span class="fl">1.2</span>, <span class="fl">0.4</span>)</a>
+<a class="sourceLine" id="cb63-3" data-line-number="3"><span class="co"># Вариант 2. Можно использовать сами векторы</span></a>
+<a class="sourceLine" id="cb63-4" data-line-number="4">nums &lt;-<span class="st"> </span><span class="kw">c</span>(my_num, my_num_<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb63-5" data-line-number="5">nums</a></code></pre></div>
+<pre><code>##  [1]   1   2   3   4   5   6   7   8   9  10  11  12 100 200 300 400</code></pre>
+</div>
+</div>
+<div id="-" class="section level3">
+<h3>Векторизованные операции</h3>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb65-1" data-line-number="1"><span class="co"># Создадим переменную, для хранения вектора</span></a>
+<a class="sourceLine" id="cb65-2" data-line-number="2">v1 &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">9</span></a>
+<a class="sourceLine" id="cb65-3" data-line-number="3">v1 <span class="co"># так можно посмотреть, что у нее внутри</span></a></code></pre></div>
+<pre><code>## [1] 1 2 3 4 5 6 7 8 9</code></pre>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb67-1" data-line-number="1"><span class="co"># С векторами можно делать множество операций - это удобно</span></a>
+<a class="sourceLine" id="cb67-2" data-line-number="2">v1 <span class="op">+</span><span class="st"> </span><span class="dv">5</span></a></code></pre></div>
+<pre><code>## [1]  6  7  8  9 10 11 12 13 14</code></pre>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" data-line-number="1">v1 <span class="op">/</span><span class="st"> </span><span class="dv">2</span></a></code></pre></div>
+<pre><code>## [1] 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5</code></pre>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1"><span class="dv">2</span> <span class="op">/</span><span class="st"> </span>v1</a></code></pre></div>
+<pre><code>## [1] 2.0000000 1.0000000 0.6666667 0.5000000 0.4000000 0.3333333 0.2857143
+## [8] 0.2500000 0.2222222</code></pre>
+</div>
+</div>
+<div id="--" class="section level2">
+<h2>Адресация внутри векторов</h2>
+<p>При помощи оператора <code>[]</code>, можно обратится к элементам вектора. В квадратных скобках вам нужно указать вектор из одного или нескольких порядковых номеров элементов.</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1">nums[<span class="dv">1</span>] <span class="co"># первый элемент в векторе nums</span></a></code></pre></div>
+<pre><code>## [1] 1</code></pre>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1">nums[<span class="dv">10</span>] <span class="co"># 10-й элемент</span></a></code></pre></div>
+<pre><code>## [1] 10</code></pre>
+<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1">nums[<span class="dv">16</span>]</a></code></pre></div>
+<pre><code>## [1] 400</code></pre>
+<p>Если вам нужно несколько элементов, то их нужно передать квадратным скобкам в виде вектора. Например, если мы напишем в квадратных скобках вектор, который содержит значения 3, 4 и 5, то добудем элементы с такими порядковыми номерами.</p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb79-1" data-line-number="1">nums[<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>]</a></code></pre></div>
+<pre><code>## [1] 3 4 5</code></pre>
+<p>Аналогично, если вам нужны элементы не подряд, то передайте вектор с номерами элементов, который вы создали при помощи функции <code>c()</code> <code>c(2, 4, 6)</code> # это вектор содержащий 2, 4 и 6, поэтому</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb81-1" data-line-number="1">nums[<span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>)] <span class="co"># возвращает 2-й, 4-й и 6-й элементы</span></a></code></pre></div>
+<pre><code>## [1] 2 4 6</code></pre>
+<p>Вектор - одномерный объект. У его элементов только один порядковый номер (индекс). Поэтому при обращении к элементам вектора нужно указывать только одно число или один вектор с адресами, как мы это делали в предыдущих примерах. Но R выдаст ошибку, если при обращении к вектору, вы не создавали вектор, а просто перечислили номера элементов через запятую.</p>
+<div class="sourceCode" id="cb83"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb83-1" data-line-number="1">nums[<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>] <span class="co"># ошибка</span></a></code></pre></div>
+<div id="-9" class="section level4">
+<h4>Задание 9</h4>
+<p>Извлеките из вектора nums элементы:</p>
+<ul>
+<li>с 12 по 15</li>
+<li>1, 3, и 5</li>
+<li>с 1 по 3 и 16</li>
+</ul>
+<div class="spoiler">
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" data-line-number="1"><span class="co"># - с 12 по 15</span></a>
+<a class="sourceLine" id="cb84-2" data-line-number="2">nums[<span class="dv">12</span><span class="op">:</span><span class="dv">15</span>]</a></code></pre></div>
+<pre><code>## [1]  12 100 200 300</code></pre>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb86-1" data-line-number="1"><span class="co"># - 1, 3, и 5</span></a>
+<a class="sourceLine" id="cb86-2" data-line-number="2">nums[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>)]</a></code></pre></div>
+<pre><code>## [1] 1 3 5</code></pre>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb88-1" data-line-number="1"><span class="co"># - с 1 по 3 и 16</span></a>
+<a class="sourceLine" id="cb88-2" data-line-number="2">nums[<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dv">16</span>)]</a></code></pre></div>
+<pre><code>## [1]   1   2   3 400</code></pre>
+</div>
+</div>
+<div id="-10" class="section level4">
+<h4>Задание 10</h4>
+<p>Что будет, если в квадратных скобках указать отрицательный индекс элемента?</p>
+<div class="spoiler">
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" data-line-number="1"><span class="co"># Отрицательные индексы используются для исключения элементов</span></a>
+<a class="sourceLine" id="cb90-2" data-line-number="2">nums[<span class="op">-</span><span class="dv">1</span>]</a></code></pre></div>
+<pre><code>##  [1]   2   3   4   5   6   7   8   9  10  11  12 100 200 300 400</code></pre>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb92-1" data-line-number="1">nums[<span class="kw">c</span>(<span class="op">-</span><span class="dv">2</span>, <span class="dv">-5</span>)]</a></code></pre></div>
+<pre><code>##  [1]   1   3   4   6   7   8   9  10  11  12 100 200 300 400</code></pre>
+</div>
+</div>
 </div>
 </div>
 <div id="---r" class="section level1">
@@ -598,74 +664,290 @@ snail_colours <span class="co"># это текстовый вектор.</span><
 <ul>
 <li>NA - англ “not available”. Когда объект был, но его свойство не измерили или не записали.</li>
 <li>NULL - пусто - просто ничего нет</li>
-<li>NaN - “not a number”</li>
+<li>NaN - “not a my_number”</li>
 <li>Inf - “infinity” - бесконечность</li>
 </ul>
-<p>Вот текстовый вектор с пропущенным значением</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow_1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="ot">NA</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;violet&quot;</span>)</code></pre></div>
-<p>Кстати, если попросили добыть из вектора номер элемента, которого там точно нет, то R выдаст NA, потому, что такого элемента нет</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rainbow_1[<span class="dv">198</span>]</code></pre></div>
-<pre><code>## [1] NA</code></pre>
-<p>Поэкспериментируем с векторами. Проверим, как работают арифметические операции</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num +<span class="st"> </span><span class="dv">2</span></code></pre></div>
-<pre><code>##  [1] -9 -8 -7 -6 -5 -4 -3 -2 -1  0  1  2  3  4  5  6  7  8  9 10 11 12 13
-## [24] 14</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num *<span class="st"> </span><span class="dv">2</span></code></pre></div>
-<pre><code>##  [1] -22 -20 -18 -16 -14 -12 -10  -8  -6  -4  -2   0   2   4   6   8  10
-## [18]  12  14  16  18  20  22  24</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num *<span class="st"> </span>(-<span class="dv">2</span>)</code></pre></div>
-<pre><code>##  [1]  22  20  18  16  14  12  10   8   6   4   2   0  -2  -4  -6  -8 -10
-## [18] -12 -14 -16 -18 -20 -22 -24</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num ^<span class="dv">2</span></code></pre></div>
-<pre><code>##  [1] 121 100  81  64  49  36  25  16   9   4   1   0   1   4   9  16  25
-## [18]  36  49  64  81 100 121 144</code></pre>
+<p>Если попросили добыть из вектора номер элемента, которого там точно нет, то R выдаст NA, потому, что такого элемента нет.</p>
 <p>Теперь посмотрим на встроенные константы в действии.</p>
-<p>Создаем новый вектор для экспериментов</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="ot">NA</span>, <span class="dv">7</span>, <span class="dv">0</span>, <span class="dv">22</span>:<span class="dv">24</span>)</code></pre></div>
-<p>Вот так он выглядит</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs</code></pre></div>
-<pre><code>## [1]  1  3 NA  7  0 22 23 24</code></pre>
+<p>Создаем новый вектор с пропущенным значением для экспериментов.</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" data-line-number="1">my_NA &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="ot">NA</span>, <span class="dv">9</span>, <span class="dv">0</span>, <span class="dv">27</span>)</a></code></pre></div>
+<p>Вот так он выглядит:</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb95-1" data-line-number="1">my_NA</a></code></pre></div>
+<pre><code>## [1]  1  3 NA  9  0 27</code></pre>
 <p>Что произойдет с NA?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs +<span class="st"> </span><span class="dv">2</span> <span class="co"># останется NA</span></code></pre></div>
-<pre><code>## [1]  3  5 NA  9  2 24 25 26</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs *<span class="st"> </span><span class="dv">0</span> <span class="co"># останется NA</span></code></pre></div>
-<pre><code>## [1]  0  0 NA  0  0  0  0  0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs /<span class="st"> </span><span class="dv">0</span>  <span class="co"># останется NA</span></code></pre></div>
-<pre><code>## [1] Inf Inf  NA Inf NaN Inf Inf Inf</code></pre>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb97-1" data-line-number="1">my_NA <span class="op">+</span><span class="st"> </span><span class="dv">2</span> <span class="co"># останется NA</span></a></code></pre></div>
+<pre><code>## [1]  3  5 NA 11  2 29</code></pre>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb99-1" data-line-number="1">my_NA <span class="op">*</span><span class="st"> </span><span class="dv">0</span> <span class="co"># останется NA</span></a></code></pre></div>
+<pre><code>## [1]  0  0 NA  0  0  0</code></pre>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" data-line-number="1">my_NA <span class="op">/</span><span class="st"> </span><span class="dv">0</span>  <span class="co"># останется NA</span></a></code></pre></div>
+<pre><code>## [1] Inf Inf  NA Inf NaN Inf</code></pre>
 <p>Но в последнем случае вы увидите</p>
 <ul>
 <li>Inf при делении чисел на ноль</li>
 <li>NaN при делении нуля на ноль</li>
 </ul>
 <p>NaN получится, если взять корень из отрицательного числа</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(-<span class="dv">1</span>)</code></pre></div>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1"><span class="kw">sqrt</span>(<span class="op">-</span><span class="dv">1</span>)</a></code></pre></div>
 <pre><code>## Warning in sqrt(-1): NaNs produced</code></pre>
 <pre><code>## [1] NaN</code></pre>
+</div>
+<div id="----r" class="section level1">
+<h1>Некоторые типы данных в R</h1>
+<div id="-" class="section level2">
+<h2>Числовые данные</h2>
+<p>Только что видели</p>
+</div>
+<div id="-" class="section level2">
+<h2>Текстовые данные</h2>
+<p>Каждый текстовый элемент (говорят “строка” - string, character) должен быть окружен кавычками - двойными или одинарными.</p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb106-1" data-line-number="1"><span class="st">&quot;это текст&quot;</span></a></code></pre></div>
+<pre><code>## [1] &quot;это текст&quot;</code></pre>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb108-1" data-line-number="1"><span class="st">&#39;это тоже текст&#39;</span></a></code></pre></div>
+<pre><code>## [1] &quot;это тоже текст&quot;</code></pre>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb110-1" data-line-number="1"><span class="st">&quot;2&quot;</span> <span class="co"># это тоже текст</span></a></code></pre></div>
+<pre><code>## [1] &quot;2&quot;</code></pre>
+<p>Текстовые значения можно объединять в векторы и работать с ними как обычно.</p>
+<div id="-11" class="section level4">
+<h4>Задание 11</h4>
+<p>Создайте вектор rainbow с названиями цветов радуги. Добудьте из этого вектора при помощи <code>[]</code> элементы 1 и 6.</p>
+<div class="spoiler">
+
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb112-1" data-line-number="1">rainbow &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="st">&quot;yellow&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>, <span class="st">&quot;violet&quot;</span>)</a>
+<a class="sourceLine" id="cb112-2" data-line-number="2">rainbow <span class="co"># Распечатываем весь вектор.</span></a></code></pre></div>
+<pre><code>## [1] &quot;red&quot;    &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb114-1" data-line-number="1">rainbow[<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">6</span>)] <span class="co"># Добываем элементы 1 и 6.</span></a></code></pre></div>
+<pre><code>## [1] &quot;red&quot;    &quot;violet&quot;</code></pre>
+<div>
+
+
+</div>
+</div>
+<div id="-" class="section level2">
+<h2>Логические данные</h2>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb116-1" data-line-number="1"><span class="ot">TRUE</span> <span class="co"># истина</span></a></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb118-1" data-line-number="1"><span class="ot">FALSE</span> <span class="co"># ложь</span></a></code></pre></div>
+<pre><code>## [1] FALSE</code></pre>
+<p>Для ленивых - можно сокращать первыми заглавными буквами. Но лучше так не делать, чтобы читать программы было легче</p>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb120-1" data-line-number="1"><span class="kw">c</span>(T, F)</a></code></pre></div>
+<pre><code>## [1]  TRUE FALSE</code></pre>
+<p>Для проверки условий используются операторы сравнения и сопоставления <code>==  &lt;  &gt;  &lt;=  &gt;=  %in%</code>.</p>
+<p>Логические операторы используются для объединения результатов нескольких проверок: И - <code>&amp;</code>, ИЛИ - <code>|</code>, НЕ - <code>!</code></p>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb122-1" data-line-number="1">?Comparison <span class="co"># справка об операторах сравнения</span></a>
+<a class="sourceLine" id="cb122-2" data-line-number="2">?match      <span class="co"># о сопоставлении</span></a>
+<a class="sourceLine" id="cb122-3" data-line-number="3">?Logic <span class="co"># Справка о логических операторах</span></a></code></pre></div>
+<pre><code>## Help on topic &#39;Logic&#39; was found in the following packages:
+## 
+##   Package               Library
+##   methods               /usr/lib/R/library
+##   base                  /usr/lib/R/library
+## 
+## 
+## Using the first match ...</code></pre>
+<p>Давайте представим, что перед нами несколько чашек с чаем. В них разное число кусков сахара и разная температура. И чай в них черный или зеленый.</p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb124-1" data-line-number="1">sugar &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb124-2" data-line-number="2">temp &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">40</span>, <span class="dv">50</span>, <span class="dv">22</span>, <span class="dv">22</span>, <span class="dv">53</span>, <span class="dv">41</span>, <span class="dv">35</span>, <span class="dv">47</span>, <span class="dv">55</span>, <span class="dv">52</span>)</a>
+<a class="sourceLine" id="cb124-3" data-line-number="3">tea &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;B&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;G&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;G&#39;</span>, <span class="st">&#39;G&#39;</span>, <span class="st">&#39;G&#39;</span>, <span class="st">&#39;B&#39;</span>)</a>
+<a class="sourceLine" id="cb124-4" data-line-number="4"><span class="co"># В каких чашках два или меньше кусков сахара?</span></a>
+<a class="sourceLine" id="cb124-5" data-line-number="5">sugar <span class="op">&lt;=</span><span class="st"> </span><span class="dv">2</span></a></code></pre></div>
+<pre><code>##  [1]  TRUE FALSE  TRUE  TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE</code></pre>
+<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb126-1" data-line-number="1"><span class="co"># В каких чашках температура больше 40 градусов?</span></a>
+<a class="sourceLine" id="cb126-2" data-line-number="2">temp <span class="op">&gt;</span><span class="st"> </span><span class="dv">40</span></a></code></pre></div>
+<pre><code>##  [1] FALSE  TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE</code></pre>
+<div class="sourceCode" id="cb128"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb128-1" data-line-number="1"><span class="kw">sum</span>(temp <span class="op">&gt;</span><span class="st"> </span><span class="dv">40</span>)</a></code></pre></div>
+<pre><code>## [1] 6</code></pre>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb130-1" data-line-number="1"><span class="kw">which</span>(temp <span class="op">&gt;</span><span class="st"> </span><span class="dv">40</span>)</a></code></pre></div>
+<pre><code>## [1]  2  5  6  8  9 10</code></pre>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb132-1" data-line-number="1"><span class="co"># В каких чашках эти условия выполняются одновременно?</span></a>
+<a class="sourceLine" id="cb132-2" data-line-number="2">(sugar <span class="op">&lt;=</span><span class="st"> </span><span class="dv">2</span>) <span class="op">&amp;</span><span class="st"> </span>(temp <span class="op">&gt;</span><span class="st"> </span><span class="dv">40</span>)</a></code></pre></div>
+<pre><code>##  [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE</code></pre>
+<div id="-12" class="section level4">
+<h4>Задание 12</h4>
+<p>При помощи логических векторов ответьте на эти вопросы:</p>
+<ul>
+<li>В каких чашках нет сахара?</li>
+<li>В каких чашках холодный чай (меньше 40 градусов)?</li>
+<li>В каких чашках 0, 3 или 5 кусков сахара?</li>
+<li>В каких чашках нет сахара и чай горячий (больше 40 градусов)?</li>
+</ul>
+<div class="spoiler">
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" data-line-number="1"><span class="co"># </span><span class="al">TODO</span></a></code></pre></div>
+</div>
+<p>Логические векторы можно использовать в [], чтобы отобрать данные, соответствующие условию.</p>
+<div class="sourceCode" id="cb135"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb135-1" data-line-number="1"><span class="co"># Какого цвета чай в чашках с температурой &gt; 50 градусов?</span></a>
+<a class="sourceLine" id="cb135-2" data-line-number="2">tea[temp <span class="op">&gt;</span><span class="st"> </span><span class="dv">50</span>]</a></code></pre></div>
+<pre><code>## [1] &quot;B&quot; &quot;G&quot; &quot;B&quot;</code></pre>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" data-line-number="1"><span class="co"># Какой температуры зеленый чай в этих чашках?</span></a>
+<a class="sourceLine" id="cb137-2" data-line-number="2">temp[tea <span class="op">==</span><span class="st"> &#39;G&#39;</span>]</a></code></pre></div>
+<pre><code>## [1] 22 35 47 55</code></pre>
+</div>
+<div id="-13" class="section level4">
+<h4>Задание 13</h4>
+<p>При помощи логических векторов отберите нужные данные:</p>
+<ul>
+<li>цвет чая, в котором нет сахара</li>
+<li>температура чая, в котором три или больше кусков сахара</li>
+</ul>
+<div class="spoiler">
+<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb139-1" data-line-number="1"><span class="co"># </span><span class="al">TODO</span></a></code></pre></div>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2>Факторы</h2>
+<p>Факторы - это способ хранения дискретных (=категориальных данных). Например, если вы поймали 10 улиток и посмотрели их цвет. У большого количества улиток небольшое счетное количество возможных цветов.</p>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" data-line-number="1">snails &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;r&quot;</span>, <span class="st">&quot;r&quot;</span>, <span class="st">&quot;r&quot;</span>, <span class="st">&quot;y&quot;</span>, <span class="st">&quot;y&quot;</span>, <span class="st">&quot;g&quot;</span>, <span class="st">&quot;g&quot;</span>, <span class="st">&quot;g&quot;</span>, <span class="st">&quot;g&quot;</span>)</a>
+<a class="sourceLine" id="cb140-2" data-line-number="2">snails <span class="co"># это просто вектор</span></a></code></pre></div>
+<pre><code>## [1] &quot;r&quot; &quot;r&quot; &quot;r&quot; &quot;y&quot; &quot;y&quot; &quot;g&quot; &quot;g&quot; &quot;g&quot; &quot;g&quot;</code></pre>
+<p>Но цвет “желтый” обозначает одно и то же для каждой из улиток. Поэтому в целях экономии места можно записать цвета этих улиток в виде вектора, в котором численным значениям будут сопоставлены “этикетки” (называются “уровни” - levels) - названия цветов. Мы можем создать “фактор” цвет улиток.</p>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" data-line-number="1">f_snails &lt;-<span class="st"> </span><span class="kw">factor</span>(snails)</a>
+<a class="sourceLine" id="cb142-2" data-line-number="2">f_snails <span class="co"># это фактор</span></a></code></pre></div>
+<pre><code>## [1] r r r y y g g g g
+## Levels: g r y</code></pre>
+<p>уровни (levels) этого фактора</p>
+<ul>
+<li>1 - g,</li>
+<li>2 - r,</li>
+<li>3 - y</li>
+</ul>
+<p>По умолчанию, R назначает порядок уровней по алфавиту. Можно изменить порядок (см. <code>help(&quot;factor&quot;)</code>). Нам это пригодится позже для работы с дискретными переменными.</p>
+</div>
 </div>
 <div id="--r" class="section level1">
 <h1>Функции в R</h1>
 <p>Вы уже видели массу функций, их легко узнать по скобкам после ключевого слова. Познакомимся еще с несколькими и научимся писать пользовательские функции. Пользовательские функции позволяют автоматизировать повторяющиеся действия и делают код легко читаемым.</p>
 <p>Вот наш вектор</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">NAs_NANs</code></pre></div>
-<pre><code>## [1]  1  3 NA  7  0 22 23 24</code></pre>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1">nums</a></code></pre></div>
+<pre><code>##  [1]   1   2   3   4   5   6   7   8   9  10  11  12 100 200 300 400</code></pre>
 <p>Длину вектора можно вычислить при помощи функции <code>length()</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">length</span>(NAs_NANs)</code></pre></div>
-<pre><code>## [1] 8</code></pre>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb146-1" data-line-number="1"><span class="kw">length</span>(nums)</a></code></pre></div>
+<pre><code>## [1] 16</code></pre>
 <p>Сумму элементов вектора при помощи функции <code>sum()</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(NAs_NANs)</code></pre></div>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb148-1" data-line-number="1"><span class="kw">sum</span>(nums)</a></code></pre></div>
+<pre><code>## [1] 1078</code></pre>
+<div id="-14" class="section level4">
+<h4>Задание 14</h4>
+<p>Вычислите среднее значение для вектора <code>nums</code>. Вначале попробуйте сделать это “вручную” при помощи функций <code>length()</code> и <code>sum()</code>. Как вы думаете, как называется функция, которая может это сделать сразу?</p>
+<div class="spoiler">
+<div class="sourceCode" id="cb150"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb150-1" data-line-number="1"><span class="kw">sum</span>(nums)<span class="op">/</span><span class="kw">length</span>(nums)</a></code></pre></div>
+<pre><code>## [1] 67.375</code></pre>
+<div class="sourceCode" id="cb152"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb152-1" data-line-number="1"><span class="kw">mean</span>(nums)</a></code></pre></div>
+<pre><code>## [1] 67.375</code></pre>
+</div>
+<p>Сумма не работает, если в векторе есть <code>NA</code>.</p>
+<div class="sourceCode" id="cb154"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb154-1" data-line-number="1">my_NA</a></code></pre></div>
+<pre><code>## [1]  1  3 NA  9  0 27</code></pre>
+<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb156-1" data-line-number="1"><span class="kw">length</span>(my_NA)</a></code></pre></div>
+<pre><code>## [1] 6</code></pre>
+<div class="sourceCode" id="cb158"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb158-1" data-line-number="1"><span class="kw">sum</span>(my_NA)</a></code></pre></div>
 <pre><code>## [1] NA</code></pre>
-<p>Упс! Почему-то получилось <code>NA</code></p>
 <p>Чтобы узнать, почему и как это исправить - посмотрите в <code>help(&quot;sum&quot;)</code>. Выяснится, что у функции <code>sum()</code> есть аргумент <code>na.rm</code>, который по умолчанию принимает значение <code>FALSE</code>, то есть <code>NA</code> не учитываются при подсчете суммы.</p>
 <p>Если мы передадим функции <code>sum</code> аргумент <code>na.rm = TRUE</code>, то получится правильная сумма</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1] 80</code></pre>
+<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb160-1" data-line-number="1"><span class="kw">sum</span>(my_NA, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>## [1] 40</code></pre>
 <p>Та же история с функцией <code>mean</code></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1] 11.42857</code></pre>
+<div class="sourceCode" id="cb162"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb162-1" data-line-number="1"><span class="kw">mean</span>(my_NA, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<pre><code>## [1] 8</code></pre>
+</div>
+</div>
+<div class="section level1">
+<h1>Датафреймы</h1>
+<p>Датафрейм - один из способов хранения табличных данных в R,</p>
+<p>Векторы одинаковой длины можно хранить вместе в виде таблицы.</p>
+<div class="sourceCode" id="cb164"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb164-1" data-line-number="1"><span class="co"># Создадим векторы, чтобы объединить их в датафрейм.</span></a>
+<a class="sourceLine" id="cb164-2" data-line-number="2">len &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">9</span> <span class="co"># числовой</span></a>
+<a class="sourceLine" id="cb164-3" data-line-number="3">col &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="st">&quot;green&quot;</span>, <span class="dv">4</span>), <span class="kw">rep</span>(<span class="st">&quot;red&quot;</span>, <span class="dv">5</span>)) <span class="co"># текстовый</span></a>
+<a class="sourceLine" id="cb164-4" data-line-number="4">wid &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">from =</span> <span class="dv">2</span>, <span class="dt">by =</span> <span class="dv">2</span>, <span class="dt">to =</span> <span class="dv">18</span>) <span class="co"># числовой</span></a>
+<a class="sourceLine" id="cb164-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb164-6" data-line-number="6"><span class="co"># Создаем датафрейм</span></a>
+<a class="sourceLine" id="cb164-7" data-line-number="7">my_worms &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Length =</span> len,</a>
+<a class="sourceLine" id="cb164-8" data-line-number="8">                       <span class="dt">Width =</span> wid,</a>
+<a class="sourceLine" id="cb164-9" data-line-number="9">                       <span class="dt">Colour =</span> col)</a></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" data-line-number="1"><span class="kw">class</span>(my_worms) <span class="co"># смотрим, действительно датафрейм</span></a></code></pre></div>
+<pre><code>## [1] &quot;data.frame&quot;</code></pre>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb167-1" data-line-number="1">my_worms <span class="co"># печать датафрейма</span></a></code></pre></div>
+<pre><code>##   Length Width Colour
+## 1      1     2  green
+## 2      2     4  green
+## 3      3     6  green
+## 4      4     8  green
+## 5      5    10    red
+## 6      6    12    red
+## 7      7    14    red
+## 8      8    16    red
+## 9      9    18    red</code></pre>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb169-1" data-line-number="1"><span class="kw">str</span>(my_worms) <span class="co"># просмотр структуры объекта</span></a></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    9 obs. of  3 variables:
+##  $ Length: int  1 2 3 4 5 6 7 8 9
+##  $ Width : num  2 4 6 8 10 12 14 16 18
+##  $ Colour: Factor w/ 2 levels &quot;green&quot;,&quot;red&quot;: 1 1 1 1 2 2 2 2 2</code></pre>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb171-1" data-line-number="1"><span class="kw">View</span>(my_worms) <span class="co"># просмотр в RStudio</span></a></code></pre></div>
+<div id="-15" class="section level4">
+<h4>Задание 15</h4>
+<p>Создайте из этих векторов датафрейм под названием <code>Jedi</code> с колонками <code>name</code>, <code>homeworld</code> и <code>num_starships</code>.</p>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb172-1" data-line-number="1">person_name &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Luke Skywalker&#39;</span>, <span class="st">&#39;Darth Vader&#39;</span>, <span class="st">&#39;Obi-Wan Kenobi&#39;</span>, <span class="st">&#39;Yoda&#39;</span>)</a>
+<a class="sourceLine" id="cb172-2" data-line-number="2">planet_name &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;Tatooine&#39;</span>, <span class="st">&#39;Tatooine&#39;</span>, <span class="st">&#39;Stewjon&#39;</span>, <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb172-3" data-line-number="3">starships &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">0</span>)</a></code></pre></div>
+<div class="spoiler">
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb173-1" data-line-number="1"><span class="co"># </span><span class="al">TODO</span></a></code></pre></div>
+</div>
+</div>
+<div id="--" class="section level2">
+<h2>Навигация внутри датафреймов</h2>
+<p>У каждой ячейки в датафрейме есть координаты вида <code>[строка, столбец]</code></p>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb174-1" data-line-number="1">my_worms[<span class="dv">2</span>, <span class="dv">3</span>] <span class="co"># вторая строка в 3 столбце</span></a></code></pre></div>
+<pre><code>## [1] green
+## Levels: green red</code></pre>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb176-1" data-line-number="1">my_worms[<span class="dv">2</span>, ] <span class="co"># вторая строка целиком</span></a></code></pre></div>
+<pre><code>##   Length Width Colour
+## 2      2     4  green</code></pre>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb178-1" data-line-number="1">my_worms[<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dv">2</span>] <span class="co"># строки с 1 по 9 во втором столбце</span></a></code></pre></div>
+<pre><code>## [1]  2  4  6  8 10 12 14 16 18</code></pre>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb180-1" data-line-number="1">my_worms[, <span class="dv">2</span>] <span class="co"># второй столбец целиком</span></a></code></pre></div>
+<pre><code>## [1]  2  4  6  8 10 12 14 16 18</code></pre>
+<p>Переменные можно извлечь при помощи оператора <code>$</code> и имени переменной</p>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb182-1" data-line-number="1">my_worms<span class="op">$</span>Length</a></code></pre></div>
+<pre><code>## [1] 1 2 3 4 5 6 7 8 9</code></pre>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb184-1" data-line-number="1">my_worms<span class="op">$</span>Width</a></code></pre></div>
+<pre><code>## [1]  2  4  6  8 10 12 14 16 18</code></pre>
+<p>Имена переменных можно использовать и внутри оператора <code>[]</code></p>
+<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb186-1" data-line-number="1">my_worms[, <span class="st">&#39;Length&#39;</span>]</a></code></pre></div>
+<pre><code>## [1] 1 2 3 4 5 6 7 8 9</code></pre>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb188-1" data-line-number="1">my_worms[, <span class="st">&#39;Width&#39;</span>]</a></code></pre></div>
+<pre><code>## [1]  2  4  6  8 10 12 14 16 18</code></pre>
+<div id="-16" class="section level4">
+<h4>Задание 16</h4>
+<p>Извлеките из датафрейма Jedi</p>
+<ul>
+<li>третью строку</li>
+<li>вектор имен персонажей</li>
+<li>значение в первом столбце четвертой строки</li>
+</ul>
+<div class="spoiler">
+<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb190-1" data-line-number="1"><span class="co"># </span><span class="al">TODO</span></a></code></pre></div>
+</div>
+</div>
+<div id="-17" class="section level4">
+<h4>Задание 17</h4>
+<p>Создайте датафрейм из созданных ранее векторов tea, temp, sugar. При помощи [] (с использованием индексов, имен переменных и логических векторов) извлеките из него следующие данные:</p>
+<ul>
+<li>Строки с чашками без сахара</li>
+<li>Строки с чашками, где 0, 3 или 5 кусков сахара</li>
+<li>Только данные о температуре и количестве сахара</li>
+<li>Цвет чая, в котором нет сахара</li>
+<li>Температура зеленого чая</li>
+</ul>
+<div class="spoiler">
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb191-1" data-line-number="1"><span class="co"># </span><span class="al">TODO</span></a></code></pre></div>
+</div>
+</div>
+</div>
 </div>
 
 <p><small>
+<!--
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">linmodr</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="varmara.github.io/linmodr/" property="cc:attributionName" rel="cc:attributionURL">Marina Varfolomeeva, Vadim Khaitov, and Yuta tamberg</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+-->
 </small></p>
 
 
