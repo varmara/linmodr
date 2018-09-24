@@ -1,6 +1,6 @@
 ---
 title: "Описательные статистики"
-author: "Юта Тамберг, Марина Варфоломеева"
+author: "Вадим Хайтов, Юта Тамберг, Марина Варфоломеева"
 subtitle: "making sense of many measurements"
 output:
   ioslides_presentation:
@@ -29,6 +29,7 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 </center>
 
 Например, анализируя каждое значение в выборке по мере поступления.
+Даже ничего не считая специально, мы примерно понимаем, какой сорт молока дороже, какой дешевле.
 
 ## Через связки описательных статистик
 
@@ -36,18 +37,14 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 
 ### Statistics of dispersion / Меры разброса
 
-# ЧАСТЬ 2. Cвязка медиана + квартили; 5-number summary.
+# ЧАСТЬ 2. Медиана и квартили.
 
 ## Медиана
 
-Предположим, мы занимаемся селекцией яблонь и хотим охарактеризовать урожай нашей любимой яблони, на которую мы возлагаем большие надежды. Симулируем данные измерения диаметров яблок.
+Предположим, мы занимаемся селекцией яблонь и хотим охарактеризовать урожай нашей любимой яблони, на которую мы возлагаем большие надежды.
 
 ```{r}
-set.seed(14)
-apples <- rnorm(8, 8, 1) #Возьмем восемь случайных
-                          #значений из нормального распределения
-apples <- round(apples,1) #Перезапишем вектор, округлив измерения
-                          #до первого знака после запятой
+apples <- c(7.3, 9.7, 10.1,  9.5,  8.0,  9.2,  7.9,  9.1)
 apples
 ```
 
@@ -89,11 +86,8 @@ sort(apples)
 ![](images/2.1_apples_sorted_2.png)
 </center>
 
-
-Проверим себя: 
-
 ```{r}
-median(apples)
+median(apples) # Проверим себя
 ```
 
 ## Медиана: устойчивость к выбросам
@@ -103,7 +97,7 @@ median(apples)
 Представим, что наше распределение пострадало от неаккуратности. Допустим сотрудник, которому мы поручили измерять яблоки, измерил также диаметр арбуза и записал этот результат вместе со всеми остальными.
 
 ```{r}
-apples2 <- c(apples, 68) #Создадим вектор с новым значением
+apples2 <- c(apples, 68) # Создадим вектор с новым значением
 sort(apples2)
 ```
 
@@ -113,17 +107,16 @@ sort(apples2)
 median(apples2)
 ```
 
-
 ## Медиана: устойчивость к выбросам
 
-Давайте для сравнения посмотрим на среднюю.
+Давайте для сравнения посмотрим на среднее.
 
 ```{r}
 mean(apples)
 mean(apples2)
 ```
 
-Как видим, она не так благополучно пережила это вторжение. Единственное неверное измерение сбило ее из разряда довольно крупных яблок в область гигантских грейпфрутов.
+Как видим, оно не так благополучно пережило это вторжение. Единственное неверное измерение сместило среднее значение из разряда довольно крупных яблок в область гигантских грейпфрутов.
 
 ## Квантили
 
@@ -133,9 +126,9 @@ mean(apples2)
 
 Примеры квантилей:
 
-- 2-квантиль --- медиана
-- 4-квантиль --- квартиль
-- 100-квантиль --- перцентиль
+- 2-квантиль ("два-квантиль") --- медиана  
+- 4-квантиль ("четыре-квантиль")--- квартиль  
+- 100-квантиль ("сто-квантиль")--- перцентиль
 
 
 ## Квартили
@@ -144,30 +137,29 @@ mean(apples2)
 
 Квартили делят распределение на __четыре__ равные части, каждая из которых включает по 25% значений.
 
-I квартиль отсекает как раз 25%.
-II --- 50%. Это ни что иное, как медиана.
-III квартиль отсекает 75% значений. 
+- I квартиль отсекает как раз 25%.  
+- II квартиль --- 50%. Это медиана.  
+- III квартиль отсекает 75% значений.  
 
 Определим их с помощью команды `quantile`
+
+```{r}
+quantile(x = apples, probs = c(0.25, 0.5, 0.75))
+```
+
+## 5-number summary
+
+Функция `quatile(x)` без указания значений вероятностей (`probs`) покажет нам квартили, минимум и максимум.
 
 ```{r}
 quantile(apples)
 ```
 
-Нам показали так же минимальную и максимальную величины.
-
-## 5-number summary
-
-Аналогичные значения, только со средней в качестве бесплатного приложения, возвращает и функция `summary`:
-
-```{r}
-summary(apples)
-summary(apples2)
-```
+5-number summary --- удобное краткое описание данных.
 
 ## Персентили
 
-Персентиль --- это частный случай квантиля. Всего 100 персентилей.
+Персентиль --- это частный случай квантиля. Всего 99 персентилей, они делят ряд наблюдений на 100 частей.
 
 Ничто не помешает нам узнать, например, какие значения отсекают 10% или 99% значений выборки. Подставим соответствующие аргументы:
 
@@ -179,16 +171,14 @@ quantile(apples, probs = c(0.1, 0.99))
 
 <div class="columns-2">
 
-```{r boxplot.plain.1, fig.height = 6, fig.width = 4}
+```{r boxplot.plain.1, fig.height = 6, fig.width = 4, purl=FALSE}
 boxplot(apples)
 ```
 
 Отложим числа, характеризующие выборку, по оси Y:
 
 - жирная линия в центре это медиана,
-
 - нижняя и верхняя границы "коробочки" это I и III квантили,
-
 - усы достигают минимального и максимального значений.
 
 <br /><br />
@@ -197,8 +187,29 @@ boxplot(apples)
 
 Если в выборке присутствуют выбросы (значения, отстоящие от границ "коробочки" больше чем на 1.5 интерквартильных расстояния), то они будут изображены отдельными точками. 
 
-
 </div>
+
+## Подготовим все, чтобы построить график в ggplot2
+
+```{r}
+library(ggplot2)
+theme_set(theme_bw())
+
+apple_data <- data.frame(diameter = apples)
+head(apple_data)
+```
+
+## Боксплот можно построить при помощи `geom_boxplot()`
+
+```{r}
+ggplot(data = apple_data) + 
+  geom_boxplot(aes(x = 'Медиана \nи квантили', y = diameter))
+```
+
+- `x` --- категория (переменная или текстовое обозначение)  
+- `y` --- зависимая переменная
+
+# Case study: диатомовые водоросли в желудках фильтраторов.
 
 ## Case study: диатомовые водоросли в желудках фильтраторов. Самостоятельная работа.
 
@@ -210,31 +221,83 @@ boxplot(apples)
 
 *Loxosomella nordgardi* --- вид-симбионт. Он практически никогда не встречается в одиночестве. 
 
+<br />
+
+Данные: Юта Тамберг
+
 ![](images/2.1_bryozoa.png)
 </div>
 
 ## Case study: диатомовые водоросли в желудках фильтраторов.
 
-В файле `data\2.1_diatome_count.csv` даны количества диатомовых водорослей в желудках этих животных. Прочитаем эти данные и посмотрим на их структуру:
+В файле `diatome_count.csv` даны количества диатомовых водорослей в желудках этих животных. Прочитаем эти данные и посмотрим на них:
 
 ```{r}
-diatoms <- read.table("data/2.1_diatome_count.csv", 
+diatoms <- read.table("data/diatome_count.csv", 
                       header = T, sep = "")
+
+```
+
+В таблице 2 переменные: 
+
+- вид (sp)
+- число водорослей в желудке (count)
+
+В переменной sp есть три варианта значений:
+
+- "host_free" (хозяин без симбионта)
+- "host_symbiont" (хозяин с симбионтом)
+- "symbiont" (симбионт)
+
+## Все ли правильно открылось? 
+
+Смотрим первые несколько строк
+
+```{r}
 head(diatoms)
 ```
 
-В таблице 2 переменные: вид (sp) и число водорослей в желудке (count). В переменной sp есть три варианта значений: "host_free" "host_symbiont" и "symbiont"
+Смотрим структуру.
 
-Ваша задача рассчитать 5-number summary для количества диатомовых в желудках хозяев и симбионтов.
+```{r}
+str(diatoms)
+```
+
+## Есть ли пропущенные значения?
+
+```{r}
+sum(! complete.cases(diatoms))
+```
+
+Что это за случаи?
+
+```{r}
+diatoms[! complete.cases(diatoms), ]
+```
+
+
+## Задание
+
+```{r echo=FALSE, purl=FALSE}
+head(diatoms)
+```
+
+Ваша задача рассчитать 5-number summary для количества диатомовых в желудках хозяев и симбионтов (всех трех категорий).
 
 ## Решение
+
 ```{r boxplot.plain.diatoms, purl=FALSE, fig.height = 3}
+# 5-number summary для хозяев без симбионтов
 host_f <- diatoms$count[diatoms$sp == "host_free"]
+quantile(host_f, na.rm = TRUE)
+
+# Для хозяев с симбионтами
 host_s <- diatoms$count [diatoms$sp == "host_symbiont"]
+quantile(host_s, na.rm = TRUE)
+
+# Для одиноких симбионтов
 symbiont <- diatoms$count [diatoms$sp == "symbiont"]
-summary(host_f)
-summary(host_s)
-summary(symbiont)
+quantile(symbiont, na.rm = TRUE)
 ```
 
 ## Боксплоты в ggplot2
@@ -242,21 +305,18 @@ summary(symbiont)
 Формат данных несколько сложен для человеческого глаза, зато очень подходит для ggplot.
 
 ```{r boxplot.ggplot.diatoms, fig.height = 4.5}
-library("ggplot2")
 ggplot(data = diatoms, aes(y = count, x = sp)) + geom_boxplot()
 ```
 
 ## Квартили и боксплот: непараметрические характеристики выборки
 
-Главный плюс, но так же и минус связки медиана + квантили это ее независимость от формы распределения.
-
-
+Главный плюс (но так же и минус) связки медиана + квантили это ее независимость от формы распределения.
 
 Будь оно симметричным или с хвостом, 5-number summary опишет, а боксплот нарисует его без искажений. Однако, далеко на этих характеристиках не уедешь.
 
 Бывают случаи, когда можно применять более специальные, но и более информативные характеристики.
 
-# ЧАСТЬ 3. Нормальное распределение
+# ЧАСТЬ 3. Нормальное распределение - первое знакомство
 
 ## Все распределения равны, но некоторые равнее
 
@@ -273,7 +333,7 @@ Norm <- data.frame(x, y)
 ND_curve <- ggplot(data = Norm, aes(x=x, y=y)) +
   geom_line(color="steelblue", size=2) + 
 #  geom_vline (xintercept = Mu) + 
-  labs(x = "Values", y = "Probability")
+  labs(x = "Values", y = "Probability density")
 ND_hist <- ggplot(data = Norm, aes(x=x, y=y)) +
   geom_bar(stat = "identity", width = .05) +
 #  geom_vline (xintercept = Mu) + 
@@ -291,41 +351,22 @@ ND_hist2 <- ND_hist + geom_vline(xintercept = 12, linetype="dotted", color = "re
 grid.arrange(ND_hist2, ND_curve2, ncol = 1)
 ```
 
-На оси Y может быть отложена относительная частота значений Х в эмпирическом распределении, или вероятность получить такие значения из теоретического распределения.
+На оси Y может быть отложена относительная частота значений Х в эмпирическом распределении, или вероятность из теоретического распределения.
 
 На оси Х отложены значения Х в интервале от 0 до 20, в действительности же кривая простирается от $-\infty$ до $+\infty$
 
-Площадь под кривой = 1.  Интегрируя кривую на промежутке $(k,..,l)$, можно узнать вероятность встречи значений $(x_k,...x_l)$.
+Площадь под кривой = 1.  Интегрируя кривую на промежутке $(k,..,l)$, можно узнать вероятность встречи значений в этом промежутке $(x_k,...x_l)$.
 
-НО! Нельзя рассчитать вероятность одного значения $X = x_k$, так как это точка, и под ней нет площади.
-
+Но нельзя рассчитать вероятность одного значения $X = x_k$, так как это точка, и под ней нет площади.
 
 <div/>
 
-## Условия появления нормально распределенных признаков
 
-<div class=columns-2>
-
-- Множество факторов
-
-- Наличие/отсутствие каждого фактора не зависит от остальных
-
-- Эффекты факторов аддитивны и независимы
-
-- Вклад каждого фактора в итоговую изменчивость одинаков
-
-Что-то напоминает, не правда ли?
-
-<center>
-![](images/2.1_polygenic_inheritance.png)
-</center>
-<div/>
-
-## Приятные особенности
+## Приятные особенности нормального распределения
 
 Нормальных кривых бесконечно много, и их описывает заковыристая формула с двумя параметрами ($\mu$ и $\sigma$).
 
-$$p= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$
+$$f(x) = \frac {1}{\sigma \sqrt{2 \pi}}\, e^{-\cfrac{(x-\mu)^2}{2\sigma^2}}$$
 
 Достаточно знать эти два значения чтобы восстановить или смоделировать любое нормальное распределение.
 
@@ -336,9 +377,9 @@ $$p= \frac {1}{\sigma \sqrt{2 \pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$
 
 можно считать что выборка у нас в кармане! Нам больше не нужно знать результаты измерений, чтобы строить предположения о природе данных.
 
-Так что же это за чудодейственные параметры? Средняя и стандартное отклонение конечно!
+Так что же это за чудодейственные параметры? $\mu$ --- среднее, $\sigma$ --- стандартное отклонение.
 
-# ЧАСТЬ 4. Связка среднее + стандартное отклонение
+# ЧАСТЬ 4. Среднее и стандартное отклонение
 
 ## Центральная тенденция
 
@@ -351,22 +392,22 @@ $$\bar{x}=\frac{\sum{x_i}}{n}$$
 Рассчитаем вручную и проверим:
 
 ```{r}
-mean_apple_diam <- sum(apples) / length(apples)
-mean_apple_diam
-round(mean_apple_diam,3) == round(mean(apples),3)
+sum(apples) / length(apples)
+
+mean(apples)
 ```
 
-## Меры разброса
+## Как оценить разброс значений?
 
 ### Девиата (отклонение)
 
-Это разность между значением вариаты (измерения) и средней:
+Это разность между значением вариаты (измерения) и средним:
 
 $$x_i - \bar{x}$$
 
 ```{r}
-raw.deviates <- apples - mean(apples)
-raw.deviates
+raw_deviates <- apples - mean(apples)
+raw_deviates
 ```
  
 ```{r echo=FALSE}
@@ -385,55 +426,91 @@ pl_app1
  
 ## Меры разброса
 
+### Девиаты не годятся как мера разброса
+
 К сожалению мы не можем просто сложить все значения девиат и поделить их на объем выборки. Сумма девиат всегда будет равна нулю.
 
 ```{r}
-round(sum(raw.deviates))
+round(sum(raw_deviates))
 ```
 
-### Путь 1: среднее отклонение = Average Deviation
-
-Первый выход, который бросается в глаза, это использовать абсолютные значения
-
-$$AD = \frac{\sum{\lvert x_i - \bar{x} \rvert}}{n}$$
-
-```{r results="hide"}
-sum(abs(raw.deviates)) / length(apples)
-```
+$$\begin{aligned}
+\sum{(x_i - \bar{x})} &= \sum x_i - \sum \bar x = \\
+&= \sum x_i - n \bar x = \\
+&= \sum x_i - n \cfrac{\sum x_i}{n} = 0
+\end{aligned}$$
 
 ## Меры разброса
 
-### Путь 2: сумма квадратов = SS, Sum of Squares
+### Сумма квадратов = SS, Sum of Squares
 
-Избавиться от знака девиаты можно не только с помощью модуля, но и возведя значение в квадрат.
+Избавиться от знака девиаты можно, возведя значение в квадрат.
 
-$$SS = \sum{{(x_i - \bar{x})}^2}$$
+$$SS = \sum{{(x_i - \bar{x})}^2} \ne 0$$
 
 ```{r results="hide"}
-sum(raw.deviates^2)
+sum(raw_deviates^2)
 ```
+
+Но на что разделить $SS$, чтобы получить меру __усредненного__ отклонения значений от среднего?
+
+## Меры разброса
+
+### Как усреднить отклонения от среднего значения?
+
+Мы не можем делить на $n$, поскольку отклонения от среднего  $x_i - \bar x$ не будут независимы.
+
+Что это значит? Сумма отклонений всегда равна нулю $\sum{(x_i - \bar{x})} = 0$.  
+Поэтому, если мы знаем $\bar x$ и $n - 1$ отклонений, то всегда сможем точно вычислить последнее отклонение.
+
+<br />
+
+$n - 1$ --- это число независимых значений (число степеней свободы).
 
 ## Меры разброса
 
 ### Дисперсия = MS, Mean Square, Variance
 
-Если мы теперь поделим сумму квадратов на объем выборки, то получим дисперсию.
+Если мы теперь поделим сумму квадратов на объем выборки минус 1, то получим дисперсию по этой выборке.
 
-$$variance=\frac{\sum{(x_i - \bar{x})^2}}{n}= \frac{SS}{n}$$
+$$s^2=\frac{\sum{(x_i - \bar{x})^2}}{n - 1}= \frac{SS}{n - 1}$$
 
 ```{r results="hide"}
-sum(raw.deviates^2) / length(apples)
+sum(raw_deviates^2) / length(apples - 1)
+var(apples)
 ```
+
+Дисперсию не получится нарисовать на графике, т.к. там используются не отклонения, а их квадраты
+
+
+## Меры разброса
 
 ### Среднеквадратичное/стандартное отклонение = Standard Deviation
 
 Квадратный корень из дисперсии позволит вернуться к исходным единицам измерения
 
-$$SD=\sqrt{\frac{\sum{(x_i - \bar{x})^2}}{n}} = \sqrt{variance}$$
+$$s = \sqrt{s^2} = \sqrt{\frac{\sum{(x_i - \bar{x})^2}}{n - 1}} = SD$$
+
+Стандартное отклонение --- это средняя величина отклонения, и ее уже можно изобразить на графике.
 
 ```{r results="hide"}
-sqrt(sum(raw.deviates^2) / length(apples))
+sqrt(sum(raw_deviates^2) / length(apples - 1))
+sd(apples)
 ```
+
+## Среднее и стандартное отклонение при помощи `stat_summary()` {.smaller}
+
+```{r}
+ggplot(data = apple_data) + 
+  stat_summary(geom = 'pointrange', fun.data = mean_sdl, 
+               fun.args = list(mult = 1),
+               aes(x = 'Среднее \nи стандартное отклонение', y = diameter))
+```
+
+`stat_summary()` использует `geom_pointrange()`  
+точка --- среднее, усы изображают $\pm$ стандартное отклонение
+
+`mean_sdl()` рассчитывает координаты точки и усов,  ее аргумент `mult = 1` показывает, сколько стандартных отклонений отложить
 
 ## Особенности применения связки
 
@@ -444,7 +521,7 @@ sqrt(sum(raw.deviates^2) / length(apples))
 - плохо работают с несимметричными распределениями.
 
 
-## Сравните разброс в выборках
+## Сравните разброс (стандартное отклонение) в выборках
 
 ```{r sd_compare1, echo=FALSE, purl=FALSE, fig.width=9, fig.height = 6, warning=FALSE, message=FALSE}
 set.seed(999)
@@ -457,17 +534,17 @@ y6 <- c(rnorm(250, mean = 1, sd = 0.1), rnorm(250, 19, 0.1))
 
 sd_compare <- data.frame(y1, y2, y3, y4, y5, y6)
 
-gy1 <- ggplot(sd_compare, aes(x = y1)) +geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20)) + labs(x = "Distribution 1")
+gy1 <- ggplot(sd_compare, aes(x = y1)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20)) + labs(x = "Distribution 1")
 
-gy2 <- ggplot(sd_compare, aes(x = y2)) +geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = "Distribution 2")
+gy2 <- ggplot(sd_compare, aes(x = y2)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 2")
 
-gy3 <- ggplot(sd_compare, aes(x = y3)) + geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = "Distribution 3")
+gy3 <- ggplot(sd_compare, aes(x = y3)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 3")
 
-gy4 <- ggplot(sd_compare, aes(x = y4)) + geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = "Distribution 4")
+gy4 <- ggplot(sd_compare, aes(x = y4)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 4")
 
-gy5 <- ggplot(sd_compare, aes(x = y5)) + geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = mean(y5), color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = "Distribution 5")
+gy5 <- ggplot(sd_compare, aes(x = y5)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = mean(y5), color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 5")
 
-gy6 <- ggplot(sd_compare, aes(x = y6)) + geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = "Distribution 6")
+gy6 <- ggplot(sd_compare, aes(x = y6)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 6")
 
 grid.arrange(arrangeGrob(gy1, gy2, gy3, ncol = 1), arrangeGrob(gy4, gy5, gy6, ncol = 1), ncol = 2)
 ```
@@ -491,17 +568,13 @@ gy6a <- ggplot(sd_compare, aes(x = y6)) + geom_histogram(fill="steelblue", color
 grid.arrange(arrangeGrob(gy1a, gy2a, gy3a, ncol = 1), arrangeGrob(gy4a, gy5a, gy6a, ncol = 1), ncol = 2)
 ```
 
-
-
 ## Задание
 
-Из пяти положительных чисел создайте выборку со средней = 10 и медианой = 7
+Из пяти положительных чисел создайте выборку со средним = 10 и медианой = 7
 
+## Решение
 
-
-## Решение 1
-
-В выборке с медианой = 7 и n = 5, мы точно знаем: (а) одно из значений должно быть равно 7, (б) два значения должны быть меньше, и два --- больше 7. 
+В выборке с медианой = 7 и n = 5, мы точно знаем: __(а)__ одно из значений должно быть равно 7, __(б)__ два значения должны быть меньше, и два --- больше 7. 
 
 Создадим вектор, в котором одно значение задано, а три других просто придумаем:
 
@@ -509,7 +582,7 @@ grid.arrange(arrangeGrob(gy1a, gy2a, gy3a, ncol = 1), arrangeGrob(gy4a, gy5a, gy
 example <- c(2, 5, 7, 10)
 ```
 
-Среднее это сумма всех значений выборки, поделенная на ее объем. Умножив среднюю на 5 получим сумму всех значений.
+Среднее это сумма всех значений выборки, поделенная на ее объем. Умножив среднее на 5 получим сумму всех значений.
 
 Определим недостающее и проверим себя:
 
@@ -519,171 +592,20 @@ example <- c(2, 5, 7, 10, 26) #перезапишем вектор
 mean(example)
 ```
 
-# ЧАСТЬ 5. От статистик к параметрам.
+## Как соотносятся способы оценки центра и размаха в выборке? {.smaller}
 
-## Выборка и генеральная совокупность
-
-### Статистики
-
-- описывают выборки
-- их обозначают латинскими буквами: $М$, $s^2$.
-
-### Параметры
-
-- описывают генеральную совокупность
-- их обозначают греческими буквами: $\mu$, $\sigma^2$
-
-С помощью выборочных статистик мы стремимся описать популяционные параметры.
-
-## Степени свободы в стандартном отклонении
-
-Среднеквадратичное отклонение, которое мы только что сконструировали, верно описывает выборку, но не годится для генеральной совокупности, так как недооценивает ее истинное разнообразие.
-
-Чтобы это исправить, в знаменатель нужно внести поправку, из объема выборки превратить его в степень свободы.
-
-### Дисперсия --- $s^2$ (выборочная оценка параметра $\sigma^2$)
-
-$$s^2=\frac{\sum{(x_i - \bar{x})^2}}{n-1}$$
-
-### Стандартное отклонение --- $s$ или SD (выборочная оценка параметра $\sigma$)
-
-$$SD=\sqrt{\frac{\sum{(x_i - \bar{x})^2}}{n-1}}$$
-
-## Степени свободы в стандартном отклонении
-
-$$SD=\sqrt{\frac{\sum{(x_i - \bar{x})^2}}{n-1}}$$
-
-```{r results="hide"}
-sqrt(sum(raw.deviates^2) / (length(apples) - 1))
+```{r}
+ggplot(data = apple_data) + 
+  geom_boxplot(aes(x = 'Медиана \nи квантили', y = apples)) +
+  stat_summary(geom = 'pointrange', fun.data = mean_sdl, 
+               fun.args = list(mult = 1), 
+               aes(x = 'Среднее \nи стандартное отклонение', y = diameter))
 ```
 
-Сравним с результатом команды `sd()`
-
-```{r results="hide"}
-sd(apples)
-```
-
-При расчете стандартного отклонения R автоматически вносит поправку и использует степени свободы, а не "сырой" объем выборки.
-
-## Ошибка среднего, SEM
-
-Имея дело с выборками и стремясь распространить то, что мы узнали, на всю генеральную совокупность, исследователю к лицу некоторая скромность.
-
-Наша выборка --- лишь одна из множества возможных выборок, берущих начало из некой генеральной совокупности. Значения попадают в выборки случайно, а потому не одинаковыми будут и итоговые выборочные статистики.
-
-Каждая из них, хотя и будет описывать популяционный параметр, имеет шанс быть неверной. 
-
-## Модель генеральной совокупности
-
-Давайте для наших экспериментов создадим генеральную совокупность с параметрами $\mu = 50$ и $\sigma = 7$.
-
-Вот график ее частотного распределения.
-
-```{r echo=FALSE, purl=FALSE, warning=FALSE}
-set.seed(38)
-X <- rnorm(n = 10000, mean = 50, sd = 7) # создаем вектор из 10000 значений нормально распределенной величины
-Mu <- mean(X)
-gg_population <- ggplot(data = data.frame(X), aes(x = X)) + geom_histogram(binwidth = 2, fill = "steelblue", color = "black") + labs(title = "Population") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) 
-gg_population
-```
-
-## Возьмем выборку из этой генеральной совокупности
-
-```{r echo=FALSE, purl=FALSE, warning=FALSE}
-i_1 <- sample(x = 10000, 30)
-sample_1 <- X[i_1]
-Mu_1 <- mean(sample_1)
-gg_sample_1 <- ggplot(data = data.frame(X = sample_1), aes(x = X)) + geom_histogram(binwidth = 1, fill = "steelblue", color = "black") + labs(title = "Sample 1") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) + geom_vline(xintercept = Mu_1, colour = "red", size = 1, linetype = "dashed")
-gg_sample_1
-# mean(sample_1)
-# sd(sample_1)
-```
-
-## В разных выборках средние значения будут отличаться.
-
-```{r echo=FALSE, purl=FALSE, fig.height=5.5, warning=FALSE}
-i_2 <- sample(x = 10000, 30)
-sample_2 <- X[i_2]
-Mu_2 <- mean(sample_2)
-gg_sample_2 <- ggplot(data = data.frame(X = sample_2), aes(x = X)) + geom_histogram(binwidth = 1, fill = "steelblue", color = "black") + labs(title = "Sample 2") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) + geom_vline(xintercept = Mu_2, colour = "red", size = 1, linetype = "dashed")
-
-i_3 <- sample(x = 10000, 30)
-sample_3 <- X[i_3]
-Mu_3 <- mean(sample_3)
-gg_sample_3 <- ggplot(data = data.frame(X = sample_3), aes(x = X)) + geom_histogram(binwidth = 1, fill = "steelblue", color = "black") + labs(title = "Sample 3") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) + geom_vline(xintercept = Mu_2, colour = "red", size = 1, linetype = "dashed")
-
-library(gridExtra)
-grid.arrange(gg_sample_1, gg_sample_2, gg_sample_3, ncol = 1, heights = c(1, 1, 1))
-```
-
-## Что будет со средними, если взять много выборок?
-
-Давайте возьмем много-много выборок, вычислим для каждой выборочное среднее и построим распределение этих выборочных средних.
-
-```{r echo=FALSE, purl=FALSE}
-# Создаем пустой вектор для записи средних
-my_means <- rep(NA, 100)
-# Цикл
-for (smpl in 1:100) {
-  i <- sample(x = 10000, size = 5)
-  mu_i <- mean(X[i])
-  my_means[smpl] <- mu_i
-}
-# length(my_means)
-# head(my_means)
-```
-
-**Выборочные средние нормально распределены с параметрами** $\mu$ и $SD _\bar{x}$
-
-**Среднее значение выборочных средних стремится к среднему в генеральной совокупности**
-
-```{r echo=FALSE, purl=FALSE, warning=FALSE}
-gg_means <- ggplot(data = data.frame(means = my_means), aes(x = means)) + geom_histogram(binwidth=1, fill="gold", color="black") + labs(title = "100 sample means, N = 5") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) + geom_vline(xintercept = mean(my_means), colour = "red", size = 1, linetype = "dashed")
-gg_means
-```
-
-## Чем больше объем выборок, тем точнее оценка среднего в генеральной совокупности
-
-$$SE _\bar{x} = \sigma / \sqrt{N}$$
-
-<div class=columns-2>
-
-```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=5, warning=FALSE}
-# Создаем пустой вектор для записи средних
-my_means_30 <- rep(NA, 100)
-# Цикл
-for (smpl in 1:100) {
-  i <- sample(x = 10000, size = 30)
-  mu_i <- mean(X[i])
-  my_means_30[smpl] <- mu_i
-}
-gg_means_30 <- ggplot(data = data.frame(means = my_means_30), aes(x = means)) + geom_histogram(binwidth=1, fill="gold", color="black") + labs(title = "100 sample means, N = 30") + xlim(30, 70) + geom_vline(xintercept = Mu, colour = "red", size = 1) + geom_vline(xintercept = mean(my_means_30), colour = "red", size = 1, linetype = "dashed")
-grid.arrange(gg_population, gg_means, gg_means_30, ncol = 1)
-```
-
-SEM, Стандартная ошибка среднего (= стандартное отклонение выборочного распределения среднего) будет в N раз меньше, чем дисперсия в генеральной совокупности 
-
-То есть, чем больше будет объем выборок, тем меньше будет эта стандартная ошибка, и тем точнее мы оценим (параметрическое) среднее в генеральной совокупности.
-
-<div/>
+Медиана и среднее дают сходные результаты, если выборка не содержит выбросов (сильно отличающихся от других наблюдений).
 
 
-## SD vs SE
+## Take-home messages
 
-Выборку должны характеризовать центральная тенденция (средняя) и мера разброса.
-
-Стандартное отклонение описыват непосредственно выборку, т.е. отличия значений от выборочного среднего, а значит является более хорошей описательной статистикой, чем стандартное отклонение (=стандартная ошибка) среднего.
-
-Поэтому лучше характеризовать данные в формате
-
-$$Mean \pm SD (N)$$
-
-а не
-
-$$Mean \pm SE (N)$$
-
-
-## Take home messages
-
-> - Описательные статистики ходят только в связке.
-> - Выбирая между медианой и средней, учитывайте природу данных.
+- Описательные статистики ходят только в связке.
+- Выбирая между медианой и средним, учитывайте природу данных.
