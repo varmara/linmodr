@@ -1,6 +1,24 @@
 # Визуализция данных средствами ggplot2
 
 
+## Учимся читать внешние данные в форате csv
+titanic <- read.table('data/Titanic.csv', sep = ';', header = TRUE)
+
+head(titanic, 8)
+
+
+## Длинный формат данных
+
+
+library(tidyr)
+long_titanic <- uncount(titanic, weights = Freq)
+head(long_titanic, 10)
+
+
+
+
+
+
 
 # Данные взяты из работы
 # Tager, I. B., Weiss, S. T., Rosner, B., and Speizer, F. E. (1979). Effect of parental cigarette smoking on pulmonary function in children. American Journal of Epidemiology, 110, 15-26.
@@ -200,7 +218,8 @@ Plot_1 + facet_grid(Sex ~ Smoker)
 circus <- function(n, p, cos2 = 0, sin2 =0, cos3 = 0, sin3 = 0){
   # n - number of points
   # p - period
-  factor <- points <- data.frame(X=c(1:n), Y=c(1:n))
+  points <- data.frame(X=c(1:n), Y=c(1:n))
+  factor <- points
   k <- 0
   for (i in 1:n){
     factor$X[i] <- (i-1)/p - k
@@ -210,8 +229,8 @@ circus <- function(n, p, cos2 = 0, sin2 =0, cos3 = 0, sin3 = 0){
   factor$Y <- factor$X
 
   for (i in 1:n){
-    points$X[i] <- cos(2*pi*factor$X[i]) + cos(cos2/4*pi*factor$X[i]) + cos(cos3/4*pi*factor$X[i])
-    points$Y[i] <- sin(2*pi*factor$Y[i]) + sin(sin2/4*pi*factor$Y[i]) + sin(sin3/4*pi*factor$Y[i])
+    points$X[i] <- cos(2*3.14*factor$X[i]) + cos(cos2/4*3.14*factor$X[i]) + cos(cos3/4*3.14*factor$X[i])
+    points$Y[i] <- sin(2*3.14*factor$Y[i]) + sin(sin2/4*3.14*factor$Y[i]) + sin(sin3/4*3.14*factor$Y[i])
   }
   return(points)
 }
@@ -224,8 +243,8 @@ cock_head$Y <- cock_head$Y +1.1
 cock_beard <- circus(100, 100, 1, 5, 1, 1)
 cock_crest <- circus(100, 100, 15, 30, 20, 40)
 cock_pupil <- circus(100, 100, 0, 0, 0, 0)
-forest <- circus(100, 100, 15, 200, 15, 100)
 
+forest <- circus(100, 100, 15, 200, 15, 100)
 fir <- data.frame(x = 3, y = seq(-3, 4, length.out = 100))
 fir$xend <- seq(3, 5, length.out = 100)
 fir$yend <- 4 - fir$xend
@@ -236,7 +255,7 @@ fir2$xend <- seq(3, -3, length.out = 100)
 fir2$yend <- fir$yend
 
 
-ray <- data.frame(x=3, y = 5, angle = runif(100, 0, 2*pi), radius = rnorm(100, 1, 0.5))
+ray <- data.frame(x=3, y = 5, angle = runif(100, 0, 2*3.14), radius = rnorm(100, 1, 0.5))
 
 stars <- data.frame(x = rnorm(30, 1, 5), y = rnorm(30, 11, 0.5) )
 
