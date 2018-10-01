@@ -107,7 +107,7 @@ ggplot(data = fev, aes(x = Age, y = FEV)) + geom_point() + labs(x = "Возра�
 ggplot(data = fev, aes(x = Age, y = FEV)) + geom_point() + labs(x = "Возраст", y = "Объем легких", title = "Зависимость между \n возрастом и объемом легких")
 
 # Делаем заголовок центральным
-ggplot(data = fev, aes(x = Age, y = FEV)) + geom_point() + labs(x = "Возраст", y = "Объем легких", title = "Зависимость между \n возрастом и объемом легких") + theme(plot.title = element_text(hjust = 0.5))
+ggplot(data = fev, aes(x = Age, y = FEV)) + geom_point() + labs(x = "Возраст", y = "Объем легких", title = "Зависимость между \n возрастом и объемом легких") + theme(plot.title = element_text(hjust = 0.3))
 
 
 # Меняем размер точек
@@ -137,6 +137,10 @@ ggplot(data = fev, aes(x = Age, y = FEV)) + geom_point(shape = 22, color = "red"
 
 
 ggsave("MyPicture.wmf", plot = last_plot())
+
+
+
+
 
 #Рисунок можно, и это правильно, поместить в специальную переменную
 Plot_1 <- ggplot(data = fev, aes(x = Age, y = FEV)) + geom_point(shape = 22, color = "red", fill = "yellow", size = 2)
