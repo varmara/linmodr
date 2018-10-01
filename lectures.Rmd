@@ -18,16 +18,16 @@ install.packages("tidyr")
 install.packages("MASS")
 ```
 
-<!-- - Презентация: [Основы ggplot2](02_intro_ggplot.html) -->
+- Презентация: [Основы ggplot2](02_intro_ggplot.html)
 - Код: [02_intro_ggplot.R](02_intro_ggplot.R)
 - Данные: [Titanic.csv](data/Titanic.csv)
 - Данные: [fev.xls](data/fev.xls)
 
 ### 03 Описательная статистика (1 окт 2 пара и 4 окт.)
 
-<!-- - Презентация [03_descriptive_statistics.html](03_descriptive_statistics.html) -->
-<!-- - Код [03_descriptive_statistics_code.R](03_descriptive_statistics_code.R) -->
-<!-- - Данные [diatome_count.csv](data/diatome_count.csv) -->
+- Презентация [03_descriptive_statistics.html](03_descriptive_statistics.html)
+- Код [03_descriptive_statistics_code.R](03_descriptive_statistics_code.R)
+- Данные [2.1_diatome_count.csv](data/2.1_diatome_count.csv)
 
 ### 04 Тестирование гипотез (8 окт 1-2 пары)
 
