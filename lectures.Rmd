@@ -34,7 +34,7 @@ install.packages("MASS")
 Часть 2
 
 <!-- - Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html) -->
-- Код [03.2_descriptive_statistics_normal_d_code.R](03_descriptive_statistics_normal_d_code.R)
+- Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R)
 
 ### 04 Тестирование гипотез (8 окт 1-2 пары)
 
