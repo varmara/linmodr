@@ -606,7 +606,13 @@ pnorm(q = 190, mean = 162.2, sd = 6.0) -
   pnorm(q = 160, mean = 162.2, sd = 6.0)
 ```
 
-Только `r round(pnorm(q = 190, mean = 162.2, sd = 6.0) - pnorm(q = 160, mean = 162.2, sd = 6.0) * 100, 1)` % девушек пройдут в пилоты по росту.
+```{r}
+p_fem <- pnorm(q = 190, mean = 162.2, sd = 6.0) - 
+  pnorm(q = 160, mean = 162.2, sd = 6.0)
+prop_fem <- round(p_fem * 100, 1)
+```
+
+Только `r prop_fem` % девушек пройдут в пилоты по росту.
 
 
 ## Take-home messages
