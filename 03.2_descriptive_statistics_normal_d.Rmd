@@ -606,7 +606,7 @@ pnorm(q = 190, mean = 162.2, sd = 6.0) -
   pnorm(q = 160, mean = 162.2, sd = 6.0)
 ```
 
-```{r}
+```{r echo=FALSE}
 p_fem <- pnorm(q = 190, mean = 162.2, sd = 6.0) - 
   pnorm(q = 160, mean = 162.2, sd = 6.0)
 prop_fem <- round(p_fem * 100, 1)
