@@ -13,8 +13,12 @@ output:
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, message = FALSE)
+library(scales)
+ar <- arrow(type = 'closed', length = unit(0.15,'cm'))
+arb <- arrow(type = 'closed', length = unit(0.15,'cm'), ends = 'both')
 ```
+
 ```{r libs-funs, include = FALSE, cache = FALSE, purl = FALSE}
 library(ggplot2)
 library(gridExtra)
@@ -77,294 +81,471 @@ dnorm_limit <- function(x, alph = 0.05, mu = 0, sig = 1, sides = 2, what = "alph
 
 ## Тестирование гипотез
 
-- Стандартное нормальное распределение
+- Выборочное распределение среднего значения
 - Как устроено тестирование гипотез
 - t-статистика
 - Применение t-теста
 - Статистическая значимость
 
-# Стандартное нормальное распределение
 
-## Стандартизация (Z-преобразование)
+# Выборочная оценка среднего
 
-Стандартизованная величина (Z-оценка) --- показывает, на сколько стандартных отклонений значение отличается от среднего
+<!-- Что мы можем сказать о среднем значении в генеральной совокупности, если у нас есть всего одна выборка? Центральная предельная теорема говорит, что если мы возьмем достаточно большую выборку из генеральной совокупности, то среднее значение будет нормально распределено. Особенно важно, что это правда даже если признак в совокупности имеет другое распределение. Повторные выборки. Зависимость точности оценки от объема выборки. Ошибка среднего SE (это иллюстрация теоремы центрального предела) -->
+
+## Как можно судить о свойствах генеральной совокупности по выборке?
+
+__Центральная предельная теорема__ (ЦПТ) говорит, что если мы возьмем достаточно большую выборку из генеральной совокупности, то среднее значение будет нормально распределено с параметрами $\mu_{\bar x}$ и $\sigma _{\bar{x}}$:
+
+$$\bar X \sim N (\mu_{\bar x}, \sigma_{\bar x})$$
+
+При чем $\sigma_{\bar x} = \sigma/\sqrt{n}$.
+
+<br/>
+
+Но самое важное, что при больших объемах выборки ($N > 30$, или даже $N > 100$) это так, даже если $x$ в генеральной совокупности не подчиняется нормальному распределению.
+
+<br/><br/>
+
+Давайте проверим на опыте, так ли это.
+
+
+## Цена алмазов
+
+Представим, что данные об алмазах из датасета `diamonds` (пакет `gplot2`) --- это генеральная совокупность.
+
+Перед вами распределение цены алмазов. Давайте будем брать из этого распределения выборки и оценивать по ним среднее значение.
 
 <div class="columns-2">
 
-```{r echo=FALSE, purl=FALSE, fig.height=5, fig.width=4.5}
-Xi <- rnorm(n = 100000, mean = 50, sd = 7)
-Mu <- mean(Xi)
-SD <- sd(Xi)
-Zi <- (Xi - Mu) / SD
-Z <- data.frame(Xi, Zi)
+```{r echo=FALSE, purl=FALSE, fig.width=5}
+library(ggplot2)
+data("diamonds")
 
-gg_sample <- ggplot(data = Z, aes(x = Xi)) + geom_histogram(binwidth = 2, fill = "lightblue", color = "black") + labs(title = "Normal Distribution, \nmu = 50, sd = 7") + geom_vline(xintercept = mean(Xi), colour = "red", size = 1)
+X <- na.omit(diamonds$price)
+sig <- sd(X)
+mu <- mean(X)
 
-gg_z <- ggplot(data = Z, aes(x = Zi)) + geom_histogram(binwidth = 0.3, fill = "steelblue", color = "black", alpha = 0.5) + labs(title = "Standard Normal Distribution, \nmu = 0, sd = 1") + geom_vline(xintercept = mean(Zi), colour = "red", size = 1)
+lab <- paste('bar(x) ==', format(mu, nsmall = 0, digits = 0), '~~~sd ==', format(sig, nsmall = 0, digits = 0))
 
-grid.arrange(gg_sample, gg_z, ncol = 1)
+gg_population <- ggplot(data = data.frame(x = X), aes(x = x)) + 
+  geom_histogram(fill = 'lightskyblue1', colour = 'black') + 
+  geom_vline(xintercept = mu, colour = 'red', size = 2) +
+  annotate('text', x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, 
+             label = lab, parse = T, size = 3.5) +
+  labs(x = 'price')
+gg_population
 ```
 
-$$z_i=\frac{x_i - \bar{x}}{SD}$$
+![](images/Diamond-age-bySteve-Jurvetson-on-Flickr.jpg)
 
-После **стандартизации** получается стандартное нормальное распределение
-
-<br/>
-
-**После стандартизации всегда**:
-
-- среднее $\mu = 0$
-- стандартное отклонение $\sigma = 1$
+<small>Diamond Age by Steve Jurvetson on Flickr</small>
+<!-- https://flic.kr/p/eRNcR -->
 
 <br/>
-
-Для стандартного нормального распределения легко можно посчитать вероятность (площадь под кривой)
 
 </div>
 
-## Вероятности --- это площади под кривой распределения случайной величины.
+## Средние в выборках
 
-Вся площадь под кривой распределения будет равна 1 (суммарная вероятность всех возможных значений равна 1)
+<div class="columns-2">
 
-Мы не можем узнать вероятность конкретного значения, т.к. конкретное значение --- это точка, а под точкой нет площади.
+```{r gg-sample, echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=5.5}
+set.seed(83314197)
+gg_sample_hist <- function(x, size) {
+  id <- sample(x = length(x), size = size)
+  my_mean <- mean(x[id])
+  ggplot(data = data.frame(x = x[id]), aes(x = x)) + 
+    geom_histogram(binwidth = 50, fill = 'grey40', colour = 'grey40') + 
+    geom_vline(xintercept = mu, colour = 'red', size = 2) +
+    geom_vline(xintercept = my_mean, colour = 'yellow3', size = 2) + 
+    annotate('text', x = Inf, y = Inf, hjust = 3.1, vjust = 1.5, 
+             label = paste('n ==', size), 
+             parse = T, size = 3.5) +
+        annotate('text', x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, 
+             label = paste('bar(x) ==', format(my_mean, nsmall = 2, digits = 2)), 
+             parse = T, size = 3.5)
+}
 
-Зато, мы можем узнать вероятность того, что случайная величина, взятая из данного распределения, попадет в конкретный диапазон значений...
+gg_void <- ggplot() + theme_void()
 
-```{r probability-curve, purl=FALSE, echo=FALSE, fig.width=10}
-mu <- 5; sig <- 1.5; X1 <- 3; X2 <- 6
-dfr <- data.frame(x = seq(0, 10, length.out = 1000))
-
-gg_all <- ggplot(dfr, aes(x = x)) +
-  scale_x_continuous(name = "Значение случайной величины", breaks = 1:9,
-                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
-  labs(y = "Плотность вероятности") + 
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "area", fill = "steelblue", alpha = 0.5) +
-    stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
-  annotate(geom = "text", label = "P[group('(',list(-infinity, infinity),')')] == 1", x = 5, y = 0.15, parse = TRUE)
-  
-gg_3 <- ggplot(dfr, aes(x = x)) +
-  scale_x_continuous(name = "Значение случайной величины", breaks = 1:9,
-                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
-  labs(y = "Плотность вероятности") + 
-    stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
-  annotate("segment", x = 3, y = 0, xend = 3, yend = dnorm(3, mean = 5, sd = sig)) +
-  annotate("point", x = 3, y = dnorm(3, mean = 5, sd = sig), colour = "steelblue", fill = "lightblue", shape = 21, size = 3) +
-    annotate(geom = "text", x = 3, y = dnorm(3, mean = 5, sd = sig), label = "P[group('[',3,']')] == 0", parse = TRUE, hjust = 1.1)
-
-grid.arrange(gg_all, gg_3, nrow = 1)
-
+n <- 20
+# gg_sample_hist(X, n, xlim = c(30, 70))
+plot_grid(gg_population + coord_cartesian(xlim = c(-1, max(X))) + theme(axis.title.x = element_blank()),
+          gg_sample_hist(X, n) + coord_cartesian(xlim = c(-1, max(X))) + theme(axis.title.x = element_blank()), 
+          gg_sample_hist(X, n) + coord_cartesian(xlim = c(-1, max(X))) + theme(axis.title.x = element_blank()), 
+          gg_sample_hist(X, n) + coord_cartesian(xlim = c(-1, max(X))) + theme(axis.title.x = element_blank()), 
+          gg_sample_hist(X, n) + coord_cartesian(xlim = c(-1, max(X))) + theme(axis.title.x = element_blank()), 
+          gg_sample_hist(X, n) + coord_cartesian(xlim = c(-1, max(X))) + labs(x = 'price'), 
+          ncol = 1, align = 'v')
 ```
 
-## Интергрирование вероятностей
 
-Внимание! Мы умеем интегрировать только "влево" от заданного значения, т.е. мы можем непосредственно вычислить только вероятность того, что случайное значение окажется __меньше__ заданного. 
+Средние в выборках отличаются от средних в генеральной совокупности.
 
-```{r snail-curve, purl=FALSE, echo=FALSE}
-mu <- 5; sig <- 1.5; X1 <- 3; X2 <- 6
-dfr <- data.frame(x = seq(0, 10, length.out = 1000))
-dfr$y1 <- dnorm(dfr$x, mean = mu, sd = sig)
-dfr$y1[!(dfr$x < X1)] <- NA
-dfr$y2 <- dnorm(dfr$x, mean = mu, sd = sig)
-dfr$y2[!(dfr$x < X2)] <- NA
+Если взять много выборок определенного размера, можно построить распределение выборочных средних.
 
-ggplot(dfr, aes(x = x)) +
-  scale_x_continuous(name = "Значение случайной величины", breaks = 1:9,
-                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
-  labs(y = "Плотность вероятности") + 
-    geom_area(aes(x = x, y = y2), fill = "steelblue", alpha = 0.5) +
-  geom_vline(xintercept = X2, colour = "steelblue", linetype = "dashed") +
-    geom_area(aes(x = x, y = y1), fill = "steelblue", alpha = 0.6) +
-  geom_vline(xintercept = X1, colour = "steelblue4", linetype = "dashed") +
-    stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue")
-  
+<br/>
+
+Давайте посмотрим, как меняется форма распределения выборочных средних при изменении объема выборки.
+
+</div>
+
+## Распределение выборочных средних
+
+<div class="columns-2">
+
+```{r gg-many-sampling-distr, echo=FALSE, purl=FALSE, fig.width=5, fig.height=5.5}
+# Функция, которая берет выборку объемом sample_size из вектора x и возвращает ее среднее значение
+sample_mean <- function(x, size){
+  id <- sample(x = length(x), size)
+  my_mean <- mean(x[id])
+  return(my_mean)
+}
+
+gg_sample_means <- function(x, n_samples, size){
+  # Считаем средние значения для большого числа выборок
+  my_means <- replicate(n = n_samples, expr = sample_mean(x, size))
+  mean_of_means <- mean(my_means)
+  sd_of_means <- sd(my_means)
+  ggplot(data = data.frame(means = my_means), aes(x = means)) + 
+    geom_histogram(binwidth = 4, fill = 'yellow3', alpha = 0.3, color = 'black') + 
+    geom_vline(xintercept = mu, colour = 'red', size = 3) +
+    geom_vline(xintercept = mean_of_means, colour = 'gold1', size = 1.5) + 
+    annotate('text', x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, 
+             label = paste('n ==', size), 
+             parse = T, size = 3.5) +
+        annotate('text', x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, 
+             label = paste('bar(x) ==', format(mean_of_means, nsmall = 2, digits = 2), '~~~sd ==', format(sd_of_means, nsmall = 2, digits = 2)), 
+             parse = T, size = 3.5)
+}
+n_samples <- 500
+plot_grid(gg_population + coord_cartesian(xlim = c(0, 20000)), 
+          gg_sample_means(x = X, n_samples = n_samples, size = 2) + 
+            coord_cartesian(xlim = c(0, 20000)) + theme(axis.title.x = element_blank()), 
+          gg_sample_means(x = X, n_samples = n_samples, size = 4) + 
+            coord_cartesian(xlim = c(0, 20000)) + theme(axis.title.x = element_blank()), 
+          gg_sample_means(x = X, n_samples = n_samples, size = 10) + 
+            coord_cartesian(xlim = c(0, 20000)) + theme(axis.title.x = element_blank()), 
+          gg_sample_means(x = X, n_samples = n_samples, size = 30) + 
+            coord_cartesian(xlim = c(0, 20000)) + labs(x = 'sample mean'), 
+          ncol = 1, align = 'v')
 ```
 
-Поскольку вся площадь под кривой вероятностей равна 1, то вероятность оказаться __больше__ заданного значения --- это 1 минус вероятность оказаться __меньше__.
+
+$$\bar X \sim N (\mu_{\bar x}, \sigma_{\bar x})$$
+
+$\mu_{\bar x} = \mu$ --- среднее значение выборочных средних стремится к среднему в генеральной совокупности.
+
+$\sigma_{\bar x} =  \sigma / \sqrt{n}$ --- стандартное отклонение в $\sqrt{n}$ раз меньше стандартного отклонения в генеральной совокупности.
+
+$\sigma_{\bar x}$ называют стандартной ошибкой среднего и обозначают $SE _{\bar{x}}$.
+
+</div>
 
 
+## Центральная предельная теорема очень важна в статистике
 
-## Пример: Размеры улиток
+<div class="columns-2">
 
-В выборке улиток средний диаметр раковины 5 см со стандартным отклонением 1.5 см.
-
-- Какова вероятность того, что случайно выбранная улитка окажется __меньше 3 см__?
-- Какова вероятность того, что случайно выбранная улитка окажется __больше 6 см__?
-- Какова доля улиток с размером раковины __в пределах 3--6 см__?
-
-![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
+```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=3.38}
+gg_sample_means(x = X, n_samples = n_samples, size = 100) + labs(x = 'sample means')
+```
 
 
-<small>tres caracoles by Alberto Villen on Freeimages.com</small>
+$$\bar X \sim N (\mu, \sigma / \sqrt{n})$$
+
+Пользуясь ее выводами, мы сможем:
+
+- строить доверительные интервалы
+- тестировать гипотезы
+
+</div>
+
+# Доверительный интервал
+
+## Если выполняется центральная предельная теорема, то
+
+<div class="columns-2">
+
+```{r echo=FALSE, purl=FALSE, fig.width=5, fig.height=3.38}
+labs_x <- c(expression(-3*sigma / sqrt(n)), expression(-2*sigma / sqrt(n)), expression(-sigma / sqrt(n)), expression(bar(x)), expression(sigma / sqrt(n)), expression(2*sigma / sqrt(n)), expression(3*sigma / sqrt(n)))
+
+gg_conf_0 <- ggplot(data = data.frame(z = -4:4), aes(x = z)) +
+  stat_function(fun = dnorm, colour = 'steelblue', size = 1) + 
+  scale_x_continuous(breaks = -3:3, sec.axis = sec_axis(~., breaks = -3:3, labels = labs_x, name = 'Выборочное распределение средних')) +
+  scale_y_continuous('Плотность вероятности') +
+  coord_cartesian(ylim = c(0, 0.47), xlim = c(-3.6, 3.6))
+
+gg_conf_0
+```
 
 
-## Вероятность встретить значение меньше заданного размера
+$$\bar X \sim N(\mu, \sigma/ \sqrt{n})$$
 
-В выборке улиток средний диаметр раковины 5 см со стандартным отклонением 1.5 см.
+После стандартизации:
 
-### Какова вероятность того, что случайно выбранная улитка окажется __меньше 3 см__? 
+$$\frac{\bar X - \mu}{\sigma / \sqrt{n}} \sim N(0, 1)$$
+
+Стандартизованное распределение выборочных средних будет подчинятся стандартному нормальному распределению.
+
+</div>
+
+
+##  Доверительный интервал из нормального распределения
+
+<div class="columns-2">
+
+```{r echo=FALSE, purl=FALSE, fig.width=5, fig.height=3.38}
+gg_conf_1 <- gg_conf_0 +
+  stat_function(geom = 'area', fun = dnorm, xlim = c(-1.96, 1.96),
+                fill = 'steelblue', alpha = 0.5) +
+  annotate('text', label = 'P == 0.95', parse = T,
+           x = 0, y = 0.1) +
+  annotate('text', label = '0.025', parse = T, size = 3,
+           x = c(-2.2, 2.2), y = 0.01)
+gg_conf_1
+```
+
+
+--- это интервал, в который попадает заданный процент выборочных средних.
+
+В 95% доверительный интервал попадает выборочное среднее в 95% повторных выборок.
+
+<br/>
+
+Как найти этот интервал?
+
+</div>
+
+##  Доверительный интервал из нормального распределения
+
+<div class="columns-2">
+
+```{r echo=FALSE, purl=FALSE, fig.width=5, fig.height=3.38}
+gg_conf_2 <- gg_conf_1 + 
+  geom_vline(xintercept = c(-1.96, 1.96), linetype = 'dashed') +
+  annotate(geom = 'text', label = c('-z[0.05]==-1.96', 'z[0.05]==1.96'), hjust = c(1.03, -0.03),
+           x = c(-1.96, 1.96), y = 0.1, parse = TRUE)
+
+gg_conf_2
+```
+
+
+$$\bar {x} \pm z_{\alpha} \cdot \sigma / \sqrt{n}$$
+
+Чтобы найти границы 95% доверительного интервала, нужно найти квантили стандартного нормального распределения, которые соответствуют вероятностям 0.025 и 0.975
 
 ```{r}
-Z_1 <- (3 - 5) / 1.5
-pnorm(Z_1)
+qnorm(p = c(0.025, 0.975))
 ```
 
-```{r snail-small, purl=FALSE, echo=FALSE, fig.height=2}
-mu <- 5; sig <- 1.5; X1 <- 3; X2 <- 6
-dfr <- data.frame(x = seq(0, 10, length.out = 1000))
-dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
-dfr$y[!(dfr$x < X1)] <- NA
 
-ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
-  scale_x_continuous(name = "Диаметр", breaks = 1:9,
-                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
-  labs(y = "Плотность вероятности") + 
-  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
-  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed")
+$z_{0.05} = 1.96$
+
+95% выборочных средних в повторных выборках будут лежать в пределах $\pm 1.96$ стандартных ошибок вокруг среднего значения.
+
+</div>
+
+## Условия применимости нормального распределения для доверительного интервала
+
+1.Должна быть известна $\sigma$ в генеральной совокупности.
+
+2.Должны выполняться условия, при которых справедлива ЦПТ:
+
+- Наблюдения в выборке должны быть независимы друг от друга.
+
+- Большой объем выборки **или** нормальное распределение $x$
+
+## Если $\pmb \sigma$ не известна
+
+Если $\sigma$ в генеральной совокупности не известна, ее можно оценить по выборочному стандартному отклонению $s$.
+
+$$\sigma / \sqrt{n} \approx s/\sqrt{n}$$
+
+После стандартизации:
+
+$$\frac{\bar X - \mu}{SE_{\bar x}} = \frac{\bar X - \mu}{s / \sqrt{n}} \sim t_{df = n - 1}$$
+
+
+стандартизованное распределение выборочных средних подчиняется $t$-распределению с числом степеней свободы $df = n - 1$
+
+
+## $t$-распределение
+
+<div class="columns-2">
+
+
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=2.62}
+ggplot(data = data.frame(t = -4 : 4), aes(x = t)) +
+  stat_function(aes(color = 't, df = 3', linetype = 't, df = 3'), 
+                fun = dt, args = list(df = 3), size = 1) +
+  stat_function(aes(color = 't, df = 10', linetype = 't, df = 10'), 
+                fun = dt, args = list(df = 10), size = 1) +
+  stat_function(aes(color = 'Z', linetype = 'Z'), 
+                fun = dnorm) +
+  scale_color_manual(
+    'Распределение',
+    values = c('t, df = 3' = 'red' , 
+               'Z' = 'steelblue', 
+               't, df = 10' = 'orange')) + 
+  scale_linetype_manual(
+    'Распределение', 
+    values = c('t, df = 3' = 1, 'Z' = 2, 't, df = 10' = 1)) + 
+  labs(y = 'Плотность вероятности') +
+  theme(legend.position = c(0.8, 0.75), 
+        legend.box.background = element_blank(),
+        legend.background = element_blank())
 ```
 
-## Вероятность встретить значение больше заданного размера
 
-В выборке улиток средний диаметр раковины 5 см со стандартным отклонением 1.5 см.
+- Симметричное колоколообразное распределение с толстыми хвостами. 
+- Единственный параметр --- число степеней свободы (для доверительного интервала $df = n - 1$).
+- При увеличении объема выборки $t$-распределение приближается к нормальному.
 
-### Какова вероятность того, что случайно выбранная улитка окажется __больше 6 см__?
 
-Мы умеем интегрировать только влево от выбранного значения, поэтому
+</div>
 
-- выясняем вероятность встретить значение меньше заданного $p$
-- находим комплементарную вероятность $1 - p$
+
+## Доверительный интервал из $t$-распределения
+
+<div class="columns-2">
+
+```{r echo=FALSE, purl=FALSE, fig.width=5.25, fig.height=3.38}
+n <- 10
+lims <- qt(p = c(0.025, 0.975), df = n - 1)
+labs <- format(lims, digits = 2, nsmall = 2)
+labs_x <- c(expression(-3*s / sqrt(n)), expression(-2*s / sqrt(n)), expression(-s / sqrt(n)), expression(bar(x)), expression(s / sqrt(n)), expression(2*s / sqrt(n)), expression(3*s / sqrt(n)))
+
+gg_conf_0 <- ggplot(data = data.frame(t = -4:4), aes(x = t)) +
+  stat_function(fun = dt, args = list(df = n - 1), colour = 'red', size = 1) +
+  scale_x_continuous(breaks = -3:3, sec.axis = sec_axis(~., breaks = -3:3, labels = labs_x, name = 'Выборочное распределение средних')) +
+  scale_y_continuous('Плотность вероятности') +
+  coord_cartesian(ylim = c(0, 0.47), xlim = c(-3.6, 3.6))
+gg_conf_1 <- gg_conf_0 +
+  stat_function(geom = 'area', fun = dt, args = list(df = n - 1), xlim = lims,
+                fill = 'red', alpha = 0.5) +
+  annotate('text', label = 'P == 0.95', parse = T,
+           x = 0, y = 0.1) +
+  annotate('text', label = '0.025', parse = T, size = 3,
+           x = lims, y = 0.01, hjust = c(1.03, -0.03))
+gg_conf_2 <- gg_conf_1 +
+  geom_vline(xintercept = lims, linetype = 'dashed') +
+  annotate(geom = 'text', label = c(paste('-t[0.05, 9]==', labs[1]), paste('t[0.05, 0]==', labs[2])), hjust = c(1.03, -0.03),
+           x = lims, y = 0.1, parse = TRUE)
+gg_conf_2 +
+  annotate('path', x = lims, y = rep(0.42, 2), arrow = arb) +
+  annotate('text', label = paste('Для~n==10~~~~~~~bar(x)%+-%', labs[2], '*~sigma / sqrt(n)'), vjust = -0.5, x = 0, y = 0.42, parse = TRUE)
+```
+
+Обязательно используется, если:
+
+- Объем выборки мал.
+- $\sigma$ не известна.
+
+$$\bar {x} \pm t_{\alpha, df} \cdot s / \sqrt{n}$$
+
+$df = n - 1$
+
+</div>
+
+Условия применимости
+
+Выполняются условия, при которых справедлива ЦПТ:
+
+- Наблюдения в выборке независимы друг от друга.
+- Большой объем выборки и нет "выбросов" **или** нормальное распределение $x$
+
+
+## Смысл 95% доверительного интервала.
+
+<div class="columns-2">
+
+
+```{r gg-many-lims, echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=5.5}
+library(dplyr)
+set.seed(14934)
+# Генеральная совокупность для симуляции
+x <- rnorm(10000, mean = 10, sd = 5)
+mu <- mean(x)
+# Функция, которая берет выборку объемом sample_size из вектора x и возвращает ее среднее значение и доверительный интервал (по t)
+sample_mean_ci <- function(x, size){
+  id <- sample(x = length(x), size)
+  my_mean <- mean(x[id])
+  ci <- my_mean + qt(p = c(0.025, 0.975), df = size - 1)
+  res <- c(my_mean, ci)
+  names(res) <- c('sample_mean', 'lower', 'upper')
+  return(res)
+}
+
+
+n_samples <- 100
+sample_size <- 20
+means_ci <- replicate(n = n_samples, expr = sample_mean_ci(x, size = sample_size))
+dfr_means <- data.frame(t(means_ci)) %>%
+  mutate(interval = 1:n_samples,
+         inside = mu >= lower & mu <= upper,
+         inside = factor(inside, levels = c(TRUE, FALSE), labels = c('Да', 'Нет')))
+perc <- round(mean(dfr_means$inside == 'Да') * 100, 1)
+
+gg_many_lims <- ggplot(data = dfr_means) +
+  geom_segment(aes(x = interval, y = lower, xend = interval, yend = upper, colour = inside)) +
+  geom_hline(yintercept = mean(x), colour = 'red', size = 1) +
+  scale_y_continuous('', breaks = mu, labels = expression(bar(x))) +
+  labs(x = 'Порядковый номер интервала в симуляции', y = 'x',
+       color = 'Включает ли\nинтервал\nистинное\nсреднее \nзначение?') +
+  coord_flip() +
+    scale_x_reverse()
+gg_many_lims
+```
+
+Среднее в генеральной совокупности --- это фиксированная величина (она либо попала в интервал, либо нет.
+
+Доверительный интервал --- случайная величина.
+
+В повторных выборках такого же размера $\approx 95\%$ всех доверительных интервалов "накроют" истинное среднее значение.
+
+</div>
+
+
+## Расчет и изображение доверительного интервала в R
 
 ```{r}
-Z_2 <- (6 - 5) / 1.5
-1 - pnorm(Z_2)
+library(ggplot2)
+data("diamonds")
+
+# цена бриллиантов хорошего качества огранки
+good <- diamonds$price[diamonds$cut == "Good"] 
+
+.mean <- mean(good)                  # выборочное среднее
+.n <- length(good)                   # объем выборки
+SE <- sd(good)/ sqrt(.n)             # стандартная ошибка
+t_crit <- qt(p = 0.975, df = .n - 1) # критич. зн. t для данного n и p = 0.95
+err <- t_crit * SE                   # предел погрешности
+# Границы доверительного интервала
+.mean - err
+.mean + err
 ```
 
-```{r snail-large, purl=FALSE, echo=FALSE, fig.height=2}
-dfr <- data.frame(x = seq(0, 10, length.out = 1000))
-dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
-dfr$y[!(dfr$x > X2)] <- NA
-ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
-  scale_x_continuous(name = "Диаметр", breaks = 1:8,
-                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
-  labs(y = "Плотность вероятности") + 
-  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
-  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
-```
+Можем записать среднюю цену бриллиантов хорошей огранки и ее доверительный интервал:
+$`r .mean` \pm `r err`$ 
 
-## Вероятность встретить значение в заданных пределах
 
-В выборке улиток средний диаметр раковины 5 см со стандартным отклонением 1.5 см.
-
-### Какова доля улиток с размером раковины __в пределах 3--6 см__?
+## Строим доверительные интервалы в ggplot
 
 ```{r}
-pnorm(Z_2) - pnorm(Z_1) 
+theme_set(theme_bw())
+ggplot(data = diamonds, aes(x = cut, y = price)) +
+  stat_summary(geom = 'pointrange', fun.data = mean_cl_normal)
 ```
 
-```{r snail-medium, purl=FALSE, echo=FALSE, fig.height=2}
-dfr <- data.frame(x = seq(0, 10, length.out = 1000))
-dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
-dfr$y[!(dfr$x > X1 & dfr$x < X2)] <- NA
-ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
-  scale_x_continuous(name = "Диаметр", breaks = 1:9,
-                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
-  labs(y = "Плотность вероятности") + 
-  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
-  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed") +
-  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
-```
+## Задание
 
-## Задача:
+Посчитайте среднюю цену и доверительный интервал для бриллиантов с такими свойствами:
 
-Средний рост 18-летних мужчин в России 174.7 см со стандартным отклонением 6.65 см. В пилоты берут только людей с ростом от 160 до 190 см (по приказу Минтранса).
+- качество огранки (`cut`) идеальное (`Ideal`)
+- прозрачность (`clarity`) наивысшая (`IF`)
 
-- Какова вероятность того, что случайно выбранный мужчина окажется __ниже 160 см__?
-
-- Какова вероятность того, что случайно выбранный мужчина окажется  __больше 190 см__?
-
-- Какова доля мужчин, не подходящих по росту в пилоты, т.е. __меньше 160 и больше 190 см__?
-
-<!-- Средний рост девочек в 16 лет 162,20, SD = 6,00 -->
-
-## Решение
-
-Средний рост 18-летних мужчин в России 174.7 см со стандартным отклонением 6.65 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
-
-### Какова вероятность того, что случайно выбранный мужчина окажется __ниже 160 см__?
-
-```{r purl=FALSE}
-Z_short <- (160 - 174.7) / 6.65
-pnorm(Z_short)
-```
-
-```{r men-short, purl=FALSE, echo=FALSE}
-mu <- 174.7; sig <- 6.65; X1 <- 160; X2 <- 190
-dfr <- data.frame(x = seq(150, 200, length.out = 1000))
-dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
-dfr$y[!(dfr$x < X1)] <- NA
-ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
-  scale_x_continuous(name = "Рост",
-                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
-  labs(y = "Плотность вероятности") + 
-  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
-  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed")
-```
-
-## Решение
-
-Средний рост 18-летних мужчин в России 174.7 см со стандартным отклонением 6.65 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
-
-### Какова вероятность того, что случайно выбранный мужчина окажется  __больше 190 см__?
-
-```{r purl=FALSE}
-Z_tall <- (190 - 174.7) / 6.65
-1 - pnorm(Z_tall)
-```
-
-```{r men-tall, purl=FALSE, echo=FALSE}
-dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
-dfr$y[!(dfr$x > X2)] <- NA
-ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
-  scale_x_continuous(name = "Рост",
-                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
-  labs(y = "Плотность вероятности") + 
-  geom_area(aes(x = x, y = y), fill = "steelblue", alpha = 0.5) +
-  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
-```
-
-
-## Решение
-
-Средний рост 18-летних мужчин в России 174.7 см со стандартным отклонением 6.65 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
-
-### Какова доля мужчин, не подходящих по росту в пилоты, т.е. __меньше 160 и больше 190 см__?
-
-
-```{r purl=FALSE}
-pnorm(Z_short) + (1 - pnorm(Z_tall))
-```
-
-```{r men-not-pilots, purl=FALSE, echo=FALSE}
-dfr$y1 <- dnorm(dfr$x, mean = mu, sd = sig)
-dfr$y1[!(dfr$x < X1)] <- NA
-dfr$y2 <- dnorm(dfr$x, mean = mu, sd = sig)
-dfr$y2[!(dfr$x > X2)] <- NA
-
-ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
-  scale_x_continuous(name = "Рост",
-                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
-  labs(y = "Плотность вероятности") + 
-  geom_area(aes(x = x, y = y1), fill = "steelblue", alpha = 0.5) +
-  geom_area(aes(x = x, y = y2), fill = "steelblue", alpha = 0.5) +
-  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed") +
-  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
-```
-
+Постройте график средней цены с доверительными интервалами для бриллиантов разного качества огранки, и прозрачности.
 
 # Как устроено тестирование гипотез
 
@@ -380,11 +561,9 @@ ggplot(dfr, aes(x = x)) +
 
 <small>tres caracoles by Alberto Villen on Freeimages.com</small>
 
-## Гипотезы: нулевая и альтернативная
+## Нулевая и альтернативная гипотезы
 
-Первый шаг в сравнении – формулировка нулевой гипотезы.
-
-Вместе с нулевой гипотезой рождается альтернативная гипотеза.
+Это первый шаг
 
 ![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg) ![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
 
@@ -432,382 +611,343 @@ ggplot(dfr, aes(x = x)) +
 
 ## Тестирование гипотез: Тестовые статистики
 
-Гипотезы выражаются математически в виде тестовых статистик. 
 
-По нашим реальным данным мы вычисляем __эмпирическое значение тестовой статистики__.
+### Шаг 1. Формулируем нулевую и альтернативную гипотезы.
+
+Гипотезы выражаются математически в виде тестовых статистик. На этом этапе мы делаем определенные допущения.
+
+### Шаг 2. Проверяем __условия применимости__ тестовой статистики.
+
+### Шаг 3. По реальным данным вычисляем __эмпирическое значение тестовой статистики__.
 
 Дальше мы должны ответить на вопрос:
 
-### Насколько вероятно получить _такое или более экстремальное_ эмпирическое значение, если верна нулевая гипотеза  $H_0$?
+**Насколько вероятно получить _такое или более экстремальное_ эмпирическое значение, если верна нулевая гипотеза  $H_0$?**
 
-Ответить на этот вопрос можно, построив __теоретическое распределение тестовой статистики__ для случая, когда верна $H_0$
+### Шаг 4. Строим теоретическое распределение тестовой статистики для случая, когда верна $H_0$, и оцениваем по нему уровень значимости.
+
+### Шаг 5. Решаем сохранить или отвергнуть $H_0$.
+
+Увы, мы не сможем узнать, какая гипотеза верна, но поймем, насколько с ней согласуются исходные данные.
 
 
-## Пример тестовой статистики: Z-тест для разницы средних (для больших выборок)
+# Одновыборочный $t$-тест
 
-$H_0: \bar x_1 - \bar x_2 = 0$, $H_A: \bar x_1 - \bar x_2 \ne 0$
+## Размер кладки черепах
 
-$$Z = \frac{\bar x_1 - \bar x_2}{SE}$$
-<small>
-$\bar x_1 - \bar x_2$ --- разница средних; $SE = SD / \sqrt{n}$ --- стандартная ошибка
-</small>
+Разберемся с одновыборочным $t$-тестом на вымышленном примере.
 
-__Для больших выборок__ (больше 100) выборочная оценка стандартизованной разницы средних значений  распределена практически нормально. Поэтому для тестирования гипотез можно использовать стандартное нормальное распределение. 
-
-```{r hypoth, echo = FALSE, purl = FALSE, fig.height=2.2}
-th <- theme_bw() #+ theme(axis.line.y = element_blank(), axis.text = element_blank(), panel.grid = element_blank())
-z_df <- data.frame(z = seq(-6, 6, length.out = 1000))
-gg_norm_h0 <- ggplot(data = z_df, aes(x = z)) +
-  stat_function(fun = dnorm, args = list(mean = 0, sd = 1), 
-                size = 1, geom = "line", aes(colour = "H0")) +
-  # stat_function(fun = dnorm, 
-                # args = list(mean = 1.5, sd = 1), 
-                # geom = "line", aes(colour = "Ha"), size = 1) + 
-  scale_colour_manual("Гипотеза", values = c("red3")) +
-  labs(x = "Z", 
-       y = "Плотность\nвероятности") + th
-gg_norm_h0
+```{r echo=FALSE, purl=FALSE}
+n <- 33
+set.seed(1814)
+X <- rnorm(n, mean = 8.5, sd = 3.2)
+x <- round(mean(X), 1)
+s <- round(sd(X), 1)
+mu <- 7
 ```
 
-Одни значения тестовой статистики будут встречаться часто, другие --- редко.
+Представьте, что в одной статье сказано, что средняя плодовитость черепах определенного вида --- `r mu` яиц в кладке.
 
-## Доверительная вероятность (p-value)
+В вашей выборке из $`r n`$ черепах --- $\bar x = `r x`$, $s = `r s`$.
 
-Площадь под любым участком этой кривой соответствует вероятности получения значений тестовой статистики в этом интервале (при условии справедливости $H_0$).
-
-Вероятность получить _такое или более экстремальное_ эмпирическое значение (при условии справедливости $H_0$) --- это __доверительная вероятность__ (p-value)
-
-Обычно нам все равно, в какой из хвостов теоретического распределения попадает наше значение тестовой статистики, поэтому мы обычно учитываем оба
-
-$$P = P(z_{observed} < |z_0|~и~z_{observed} > |z_0|)$$
-
-```{r hypoth-p, echo = FALSE, purl = FALSE, fig.width=10, fig.height=2.5}
-# |z|
-Z_large <- 1.5 
-Z_small <- 2.3
-
-gg_large_p <- gg_norm_h0 +
-  # p
-  stat_function(fun = dnorm_limit, 
-                args = list(alph = 2*pnorm(-abs(Z_large))), 
-                geom = "area", fill = "grey", alpha = 0.7) + 
-  # limits
-  geom_vline(xintercept = Z_large, size = 1, linetype = "dotted") +
-  geom_vline(xintercept = -Z_large, size = 1, linetype = "dotted") +
-    annotate(geom = "text", x = -Z_large, y = 0.1, hjust = 1.3,
-           label = "P(z[obs] <= -z[0])", parse = TRUE) +
-      annotate(geom = "text", x = Z_large, y = 0.1, hjust = -0.3,
-           label = "P(z[obs] >= z[0])", parse = TRUE) +
-      annotate(geom = "text", x = 0, y = 0.41, hjust = 0.5,
-           label = "group('|',z[0],'|') == 1.5", parse = TRUE) +
-  theme(legend.position = "none") +
-  labs(title = paste("Большая доверительная вероятность\nP =", round(2*pnorm(-abs(Z_large)), 2)))
-
-gg_small_p <- gg_norm_h0 + 
-  # p
-  stat_function(fun = dnorm_limit, 
-                args = list(alph = 2*pnorm(-abs(Z_small))), 
-                geom = "area", fill = "grey", alpha = 0.7) + 
-  # limits
-  geom_vline(xintercept = Z_small, size = 1, linetype = "dotted") +
-  geom_vline(xintercept = -Z_small, size = 1, linetype = "dotted") +
-    annotate(geom = "text", x = -Z_small, y = 0.1, hjust = 1.1,
-           label = "P(z[obs] <= -z[0])", parse = TRUE) +
-      annotate(geom = "text", x = Z_small, y = 0.1, hjust = -0.1,
-           label = "P(z[obs] >= z[0])", parse = TRUE) +
-      annotate(geom = "text", x = 0, y = 0.41, hjust = 0.5,
-           label = "group('|',z[0],'|') == 2.3", parse = TRUE) +
-  labs(title = paste("Небольшая доверительная вероятность\nP =", round(2*pnorm(-abs(Z_small)), 2)))
-
-grid.arrange(gg_large_p, gg_small_p, nrow = 1, widths = c(0.47, 0.53))
+```{r echo=FALSE, eval=FALSE}
+mu <- 7
+X <- c(5.7, 11.6, 5.7, 9.89, 9.01, 10.1, 12.4, 2.37, 7.21, 6.86, 9.77, 10.6, 3.82, 13.7, 6.01, 10.2, 7.36, 14.8, 10.1, 8.44, 10.5, 8.85, 4.18, 9.12, 12.3, 7.83, 9.51, 4.01, 9.75, 7.59, 0.769, 8.5, 10.8)
+(n <- length(X))
+(x <- mean(X))
+(s <- sd(X))
 ```
 
-## Уровень значимости $\alpha$
+Отличается ли реальная плодовитость в обследованной вами популяции черепах от того, что указано в статье?
 
-Считается, что если вероятность получить конкретное значение тестовой статистики в условиях справедливой $H_0$ достаточно мала, то такую нулевую гипотезу можно отвергнуть.
-
-__Уровень значимости $\alpha$ --- это вероятность ошибочно отвергнуть справедливую нулевую гипотезу__. Т.е. это вероятность найти различия там, где их нет (__вероятность ошибки I рода__). Обычно выбирают уровень значимости $\alpha = 0.05$, реже $0.01$
-
-Для z-теста  $\alpha$ --- это вероятность ошибочно сделать вывод о том, что средние выборок различаются __при условии, что эти выборки получены из одной генеральной совокупности__.
-
-```{r alpha, echo = FALSE, purl = FALSE, fig.height=3, fig.width=10}
-gg_norm_h0 +
-  # alpha
-  stat_function(fun = dnorm_limit, 
-                args = list(alph = 0.05), 
-                geom = "area", fill = "red", alpha = 0.2) +
-  geom_vline(xintercept = 1.96*c(-1, 1), size = 1, linetype = "dashed", colour = "red3") +
-  annotate(geom = "text", x = -1.96, y = 0.04, hjust = 1.6,
-           label = "alpha/2", parse = TRUE) +
-      annotate(geom = "text", x = 1.96, y = 0.04, hjust = -0.6,
-           label = "alpha/2", parse = TRUE) +
-  labs(title = "Тестирование гипотез при помощи z-теста") + 
-  # редкие
-  annotate(geom = "text", x = -4, y = 0.1, label = "Редкие значения\nP ≤ α, отвергаем H0") + 
-  annotate(geom = "text", x = 4, y = 0.1, label = "Редкие значения\nP ≤ α, отвергаем H0") + 
-  annotate(geom = "text", x = 0, y = 0.1, label = "Обычные значения\nP > α, сохраняем H0") + 
-    annotate(geom = "text", x = 0, y = 0.42, hjust = 0.5, 
-           label = "-z и z при alpha 0.05")
-```
-
-## Тестирование гипотез: Как принять решение?
-
-### Алгоритм действий
-
-1. Для конкретных данных получаем значение тестовой статистики
-2. Сравниваем его с теоретическим распределением (распределением при условии, что $H_0$ верна) и находим вероятность найти более экстремальное значение тестовой статистики
-3. Решаем, отвергнуть ли $H_0$:
-    + Если $P \le \alpha$, отвергаем $H_0$
-    + Если $P > \alpha$, сохраняем $H_0$
-
-```{r hypoth-p-alpha, echo = FALSE, purl = FALSE, fig.width=10, fig.height=3}
-gg_large_p_alpha <- gg_large_p +
-  # alpha
-  stat_function(fun = dnorm_limit, 
-                args = list(alph = 0.05), 
-                geom = "area", fill = "red", alpha = 0.2) +
-  # geom_vline(xintercept = 1.96*c(-1, 1), size = 1, linetype = "dashed", colour = "red3") +
-  annotate(geom = "text", x = -1.96, y = 0.04, hjust = 1.6,
-           label = "alpha/2", parse = TRUE) +
-      annotate(geom = "text", x = 1.96, y = 0.04, hjust = -0.6,
-           label = "alpha/2", parse = TRUE) +
-    labs(title = "P > α, сохраняем H0")
-
-gg_small_p_alpha <- gg_small_p + 
-  # alpha
-  stat_function(fun = dnorm_limit, 
-                args = list(alph = 0.05), 
-                geom = "area", fill = "red", alpha = 0.2) +
-  # geom_vline(xintercept = 1.96*c(-1, 1), size = 1, linetype = "dashed", colour = "red3") +
-    annotate(geom = "text", x = -1.96, y = 0.04, hjust = 1.6,
-           label = "alpha/2", parse = TRUE) +
-      annotate(geom = "text", x = 1.96, y = 0.04, hjust = -0.6,
-           label = "alpha/2", parse = TRUE) +
-    labs(title = "P ≤ α, отвергаем H0")
+![](images/gopher-tortoise.jpg)
 
 
-grid.arrange(gg_large_p_alpha, gg_small_p_alpha, nrow = 1, widths = c(0.47, 0.53))
-```
-
-## Доверительная вероятность (p-value).
-
-### Ещё раз, другими словами
-
-Допустим, мы сравнили выборки и получили $р = 0.03$
-
-$p = 0.03$ --- __это не значит__, что $H_0$ верна с вероятностью 3%!
-
-$p = 0.03$ --- __это значит__, что если выборки одинаковы, а $H_0$ верна, шанс получить результат, который мы получили составляет 3%.
-
-Уже мы сами решаем, кажется ли нам такая вероятность приемлемой (сравниваем с выбранным уровнем значимости $\alpha$)
+<small>Gopher Tortoise by Judy Gallagher on Flickr</small>
+<!-- https://flic.kr/p/Q2ZozS -->
 
 
-<!-- ## Операции с распределениями -->
+## Одновыборочный t-тест
 
-<!-- Давайте познакомимся с тремя полезными функциями для работы с распределениями: `r, q, p` -->
+- $H_0: \mu = \mu_0$ --- Реальная средняя плодовитость черепах такая, как в статье.
+- $H_A: \mu \ne \mu_0$ --- Средняя плодовитость отличается от того, что написано в статье.
 
-<!-- ### r = random number generation. -->
+$\mu_0$ --- это какое-то конкретное значение. В нашей задаче это --- `r mu` яиц в кладке.
 
-<!-- С помощью этой функции можно смоделировать взятие выборки из генеральной совокупности с заданными параметрами. -->
+<br/>
 
-<!-- Например: `rnorm(1000, mean = 20, sd = 2)` сгенерирует выборку в 1000 случайных значений из нормального распределения. -->
+$$t = \cfrac{\bar x - \mu}{ s / \sqrt{n} }$$
 
-
-<!-- ### q = quantile function. -->
-
-<!-- С ее помощью можно получить квантиль (точнее персентиль) - то значение переменной, которое отсекает заданную часть распределения. -->
-
-<!-- Например: `qnorm(0.5, mean = 20, sd = 2)` вернет среднюю, т.к. ровно 50% значений в нормальном распределении $< \mu$ -->
-
-<!-- `qnorm(0.025, mean = 20, sd = 2)` вернет то значение X, которое делит распределение на куски в 2.5% и 97.5%, т.е. 2.5% всех значений будут меньше, а 97.5% - больше него. -->
-
-<!-- ### p = probability distribution function -->
-
-<!-- С ее помощью можно рассчитать вероятность того, что случайная величина, взятая из данного распределения, окажется меньше заданного нами значения. -->
-
-<!-- Эта операция принципиально обратна тому, что делает `q`. -->
-
-<!-- Например: `pnorm(20, mean = 20, sd = 2)` вернет вероятность 0.5, или 50%, поскольку мы передали ей в качестве аргумента среднюю -->
-
-<!-- Эта функция работает кумулятивно: -->
-
-<!-- ```{r} -->
-<!-- round(pnorm(c(0, 15, 20, 25, 40), 20, 2), 3) -->
-<!-- ``` -->
-
-# t-статистика
-
-
-## Z-тест непригоден для проверки равенства средних в малых выборках
-
-$H_0: \bar x_1 - \bar x_2 = 0$, $H_A: \bar x_1 - \bar x_2 \ne 0$
-
-Для малых выборок нельзя использовать Z-тест для проверки $H_0: \bar x_1 - \bar x_2 = 0$, поскольку в этом случае стандартизованная разница средних уже не подчиняется нормальному распределению
-
-
-## t-статиктика Стьюдента (t-критерий)
-
-Гипотезы: $H_0: \bar{x}_1 = \bar{x}_2$, $H_A: \bar{x}_1 \ne \bar{x}_2$
-
-Двухвыборочный тест Стьюдента (Student, 1908) используется для проверки значимости различий между средними значениями двух нормально распределенных величин.
-
-$$t=\frac{\bar{x}_1 - \bar{x}_2}{SE}$$
+Если выполняется ЦПТ, то одновыборочная $t$-статистика подчиняется $t$-распределению  
+с числом степеней свободы $df = n - 1$.
 
 Условия применимости:
 
-- Выборки случайны и независимы друг от друга
-- Величины нормально распределены
-- __Дисперсии в группах одинаковы__
+- Наблюдения в выборке должны быть независимы друг от друга.
+- Объем выборки достаточно велик **или** величины нормально распределены.
 
-- $\bar x_1 - \bar x_2$ --- это разность между двумя средними значениями  
-- $SE = \sqrt{\frac{s_1^2(n_1-1) +s_2^2(n_2-1)}{n_1+n_2-2}\Big(\frac{1}{n_1} + \frac{1}{n_2}\Big)}$ --- Обобщенное стандартная ошибка разности двух средних
-- $df = (n_1 - 1) + (n_2 - 1) = n_1 + n_2 - 2$ --- число степеней свободы
+## Проверяем, нормально ли распределение
 
-## t-тест Уэлча --- это модификация теста Стьюдента __для случая разных дисперсий__
-
-$$t=\frac{\bar{x}_1 - \bar{x}_2}{SE}$$
-
-Условия применимости:
-
-- Выборки случайны и независимы друг от друга
-- Величины нормально распределены
-
-
-$$SE = \sqrt{\frac {s_1^2} {n_1} + \frac {s_2^2} {n_2}}$$
-
-Приблизительное число степеней свободы рассчитывается по уравнению Уэлча-Саттеруэйта 
-
-$$df_{ Welch–Satterthwaite} \approx \frac {\Big(\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}\Big)^2} {\frac {s_1^4} {n^2_1 \cdot df_1} + \frac {s_2^4} {n^2_2 \cdot df_1}}$$
-
-
-## t-распределение --- распределение разницы средних для выборок из одной совокупности
-
-t-статистика подчиняется t-распределению.
-
-Иными словами, если много раз взять выборки __из одной__ совокупности (т.е. при условии, что $H_0$ верна) и посчитать между ними разницу, то она будет подчиняться t-распределению. 
-
-Форма t-распределения зависит только от одного параметра --- числа степеней свободы $df = n_1 + n_2 - 2$
-
-При больших объемах выборок форма t-распределения приближается к нормальному
-
-
-```{r gg-t, echo=FALSE, purl=FALSE}
-t_df <- data.frame(t = seq(-6, 6, length.out = 1000))
-
-gg_t <- ggplot(data = t_df, aes(x = t)) +
-    labs(x = "Стандартизованная разница средних", 
-       y = "Плотность\nвероятности", 
-       title = "t-распределение")
-
-gg_t + 
-  stat_function(fun = dt, args = list(df = 2), size = 1, geom = "line", aes(colour = "2")) + 
-  stat_function(fun = dt, args = list(df = 4), size = 1, geom = "line", aes(colour = "4")) +   stat_function(fun = dt, args = list(df = 10), size = 1, geom = "line", aes(colour = "10")) + 
-  stat_function(fun = dt, args = list(df = 100), size = 1, geom = "line", aes(colour = "100")) + 
-  scale_colour_manual("df", values = c("2" = "#bd0026", "4" = "#f03b20", "10" = "#fd8d3c", "100" = "#fed976"), breaks = c("2", "4", "10", "100"))
+```{r echo=FALSE, purl=FALSE, fig.width=5.8, fig.height=5}
+library(car)
+qqPlot(X, id = FALSE)
 ```
 
-## Уровень значимости $\alpha$
+## Вычислим наблюдаемое значение $t$-статистики
 
-Для t-теста  $\alpha$ --- это вероятность ошибочно сделать вывод о том, что средние выборок различаются __при условии, что эти выборки получены из одной генеральной совокупности__.
+$$t = \cfrac{\bar x - \mu}{ s / \sqrt{n} }$$
+Средняя плодовитость в выборке из `r n` черепах $\bar x = `r x`$, стандартное отклонение $s = `r s`$.
+В статье указана плодовитость $`r mu`$.
 
-```{r gg-tcrit, echo=FALSE, purl=FALSE}
-alpha <- 0.05
-df <- 18
-sides <- 2
-p_cut <- abs(qt(p = alpha/sides, df = df))
-gg_t + 
-  # alpha
-  stat_function(fun = dt_limit, 
-                args = list(alph = alpha, df = df, sides = sides), 
-                geom = "area", fill = "red", alpha = 0.7) + 
-  stat_function(fun = dt, args=list(df=df), 
-                geom = "line", colour = "darkred") +
-  labs(title = "Тестирование гипотез при помощи t-теста") + 
-  # редкие
-  annotate(geom = "text", x = -4, y = 0.1, label = "Редкие значения\nP ≤ α, отвергаем H0") + 
-  annotate(geom = "text", x = 4, y = 0.1, label = "Редкие значения\nP ≤ α, отвергаем H0") + 
-  annotate(geom = "text", x = 0, y = 0.1, label = "Обычные значения\nP > α, сохраняем H0") + 
-  geom_vline(xintercept = p_cut, size = 1, linetype = "dotted") +
-  geom_vline(xintercept = -p_cut, size = 1, linetype = "dotted") +
-    annotate(geom = "text", x = -p_cut, y = 0.4, hjust = 1.1, 
-           label = "-t и t при alpha 0.05") 
+
+```{r echo=FALSE}
+t_val <- round((x - mu) / (s / sqrt(n)), 1)
+p_val <- format(2*pt(-t_val, df = n - 1), digits = 1, nsmall = 3)
 ```
 
-## Тестирование гипотезы о равенстве двух средних при помощи t-теста
 
-### Алгоритм действий
+$$t = \cfrac{`r x` - `r mu`}{ `r s` / \sqrt{`r n`} } = `r t_val`$$
 
-1. Для конкретных данных считаем значение t-критерия
-2. Сравниваем его с теоретическим распределением t (распределением при условии, что $H_0$ верна) при данном числе степеней свободы df. Находим p --- вероятность найти более экстремальное значение тестовой статистики.
-3. Решаем, отвергнуть ли $H_0$:
-    + Если $P \le \alpha$, отвергаем $H_0$
-    + Если $P > \alpha$, сохраняем $H_0$
+## Насколько это значение согласуется с $H_0$?
 
-```{r gg-tcrit-h, echo=FALSE, purl=FALSE, fig.width=10}
-# |t|
-T_large <- 1.5 
-T_small <- 2.3
-  
-gg_t_large_p_alpha <- gg_t +
-    stat_function(fun = dt, args = list(df = df), 
-                geom = "line", colour="darkred", size = 1, aes(colour = "H0")) +
-# p
-stat_function(fun = dt_limit, 
-              args = list(alph = 2*pt(-abs(T_large), df = df)), 
-              geom = "area", fill = "grey", alpha = 0.7) + 
-  # alpha
-  stat_function(fun = dt_limit, 
-                args = list(alph = alpha, df = df, sides = sides), 
-                geom = "area", fill = "red", alpha = 0.2) +
-  
-    # limits
-  geom_vline(xintercept = T_large, size = 1, linetype = "dotted") +
-  geom_vline(xintercept = -T_large, size = 1, linetype = "dotted") +
-  annotate(geom = "text", x = -T_large, y = 0.1, hjust = 1.3,
-           label = "P(t[obs] <= -t[0])", parse = TRUE) +
-  annotate(geom = "text", x = T_large, y = 0.1, hjust = -0.3,
-           label = "P(t[obs] >= t[0])", parse = TRUE) +
-  annotate(geom = "text", x = 0, y = 0.41, hjust = 0.5,
-           label = "group('|', t[0], '|') == 1.5", parse = TRUE) +
-  theme(legend.position = "none") +
-# tails
-  annotate(geom = "text", x = qt(0.025, df = 18), y = 0.04, hjust = 1.6,
-           label = "alpha/2", parse = TRUE) +
-      annotate(geom = "text", x = qt(0.975, df = 18), y = 0.04, hjust = -0.6,
-           label = "alpha/2", parse = TRUE) +
-    labs(title = "P > α, сохраняем H0")
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
+library(ggplot2)
+theme_set(theme_bw())
+cols <- c('orange', 'red')
+labs <- c(paste('p =', p_val), expression(alpha ==0.05))
+mappings <- factor(c('p', 'alpha'), levels = c('p', 'alpha'), labels = labs)
+names(cols) <- labs
 
-gg_t_small_p_alpha <- gg_t + 
-    stat_function(fun=dt, args=list(df=df), 
-                geom="line", colour="darkred", size = 1, aes(colour = "H0")) +
-  # p
-stat_function(fun = dt_limit, 
-              args = list(alph = 2*pt(-abs(T_small), df = df)), 
-              geom = "area", fill = "grey", alpha = 0.7) + 
-  # alpha
-  stat_function(fun = dt_limit, 
-                args = list(alph = alpha, df = df, sides = sides), 
-                geom = "area", fill = "red", alpha = 0.2) +
-    # limits
-  geom_vline(xintercept = T_small, size = 1, linetype = "dotted") +
-  geom_vline(xintercept = -T_small, size = 1, linetype = "dotted") +
-  annotate(geom = "text", x = -T_small, y = 0.1, hjust = 1.1,
-           label = "P(t[obs] <= -t[0])", parse = TRUE) +
-  annotate(geom = "text", x = T_small, y = 0.1, hjust = -0.1,
-           label = "P(t[obs] >= t[0])", parse = TRUE) +
-  annotate(geom = "text", x = 0, y = 0.41, hjust = 0.5,
-           label = "group('|', t[0], '|') == 2.3", parse = TRUE) +
-  # tails
-  annotate(geom = "text", x = qt(0.025, df = 18), y = 0.04, hjust = 1.6,
-           label = "alpha/2", parse = TRUE) +
-      annotate(geom = "text", x = qt(0.975, df = 18), y = 0.04, hjust = -0.6,
-           label = "alpha/2", parse = TRUE) +
-    labs(title = "P ≤ α, отвергаем H0")
+gg_test_0 <- ggplot(data = data.frame(t = -4:4), aes(x = t)) + 
+  stat_function(fun = dt, args = list(df = n - 1), colour = 'steelblue', size = 1) +
+  scale_x_continuous(breaks = -4:4, 
+                     sec.axis = sec_axis(~.  * (s / sqrt(n))+ mu, 
+                                         name = 'Наблюдаемое значение',
+                                         breaks = seq(2, 18, 1))) +
+  coord_cartesian(ylim = c(0, 0.5), xlim = c(-3.8, 3.8)) +
+  labs(y = 'Плотность вероятности')
 
+gg_test_t <- gg_test_0 +
+  # Выноски для t
+  annotate(geom = 'segment', 
+           x = c(-t_val, t_val), 
+           y = dt(c(-t_val, t_val), df = n - 1) + 0.15,
+           xend = c(-t_val, t_val), 
+           yend = c(0, 0), 
+           arrow = ar) +
+    # Подпись t
+  annotate(geom = 'text', label = c(paste('-t =', -t_val), paste('t =', t_val)),
+           x = c(-t_val, t_val), 
+           y = dt(c(-t_val, t_val), df = n - 1) + 0.15,
+           vjust = -0.3)
 
-grid.arrange(gg_t_large_p_alpha, gg_t_small_p_alpha, nrow = 1, widths = c(0.47, 0.53))
+gg_test_p <- gg_test_t +
+    # Площадь под кривой
+  stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
+                aes(fill = mappings[1]), xlim = c(-4, -t_val), alpha = 0.7) +
+  stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
+               aes(fill = mappings[1]), xlim = c(t_val, 4), alpha = 0.7) +
+  scale_fill_manual('', values = cols) +
+  theme(legend.position = c(0.14, 0.96), legend.background = element_blank())
+
+gg_test_alpha <- gg_test_0 + 
+  # geom_vline(xintercept = qt(c(0.025, 0.975), df = n - 1), linetype = 2) +
+        # Уровень значимости
+  stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
+                aes(fill = mappings[2]), xlim = c(-4, qt(0.025, df = n - 1)), alpha = 0.3) +
+  stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
+                aes(fill = mappings[2]), xlim = c(qt(0.975, df = n - 1), 4), alpha = 0.3) +
+   scale_fill_manual('', values = cols, labels = labs[2])+
+  guides(fill = guide_legend(override.aes = list(alpha = 0.4))) +
+  theme(legend.position = c(0.13, 0.96), legend.background = element_blank())
+
+gg_test_alpha_p <- gg_test_t + 
+  # Критический уровень значимости
+  stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
+                aes(fill = mappings[2]), xlim = c(-4, qt(0.025, df = n - 1)), alpha = 0.3) +
+  stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
+                aes(fill = mappings[2]), xlim = c(qt(0.975, df = n - 1), 4), alpha = 0.3) +
+  # Значение p, уровень значимости
+  stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
+                aes(fill = mappings[1]), xlim = c(-4, -t_val), alpha = 0.8) +
+  stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
+                aes(fill = mappings[1]), xlim = c(t_val, 4), alpha = 0.8) +
+  scale_fill_manual('', values = cols, labels = rev(labs)) +
+  guides(fill = guide_legend(override.aes = list(alpha = 0.25)))+
+  theme(legend.position = c(0.14, 0.92), legend.background = element_blank())
+
+gg_test_t # реальное t
+# gg_test_p # уровень значимости
+# gg_test_alpha # критический уровень значимости
+# gg_test_alpha_p # сравнение с уровнем значимости
 ```
 
+
+При $H_0$ значение $t$ будет близко к нулю.
+
+Насколько необычны значения t меньше или больше $\pm `r t_val`$?
+
+
+## Уровень значимости ($p$-value)
+
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
+gg_test_p # Значение p
+```
+
+
+__Уровень значимости__ --- это вероятность получить значение $t$ меньше или больше данного, если бы $H_0$ была справедлива.
+
+
+## Уровень значимости ($p$-value)
+
+\columnsbegin
+\column{0.49\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
+gg_test_p # Значение p
+```
+
+\column{0.49\textwidth}
+
+Можно вычислить значение $p$
+
+```{r purl=FALSE}
+2 * ( 1 - pt(2.7, df = 33 - 1) )
+```
+
+Если бы плодовитость не отличалось от указанной в статье, получить $t$ меньше или больше $`r t_val`$ можно было бы с вероятностью $p = `r p_val`$. 
+
+\columnsend
+
+
+## Критический уровень значимости
+
+
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
+gg_test_alpha +  geom_vline(xintercept = qt(c(0.025, 0.975), df = n - 1), linetype = 2)
+```
+
+
+Критический уровень значимости $\alpha$ --- это порог для принятия решений.
+
+Обычно используют $\alpha = 0.05$.
+
+Если $p \le \alpha$ --- отвергаем $H_0$  и принимаем $H_A$.
+
+Если $p > \alpha$ --- сохраняем $H_0$,  не можем ее отвергнуть.
+
+
+
+## Принимаем решение
+
+
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
+gg_test_alpha_p
+```
+
+
+Мы получили $p < \alpha$, поэтому отвергаем $H_0$ и принимаем $H_A$.
+
+Фактическая плодовитость статистически значимо отличается от указанной в статье.
+
+
+## Заблуждения о $p$-values
+
+>- Правда ли, что $p$ --- вероятность того, что верна сама $H_0$?  
+>- Нет! Значение $p$ всегда считается __при условии, что $H_0$ верна__. Но $H_0$ может быть неверна.
+
+<br/>
+
+>- Правда ли, что $p$ --- это вероятность получить такое значение статистики при справедливой $H_0$?
+>- Нет! Вероятность вычисляется как площадь под участком кривой.  Конкретное значение статистики --- это точка и под ней нет площади.
+
+<br/>
+
+>- Правда ли, что если $p > 0.05$, то различий между группами на самом деле нет?  
+>- Нет! Это значит, что наблюдаемый эффект согласуется с нулевой гипотезой. Различия могут быть.
+
+
+# Двухвыборочный t-тест
+
+## Гипотезы в двухвыборочном $t$-тесте и тестовая статистика
+
+$H_0: \mu_1 - \mu_2 = 0$ --- средние значения не различаются в двух группах
+
+$H_A: \mu_1 - \mu_2 \ne 0$ --- средние значения различаются
+
+\vspace{1\baselineskip}
+
+Т.е. нас интересует __разность выборочных средних__.
+
+Ее ожидаемое значение при $H_0$ будет 0.
+
+
+t-тест в общем виде выглядит так
+
+$$t=\frac{\text{Наблюдаемая~величина - Ожидаемое~значение}}{\text{Стандартная~ошибка}}$$
+
+## t-тест и его разновидности
+
+Двухвыборочный t-тест используется для проверки значимости различий между средними
+
+$$t=\frac{(\bar{x}_1 - \bar{x}_2) - (\mu_1 - \mu_2)}{SE_{\bar{x}_1 - \bar{x}_2}} \; = \; \frac{\bar{x}_1 - \bar{x}_2}{SE_{\bar{x}_1 - \bar{x}_2}}$$
+
+\pause
+
+$SE_{\bar{x}_1 - \bar{x}_2}$ --- стандартная ошибка разности двух средних, может рассчитываться по-разному
+
+- t-тест Стьюдента --- если считать, что дисперсии в группах равны
+- t-тест Уэлча --- если считать, что дисперсии могут быть разными
+
+## Стандартная ошибка разности средних в t-тесте Стьюдента
+
+\note{Student 1908}
+
+Если группы независимы и дисперсии в них равны, то по центральной предельной теореме
+
+$$SE_{\bar{x}_1 - \bar{x}_2} = \sqrt{ \frac{\sigma^2}{n_{1}} + \frac{\sigma^2}{n_{2}}} \approx \sqrt{ \frac{s^2}{n_{1}} + \frac{s^2}{n_{2}}}$$
+
+$s^2 = \cfrac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2}{n_1 + n_2 - 2}$ --- это __обобщенная дисперсия__ по двум выборкам.
+
+Результирующая $t$-статистика подчиняется $t$-распределению с  $df = n_1 + n_2 - 2$.
+
+\pause
+
+Осторожно, равенство дисперсий в группах ---  
+это часто нереалистичное предположение!
+
+
+## Cтандартная ошибка разности средних в t-тесте Уэлча
+
+Если группы независимы и дисперсии в них неизвестны, то получается
+
+$$SE_{\bar{x}_1 - \bar{x}_2} = \sqrt{ \frac{\sigma^2_{1}}{n_{1}} + \frac{\sigma^2_{2}}{n_{2}}} \approx \sqrt{ \frac{s^2_{1}}{n_{1}} + \frac{s^2_{2}}{n_{2}}}$$
+\pause
+
+Проблема в том, что эта величина __лишь приблизительно следует t-распределению__, если считать его степени свободы как обычно для двух групп $df = n_1 + n_2 - 2$.
+
+Это из-за того, что мы оцениваем __две__ дисперсии  
+при помощи их стандартных отклонений. 
+
+## Приблизительное число степеней свободы
+
+Можно рассчитать по уравнению Уэлча-Саттеруэйта. Это решит проблему. 
+
+$$df_{ Welch-Satterthwaite} \approx \cfrac {\bigg(\cfrac{s^2_{1}}{n_{1}} + \cfrac{s^2_{2}}{n_{2}}\bigg)^2}
+{\cfrac{1}{n_{1} - 1}\bigg(\cfrac {s_{1}^2} {n_{1}}\bigg)^2 + \cfrac{1}{n_{2} - 1}\bigg(\cfrac {s_{2}^2} {n_{2}}\bigg)^2}$$
+
+
+t-тестом Уэлча можно пользоваться, даже если дисперсии равны.
+
+Он немного консервативнее, чем тест Стьюдента.
+
+## Условия применимости двухвыборочного t-теста
+
+Почти такие же, как условия справедливости ЦПТ
+
+- Наблюдения независимы друг от друга.
+- Выборки независимы друг от друга (новое условие).
+- Объем выборки достаточно велик или величины нормально распределены.
 
 # Применение t-теста
 
@@ -821,7 +961,7 @@ head(sleep)
 # str(sleep)
 ```
 
-## Двухвыборочный t-критерий
+## Двухвыборочный t-тест
 
 Сравним увеличение продолжительности сна при помощи двухвыборочного t-критерия.
 
@@ -893,11 +1033,10 @@ t.test(rem$time[rem$group == 1], rem$time[rem$group == 2])
 
 ## Take-home messages
 
-- Стандартизация --- преобразование данных в отклонения от среднего значения, измеренные в стандартных отклонениях
-- Стандартное нормальное распределение удобно для расчетов вероятностей
-- Вероятность попадания случайной величины в произвольный интервал можно получить в результате интегрирования кривой распределения на этом интервале
-- При тестировании нулевой гипотезы оценивают вероятность получения данного или более экстремального значения тестовой статистики при условии справедливости нулевой гипотезы. Если эта вероятность меньше выбранного уровня значимости, то нулевую гипотезу отвергают
-- Для сравнения выборочных средних в независимых выборках лучше использовать t-критерий Уэлча, который учитывает, что дисперсии в выборках могут быть разными
+- По центральной предельной теореме выборочные средние нормально распределены $$\bar X \sim N (\mu, \sigma / \sqrt{n})$$.
+- Доверительный интервал к среднему значению можно построить из нормального распределения, если известна $\sigma$ в генеральной совокупности, или из $t$-распределения, если она не известна.
+- При тестировании нулевой гипотезы оценивают вероятность получения данного или более экстремального значения тестовой статистики при условии, что $H_0$ справедлива. Если эта вероятность меньше выбранного критического уровня значимости, то нулевую гипотезу отвергают.
+- Для сравнения выборочных средних в независимых выборках лучше использовать t-критерий Уэлча, который учитывает, что дисперсии в выборках могут быть разными.
 
 ## Дополнительные ресурсы
 
