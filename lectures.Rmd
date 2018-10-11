@@ -51,9 +51,9 @@ install.packages("car")
 ### 05.1 Простая линейная регрессия  (11 окт)
 
 <!-- - Презентация: [05.1_LM.html](05.1_LM.html) -->
-<!-- - Код: [05.1_LM_code.R](05.1_LM_code.R) -->
-<!-- - Данные:  -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
+- Код: [05.1_LM_code.R](05.1_LM_code.R)
+- Данные:
+    + [IQ_brain.csv](data/IQ_brain.csv)
 <!--     + [secher.xls](data/secher.xls) -->
 
 ### 05.2 Краткое введение в мир матричной алгебры (15 окт. 1 пара)
