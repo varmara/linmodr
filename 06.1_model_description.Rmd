@@ -1,0 +1,390 @@
+---
+title: "Описание и проверка значимости линейных моделей"
+author: Марина Варфоломеева, Вадим Хайтов
+output:
+  ioslides_presentation:
+    widescreen: true
+    css: assets/my_styles.css
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, 
+               fig.width = 7, fig.height = 3, 
+               warning = FALSE, message = FALSE)
+```
+
+## Описание и проверка значимости линейных моделей
+
+### Вы сможете
+
+- Подобрать линейную модель зависимости переменной-отклика от одного предиктора
+- Протестировать значимость линейной модели в целом и значимость отдельных ее коэффициентов при помощи t и F критериев
+
+```{r echo=FALSE, purl=FALSE}
+lm_equation <- function(fit, strict = TRUE, rnd = 2){
+#   extracting call formula 
+  frml <- as.character(fit$call)[2]
+#   extract signs
+    sign <- ifelse(grepl("-", coef(fit)[-1]), " - ", " + ")
+  # extract coefficients
+  coeffs <- format(round(abs(coef(fit)), rnd), digits = 2, nsmall = rnd, trim = TRUE)
+  if(strict == TRUE){
+    i <- 1:(length(coeffs) - 1)
+    vars <- c("Y", paste0(" X", i))
+    
+  } else {
+# extract vector of variable names
+  vars <- c(all.vars(formula(fit))[1], names(fit$coefficients)[-1])
+# combine everything
+  }
+  start <- ifelse(coef(fit)[1] > 0, paste(vars[1], coeffs[1], sep = " = "), paste(vars[1], coeffs[1], sep = " = - "))
+  end <- paste(sign, coeffs[-1], vars[-1], sep = "", collapse = "")
+  return(paste0(start, end, sep = ""))
+}
+```
+
+
+# Вспомним пример из прошлой лекции
+
+## Пример: IQ и размеры мозга
+
+Зависит ли уровень интеллекта от размера головного мозга? (Willerman et al. 1991)
+
+<div class="columns-2"> 
+
+![Scan_03_11](images/MRI-Scan_03_11-by_bucaorg(Paul_Burnett)_no_Flickr.jpg)
+<small>[Scan_03_11](https://flic.kr/p/c45eZ3) by bucaorg(Paul_Burnett) on Flickr</small>  
+
+<br/>
+
+Было исследовано 20 девушек и 20 молодых людей
+
+У каждого индивида измеряли:
+
+- вес
+- рост
+- размер головного мозга (количество пикселей на изображении ЯМР сканера)
+- Уровень интеллекта измеряли с помощью IQ тестов
+
+<small>Пример: Willerman, L., Schultz, R., Rutledge, J. N., and Bigler, E. (1991), "In Vivo Brain Size and Intelligence", Intelligence, 15, p.223--228.  
+Данные: ["The Data and Story Library"](http://lib.stat.cmu.edu/DASL)  
+Фото: [Scan\_03\_11](https://flic.kr/p/c45eZ3) by bucaorg (Paul Burnett) on Flickr
+</small>
+
+</div>
+
+## Вспомним, на чем мы остановились
+
+```{r echo=FALSE, purl=TRUE}
+## Код из прошлой лекции #################################
+
+## Открываем данные
+library(readxl)
+brain <- read.csv("data/IQ_brain.csv", header = TRUE)
+
+## Линейная модель
+brain_model <- lm(PIQ ~ MRINACount, data = brain)
+summary(brain_model)
+```
+
+## Уравнение и график зависимости
+
+$$PIQ_i = 1.744 + 0.0001202 \cdot MRINACount_i$$
+
+```{r echo=FALSE, purl=TRUE}
+library(ggplot2)
+theme_set(theme_bw())
+ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
+  geom_point() + 
+  geom_smooth(method = "lm")
+```
+
+# Тестирование гипотез о линейных моделях
+ 
+ 
+## Способы проверки значимости модели и ее коэффициентов
+
+Два равноправных способа
+
+### Значима ли модель целиком?
+
++ F критерий: действительно ли объясненная моделью дисперсия $MS_{r}$ больше, чем случайная (= остаточная) дисперсия $MS_{e}$?
+
+### Значима ли связь между предиктором и откликом?
+
++ t-критерий: отличается ли от нуля коэффициент $b_k$ при этом предикторе $x_k$
++ F-критерий: действительно ли объясненная предиктором дисперсия $MS_{x_{k}}$ больше, чем случайная (= остаточная) дисперсия $MS_{e}$?
+
+# Тестирование гипотез с помощью t-критерия  
+
+## Тестирование гипотез с помощью t-критерия  
+
+Зависимость есть, если $\beta_k \ne 0$
+
+Нулевая гипотеза $H_0: \beta_k = 0$
+
+Тестируем гипотезу при помощи t-критерия
+
+$$t=\frac{b_k - \beta_k}{SE_{b_k}} = \frac{b_k}{SE_{b_k}}$$
+
+Число степеней свободы: $df = n − p$, где $n$ --- объем выборки, $p$ --- число параметров модели, $k$ --- конкретный коэффициент регрессии. 
+
+Для простой линейной регрессии с одним предиктором $df = n - 2$.
+
+
+## Зависит ли IQ от размера головного мозга? {.smaller}
+
+$$PIQ_i = 1.744 + 0.0001202 \cdot MRINACount_i$$
+
+```{r}
+summary(brain_model)
+```
+
+```{r echo=FALSE, purl=FALSE}
+n <- nrow(brain_model$model)
+n_par <- length(coef(brain_model))
+df_t <-  n - n_par
+smr_brain <- coef(summary(brain_model))
+t_val <- round(smr_brain[2, "t value"], 2)
+p_val <- round(smr_brain[2, "Pr(>|t|)"], 2)
+t_crit <- qt(p = 0.95, df = 38)
+```
+
+Результаты теста на IQ статистически значимо связаны с размерами мозга на МРТ ($t_{0.05,\:`r df_t`} = `r t_val`$, $p = `r p_val`$).
+
+# Тестирование гипотез при помощи F-критерия
+
+```{r echo=FALSE}
+lims <- range(brain$PIQ) + c(-1, 1)
+yannot <- lims[1] + 0.5
+xannot <- max(brain$MRINACount)
+gmean <- mean(brain$PIQ, na.rm = TRUE)
+Y <- 150
+Y_hat <- predict(brain_model, newdata = brain[brain$PIQ == 150, ])
+X <- brain$MRINACount[brain$PIQ == 150]
+
+# Общая изменчивость
+pl_tot <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
+  geom_hline(yintercept = gmean, size = 1) + 
+  geom_segment(aes(x = MRINACount, y = PIQ, 
+                   xend = MRINACount, yend = gmean), colour = "grey70") + 
+  geom_point() +
+    annotate("text", label = "Общее\nсреднее", 
+             x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
+  ggtitle("Общая изменчивость") + 
+  annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 6) 
+
+# Когда есть зависимость
+pl_all <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +  
+  geom_smooth(method = "lm", se = F, size = 1.3) + 
+    geom_segment(aes(x = MRINACount, y = PIQ, 
+                   xend = MRINACount, yend = gmean), colour = "grey70") +  
+  geom_hline(yintercept = gmean, size = 2) + 
+      annotate("text", label = "Общее среднее", 
+             x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
+  annotate("segment", x = X - 1500, y = Y, xend = X - 1500, yend = gmean, colour = "grey70", size = 2) + 
+  annotate("segment", x = X + 2000, y = Y, xend = X + 2000, yend = Y_hat, colour = "#009E73", size = 2) +
+  annotate("segment", x = X + 2000, y = Y_hat, xend = X + 2000, yend = gmean, colour = "#E69F00", size = 2) +
+  geom_point(size = 2)
+
+# Когда нет зависимости
+pl_no <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +  
+      geom_segment(aes(x = MRINACount, y = PIQ, 
+                   xend = MRINACount, yend = gmean), colour = "grey70") +  
+  geom_hline(yintercept = gmean, size = 5) + 
+      annotate("text", label = "Общее среднее", 
+             x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
+    geom_hline(yintercept = gmean, size = 2, colour = "dodgerblue1") + 
+  annotate("segment", x = X - 1500, y = Y, xend = X - 1500, yend = gmean, colour = "grey70", size = 2) + 
+  annotate("segment", x = X + 2000, y = Y, xend = X + 2000, yend = gmean, colour = "#009E73", size = 2) +
+  geom_point(size = 2)
+
+# Объясненная изменчивость
+pl_exp <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
+  geom_smooth(method = "lm", se = F, size = 1.3) + 
+  geom_hline(yintercept = gmean, size = 1) + 
+  geom_segment(aes(x = MRINACount, y = gmean, 
+                   xend = MRINACount, yend = fitted(brain_model)), colour = "#E69F00") + 
+  geom_point() +
+  annotate("text", label = "Общее\nсреднее", 
+           x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
+  ggtitle("Объясненная изменчивость") +
+      annotate("text", label = "SS[r] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 6)
+
+# Остаточная изменчивость
+pl_res <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
+  geom_smooth(method ="lm", se = F, size = 1.3) + 
+  geom_segment(aes(x = MRINACount, y = PIQ, 
+                   xend = MRINACount, yend = fitted(brain_model)), colour = "#009E73") + 
+  geom_point() +
+  ggtitle("Случайная изменчивость") +
+  annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 6)
+```
+
+## Общая изменчивость
+
+Общая изменчивость SS~t~ --- это сумма квадратов отклонений наблюдаемых значений $y_i$ от общего среднего $\bar y$
+
+```{r echo=FALSE}
+pl_tot
+```
+
+## Структура общей изменчивости
+
+$$SS_t = SS_r + SS_e$$
+
+```{r echo=FALSE, fig.height=5.5, fig.width=10}
+library(gridExtra)
+lay <- rbind(c(NA, 1, 1, 1, 1, NA),
+             c(2, 2, 3, 3, 4, 4))
+grid.arrange(pl_all, pl_tot, pl_exp, pl_res, layout_matrix = lay, heights = c(0.42, 0.58))
+```
+
+
+##
+
+```{r echo=FALSE, fig.height=2.8, fig.width=10}
+library(gridExtra)
+grid.arrange(pl_tot, pl_exp, pl_res, nrow = 1)
+```
+
+
+
+| $MS_t$, полная дисперсия | $MS_r$, дисперсия, <br /> объясненая регрессией  | $MS_e$, остаточная дисперсия | 
+|-----|-----|-----|
+| $MS_{t} =\frac{SS_{t}}{df_{t}}$ | $MS_{r} =\frac{SS_{r}}{df_{r}}$ | $MS_{e} =\frac{SS_{e}}{df_{e}}$ |
+| $SS_{t}=\sum{(\bar{y}-y_i)^2}$ | $SS_{r}=\sum{(\hat{y}-\bar{y})^2}$ | $SS_{e}=\sum{(\hat{y}-y_i)^2}$ |
+| $df_{t} = n-1$ | $df_{r} = 1$ | $df_{e} = n-2$  |
+
+
+## С помощью $MS_r$ и $MS_e$ можно тестировать значимость коэффициентов
+
+Если дисперсии остатков для всех значений x равны, то
+
+$E(MS_r) = \sigma^2 + \beta_1^2\sum(x_i - \bar x)^2$
+
+$E(MS_e) =\sigma^2$
+
+Если зависимости нет, то $\beta_1 = 0$, и тогда $MS_r = MS_e$
+
+- $H_0: \beta_1 = 0$
+- $H_A: \beta_1 \ne 0$
+
+$$ F_{df_r, df_e}= \frac{MS _{r}}{MS_{e}}$$
+
+
+## Тестирование значимости коэффициентов регрессии при помощи F-критерия
+
+$$ F_{df_r, df_e}= \frac{MS _{r}}{MS_{e}}$$
+
+Для простой линейной регрессии $df_{r} = 1$ и $df_{e} = n - 2$
+
+
+```{r, echo=FALSE, purl=FALSE}
+ar <- arrow(type = "closed", length = unit(0.15,"cm"))
+arb <- arrow(type = "closed", length = unit(0.15,"cm"), ends = "both")
+
+dfr <- data.frame(f = seq(-0.1, 2, 0.001))
+ggplot(dfr, aes(x = f)) + 
+  stat_function(fun = df, args = list(df1 = 1, df2 = 21), size = 1.3) + 
+labs(title = expression(bold(paste("F-распределение,", ~df[1]==1, ", ", ~ df[2]==25))),
+     x = "F", y = "Плотность вероятности")
+```
+
+
+## Таблица результатов дисперсионного анализа
+
+| Источник изменчивости  | df | SS | MS | F  | 
+| ----- | ----- | ----- | ----- | ----- | 
+| Регрессия | $df _r = 1$ | $SS _r = \sum{(\bar y - \hat y _i)^2}$ | $MS _r = \frac{SS _r}{df _r}$ | $F _{df _r, df _e} = \frac{MS _r}{MS _e}$ | 
+| Остаточная|  $df _e = n - 2$ | $SS _e = \sum{(y _i - \hat y _i)^2}$ | $MS _e = \frac{SS _e}{df _e}$ | 
+| Общая | $df _t = n - 1$ | $SS _t = \sum {(\bar y - y _i)^2}$ | 
+
+
+Минимальное упоминание результатов в тексте должно содержать $F _{df _r, df _e}$ и $p$.
+
+
+# Оценка качества подгонки модели
+
+## В чем различие между этими двумя моделями?
+
+```{r, echo=FALSE}
+x <- rnorm(200, 20, 5)
+y1 <- 10 * x + 5 + rnorm(100, 0, 5)
+y2 <- 10 * x + 5 + rnorm(100, 0, 30)
+d <- data.frame(x = x, y1 = y1)
+pl_R1 <- ggplot(d, aes(x = x, y = y1)) + geom_point() + 
+  geom_smooth(method = "lm", se = F)
+pl_R2 <- ggplot(d, aes(x = x, y = y2)) + geom_point() + 
+  geom_smooth(method = "lm", se = F)
+grid.arrange (pl_R1, pl_R2, nrow = 1)
+```
+
+>- У этих моделей разный разброс остатков:
+>- Модель слева объясняет практически всю изменчивость
+>- Модель справа объясняет не очень много изменчивости
+
+## Коэффициент детерминации --- мера качества подгонки модели
+
+### Коэффициент детерминации
+
+описывает какую долю дисперсии зависимой переменной объясняет модель
+
+$$R^2 = \frac{SS_{r}}{SS_{t}}$$
+
+- $0 < R^2 < 1$
+- $R^2 = r^2$ --- для простой линейной регрессии коэффициент детерминации равен квадрату коэффициента Пирсоновской корреляции
+
+
+## Если в модели много предикторов, нужно внести поправку
+
+###  Скорректированный коэффициет детерминации (adjusted R-squared)
+
+Применяется если необходимо сравнить две модели с разным количеством параметров  
+
+$$ R^2_{adj} = 1- (1-R^2)\frac{n-1}{n-p}$$
+
+$p$ - количество параметров в модели   
+
+Вводится штраф за каждый новый параметр
+
+## Еще раз смотрим на результаты регрессионного анализа зависимости IQ от размеров мозга
+
+```{r}
+summary(brain_model)
+```
+
+
+## Как записываются результаты регрессионного анализа в тексте статьи?
+
+Мы показали, что связь между результатами теста на IQ и размером головного мозга на МРТ описывается моделью вида
+<br>
+IQ = 1.74 + 0.00012 MRINACount ($F_{1,38}$ = 6.686, p = 0.0136, $R^2$ = 0.149)
+<br>
+<br>
+
+>- Неужели уже пора писать статью?
+
+
+## Take-home messages
+
+- Гипотезы о наличии зависимости можно тестировать при помощи t- или F-теста.
+- Качество подгонки модели можно оценить при помощи коэффициента детерминации $R^2$.
+- У линейных моделей есть условия применимости, поэтому не спешите описывать результаты --- сначала проверьте.
+
+## Что почитать
+
++ Гланц, С., 1998. Медико-биологическая статистика. М., Практика
++ Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014
++ Diez, D.M., Barr, C.D. and Çetinkaya-Rundel, M., 2015. OpenIntro Statistics. OpenIntro.
++ Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data. Springer Science & Business Media.
++ Quinn G.P., Keough M.J. 2002. Experimental design and data analysis for biologists
++ Logan M. 2010. Biostatistical Design and Analysis Using R. A Practical Guide
+
+
