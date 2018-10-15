@@ -58,7 +58,7 @@ install.packages("car")
 
 ### 05.2 Краткое введение в мир матричной алгебры (15 окт. 1 пара)
 
-<!-- - Презентация: [05.2_Introduction_to_matrix_algebra.html](05.2_Introduction_to_matrix_algebra.html) -->
+- Презентация: [05.2_Introduction_to_matrix_algebra.html](05.2_Introduction_to_matrix_algebra.html)
 - Код: [05.2_Introduction_to_matrix_algebra_code.R](05.2_Introduction_to_matrix_algebra_code.R)
 
 ### 06 Описание, проверка значимости и валидности линейной модели (15 окт. 2 пара и 18 окт.)
