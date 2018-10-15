@@ -63,9 +63,25 @@ install.packages("car")
 
 ### 06 Описание, проверка значимости и валидности линейной модели (15 окт. 2 пара и 18 окт.)
 
-<!-- - Презентация: [06_model_description_testing_and_validation.html](06_model_description_testing_and_validation.html) -->
-<!-- - Код:  -->
-<!--     + [06_model_description_testing_and_validation_code.R](06_model_description_testing_and_validation_code.R) -->
+Часть 1
+
+<!-- - Презентация: -->
+<!--     + [06.1_model_description.html](06.1_model_description.html) -->
+- Код:
+    + [06.1_model_description_code.R](06.1_model_description_code.R)
+    + [06_task_assumptions_catsM.R](06_task_assumptions_catsM.R)
+    + [06_task_assumptions_GAG.R](06_task_assumptions_GAG.R)
+- Данные:
+    + [IQ_brain.csv](data/IQ_brain.csv)
+    + [catsM.xlsx](data/catsM.xlsx)
+    + [GAGurine.xlsx](data/GAGurine.xlsx)
+    
+Часть 2
+
+<!-- - Презентация: -->
+<!--     + [06.2_model_validation.html](06.2_model_validation.html) -->
+<!-- - Код: -->
+<!--     + [06.2_model_validation_code.R](06.2_model_validation_code.R) -->
 <!--     + [06_task_assumptions_catsM.R](06_task_assumptions_catsM.R) -->
 <!--     + [06_task_assumptions_GAG.R](06_task_assumptions_GAG.R) -->
 <!-- - Данные: -->
