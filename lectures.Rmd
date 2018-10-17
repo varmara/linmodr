@@ -81,14 +81,13 @@ install.packages("car")
 <!-- - Презентация: -->
 <!--     + [06.2_model_validation.html](06.2_model_validation.html) -->
 <!-- - Код: -->
-<!--     + [06.2_model_validation_code.R](06.2_model_validation_code.R) -->
-<!--     + [06_task_assumptions_catsM.R](06_task_assumptions_catsM.R) -->
-<!--     + [06_task_assumptions_GAG.R](06_task_assumptions_GAG.R) -->
-<!-- - Данные: -->
-<!--     + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt) -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!--     + [catsM.xlsx](data/catsM.xlsx) -->
-<!--     + [GAGurine.xlsx](data/GAGurine.xlsx) -->
+    + [06.2_model_validation_code.R](06.2_model_validation_code.R)
+    + Задания про котов и GAG из прошлой части (работайте в том же коде)
+- Данные:
+    + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt)
+    + [IQ_brain.csv](data/IQ_brain.csv)
+    + [catsM.xlsx](data/catsM.xlsx)
+    + [GAGurine.xlsx](data/GAGurine.xlsx)
 
 ### 07.1 Множественная линейная регрессия (22 окт 1 пара)
 
