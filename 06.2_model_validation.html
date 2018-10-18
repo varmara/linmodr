@@ -3246,12 +3246,12 @@ font-size: 0.8em;
           </hgroup>
   </slide>
 
-<slide class=""><hgroup><h2>Описание и проверка значимости линейных моделей</h2></hgroup><article  id="-----">
+<slide class=""><hgroup><h2>Диагностика линейных моделей</h2></hgroup><article  id="--">
 
 <h3>Вы сможете</h3>
 
 <ul>
-<li>Проверить условия применимости линейной регрессии при помощи графиков остатков</li>
+<li>Проверить условия применимости линейной регрессии при помощи графиков</li>
 </ul>
 
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Вспомним пример из прошлой лекции</h2></hgroup><article  id="----">
@@ -3325,7 +3325,7 @@ coef(summary(fit))</pre>
 ## V4    0.861     0.1196    7.20 8.30e-13
 ## V5    0.927     0.0833   11.13 4.78e-28</pre>
 
-<p>Все достоверно? Пишем статью?</p>
+<p>Все значимо? Пишем статью?</p>
 
 </article></slide><slide class=""><hgroup><h2>Задание</h2></hgroup><article >
 
@@ -3363,11 +3363,11 @@ residualPlot(fit, pch = &quot;.&quot;)</pre>
 
 <h3>&ldquo;Сырые&rdquo; остатки</h3>
 
-<p>\[\varepsilon_i = y_i - \hat{y_i}\]</p>
+<p>\[e_i = y_i - \hat{y_i}\]</p>
 
 <h3>Стандартизованные (стьюдентизированные) остатки</h3>
 
-<p>\[s_i = \frac{p_i}{\sqrt{1 - h_{ii}}} = \frac{e_i}{\sqrt{MS_e(1-h_{ii})}}\]</p>
+<p>\[s_i = \frac{e_i}{\sqrt{MS_e(1-h_{ii})}}\]</p>
 
 <ul>
 <li>легко сравнивать (стандартизованы), учитывают силу влияния наблюдений</li>
@@ -3697,7 +3697,7 @@ gg_resid</pre>
 </ul></li>
 </ul>
 
-</article></slide><slide class=""><hgroup><h2>Проверка условия независимости</h2></hgroup><article  id="--" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Проверка условия независимости</h2></hgroup><article  class="smaller" id="--">
 
 <h3>Графики зависимости остатков от предикторов в модели</h3>
 

@@ -78,8 +78,8 @@ install.packages("car")
     
 Часть 2
 
-<!-- - Презентация: -->
-<!--     + [06.2_model_validation.html](06.2_model_validation.html) -->
+- Презентация:
+    + [06.2_model_validation.html](06.2_model_validation.html)
 - Код:
     + [06.2_model_validation_code.R](06.2_model_validation_code.R)
     + Задания про котов и GAG из прошлой части (работайте в том же коде)
