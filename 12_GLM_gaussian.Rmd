@@ -1,0 +1,458 @@
+---
+title: "Обобщенные линейные модели с нормальным распределением остатков"
+author: Марина Варфоломеева, Вадим Хайтов
+output:
+  ioslides_presentation:
+    widescreen: true
+    css: assets/my_styles.css
+    logo: assets/Linmod_logo.png
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# output options
+options(width = 70, scipen = 6)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+```
+
+## Мы рассмотрим
+
+- Принципы выбора лучшей линейной модели
+- Переобучение моделей
+- Метод максимального правдоподобия
+- Сравнение линейных моделей разными способами:
+    - частный F-критерий
+    - тест отношения правдоподобий
+    - информационный критерий Акаике (AIC)
+
+### Вы сможете
+
+- Объяснить связь между качеством описания существующих данных и краткостью модели
+- Объяснить, что такое "переобучение" модели
+- Определять, какие модели являются вложенными
+- Объяснить, как подбирают параметры линейных моделей методом максимального правдоподобия
+- Сравнивать вложенные модели при помощи частного F-критерия или теста отношения правдоподобий
+- Сравнивать модели при помощи AIC
+
+
+```{r, echo=FALSE, message=FALSE, purl=FALSE}
+library(ggplot2)
+theme_set(theme_bw())
+library(gridExtra)
+```
+
+
+# Модель множественной линейной регрессии
+
+## Пример: птицы в лесах Австралии
+
+От каких характеристик лесного участка зависит обилие птиц в лесах юго-западной Виктории, Австралия (Loyn, 1987)
+
+Переменных много, мы хотим из них выбрать __оптимальный небольшой__ набор.
+
+<div class="columns-2">
+
+![forest in Victoria, Australia](images/vict_m.jpg)
+<small>Mystic Forest - Warburton, Victoria by ¡kuba! on flickr</small>
+
+
+
+56 лесных участков:
+
+- ABUND - обилие птиц
+- AREA - площадь участка
+- YRISOL - год изоляции участка
+- DIST - расстояние до ближайшего леса
+- LDIST - расстояние до ближайшего большого леса
+- GRAZE - пастбищная нагрузка (1-5)
+- ALT - высота над уровнем моря
+
+</div>
+
+<small>Пример из кн. Quinn, Keugh, 2002, данные из Loyn, 1987)</small>
+
+## Модель из прошлой лекции
+
+```{r}
+bird <- read.csv("data/loyn.csv")
+bird$logAREA <- log(bird$AREA)
+bird$logDIST <- log(bird$DIST)
+bird$logLDIST <- log(bird$LDIST)
+mod2 <- lm(ABUND ~ logAREA + YRISOL + logDIST + logLDIST + ALT, data = bird)
+```
+
+## Влияют ли предикторы?
+
+```{r}
+summary(mod2)
+```
+
+Не все предикторы влияют, возможно, эту модель можно оптимизировать...
+
+# Тесты отношения правдоподобий
+
+## Вероятность и правдоподобие
+
+Правдоподобие (likelihood) ---  способ измерить соответствие имеющихся данных тому, что можно получить при определенных значениях параметров модели.
+
+Мы оцениваем это как произведение вероятностей получения каждой из точек данных
+
+$$L(\theta| data) = \Pi^n _{i = 1}f(x| \theta)$$
+
+где $f(data| \theta)$ - функция плотности распределения с параметрами $\theta$
+
+```{r gg-norm-tunnel, echo=FALSE, fig.height=4, purl=FALSE}
+## Based on code by Arthur Charpentier:
+## http://freakonometrics.hypotheses.org/9593
+## TODO: wrap it into a function and adapt it for use with other distributions
+## as Markus Gesmann has done here
+## http://www.magesblog.com/2015/08/visualising-theoretical-distributions.html
+set.seed(32981)
+op <- par(mar = c(0, 0, 0, 0))
+n <- 2
+X <- runif(25, 0, 10)
+Y <- 5 + 1.2 * X + rnorm(25, 0, 5)
+df <- data.frame(X,Y)
+
+# regression
+reggig <- glm(Y ~ X, data = df, family = gaussian(link = "identity"))
+
+# empty plot
+vX <- seq(min(X) - 0.1, max(X) + 0.1, length = n)
+dy <- 2 * sd(Y)
+vY <- seq(min(Y) - dy, max(Y) + dy, length = n)
+mat <- persp(x = vX, y = vY, z = matrix(0, n, n),
+             zlim = c(0, 0.03),
+             theta =  -40, phi = 15, expand = 0.1,
+             ticktype  = "detailed",  box = FALSE, border = "gray60")
+
+x <- seq(min(X), max(X), length = 501)
+
+# expected values
+C <- trans3d(x, predict(reggig, newdata = data.frame(X = x), type = "response"), rep(0, length(x)), mat)
+lines(C, lwd = 2)
+
+sdgig <- sqrt(summary(reggig)$dispersion)
+
+# 1SD
+y1 <- qnorm(.95, predict(reggig, newdata = data.frame(X = x), type = "response"),  sdgig)
+C <- trans3d(x, y1, rep(0, length(x)), mat)
+lines(C, lty = 2, col = "#d95f02")
+y2 <- qnorm(.05, predict(reggig, newdata = data.frame(X = x), type = "response"),  sdgig)
+C <- trans3d(x, y2, rep(0, length(x)), mat)
+lines(C, lty = 2, col = "#d95f02")
+
+# C <- trans3d(c(x, rev(x)), c(y1, rev(y2)), rep(0, 2 * length(x)), mat)
+# polygon(C, border = NA, col = "yellow")
+
+# data points
+C <- trans3d(X, Y, rep(0, length(X)), mat)
+points(C, pch = 1, col = "black", cex = 0.4)
+
+# density curves
+n <- 6
+vX <- seq(min(X), max(X), length = n)
+
+mgig <- predict(reggig, newdata = data.frame(X = vX))
+
+sdgig <- sqrt(summary(reggig)$dispersion)
+
+for(j in n:1){
+  stp <- 251
+  x <- rep(vX[j], stp)
+  y <- seq(min(min(Y) - dy, 
+               qnorm(.05, 
+                     predict(reggig, 
+                             newdata = data.frame(X = vX[j]), 
+                             type = "response"),  
+                     sdgig)), 
+           max(Y) + dy, 
+           length = stp)
+  z0 <- rep(0, stp)
+  z <- dnorm(y,  mgig[j],  sdgig)
+  C <- trans3d(c(x, x), c(y, rev(y)), c(z, z0), mat)
+  polygon(C, border = NA, col = "light blue", density = 40)
+  C <- trans3d(x, y, z0, mat)
+  lines(C, lty = 2, col = "grey60")
+  C <- trans3d(x, y, z, mat)
+  lines(C, col = "steelblue")
+}
+par(op)
+```
+
+
+## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
+
+$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$
+
+## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
+
+$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$
+
+Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
+
+$N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1} {2 \sigma^2} \epsilon_i^2)$
+
+## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
+
+$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$
+
+Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
+
+$N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1} {2 \sigma^2} \epsilon_i^2)$
+
+Функцию правдоподобия (likelihood, вероятность получения нашего набора данных) можно записать как произведение вероятностей:
+
+$L(\epsilon_i|\mathbf{y}, \mathbf{x}) = \Pi^n _{n = 1} N(\epsilon_i, \sigma^2) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2)$
+
+## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
+
+$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$
+
+Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
+
+$N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1} {2 \sigma^2} \epsilon_i^2)$
+
+Функцию правдоподобия (likelihood, вероятность получения нашего набора данных) можно записать как произведение вероятностей:
+
+$L(\epsilon_i|\mathbf{y}, \mathbf{x}) = \Pi^n _{n = 1} N(\epsilon_i, \sigma^2) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2)$
+
+Поскольку $\epsilon_i = y_i - (b_0 + b_1x_1 + \ldots + b_kx_k)$
+
+то функцию правдоподобия можно переписать так:
+
+$L(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (b_0 + b_1x_1 + \ldots + b_kx_k))^2)$
+
+## Подбор параметров модели методом максимального правдоподобия
+
+Чтобы найти параметры модели
+
+$$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$$
+
+нужно найти такое сочетание параметров  $b_0$, $b_1$, \ldots $b_k$, и $\sigma^2$, при котором функция правдоподобия будет иметь максимум (именно поэтому метод называется метод максимального правдоподобия:
+
+$\begin{array}{l}
+L(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2) = \\
+&= \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (b_0 + b_1x_1 + \ldots + b_kx_k))^2)
+\end{array}$
+
+
+## Логарифм правдоподобия (loglikelihood)
+
+Вычислительно проще работать с логарифмами правдоподобий (loglikelihood)
+
+Если функция правдоподобия
+
+$\begin{array}{l}
+L(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2) = \\
+&= \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (b_0 + b_1x_1 + \ldots + b_kx_k))^2)
+\end{array}$
+
+то логарифм правдоподобия
+
+$\begin{array}{l}
+logLik(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= & \\
+ln L(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= &- \frac{n}{2} (ln2\pi + ln\sigma^2) - \frac{1}{2\sigma^2}(\sum \epsilon^2_i) = \\
+&= &- \frac{n}{2} (ln2\pi + ln\sigma^2) - \\
+& &- \frac{1}{2\sigma^2}(\sum (y_i - (b_0 + b_1x_1 + \ldots + b_kx_k))^2)
+\end{array}$
+
+Чем больше логарифм правдоподобия тем лучше модель.
+
+## Подбор параметров модели методом максимального правдоподобия
+
+Для подбора параметров методом максимального правдоподобия используют функцию `glm()`
+
+
+```{r}
+# Симулированные данные
+set.seed(9328)
+dat <- data.frame(X = runif(n = 50, min = 0, max = 10))
+dat$Y <- 3 + 15 * dat$X + rnorm(n = 50, mean = 0, sd = 1)
+
+# Подбор модели двумя способами
+Mod     <-  lm(Y ~ X, data = dat) # МНК
+Mod_glm <- glm(Y ~ X, data = dat) # МЛ
+
+# Одинаковые оценки коэффициентов
+coefficients(Mod)
+coefficients(Mod_glm)
+```
+
+
+## Логарифм правдоподобия
+
+$LogLik$ для модели можно найти с помощью функции `logLic()`
+
+```{r}
+logLik(Mod_glm)
+```
+
+## Логарифм правдоподобия вручную
+
+
+```{r}
+# Предсказанные значения
+dat$predicted <- predict(Mod)
+# Оценка дисперсии
+SD <- summary(Mod)$sigma 
+# Вероятности для каждой точки
+dat$Prob <- dnorm(dat$Y, mean = dat$predicted, sd = SD)
+# Логарифм вероятностей
+dat$LogProb <- log(dat$Prob)
+# Логарифм произведения, равный сумме логарифмов
+sum(dat$LogProb)
+```
+
+
+## Тест отношения правдоподобий (Likelihood Ratio Test)
+
+Тест отношения правдоподобий позволяет определить какая модель более правдоподобна с учетом данных.
+
+$$LRT = 2ln\Big(\frac{L_{full}}{L_{reduced}}\Big) = -2ln\Big(\frac{L_{reduced}}{L_{full}}\Big) = -2(lnL_{reduced} - lnL_{full})$$
+
+- $L_{full}$, $L_{reduced}$ - правдоподобия более полной из двух моделей и уменьшенной модели
+- $lnL_{full}$, $lnL_{reduced$ - логарифмы правдоподобий
+
+Разница логарифмов правдоподобий имеет распределение, которое можно апроксимировать $\chi^2$, с числом степеней свободы $df = df_{full} - df_{reduced}$ (Wilks, 1938)
+
+# Тест отношения правдоподобий в R
+
+## Задание
+
+Для этой полной модели
+
+```{r}
+GLM1 <- glm(ABUND ~ logAREA + YRISOL + logDIST + logLDIST + ALT, data = bird)
+```
+
+Подберите оптимальную модель при помощи тестов отношения правдоподобий
+
+Тест отношения правдоподобий можно сделать с помощью тех же функций, что и частный F-критерий:
+
+- по-одному `anova(mod3, mod2, test = "Chisq")`
+- все сразу `drop1(mod3, test = "Chisq")`
+
+
+## Решение (шаг 1)
+
+```{r purl=FALSE}
+drop1(GLM1, test = "Chisq")
+# Нужно убрать logDIST
+```
+
+## Решение (шаг 2)
+
+```{r purl=FALSE}
+# Убираем logDIST
+GLM2 <- update(GLM1, . ~ . - logDIST)
+drop1(GLM2, test = "Chisq")
+# Нужно убрать logLDIST
+```
+
+## Решение (шаг 3)
+
+```{r purl=FALSE}
+# Убираем logLDIST
+GLM3 <- update(GLM2, . ~ . - logLDIST)
+drop1(GLM3, test = "Chisq")
+# Нужно убрать ALT
+```
+
+## Решение (шаг 4)
+
+```{r purl=FALSE}
+# Убираем ALT
+GLM4 <- update(GLM3, . ~ . - ALT)
+drop1(GLM4, test = "Chisq")
+# Больше ничего убрать не получается
+```
+
+## Решение (шаг 5)
+
+```{r purl=FALSE}
+summary(GLM4)
+```
+
+Финальную модель нужно проверить на выполнение условий применимости
+
+# Информационные критерии
+
+## AIC - Информационный критерий Акаике (Akaike Information Criterion)
+
+$AIC = -2 logLik + 2p$
+
+- $logLik$ - логарифм правдоподобия для модели
+- $2p$ - штраф за введение в модель $p$ параметров, т.е. за "сложность" модели
+
+AIC --- это мера потери информации, которая происходит, если реальность описывать этой моделью (Akaike 1974)
+
+AIC --- относительная мера качества модели. Т.е. не бывает какого-то "хорошего" AIC. Значения AIC можно интерпретировать только в сравнении с AIC для других моделей: чем меньше AIC --- тем лучше модель.
+
+__Важно!__   Информационные критерии можно использовать для сравнения __даже для невложенных моделей__. Но модели должны быть __подобраны с помощью ML__ и __на одинаковых данных__!
+
+## Некоторые другие информационные критерии
+
+|Критерий | Название  | Формула|
+|------ | ------ | ------|
+|AIC | Информационный критерий Акаике | $AIC = -2 logLik + 2p$|
+|BIC | Баесовский информационный критерий | $BIC = -2 logLik + p \cdot ln(n)$|
+|AICc | Информационный критерий Акаике с коррекцией для малых выборок (малых относительно числа параметров: $n/p < 40$, Burnham, Anderson, 2004) | $AIC_c = -2 logLik + 2p + \frac{2p(p + 1)}{n - p - 1}$|
+
+- $logLik$ - логарифм правдоподобия для модели
+- $p$ - число параметров
+- $n$ - число наблюдений
+
+
+# Информационные критерии в R
+
+```{r echo=FALSE, purl=FALSE}
+lm_equation <- function(fit, strict = TRUE, rnd = 2){
+#   extracting call formula 
+  frml <- as.character(fit$call)[2]
+#   extract signs
+    sign <- ifelse(grepl("-", coef(fit)[-1]), " - ", " + ")
+  # extract coefficients
+  coeffs <- format(round(abs(coef(fit)), rnd), digits = 2, nsmall = rnd, trim = TRUE)
+  if(strict == TRUE){
+    i <- 1:(length(coeffs) - 1)
+    vars <- c("Y", paste0(" X", i))
+    
+  } else {
+# extract vector of variable names
+  vars <- c(all.vars(formula(fit))[1], names(fit$coefficients)[-1])
+# combine everything
+  }
+  start <- ifelse(coef(fit)[1] > 0, paste(vars[1], coeffs[1], sep = " = "), paste(vars[1], coeffs[1], sep = " = - "))
+  end <- paste(sign, coeffs[-1], vars[-1], sep = "", collapse = "")
+  return(paste0(start, end, sep = ""))
+}
+```
+
+## Рассчитаем AIC для наших моделей
+
+```{r}
+AIC(GLM1, GLM2, GLM3, GLM4)
+```
+
+>- Судя по AIC, лучшая модель GLM3 или GLM4. Если значения AIC различаются всего на 1-2 единицу --- такими различиями можно пренебречь и выбрать более простую модель (GLM4).
+
+>- Уравнение модели: $`r lm_equation(GLM4, strict = FALSE)`$
+
+
+
+## Take-home messages
+
+
+
+## Что почитать
+
++ <span style="color:red">Must read paper!</span> Zuur, A.F. and Ieno, E.N., 2016. A protocol for conducting and presenting results of regression‐type analyses. Methods in Ecology and Evolution, 7(6), pp.636-645.
+
++ Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014
++ Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data. Springer Science & Business Media.
++ Quinn G.P., Keough M.J. 2002. Experimental design and data analysis for biologists
++ Logan M. 2010. Biostatistical Design and Analysis Using R. A Practical Guide

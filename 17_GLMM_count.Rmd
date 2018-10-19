@@ -4,10 +4,25 @@ subtitle    : "Линейные модели..."
 author: Марина Варфоломеева, Вадим Хайтов
 output:
   ioslides_presentation:
-    widescreen: yes
+    widescreen: true
     css: assets/my_styles.css
     logo: assets/Linmod_logo.png
+  beamer_presentation:
+    colortheme: beaver
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: default
+    toc: no
+editor_options: 
+  chunk_output_type: console
 ---
+
 
 ## Вы узнаете
 

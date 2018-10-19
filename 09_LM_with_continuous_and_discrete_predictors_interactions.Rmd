@@ -6,9 +6,22 @@ output:
     widescreen: true
     css: assets/my_styles.css
     logo: assets/Linmod_logo.png
+  beamer_presentation:
+    colortheme: beaver
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: default
+    toc: no
 editor_options: 
   chunk_output_type: console
 ---
+
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 # output options
