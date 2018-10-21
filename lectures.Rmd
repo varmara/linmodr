@@ -96,14 +96,14 @@ install.packages(c("gridExtra", "ISwR"))
 ```
 
 <!-- - Презентация: [07.1_multiple_LM.html](07.1_multiple_LM.html) -->
-<!-- - Код: [07.1_multiple_LM_code.R](07.1_multiple_LM_code.R) -->
-<!-- - Данные: [loyn.csv](data/loyn.csv) -->
+- Код: [07.1_multiple_LM_code.R](07.1_multiple_LM_code.R)
+- Данные: [loyn.csv](data/loyn.csv)
 
 ### 07.2 Выбор оптимальной модели (22 окт 2 пара)
 
 <!-- - Презентация: [07.2_model_selection.html](07.2_model_selection.html) -->
-<!-- - Код: [07.2_model_selection_code.R](07.2_model_selection_code.R) -->
-<!-- - Данные: [loyn.csv](data/loyn.csv) -->
+- Код: [07.2_model_selection_code.R](07.2_model_selection_code.R)
+- Данные: [loyn.csv](data/loyn.csv)
 
 ## Общие линейные модели
 
