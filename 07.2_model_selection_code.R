@@ -120,13 +120,13 @@ Anova(mod2_reordered)
 # Подбираем полную модель, удаляем предикторы по-одному, тестируем ухудшилась ли модель. Для окончательного удаления на этом шаге выбираем предиктор, удаление которого меньше всего ее ухудшает.
 mod3 <- update(mod2, . ~ . - logAREA)
 anova(mod2, mod3)
-mod4 <- update(mod3, . ~ . - YRISOL)
+mod4 <- update(mod2, . ~ . - YRISOL)
 anova(mod2, mod4)
-mod5 <- update(mod3, . ~ . - logDIST)
+mod5 <- update(mod2, . ~ . - logDIST)
 anova(mod2, mod5)
-mod6 <- update(mod3, . ~ . - logLDIST)
+mod6 <- update(mod2, . ~ . - logLDIST)
 anova(mod2, mod6)
-mod7 <- update(mod3, . ~ . - ALT)
+mod7 <- update(mod2, . ~ . - ALT)
 anova(mod2, mod7)
 
 
