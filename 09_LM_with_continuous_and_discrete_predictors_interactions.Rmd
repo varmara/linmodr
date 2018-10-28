@@ -1,6 +1,6 @@
 ---
 title: "Взаимодействие дискретных и непрерывных предикторов"
-author: Марина Варфоломеева, Вадим Хайтов
+author: Вадим Хайтов, Марина Варфоломеева
 output:
   ioslides_presentation:
     widescreen: true
@@ -174,214 +174,26 @@ grid.arrange(
 
 ##  Если у дискретного предиктора становится больше уровней... {.smaller}
 
-$$y_i = \beta_0 + \beta_1x_1 + \big(\beta_2x_2 + ... + \beta_l x_l\big) + \big(\beta_{l+1}x_{l+1} + ... + \beta_m x_m\big) + \epsilon_i$$
+$$y_i = b_0 + b_1x_i + \big(b_2I_{2i} + ... + b_k I_{ki}\big) + \big(b_{k+1}I_{2i}x_i + ... + b_{2k-1} I_{ki} x_i\big) + e_i$$
+
 
 В случае, __если у дискретного фактора $k$ градаций__, уравнение полной модели будет включать несколько групп коэффициентов:
+\vspace{-0.5\baselineskip}
 
-- $\beta_0$ --- значение свободного члена для базового уровня дискретного фактора
-- $\beta_1$ --- коэффициент угла наклона для базового уровня дискретного фактора
+- $b_0$ --- значение свободного члена для базового уровня дискретного фактора
+- $b_1$ --- коэффициент угла наклона для базового уровня дискретного фактора
 
 Поправки для свободного члена:
+\vspace{-0.5\baselineskip}
 
-- $\beta_2, ..., \beta_l$ --- коррекция свободного члена для других уровней (всего их $p = k - 1$)
+- $b_2, ..., b_k$ --- коррекция свободного члена для других уровней (всего их $k - 1$)
 
 Поправки для угла наклона:
+\vspace{-0.5\baselineskip}
 
-- $\beta_{l+1}, ..., \beta_m$ --- коррекция коэффициентов угла наклона для других уровней (всего их $p = k - 1$)
-
-
-<!-- ## Пример: Пуромицин -->
-
-<!-- Пуромицин - антибиотик пуринового ряда, ингибитор синтеза белков.  -->
-<!-- Эти данные --- о том, как меняется активность фермента галактозил трансферазы под воздействием пуромицина (Treloar 1974). Измеряли скорость реакции в зависимости от концентрации субстрата на мембранах аппарата Гольджи из богатых мембранами фракций из печени крыс. -->
-
-<!-- - `conc` --- концентрация пуромицина -->
-<!-- - `rate` --- скорость химической реакции -->
-<!-- - `state` --- индикатор того, обработаны ли клетки пуромицином -->
-
-<!-- ```{r} -->
-<!-- library(readxl) -->
-<!-- Puromycin <- read_excel("data/Puromycin.xlsx") -->
-<!-- head(Puromycin) -->
-<!-- ``` -->
-
-<!-- ## Знакомимся с данными -->
-
-<!-- ```{r} -->
-<!-- sapply(Puromycin, class) -->
-<!-- colSums(is.na(Puromycin)) -->
-<!-- nrow(Puromycin) -->
-<!-- ``` -->
-
-<!-- ## Знакомимся с данными -->
-
-<!-- ```{r} -->
-<!-- table(Puromycin$state, Puromycin$conc) -->
-<!-- library(ggplot2) -->
-<!-- ggplot(Puromycin, aes(x = state, y = conc)) + geom_boxplot() -->
-<!-- ``` -->
-
-<!-- ## Задание -->
-
-<!-- Постройте график зависимости скорости химической реакции от концентрации -->
-
-<!-- ## Решение -->
+- $b_{k+1}, ..., b_{2k - 1}$ --- коррекция коэффициентов угла наклона для других уровней (всего их $k - 1$)
 
 
-<!-- На самом деле, зависимость скорости химической реакции от концентрации нелинейна, но мы попробуем использовать трансформацию -->
-
-<!-- ```{r purl=FALSE, eval=FALSE} -->
-<!-- library(ggplot2) -->
-<!-- ggplot(Puromycin, aes(x = conc, y = rate, colour = state)) +  -->
-<!--   geom_point() -->
-<!-- ggplot(Puromycin, aes(x = log(conc), y = rate, colour = state)) +  -->
-<!--   geom_point() -->
-<!-- ``` -->
-
-<!-- ```{r gg-transformation, purl=FALSE, eval=TRUE, fig.width=10, echo=FALSE} -->
-<!-- library(gridExtra) -->
-<!-- grid.arrange( -->
-<!-- ggplot(Puromycin, aes(x = conc, y = rate, colour = state)) + geom_point(), -->
-<!-- ggplot(Puromycin, aes(x = log(conc), y = rate, colour = state)) + geom_point(), -->
-<!-- ncol = 2) -->
-<!-- ``` -->
-
-<!-- ## Запись формулы линейной модели со взаимодействием в R -->
-
-<!-- `Response ~ Continuous + Categorical + Continuous : Categorical` (полная запись) -->
-
-<!-- `Response ~ Continuous * Categorical`(сокращенная запись) -->
-
-<!-- `Continuous : Categorical` --- Кодовое обозначение взаимодействия. Добавление взаимодействия непрерывного и дискретного факторов в модель означает, что возможен разный угол наклона прямых для разных групп. -->
-
-<!-- ## Подберем -->
-
-<!-- ```{r} -->
-<!-- Puromycin$lc <- log(Puromycin$conc) -->
-<!-- M1 <- lm(rate ~ lc + state + lc:state, data = Puromycin) -->
-<!-- # M1 <- lm(rate ~ lc * state, data = Puromycin) # То же самое -->
-<!-- summary(M1) -->
-<!-- ``` -->
-
-<!-- >- Взаимодействие достоверно! -->
-
-<!-- ## Проверяем выполнение условий применимости  -->
-
-<!-- ## Решение -->
-
-<!-- ```{r purl=FALSE} -->
-<!-- # Данные для графиков остатков -->
-<!-- M1_diag <- fortify(M1) -->
-<!-- ``` -->
-<!-- ### 1) График расстояния Кука -->
-
-<!-- ```{r purl=FALSE} -->
-<!-- ggplot(M1_diag, aes(x = 1:nrow(M1_diag), y = .cooksd)) + -->
-<!--   geom_bar(stat = "identity") -->
-<!-- ``` -->
-
-<!-- ## Решение -->
-
-<!-- ### 2) График остатков от предсказанных значений -->
-<!-- ```{r purl=FALSE} -->
-<!-- gg_resid <- ggplot(data = M1_diag, aes(x = .fitted, y = .stdresid)) + -->
-<!--   geom_point() + geom_hline(yintercept = 0) -->
-<!-- grid.arrange(gg_resid, gg_resid + geom_smooth(), -->
-<!--              gg_resid + geom_smooth(method = "lm"), nrow = 1) -->
-<!-- ``` -->
-
-<!-- ## Решение -->
-
-<!-- ### 3) Графики остатков от предикторов в модели и не в модели -->
-
-<!-- ```{r fig.width=10,  purl=FALSE} -->
-<!-- library(gridExtra) -->
-<!-- grid.arrange(gg_resid + aes(x = lc),  -->
-<!--              ggplot(M1_diag, aes(x = state, y = .stdresid)) + geom_boxplot(),  -->
-<!--              nrow = 1) -->
-<!-- ``` -->
-
-<!-- ## Решение -->
-
-<!-- ### 4) Квантильный график остатков -->
-<!-- ```{r fig.height=4,  purl=FALSE} -->
-<!-- library(car) -->
-<!-- qqPlot(M1) -->
-<!-- ``` -->
-
-
-<!-- ## Рисуем график предсказаний -->
-
-<!-- Что не так с этим графиком? Это наша модель? -->
-
-<!-- ```{r M1-predictions} -->
-<!-- ggplot(Puromycin, aes(x = lc, y = rate, colour = state)) +  -->
-<!--   geom_point() +  -->
-<!--   geom_smooth(method = "lm") -->
-<!-- ``` -->
-
-<!-- >- Это не наша модель --- здесь разный угол наклона, а у нашей модели график должен быть другой, с одинаковым углом наклона. (По умолчанию ggplot рисует отдельные регрессии для каждого сабсета) -->
-
-<!-- ## Задание -->
-
-<!-- Постройте график предсказаний модели по этим данным -->
-
-<!-- ### Данные для графика -->
-
-<!-- ```{r} -->
-<!-- library(plyr) -->
-<!-- NewData <- ddply( -->
-<!--   Puromycin, .variables = .(state), .fun = summarise,  -->
-<!--   lc = seq(min(lc), max(lc), length = 100)) -->
-
-<!-- # предсказанные значения -->
-<!-- Predictions <- predict(M1, newdata = NewData, se.fit = TRUE) -->
-<!-- NewData$fit <- Predictions$fit -->
-
-<!-- # стандартные ошибки -->
-<!-- NewData$SE <- Predictions$se.fit -->
-
-<!-- # доверительный интервал -->
-<!-- NewData$upr <- NewData$fit + 1.96 * NewData$SE -->
-<!-- NewData$lwr <- NewData$fit - 1.96 * NewData$SE -->
-
-<!-- # Обратная трансформация предиктора -->
-<!-- NewData$conc <- exp(NewData$lc) -->
-<!-- ``` -->
-
-<!-- ## Рисуем график предсказаний  -->
-
-<!-- ```{r gg-M1-predictions-backtrans, purl=FALSE} -->
-<!-- ggplot(NewData, aes(x = conc, y = fit)) +  -->
-<!--   geom_ribbon(alpha = 0.2, aes(ymin = lwr, ymax = upr, group = state)) + -->
-<!--   geom_line(aes(colour = state)) + -->
-<!--   geom_point(data = Puromycin, aes(x = conc, y = rate, colour = state)) -->
-<!-- ``` -->
-
-
-<!-- ##  Задание -->
-
-<!-- Запишите уравнение этой модели и уравнения для каждой группы -->
-<!-- ```{r} -->
-<!-- coef(M1) -->
-<!-- ``` -->
-
-<!-- ```{r gg-not-ancova, echo=FALSE, purl=FALSE} -->
-<!-- ggplot(Puromycin, aes(x = lc, y = rate, colour = state)) +  -->
-<!--   geom_point() +  -->
-<!--   geom_smooth(method = "lm") -->
-<!-- ``` -->
-
-<!-- ## Решение -->
-
-<!-- $rate = 209.2 + 37.1 * lc - 44.6 * stateuntreated - 10.1 * lc * stateuntreated$ -->
-
-<!-- $stateuntreated = 1$ если $state = untreated$ и ноль в остальных случаях -->
-
-<!-- Уравнение для treated: $rate = 209.2 + 37.1 * lc$ -->
-
-<!-- Уравнение для untreated: $rate = (209.2- 44.6) + (37.1 - 10.1) * lc$,   -->
-<!-- то есть $rate = 164.6 + 27 * lc$ -->
 
 ```{r echo=FALSE, purl=FALSE}
 lm_equation <- function(fit, strict = TRUE, rnd = 2){
@@ -406,44 +218,6 @@ lm_equation <- function(fit, strict = TRUE, rnd = 2){
 }
 ```
 
-<!-- ## Тестируем гомогенность углов наклона -->
-
-<!-- Это делается как обычно при выборе моделей: при помощи `anova()` или `drop1()` -->
-
-<!-- ```{r} -->
-<!-- M2 <- lm(rate ~ lc + state, data = Puromycin) -->
-
-<!-- # anova(M1, M2, test="F") -->
-<!-- drop1(M1, test = "F") -->
-<!-- ``` -->
-
-<!-- >- Если убрать взаимодействие, то модель становится значительно хуже. Поэтому взаимодействие сохраняем -->
-
-<!-- ## Представляем результаты в виде таблицы {.smaller} -->
-
-<!-- ### Вариант 1. Последовательное тестирование (SS type I) -->
-
-<!-- Факторы тестируются в порядке включения в модель. __Результат тестирования зависит от порядка включения__ -->
-
-<!-- ```{r} -->
-<!-- anova(M1) -->
-<!-- M3 <- lm(rate ~ state + lc + state:lc, data = Puromycin) -->
-<!-- anova(M3) -->
-<!-- ``` -->
-
-<!-- ## Представляем результаты в виде таблицы  {.smaller} -->
-
-<!-- ### Вариант 2. Иерархическое тестирование (SS type III) -->
-
-<!-- Каждый из факторов по отношению к модели только без него, но со всеми остальными. -->
-<!-- Нужно, если много факторов и выборки разного размера. Тогда результат не будет зависеть от порядка включения факторов в модель. -->
-
-<!-- ```{r} -->
-<!-- # library(car) -->
-<!-- Anova(M1, type = 3)  -->
-<!-- # Anova(M3, type = 3) # сравните -->
-<!-- ``` -->
-
 
 # Модель со взаимодействием на примере данных о весе новорожденных
 
@@ -465,6 +239,15 @@ lm_equation <- function(fit, strict = TRUE, rnd = 2){
 wt <- read.table("data/birthwt.csv", header = TRUE, sep = ";")
 ```
 
+## Преобразуем значения перменных
+
+```{r}
+wt$smoke[wt$smoke == 1] <- 'Smoker'
+wt$smoke[wt$smoke == 0] <- 'Non smoker'
+wt$smoke <- factor(wt$smoke)
+```
+
+
 ## Задание
 
 - Исследуйте данные о весе новорожденных
@@ -474,17 +257,25 @@ wt <- read.table("data/birthwt.csv", header = TRUE, sep = ";")
 - Напишите общее уравнение и отдельные уравнения модели
 - Постройте график предсказаний модели
 
-## Решение
+## Решение{.smaller}
 
 ```{r}
 str(wt)
 colSums(is.na(wt))
+```
+
+## Решение{.smaller}
+
+```{r}
 table(wt$smoke, wt$age)
 table(wt$smoke, wt$race)
 table(wt$smoke, wt$ui)
 ```
 
-## Решение
+
+
+
+## Решение {.smaller}
 
 ```{r}
 wt$race <- factor(wt$race)
@@ -497,13 +288,21 @@ wt$ftv <- factor(wt$ftv)
 ```
 
 
-## Решение
+## Решение {.smaller}
 
 ```{r fig.show='hold', fig.height=2.5}
 gg_dot <- ggplot(wt, aes(y = 1:nrow(wt))) + geom_point()
 gg_dot + aes(x = age)
+```
+
+## Решение {.smaller}
+
+```{r fig.show='hold', fig.height=2.5}
 gg_dot + aes(x = bwt)
 ```
+
+
+
 
 ## Решение
 
@@ -511,6 +310,7 @@ gg_dot + aes(x = bwt)
 
 ```{r}
 wt_mod_1 <- lm(bwt ~ age+smoke, data = wt)
+library(car)
 vif(wt_mod_1)
 ```
 
@@ -529,7 +329,7 @@ drop1(wt_mod_2, test = "F")
 
 >- От исключения взаимодействия модель становится значительно хуже. Оставляем
 
-## Решение
+## Решение {.smaller}
 
 ```{r}
 # Данные для графиков остатков
@@ -538,7 +338,8 @@ wt_mod_2_diag <- data.frame(
   wt_mod_2_diag, 
   wt[, c("lwt", "race", "smoke", "ptl", "ht", "ui", "ftv")])
 ```
-### 1) График расстояния Кука
+
+### График расстояния Кука
 
 ```{r}
 ggplot(wt_mod_2_diag, aes(x = 1:nrow(wt_mod_2_diag), y = .cooksd)) +
@@ -547,17 +348,17 @@ ggplot(wt_mod_2_diag, aes(x = 1:nrow(wt_mod_2_diag), y = .cooksd)) +
 
 ## Решение
 
-### 2) График остатков от предсказанных значений
+### График остатков от предсказанных значений
 ```{r}
 gg_resid <- ggplot(data = wt_mod_2_diag, aes(x = .fitted, y = .stdresid)) +
-  geom_point() + geom_hline(yintercept = 0)
+  geom_point() + geom_hline(yintercept = 0) + geom_smooth()
 gg_resid
 ```
 
 
-## Решение
+## Решение {.smaller}
 
-### 3) Графики остатков от предикторов в модели и не в модели
+### Графики остатков от предикторов в модели и не в модели
 
 ```{r fig.width=10}
 library(gridExtra)
@@ -566,7 +367,7 @@ grid.arrange(gg_resid + aes(x = age),
              nrow = 1)
 ```
 
-## Решение
+## Решение {.smaller}
 
 ```{r fig.width=10}
 gg_box <- ggplot(data = wt_mod_2_diag, aes(x = smoke, y = .stdresid)) +
@@ -583,7 +384,7 @@ grid.arrange(gg_box + aes(x = smoke),
 
 ## Решение
 
-### 4) Квантильный график остатков
+### Квантильный график остатков
 ```{r fig.height=4}
 qqPlot(wt_mod_2)
 ```
@@ -596,18 +397,18 @@ qqPlot(wt_mod_2)
 summary(wt_mod_2)
 ```
 
-## Записываем уравнение модели
+<!-- ## Записываем уравнение модели -->
 
-```{r}
-coef(wt_mod_2)
-```
+<!-- ```{r} -->
+<!-- coef(wt_mod_2) -->
+<!-- ``` -->
 
-Общее уравнение: 
+<!-- Общее уравнение:  -->
 
-`r lm_equation(wt_mod_2, strict = FALSE)`
+<!-- `r lm_equation(wt_mod_2, strict = FALSE)` -->
 
-- Для некурящих: $N = 2406.06 + 27.73 * age$
-- Для курящих: $N = 3204.23 - -18.84 * age$
+<!-- - Для некурящих: $N = 2406.06 + 27.73 * age$ -->
+<!-- - Для курящих: $N = 3204.23 - -18.84 * age$ -->
 
 ## Таблица дисперсионного анализа {.smaller}
 
@@ -615,46 +416,172 @@ coef(wt_mod_2)
 Anova(wt_mod_2, type = 3)
 ```
 
+
+
+# Анатомируем модель  {.segue}
+
+## Результаты подбора модели
+
+```{r}
+
+summary(wt_mod_2)
+```
+
+
+## Можем ли мы избавиться от взаимодействия?
+
+```{r}
+drop1(wt_mod_2, test = 'F')
+```
+
+Если удалить взаимодействия, то модель значимо изменится.
+
+В этой системе присутствует взаимодействие!
+
+## Модельная матрица при наличии взаимодействий дискретного и непрерывного предиктора
+
+```{r}
+X <- model.matrix(wt_mod_2)
+
+head(X, 10)
+```
+
+
+В колонке `(Intercept)` --- как всегда единицы.
+
+В колонке `age` --- возраст матери
+
+Базовый уровень  `smoke` = `Non smoker`, в колонке `smokeSmoker` стоят единицы, если мать курящая, если она не курит, то стоят нули.
+
+Колонка `age:smokeSmoker` описывает взаимодействие: если мать курит (`Smoker`), то в этой колонке стоит ее возраст, если мать не курит (`Non smoker`), то стоит ноль.
+
+
+## Вектор коэффициентов
+
+```{r echo=FALSE, purl=TRUE}
+options(digits = 6)
+```
+
+```{r}
+b <- coefficients(wt_mod_2)
+b
+```
+
+## Предсказанные значения в матричном виде
+$$
+\widehat{\textbf{y}} =  \textbf{X} \textbf{b}
+$$
+
+```{r}
+as.numeric(fitted(wt_mod_2)[1])
+(X %*% b) [1]
+```
+
+## Предсказанное значение для объекта, относящегося к базовому уровню
+
+```{r}
+X[1,] # Первая строка в модельной матрице
+```
+
+
+```{r}
+b
+```
+
+Что происходит при матричном умножении
+
+```{r}
+1 * 2406.0580 + 19.0 * 27.7314  + 0 * 798.1749 + 0 * -46.5719
+
+```
+
+## Общий вид формулы предсказанного значения для базового уровня
+
+
+$$
+\widehat{bwt_i} = 2406.0580 + 27.7314 age_i
+$$
+
+
+## Предсказанное значение для объекта, не относящегося к базовому уровню
+
+
+```{r}
+as.numeric(fitted(wt_mod_2)[3])
+X[3,] # Третья строка в модельной матрице
+b # Коэффциенты
+```
+
+Что происходит при матричном умножении
+
+```{r}
+1 * 2406.0580 + 20 * 27.7314  + 1 * 798.1749 + 20 * -46.5719
+```
+
+## Общий вид формулы предсказанного значения для объектов, не относящихся к базовому уровню
+
+$$
+\widehat{bwt}_i = 2406.0580 + 27.7314 age_i + 798.1749 + (-46.5719) age_i
+$$
+
+$$
+\widehat{bwt}_i = (2406.0580 + 798.1749) + (27.7314 - 46.5719) age_i  = 3204.23 +(-18.8405)age_i
+$$
+
+
+
+
+# Визуализация модели
+
 ## Сложные модели лучше по возможности изображать в виде графика {.smaller}
 
 ### Данные для графика
-
 ```{r}
-library(plyr)
-# Диапазон возрастов разный для курящих и некурящих, поэтому
-NewData <- ddply(
-  .data = wt, .variables = .(smoke), .fun = summarise,
-  age = seq(min(age), max(age), length = 100))
+# Диапазон возрастов разный для курящих и некурящих, поэтому...
+library(dplyr)
+new_data <- wt %>% group_by(smoke)%>%
+  do(data.frame(age = seq(min(.$age), max(.$age), length.out = 100)))
 
-# предсказанные значения
-Predictions <- predict(wt_mod_2, newdata = NewData, se.fit = TRUE)
-NewData$fit <- Predictions$fit
-# стандартные ошибки
-NewData$SE <- Predictions$se.fit
-# доверительный интервал
-NewData$upr <- NewData$fit + 1.96 * NewData$SE
-NewData$lwr <- NewData$fit - 1.96 * NewData$SE
+# Предсказанные значения
+Predictions <- predict(wt_mod_2, newdata = new_data, se.fit = TRUE)
+new_data$fit <- Predictions$fit
+
+# Стандартные ошибки
+new_data$se <- Predictions$se.fit
+# Критические значения t
+t_crit <- qt(0.975, df = nrow(wt) - length(coef(wt_mod_2)))
+# Доверительный интервал
+new_data$upr <- new_data$fit + t_crit * new_data$se
+new_data$lwr <- new_data$fit - t_crit * new_data$se
 ```
 
 
 
+## Рисуем график предсказаний
 
-##Рисуем график предсказаний
-
-```{r wt-mod-2-predict, purl=FALSE}
-ggplot(NewData, aes(x = age, y = fit)) +
+```{r}
+Pl_smoke <- ggplot(new_data, aes(x = age, y = fit)) +
   geom_ribbon(alpha = 0.2, aes(ymin = lwr, ymax = upr, group = smoke)) +
   geom_line(aes(colour = smoke))
+Pl_smoke
 ```
 
 ## На графике предсказаний можно показать исходные значения
 
-```{r wt-mod-2-predict-points, purl=FALSE}
-ggplot(NewData, aes(x = age, y = fit)) +
-  geom_ribbon(alpha = 0.2, aes(ymin = lwr, ymax = upr, group = smoke)) +
-  geom_line(aes(colour = smoke)) +
-  geom_point(data = wt, aes(x = age, y = bwt, colour = smoke))
+```{r}
+Pl_final <- Pl_smoke +
+  geom_point(data = wt, aes(x = age, y = bwt, colour = smoke)) +
+  scale_colour_discrete('Курила ли мать', labels = c('Не курила', 'Курила')) +
+  labs(x = 'Возраст матери', y = 'Вес новорожденного')
+Pl_final
 ```
+
+## О чем говорят результаты
+
+1. Наличие значимого взаимодействия говорит о том, что связь веса новорожденного и возраста матери выглядит по-разному у курящих и некурящих матерей.
+2. Мы не можем судить о влиянии каждого из предикторов по отдельности (main effects), так как они взаимодействуют.
+3. При визуализации модели становится видно, что у некурящих матерей есть тенденция с увеличением возраста рожать более крупных детей, у курящих матерей эта связь не выражена.
+4. У курящих женщин с возрастом более 25 лет  есть тенденция рожать более легких детей.
 
 
 ## Take home messages
