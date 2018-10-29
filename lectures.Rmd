@@ -120,6 +120,11 @@ install.packages("cowplot")
 
 - Презентация: [08_LM_with_continuous_and_discrete_predictors_2.html](08_LM_with_continuous_and_discrete_predictors_2.html)
 - Код: [08_LM_with_continuous_and_discrete_predictors_code.R](08_LM_with_continuous_and_discrete_predictors_code_2.R)
+
+- Код: [08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R](08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R)
+
+
+
 - Данные:
     + [goats.xlsx](data/goats.xlsx)
     + [vitcap2.csv](data/tlc.csv)
@@ -129,8 +134,8 @@ install.packages("cowplot")
 ### 09 Модели с разными значениями угла наклона для групп (29 окт 1-2 пары)
 
 <!-- - Презентация: [09_LM_with_continuous_and_discrete_predictors_interactions.html](09_LM_with_continuous_and_discrete_predictors_interactions.html) -->
-<!-- - Код: -->
-<!--     + [09_LM_with_continuous_and_discrete_predictors_Practicum.R](09_LM_with_continuous_and_discrete_predictors_Practicum.R) -->
+- Код:
+    + [09_LM_with_continuous_and_discrete_predictors_interactions.R](09_LM_with_continuous_and_discrete_predictors_interactions.R)
     + [09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R)
 
 - Данные:     
