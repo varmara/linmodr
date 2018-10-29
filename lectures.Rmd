@@ -127,7 +127,7 @@ install.packages("cowplot")
 
 - Данные:
     + [goats.xlsx](data/goats.xlsx)
-    + [vitcap2.csv](data/tlc.csv)
+    + [tlc.csv](data/tlc.csv)
     + [Puromycin.xlsx](data/Puromycin.xlsx)
     + [birthwt.csv](data/birthwt.csv)
 
