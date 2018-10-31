@@ -8,6 +8,17 @@
 
 \linespread{0.75}
 
+%%% Работа с русским языком
+\usepackage{cmap}					    % поиск в PDF
+\usepackage{mathtext} 				% русские буквы в формулах
+
+% Для разметки слайдов и картинок
+\usepackage{tikz}
+\usepackage{animate}
+
+% Для двойных прямых кавычек в Verbatim (не работает почему-то)
+\usepackage{upquote}
+
 \definecolor{links}{HTML}{2A1B81}
 \hypersetup{colorlinks=true,linkcolor=,urlcolor=links,pdfview=FitH,pdfpagelayout=SinglePage, unicode=true,breaklinks=true}
 
@@ -42,8 +53,13 @@
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 
-\logo{\includegraphics[height=0.3cm]{assets/Linmod_logo.png}}
+% Для таблиц в tabularx окружении при помощи пакета huxtable
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{hhline} %обязательно
+\usepackage{calc}
 
+\logo{\includegraphics[height=0.3cm]{assets/Linmod_logo.png}}
 
 % redefine beamer footline
 \setbeamertemplate

@@ -146,13 +146,13 @@ install.packages("cowplot")
 ### 10 Однофакторный дисперсионный анализ (1 нояб)
 
 ```{r eval=FALSE}
-install.packages(c("DAAG", "multcomp", "Hmisc"))
+install.packages(c("DAAG", "multcomp"))
 ```
 
 <!-- - Презентация: [10_anova.pdf](10_anova.pdf) -->
-<!-- - Код: [10_anova_code.R](10_anova_code.R) -->
+- Код: [10_anova_code.R](10_anova_code.R)
 
-### 11 Многофакторный дисперсионный анализ (5 нояб 1-2 пары)
+### 11 Многофакторный дисперсионный анализ (8 нояб 1 пара, 12 нояб 1 пара)
 
 <!-- - Презентация: [11_two-way_anova_and_interactions.pdf](11_two-way_anova_and_interactions.pdf) -->
 <!-- - Код: [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R) -->
@@ -160,11 +160,11 @@ install.packages(c("DAAG", "multcomp", "Hmisc"))
 
 ## Обобщенные линейные модели (GLM)
 
-### 12 GLM для нормально распределенных данных (8 нояб, 12 нояб 1 пара)
+### 12 GLM для нормально распределенных данных (12 нояб 2 пара и 15 нояб)
 
 
 
-### 13 GLM для счетных данных (12 нояб 2 пара и 15 нояб)
+### 13 GLM для счетных данных (19 нояб 1-2 пары)
 
 ```{r eval=FALSE}
 install.packages("AER")
@@ -174,7 +174,7 @@ install.packages("AER")
 <!-- - Код: [13_GLM_count_code.R](13_GLM_count_code.R) -->
 <!-- - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx) -->
 
-### 14 GLM для бинарных данных (=логистическая регрессия) (19 нояб 1-2 пары)
+### 14 GLM для бинарных данных (=логистическая регрессия) (22 нояб и 26 нояб 1 пара)
 
 ```{r eval=FALSE}
 install.packages("ISwR")
@@ -190,7 +190,7 @@ install.packages("ISwR")
 
 ## Смешанные модели (GLMM)
 
-### 15.1--15.2 GLMM для нормально-распределенных данных (22 нояб и 26 нояб 1 пара)
+### 15.1--15.2 GLMM для нормально-распределенных данных (26 нояб 2 пара и 29 нояб)
 
 ```{r eval=FALSE}
 install.packages("tidyr")
@@ -205,13 +205,13 @@ install.packages("tidyr")
 <!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
 
 
-### 16 Моделирование структуры дисперсии в смешаных моделях (26 нояб 2 пара и 29 нояб)
+### 16 Моделирование структуры дисперсии в смешаных моделях (3 дек 1-2 пары)
 
 <!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
 <!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
 <!-- - Данные: [Khaitov_2013_myt.csv](data/myt.csv) -->
 
-### 17 GLMM для счетных данных (3 дек 1-2 пары)
+### 17 GLMM для счетных данных (10 дек 1-2 пары)
 
 <!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
 <!-- - Код:  -->
@@ -221,7 +221,7 @@ install.packages("tidyr")
 <!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
 <!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
 
-### 18 GLMM для бинарных данных (10 дек 1-2 пары)
+### 18 GLMM для бинарных данных (17 дек 1-2 пары)
 
 ```{r eval=FALSE}
 install.packages(c("MASS", "glmmML", "lme4", "doBy"))
