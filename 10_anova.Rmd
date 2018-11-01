@@ -229,7 +229,7 @@ __Параметризация эффектов__ (effects coding, sum-to-zero  
 ## Переменные-индикаторы
 
 <!-- \begin{adjustbox}{max width=\textwidth} -->
-\begin{tabular}{p{1.1cm}|C{1.2cm} C{1.2cm} C{1.2cm} C{1.2cm} C{1.2cm}}
+\begin{tabular}{p{1.1cm}|C{1.3cm} C{1.3cm} C{1.3cm} C{1.3cm} C{1.3cm}}
 \textbf{Фактор} & \multicolumn{5}{c}{\textbf{Переменные-индикаторы}} \\
 \cline{2-6}
 \texttt{sp} &\texttt{spЛугКон} \newline $x_1$ &  \texttt{spМалин} \newline $x_2$ & \texttt{spБелТряс} \newline $x_3$ & \texttt{spЛесКон} \newline $x_4$ & \texttt{spЛесЗав} \newline $x_5$\\
@@ -251,7 +251,7 @@ __Параметризация эффектов__ (effects coding, sum-to-zero  
 ## Уравнение модели в параметризации индикаторов
 
 <!-- \begin{adjustbox}{max width=\textwidth} -->
-\begin{tabular}{p{1.1cm}|C{1.2cm} C{1.2cm} C{1.2cm} C{1.2cm} C{1.2cm}}
+\begin{tabular}{p{1.1cm}|C{1.3cm} C{1.3cm} C{1.3cm} C{1.3cm} C{1.3cm}}
 \textbf{Фактор} & \multicolumn{5}{c}{\textbf{Переменные-индикаторы}} \\
 \cline{2-6}
 \texttt{sp} &\texttt{spЛугКон} \newline $x_1$ &  \texttt{spМалин} \newline $x_2$ & \texttt{spБелТряс} \newline $x_3$ & \texttt{spЛесКон} \newline $x_4$ & \texttt{spЛесЗав} \newline $x_5$\\
