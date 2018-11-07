@@ -155,8 +155,8 @@ install.packages(c("DAAG", "multcomp"))
 ### 11 Многофакторный дисперсионный анализ (8 нояб 1 пара, 12 нояб 1 пара)
 
 <!-- - Презентация: [11_two-way_anova_and_interactions.pdf](11_two-way_anova_and_interactions.pdf) -->
-<!-- - Код: [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R) -->
-<!-- - Данные: [hall.csv](data/hall.csv) -->
+- Код: [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R)
+- Данные: [hall.csv](data/hall.csv)
 
 ## Обобщенные линейные модели (GLM)
 
