@@ -66,7 +66,7 @@ source("support_linmodr.R")
 ## Знакомимся с данными
 
 ```{r}
-fert <- read.csv(file="data/hall.csv")
+fert <- read.csv(file='data/hall.csv')
 str(fert)
 # Для удобства названия переменных маленькими буквами
 colnames(fert) <- tolower(colnames(fert))
@@ -97,7 +97,7 @@ table(fert$time, fert$treat)
 library(ggplot2)
 theme_set(theme_bw())
 gg_rich <- ggplot(data = fert, aes(x = time, y = richness, colour = treat)) + 
-  stat_summary(geom = "pointrange", fun.data = mean_cl_normal)
+  stat_summary(geom = 'pointrange', fun.data = mean_cl_normal)
 gg_rich
 ```
 
@@ -390,7 +390,7 @@ ggplot(data = mod_treatment_diag, aes(x = treat, y = .stdresid, colour = time)) 
 
 - Видна гетерогенность дисперсии. 
 
-В данном случае это не страшно, т.к. дисперсионный анализ устойчив к ситуации, когда в одной из групп разброс меньше, чем в других (особенно, если данные не слишком несбалансированные) (Underwood, 1997)
+В данном случае это не страшно, т.к. дисперсионный анализ устойчив к ситуации, когда в одной из групп разброс меньше, чем в других (особенно, если данные не слишком несбалансированные) (Underwood, 1997, McGuinness, 2002)
 
 
 ## Квантильный график остатков
@@ -516,7 +516,7 @@ __Осторожно!__ Тестируя предикторы в разном п
 ```{r}
 mod_treatment <- lm(log_rich ~ treat * time, data = fert)
 library(car)
-Anova(mod_treatment, type = "II")
+Anova(mod_treatment, type = 'II')
 ```
 
 ## Дисперсионный анализ c III типом сумм квадратов
@@ -562,7 +562,7 @@ fert$treat_time <- interaction(fert$treat, fert$time)
 fit_inter <- lm()
 # Делаем пост хок тест для этой модели
 library(multcomp)
-dat_tukey <- glht(, linfct = mcp( = "Tukey"))
+dat_tukey <- glht(, linfct = mcp( = 'Tukey'))
 summary()
 ```
 
@@ -575,7 +575,7 @@ fert$treat_time <- interaction(fert$treat, fert$time)
 fit_inter <- lm(log_rich ~ treat_time - 1, data = fert)
 # Делаем пост хок тест для этой модели
 library(multcomp)
-dat_tukey <- glht(fit_inter, linfct = mcp(treat_time = "Tukey"))
+dat_tukey <- glht(fit_inter, linfct = mcp(treat_time = 'Tukey'))
 summary(dat_tukey)
 ```
 
@@ -595,7 +595,7 @@ MyData <- expand.grid(treat = levels(fert$treat),
                       time = levels(fert$time))
 MyData <- data.frame(
   MyData,
-  predict(mod_treatment, newdata = MyData, interval = "confidence")
+  predict(mod_treatment, newdata = MyData, interval = 'confidence')
   )
 # Обратная трансформация (не забываем про единичку, которую прибавляли)
 MyData$richness <- 10^MyData$fit - 1
@@ -683,9 +683,9 @@ gg_linep
 ## Приводим график в приличный вид
 
 ```{r tidy.opts=list(width.cutoff=60)}
-gg_final <- gg_linep + labs(x = "Экспозиция",  y = "Число видов") + 
-  scale_colour_brewer(name = "", palette = "Dark2", 
-    labels = c("Контроль", "Эксперимент"))
+gg_final <- gg_linep + labs(x = 'Экспозиция',  y = 'Число видов') + 
+  scale_colour_brewer(name = '', palette = 'Dark2', 
+    labels = c('Контроль', 'Эксперимент'))
 gg_final
 ```
 
