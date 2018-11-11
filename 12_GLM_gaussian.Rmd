@@ -59,6 +59,10 @@ $E(y_i) = \mu_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
 
 Если отклик подчиняется другому распределению, такие модели не годятся.
 
+\vspace{\baselineskip}
+
+Последний из двух вариантов записи модели (распределение отклика и линейный предиктор) мы будем использовать дальше.
+
 ## Обобщенные линейные модели
 
 Обобщенные линейные модели (Generalized Linear Models, GLM, GLZ, GLIM) позволяют моделировать зависимости не только для нормально-распределенных величин, но и для других распределений.
@@ -332,6 +336,7 @@ $y_i \sim N(\mu_i, \sigma)$
 
 $E(y_i) = \mu_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
 
+\pause
 
 ### Обобщенная линейная модель состоит из трех компонентов
 
@@ -362,7 +367,11 @@ $g(\mu_i) = \eta_i$
 
 $\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
 
-Функция связи $g(\mu)$ используется разная в зависимости от распределения $f(y_i|\theta)$. Например:
+Функция связи $g(\mu)$ используется разная в зависимости от распределения $f(y_i|\theta)$.
+
+\pause
+
+Например:
 
 \small
 
@@ -378,7 +387,7 @@ $\mu_i = \eta_i$
 
 $\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
 
-<!-- \pause -->
+\pause
 
 \column{0.32\textwidth}
 
@@ -390,7 +399,7 @@ $ln(\mu_i) = \eta_i$
 
 $\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
 
-<!-- \pause -->
+\pause
 
 \column{0.32\textwidth}
 
@@ -504,9 +513,13 @@ $$L(\theta| \text{data}) = \Pi^n _{i = 1}f(\text{data}| \theta)$$
 
 \columnsend
 
-Нужно найти параметры  $\theta$, которые максимизирут правдоподобие: $L(\theta | \text{data}) \longrightarrow \text{max}$
+Нужно найти параметры  $\theta$, которые максимизирут правдоподобие:
 
-Вычислительно проще работать с логарифмами правдоподобий (loglikelihood): $lnL(\theta| \text{data}) \longrightarrow \text{max}$
+$$L(\theta | \text{data}) \longrightarrow \text{max}$$
+
+Вычислительно проще работать с логарифмами правдоподобий (loglikelihood): 
+
+$$lnL(\theta| \text{data}) \longrightarrow \text{max}$$
 
 Редко можно решить аналитически, обычно используются численные решения.
 
@@ -592,6 +605,8 @@ $\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
 
 Как зависит питательная ценность икры от месяца вылова рыбы (сентябрь или ноябрь) с учетом ковариаты (возраста рыбы) и их взаимодействия.
 
+\vspace{\baselineskip}
+
 $PctDM_i \sim N(\mu_i, \sigma)$
 
 $E(PctDM_i) = \mu_i$
@@ -599,6 +614,8 @@ $E(PctDM_i) = \mu_i$
 $\mu_i = \eta_i$
 
 $\eta_i = \beta_0 + \beta_1 Age_{i} + \beta_2 Month_{Nov\,i} + \beta_{3} Age_{i} Month_{Nov\,i}$
+
+\vspace{\baselineskip}
 
 - $PctDM_i$ -- содержание сухого вещества в икре
 - $Age_{i}$ -- возраст рыбы
@@ -623,7 +640,7 @@ $E(PctDM_i) = \mu_i$
 
 $\mu_i = \eta_i$
 
-$\begin{aligned}\eta_i &= 38.12 - 0.24 Age_{i} + 1.28 Month_{Nov\,i} + \\ &+ 0.02 Age_{i} Month_{Nov\,i}\end{aligned}$
+$\eta_i = 38.12 - 0.24 Age_{i} + 1.28 Month_{Nov\,i} + 0.02 Age_{i} Month_{Nov\,i}$
 
 # Диагностика модели
 
@@ -639,6 +656,8 @@ $$e_i = y_i - E(y_i)$$
 ```{r}
 resid(mod, type = 'response')[1:5]
 ```
+
+\pause
 
 ### Пирсоновские остатки (Pearson's residuals)
 
