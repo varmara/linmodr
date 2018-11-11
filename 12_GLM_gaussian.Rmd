@@ -1,120 +1,431 @@
 ---
 title: "Обобщенные линейные модели с нормальным распределением остатков"
-author: Марина Варфоломеева, Вадим Хайтов
+subtitle: "Линейные модели..."
+author: "Марина Варфоломеева, Вадим Хайтов"
+institute: "Кафедра Зоологии беспозвоночных, Биологический факультет, СПбГУ"
+fontsize: 10pt
+classoption: 't,xcolor=table'
+language: russian, english
 output:
-  ioslides_presentation:
-    widescreen: true
-    css: assets/my_styles.css
-    logo: assets/Linmod_logo.png
-editor_options: 
-  chunk_output_type: console
+  beamer_presentation:
+    theme: default
+    toc: no
+    colortheme: beaver
+    latex_engine: xelatex
+    slide_level: 2
+    fig_crop: false
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 70, scipen = 6)
+options(width = 80, scipen = 4)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+# library("extrafont")
+source("support_linmodr.R")
 ```
 
-## Мы рассмотрим
+## Общая линейная модель --- удобный инструмент описания связей
 
-- Принципы выбора лучшей линейной модели
-- Переобучение моделей
-- Метод максимального правдоподобия
-- Сравнение линейных моделей разными способами:
-    - частный F-критерий
-    - тест отношения правдоподобий
-    - информационный критерий Акаике (AIC)
+$y_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i} + \varepsilon_i$,
 
-### Вы сможете
+где $\varepsilon_i \sim N(0, \sigma)$.
 
-- Объяснить связь между качеством описания существующих данных и краткостью модели
-- Объяснить, что такое "переобучение" модели
-- Определять, какие модели являются вложенными
-- Объяснить, как подбирают параметры линейных моделей методом максимального правдоподобия
-- Сравнивать вложенные модели при помощи частного F-критерия или теста отношения правдоподобий
-- Сравнивать модели при помощи AIC
+Предикторы в такой модели могут быть дискретными и непрерывными.
 
-
-```{r, echo=FALSE, message=FALSE, purl=FALSE}
+```{r echo=FALSE, purl=FALSE}
 library(ggplot2)
-theme_set(theme_bw())
-library(gridExtra)
+N <- 100
+set.seed(3829)
+x <- rnorm(N, 5, 3)
+dat <- data.frame(x = x, y = 5 + 0.8 * x + rnorm(N, 0, 1.7))
+ggplot(data = dat, aes(x = x, y = y)) + geom_point(colour = 'grey20', position = position_jitter(width = 0.05)) + geom_smooth(method = 'lm')
 ```
 
+## Применимость общих линейных моделей ограничена
 
-# Модель множественной линейной регрессии
+$y_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i} + \varepsilon_i$,
 
-## Пример: птицы в лесах Австралии
+где $\varepsilon_i \sim N(0, \sigma)$.
 
-От каких характеристик лесного участка зависит обилие птиц в лесах юго-западной Виктории, Австралия (Loyn, 1987)
+Т.е. на самом деле мы имеем ввиду, что переменная-отклик подчиняется нормальному распределению:
 
-Переменных много, мы хотим из них выбрать __оптимальный небольшой__ набор.
+$y_i \sim N(\mu_i, \sigma)$
 
-<div class="columns-2">
+$E(y_i) = \mu_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
 
-![forest in Victoria, Australia](images/vict_m.jpg)
-<small>Mystic Forest - Warburton, Victoria by ¡kuba! on flickr</small>
+Если отклик подчиняется другому распределению, такие модели не годятся.
 
+## Обобщенные линейные модели
 
+Обобщенные линейные модели (Generalized Linear Models, GLM, GLZ, GLIM) позволяют моделировать зависимости не только для нормально-распределенных величин, но и для других распределений.
 
-56 лесных участков:
+\vspace{\baselineskip}
 
-- ABUND - обилие птиц
-- AREA - площадь участка
-- YRISOL - год изоляции участка
-- DIST - расстояние до ближайшего леса
-- LDIST - расстояние до ближайшего большого леса
-- GRAZE - пастбищная нагрузка (1-5)
-- ALT - высота над уровнем моря
+Не путайте обобщенные линейные модели с общими (General Linear Models, тоже сокращаются как GLM).
 
-</div>
+## Важнейшие распределения из семейства экспоненциальных
 
-<small>Пример из кн. Quinn, Keugh, 2002, данные из Loyn, 1987)</small>
+\columnsbegin
+\column{0.48\textwidth}
 
-## Модель из прошлой лекции
+Для непрерывных величин
 
-```{r}
-bird <- read.csv("data/loyn.csv")
-bird$logAREA <- log(bird$AREA)
-bird$logDIST <- log(bird$DIST)
-bird$logLDIST <- log(bird$LDIST)
-mod2 <- lm(ABUND ~ logAREA + YRISOL + logDIST + logLDIST + ALT, data = bird)
+- Нормальное распределение
+- Гамма распределение
+
+\column{0.48\textwidth}
+
+Для дискретных величин
+
+- Биномиальное распределение
+- Распределение Пуассона
+- Отрицательное биномиальное распределение
+
+\columnsend
+
+## Нормальное распределение
+
+\columnsbegin
+\column{0.48\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, out.width='2.5in', fig.height=3.38, out.height='2.25in'}
+library(ggplot2)
+mu1 <- 0
+mu2 <- 10
+sigma1 <- 3
+sigma2 <- 7
+y <- seq(-20, 40, length.out = 100)
+pi <- data.frame(y = rep(y, 4), pi = c(dnorm(y, mu1, sigma1), dnorm(y, mu1, sigma2), dnorm(y, mu2, sigma1), dnorm(y, mu2, sigma2)), mu = rep(c(mu1, mu2), each = 2*length(y)), sigma = rep(c(sigma1, sigma2, sigma1, sigma2), each = length(y)) )
+
+ggplot(pi, aes(x = y, y = pi)) + geom_line(stat = "identity", colour = 'grey20', size = 1) + facet_grid(mu~sigma, labeller = label_both) + 
+  # ggtitle("Нормальное распределение \nпри разных параметрах") + 
+  ylab("f(y)")
 ```
 
-## Влияют ли предикторы?
+\column{0.42\textwidth}
 
-```{r}
-summary(mod2)
+\vspace{-\baselineskip}
+
+$$f(y)= \frac {1}{\sqrt{2 \pi \sigma^2}} \cdot e^{-\frac{1}{2 \sigma^2} (y - \mu)^2}$$
+Параметры:
+
+- $\mu$ -- среднее  
+- $\sigma$ -- стандартное отклонение
+
+\vspace{\baselineskip}
+
+Свойства:
+
+- $E(y)  = \mu$ -- мат.ожидание
+- $var(y) = 1$ -- функция дисперсии (variance function)
+- $-\infty \le y \le +\infty$,  $y \in \mathbb R$ -- диапазон значений
+
+\columnsend
+
+\note{Faraway J.J. (2017) Extending the linear model with R, p.154 - написано про variance functions}
+
+## Гамма-распределение
+
+\columnsbegin
+\column{0.48\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, out.width='2.5in', fig.height=3.38, out.height='2.25in'}
+mu1 <- 3
+mu2 <- 1
+nu1 <- 0.1
+nu2 <- 2
+y <- seq(0, 10, length.out = 100)
+
+pi <- data.frame(
+  y = rep(y, 4), 
+  mu = rep(c(mu1, mu2), each = 2*length(y)), 
+  nu = rep(c(nu1, nu2, nu1, nu2), each = length(y)) )
+pi$pi = dgamma(pi$y, pi$nu, pi$mu)
+
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_line(stat = "identity", colour = 'grey20', size = 1) + 
+  facet_grid(mu ~ nu, labeller = label_both) + 
+  # ggtitle("Гамма распределение при разных параметрах") + 
+  ylab("f(y)")
+
 ```
 
-Не все предикторы влияют, возможно, эту модель можно оптимизировать...
+\column{0.42\textwidth}
 
-# Тесты отношения правдоподобий
+\vspace{-\baselineskip}
 
-## Вероятность и правдоподобие
+$$f(y) = \frac{1}{\Gamma(\nu)}\cdot (\frac{\nu}{\mu})^{\nu} \cdot y^{\nu-1} \cdot e^{\cfrac{y \cdot \nu}{\mu}}$$
+Параметры:
 
-Правдоподобие (likelihood) ---  способ измерить соответствие имеющихся данных тому, что можно получить при определенных значениях параметров модели.
+- $\mu$ -- среднее  
+- $\nu$ -- определяет степень избыточности дисперсии
 
-Мы оцениваем это как произведение вероятностей получения каждой из точек данных
 
-$$L(\theta| data) = \Pi^n _{i = 1}f(x| \theta)$$
+\vspace{\baselineskip}
 
-где $f(data| \theta)$ - функция плотности распределения с параметрами $\theta$
+Свойства:
 
-```{r gg-norm-tunnel, echo=FALSE, fig.height=4, purl=FALSE}
+- $E(y) = \mu$ -- мат.ожидание
+- $var(y) = \frac {\mu^2}{\nu}$ -- функция дисперсии
+- $0 < y \le +\infty$, $y \in \mathbb R$ -- диапазон значений
+
+
+\columnsend
+
+## Биномиальное распределение
+
+\columnsbegin
+\column{0.48\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, out.width='2.5in', fig.height=3.38, out.height='2.25in'}
+mu1 <- 0.1
+mu2 <- 0.5
+N1 <- 10
+N2 <- 50
+y <-seq(0, 35, by = 1)
+pi <- data.frame(y = rep(y, 4), pi = c(dbinom(y, size = N1, prob = mu1), dbinom(y,  size = N2, prob = mu1), dbinom(y,  size = N1, prob = mu2), dbinom(y,  size = N2, prob = mu2)),  mu = rep(c(mu1, mu2), each = 2*length(y)), N = rep(c(N1, N2, N1, N2), each = length(y)))
+
+ggplot(pi, aes(x = y, y = pi)) + geom_bar(stat = "identity", fill = 'grey20') + facet_grid(N~mu,  labeller = label_both) + 
+  # ggtitle("Биномиальное распрделение \nпри разных параметрах") + 
+  ylab("f(y)")
+```
+
+\column{0.42\textwidth}
+
+\vspace{-\baselineskip}
+
+$$f(y) = \frac{n!}{y! \cdot (n-y)!} \cdot \pi^y \cdot (1 - \pi)^{n-y}$$
+
+Параметры:
+
+- $n$ -- число объектов в испытании  
+- $\pi$ -- вероятность того, что $y = 1$
+
+
+\vspace{\baselineskip}
+
+Свойства:
+
+- $E(y)  = n \cdot \pi$ -- мат.ожидание
+- $var(y) = n \cdot \pi \cdot (1-\pi)$ -- функция дисперсии
+- $0 \le y \le +\infty$, $y \in \mathbb{N}$ -- диапазон значений
+
+\columnsend
+
+## Распределение Пуассона 
+
+\columnsbegin
+\column{0.48\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=2.32*1.5, out.width='2.32in', fig.height=3.38, out.height='2.25in'}
+mu1 <- 1
+mu2 <- 5
+mu3 <- 10
+mu4 <- 20
+y <- seq(0, 35, by = 1)
+
+pi <- data.frame(
+  y = rep(y, 4),  
+  pi = c(dpois(y, mu1), dpois(y, mu2), dpois(y, mu3), dpois(y, mu4)), 
+  mu = rep(c(mu1, mu2, mu3, mu4), each = length(y))
+)
+
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_bar(stat = "identity", fill = 'grey20') + 
+  facet_wrap(~ mu, nrow = 2, labeller = label_both) + 
+  # ggtitle("Распределение Пуассона \nпри разных параметрах") + 
+  ylab("f(y)")
+```
+
+\column{0.42\textwidth}
+
+\vspace{-\baselineskip}
+
+$$f(y)= \frac{\mu^y \cdot e{-\mu}}{y!}$$
+
+Параметр:
+
+- $\mu$ -- задает среднее и дисперсию
+
+
+\vspace{\baselineskip}
+
+Свойства:
+
+- $E(y) = \mu$ --- мат.ожидание
+- $var(y) = \mu$ --- функция дисперсии
+- $0 \le y \le +\infty$, $y \in \mathbb{N}$ --- диапазон значений
+
+
+\columnsend
+
+## Отрицательное биномиальное распределение
+
+\columnsbegin
+\column{0.48\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=3.75, out.width='2.5in', fig.height=3.38, out.height='2.25in'}
+mu1 <- 1
+mu2 <- 5
+k1 <- 0.1
+k2 <- 100
+y <- 0:30
+
+pi <- data.frame(
+  y = rep(y, 4), 
+  pi = c(dnbinom(y, size = k1, mu = mu1), 
+         dnbinom(y, size = k1, mu = mu2), 
+         dnbinom(y, size = k2, mu = mu1), 
+         dnbinom(y, size = k2, mu = mu2)), 
+  mu = rep(c(mu1, mu2), each = 2*length(y)), 
+  k = rep(c(k1, k2, k1, k2), each = length(y)) )
+
+ggplot(pi, aes(x = y, y = pi)) + 
+  geom_bar(stat = "identity", fill = 'grey20') + 
+  facet_grid(mu~k, labeller = label_both, scales = "free_y") + 
+  # ggtitle("Отрицательное биномиальное распределение \nпри разных параметрах") + 
+  ylab("f(y)")
+```
+
+\column{0.42\textwidth}
+
+\vspace{-\baselineskip}
+
+$$f(y) = \frac{\Gamma(y + k)}{\Gamma(k) \cdot \Gamma(y+1)} \cdot (\frac{k}{\mu + k})^k \cdot (1 - \frac{k}{\mu + k})^y$$
+
+Параметры: 
+
+- $\mu$ -- среднее  
+- $k$ -- определяет степень избыточности дисперсии
+
+\vspace{\baselineskip}
+
+Свойства:
+
+- $E(y)  = \mu$ -- мат.ожидание
+- $var(y) = \mu + \frac {\mu^2}{k}$ -- функция дисперсии
+- $0 \le y \le +\infty$, $y \in \mathbb{N}$ -- диапазон значений
+
+\note{Это смесь Пуассоновского и Гамма распределений: $y$ подчиняется распределению Пуассона с Гамма-распределенным $\mu$. Приближается к распр. Пуассона при очень больших $k$.}
+
+\columnsend
+
+## Обобщенные линейные модели (Generalized Linear Models)
+
+Обобщенные линейные модели (Nelder, Weddlerburn, 1972)
+
+- Позволяют моделировать не только величины, подчиняющиеся нормальному распределению, но и другим распределениям из семейства экспоненциальных.
+
+- Подбор коэффициентов делается методом максимального правдоподобия.
+
+<!-- \columnsend -->
+
+## Чем отличается обобщенная линейная модель от общей?
+
+### Общая линейная модель состоит из двух компонентов
+
+$y_i \sim N(\mu_i, \sigma)$
+
+$E(y_i) = \mu_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
+
+
+### Обобщенная линейная модель состоит из трех компонентов
+
+$y_i \sim f(y_i|\theta)$ 
+
+$E(y_i) = \mu_i = g^{-1}(\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i})$
+
+$g(\mu_i) = \eta_i$
+
+$\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
+
+\vspace{\baselineskip}
+
+- Случайная часть --- $y_i \sim f(y_i|\theta)$ --- распределение из семейства экспоненциальных с параметрами $\theta$.  
+- Фиксированная часть.
+
+Компонент, который появляется в GLM:
+
+- $g()$ --- функция связи, которая трансформирует мат. ожидание отклика в линейный предиктор (обратная функция обозначается $g^{-1}()$).
+
+## Функция связи
+
+$y_i \sim f(y_i|\theta)$ 
+
+$E(y_i) = \mu_i = g^{-1}(\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i})$
+
+$g(\mu_i) = \eta_i$
+
+$\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
+
+Функция связи $g(\mu)$ используется разная в зависимости от распределения $f(y_i|\theta)$. Например:
+
+\small
+
+\columnsbegin
+
+\column{0.32\textwidth}
+
+**Идентичность:**
+
+$E(y_i) = \mu_i \phantom{\frac{e^{\beta_0}}{1 + e^{\beta_0}}}$
+
+$\mu_i = \eta_i$
+
+$\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
+
+<!-- \pause -->
+
+\column{0.32\textwidth}
+
+**Логарифм:**
+
+$E(y_i) = e^{\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}} \phantom{\frac{e^{\beta_0}}{1 + e^{\beta_0}}}$
+
+$ln(\mu_i) = \eta_i$
+
+$\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
+
+<!-- \pause -->
+
+\column{0.32\textwidth}
+
+**Логит:** 
+
+$E(y_i) = \frac{e^{\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}}{1 + e^{\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}}$
+
+$ln\big(\frac{\mu_i}{1 - \mu_i}\big) = \eta_i$
+
+$\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
+
+\columnsend
+
+
+
+## Параметры обобщенных линейных моделей подбирают методом максимального правдоподобия
+
+Правдоподобие (likelihood) --- измеряет соответствие реально наблюдаемых данных тем, что можно получить из модели при определенных значениях параметров.
+
+\columnsbegin
+\column{0.48\textwidth}
+
+```{r gg-norm-tunnel0, echo=FALSE, fig.height=4, purl=FALSE}
 ## Based on code by Arthur Charpentier:
 ## http://freakonometrics.hypotheses.org/9593
 ## TODO: wrap it into a function and adapt it for use with other distributions
 ## as Markus Gesmann has done here
 ## http://www.magesblog.com/2015/08/visualising-theoretical-distributions.html
-set.seed(32981)
+library(boot)
+data(catsM)
+cat <- catsM
 op <- par(mar = c(0, 0, 0, 0))
 n <- 2
-X <- runif(25, 0, 10)
-Y <- 5 + 1.2 * X + rnorm(25, 0, 5)
+X <- cat$Bwt
+Y <- cat$Hwt
 df <- data.frame(X,Y)
 
 # regression
@@ -122,11 +433,10 @@ reggig <- glm(Y ~ X, data = df, family = gaussian(link = "identity"))
 
 # empty plot
 vX <- seq(min(X) - 0.1, max(X) + 0.1, length = n)
-dy <- 2 * sd(Y)
-vY <- seq(min(Y) - dy, max(Y) + dy, length = n)
+vY <- seq(min(Y) - 10, max(Y) + 10, length = n)
 mat <- persp(x = vX, y = vY, z = matrix(0, n, n),
-             zlim = c(0, 0.03),
-             theta =  -40, phi = 15, expand = 0.1,
+             zlim = c(0, 0.1),
+             theta =  -30, phi = 20, expand = 0.1,
              ticktype  = "detailed",  box = FALSE, border = "gray60")
 
 x <- seq(min(X), max(X), length = 501)
@@ -163,13 +473,13 @@ sdgig <- sqrt(summary(reggig)$dispersion)
 for(j in n:1){
   stp <- 251
   x <- rep(vX[j], stp)
-  y <- seq(min(min(Y) - dy, 
-               qnorm(.05, 
-                     predict(reggig, 
-                             newdata = data.frame(X = vX[j]), 
-                             type = "response"),  
-                     sdgig)), 
-           max(Y) + dy, 
+  y <- seq(min(min(Y) - 10,
+               qnorm(.05,
+                     predict(reggig,
+                             newdata = data.frame(X = vX[j]),
+                             type = "response"),
+                     sdgig)),
+           max(Y) + 10,
            length = stp)
   z0 <- rep(0, stp)
   z <- dnorm(y,  mgig[j],  sdgig)
@@ -178,280 +488,487 @@ for(j in n:1){
   C <- trans3d(x, y, z0, mat)
   lines(C, lty = 2, col = "grey60")
   C <- trans3d(x, y, z, mat)
-  lines(C, col = "steelblue")
+  lines(C, col = "grey20")
 }
 par(op)
 ```
 
-
-## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
-
-$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$
-
-## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
-
-$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$
-
-Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
-
-$N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1} {2 \sigma^2} \epsilon_i^2)$
-
-## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
-
-$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$
-
-Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
-
-$N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1} {2 \sigma^2} \epsilon_i^2)$
-
-Функцию правдоподобия (likelihood, вероятность получения нашего набора данных) можно записать как произведение вероятностей:
-
-$L(\epsilon_i|\mathbf{y}, \mathbf{x}) = \Pi^n _{n = 1} N(\epsilon_i, \sigma^2) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2)$
-
-## Выводим формулу правдоподобия для линейной модели с нормальным распределением ошибок
-
-$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$
-
-Пусть в нашей модели остатки нормально распределены ($\epsilon_i \sim N(0, \sigma^2)$) и их значения независимы друг от друга:
-
-$N(\epsilon_i; 0, \sigma^2) = \frac {1} { \sqrt {2\pi\sigma^2} } exp (-\frac {1} {2 \sigma^2} \epsilon_i^2)$
-
-Функцию правдоподобия (likelihood, вероятность получения нашего набора данных) можно записать как произведение вероятностей:
-
-$L(\epsilon_i|\mathbf{y}, \mathbf{x}) = \Pi^n _{n = 1} N(\epsilon_i, \sigma^2) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2)$
-
-Поскольку $\epsilon_i = y_i - (b_0 + b_1x_1 + \ldots + b_kx_k)$
-
-то функцию правдоподобия можно переписать так:
-
-$L(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) = \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (b_0 + b_1x_1 + \ldots + b_kx_k))^2)$
-
-## Подбор параметров модели методом максимального правдоподобия
-
-Чтобы найти параметры модели
-
-$$y_i = b_0 + b_1x_1 + \ldots + b_kx_k + \epsilon_i$$
-
-нужно найти такое сочетание параметров  $b_0$, $b_1$, \ldots $b_k$, и $\sigma^2$, при котором функция правдоподобия будет иметь максимум (именно поэтому метод называется метод максимального правдоподобия:
-
-$\begin{array}{l}
-L(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2) = \\
-&= \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (b_0 + b_1x_1 + \ldots + b_kx_k))^2)
-\end{array}$
+\column{0.48\textwidth}
 
 
-## Логарифм правдоподобия (loglikelihood)
+Это произведение вероятностей получения каждой из точек данных:
 
-Вычислительно проще работать с логарифмами правдоподобий (loglikelihood)
+$$L(\theta| \text{data}) = \Pi^n _{i = 1}f(\text{data}| \theta)$$
 
-Если функция правдоподобия
+- $f(\text{data}| \theta)$ --- функция распределения с параметрами $\theta$
 
-$\begin{array}{l}
-L(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= \frac {1} {\sqrt{(2\pi\sigma^2)^n}} exp(- \frac {1} {2\sigma^2} \sum {\epsilon_i}^2) = \\
-&= \frac {1} {\sqrt{(2\pi\sigma^2)^n}}exp(- \frac {1} {2\sigma^2} \sum (y_i - (b_0 + b_1x_1 + \ldots + b_kx_k))^2)
-\end{array}$
+\columnsend
 
-то логарифм правдоподобия
+Нужно найти параметры  $\theta$, которые максимизирут правдоподобие: $L(\theta | \text{data}) \longrightarrow \text{max}$
 
-$\begin{array}{l}
-logLik(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= & \\
-ln L(b_1\ldotsb_k, \sigma^2| \mathbf{y}, \mathbf{x}) &= &- \frac{n}{2} (ln2\pi + ln\sigma^2) - \frac{1}{2\sigma^2}(\sum \epsilon^2_i) = \\
-&= &- \frac{n}{2} (ln2\pi + ln\sigma^2) - \\
-& &- \frac{1}{2\sigma^2}(\sum (y_i - (b_0 + b_1x_1 + \ldots + b_kx_k))^2)
-\end{array}$
+Вычислительно проще работать с логарифмами правдоподобий (loglikelihood): $lnL(\theta| \text{data}) \longrightarrow \text{max}$
 
-Чем больше логарифм правдоподобия тем лучше модель.
+Редко можно решить аналитически, обычно используются численные решения.
 
-## Подбор параметров модели методом максимального правдоподобия
+## Пример -- энергетическая ценность икры
 
-Для подбора параметров методом максимального правдоподобия используют функцию `glm()`
+Один из показателей, связанных с жизнеспособностью икры -- доля сухого вещества. Она пропорциональна количеству запасенной энергии. 
 
+Отличается ли энергетическая ценность икры большой озерной форели в сентябре и ноябре?
+
+Данные: Lantry et al., 2008   
+Источник: пакет Stat2Data
+
+## Открываем данные
 
 ```{r}
-# Симулированные данные
-set.seed(9328)
-dat <- data.frame(X = runif(n = 50, min = 0, max = 10))
-dat$Y <- 3 + 15 * dat$X + rnorm(n = 50, mean = 0, sd = 1)
+library(Stat2Data)
+data(FishEggs)
+```
 
-# Подбор модели двумя способами
-Mod     <-  lm(Y ~ X, data = dat) # МНК
-Mod_glm <- glm(Y ~ X, data = dat) # МЛ
+Все ли правильно открылось?
 
-# Одинаковые оценки коэффициентов
-coefficients(Mod)
-coefficients(Mod_glm)
+```{r}
+str(FishEggs)
+```
+
+Нет ли пропущенных значений?
+
+```{r}
+colSums(is.na(FishEggs))
+```
+
+## Меняем порядок уровней факторов
+
+Уровни факторов в исходных данных:
+
+```{r}
+levels(FishEggs$Month)
+```
+
+Делаем базовым уровнем сентябрь.
+
+```{r}
+FishEggs$Month <- relevel(FishEggs$Month, ref = 'Sep')
+```
+
+Теперь уровни в хронологическом порядке:
+
+```{r}
+levels(FishEggs$Month)
+```
+
+## Объемы выборок
+
+```{r}
+table(FishEggs$Month)
+```
+
+## Ищем выбросы
+
+```{r}
+library(cowplot)
+library(ggplot2)
+theme_set(theme_bw())
+gg_dot <- ggplot(FishEggs, aes(y = 1:nrow(FishEggs))) + geom_point()
+plot_grid(gg_dot + aes(x = Age), 
+          gg_dot + aes(x = PctDM), nrow = 1)
 ```
 
 
-## Логарифм правдоподобия
+## Модель для описания питательной ценности икры
 
-$LogLik$ для модели можно найти с помощью функции `logLic()`
+### GLM с нормальным распределением отклика
+
+$y_i \sim N(\mu_i, \sigma)$
+
+$E(y_i) = \mu_i$
+
+$\mu_i = \eta_i$ --- функция связи "идентичность" (identity)
+
+$\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}$
+
+### Модель зависимости в примере
+
+Как зависит питательная ценность икры от месяца вылова рыбы (сентябрь или ноябрь) с учетом ковариаты (возраста рыбы) и их взаимодействия.
+
+$PctDM_i \sim N(\mu_i, \sigma)$
+
+$E(PctDM_i) = \mu_i$
+
+$\mu_i = \eta_i$
+
+$\eta_i = \beta_0 + \beta_1 Age_{i} + \beta_2 Month_{Nov\,i} + \beta_{3} Age_{i} Month_{Nov\,i}$
+
+- $PctDM_i$ -- содержание сухого вещества в икре
+- $Age_{i}$ -- возраст рыбы
+- $Month_{Nov\,i}$ -- переменная-индикатор для уровня $Month_{Nov\,i} = 1$
+
+\note{В генеральной совокупности параметры модели $\beta_0, ..., \beta_3$.  
+Подобрав модель, мы получим их оценки $b_0, ..., b_3$.
+}
+
+## Подбираем модель
 
 ```{r}
-logLik(Mod_glm)
+mod <- glm(PctDM ~ Age * Month, data = FishEggs)
+mod
+# Чтобы записать модель, нужна еще сигма.
+sigma(mod)
 ```
 
-## Логарифм правдоподобия вручную
+$PctDM_i \sim N(\mu_i, 1.24)$
 
+$E(PctDM_i) = \mu_i$
+
+$\mu_i = \eta_i$
+
+$\begin{aligned}\eta_i &= 38.12 - 0.24 Age_{i} + 1.28 Month_{Nov\,i} + \\ &+ 0.02 Age_{i} Month_{Nov\,i}\end{aligned}$
+
+# Диагностика модели
+
+## Разновидности остатков в GLM
+
+### Остатки в масштабе отклика (response residuals)
+
+$$e_i = y_i - E(y_i)$$
+- Это разница между наблюдаемым и предсказанным значениями.
+
+- Аналог "сырых" остатков в простой линейной регрессии.
 
 ```{r}
-# Предсказанные значения
-dat$predicted <- predict(Mod)
-# Оценка дисперсии
-SD <- summary(Mod)$sigma 
-# Вероятности для каждой точки
-dat$Prob <- dnorm(dat$Y, mean = dat$predicted, sd = SD)
-# Логарифм вероятностей
-dat$LogProb <- log(dat$Prob)
-# Логарифм произведения, равный сумме логарифмов
-sum(dat$LogProb)
+resid(mod, type = 'response')[1:5]
 ```
 
+### Пирсоновские остатки (Pearson's residuals)
+
+$$r_{p\,i} = \frac{y_i - E(y_i)}{\sqrt{var(y_i)}}$$
+
+- Это обычные остатки, деленные на стандартную ошибку предсказанного значения. 
+
+- Аналог стандартизованных остатков в простой линейной регрессии.
+
+```{r}
+resid(mod, type = 'pearson')[1:5]
+```
+
+Для GLM с нормальным распределением отклика оба типа остатков одинаковы.
+
+
+## Условия применимости GLM с нормальным распределением отклика
+
+- Случайность и независимость наблюдений внутри групп.
+- Нормальное распределение остатков.
+- Гомогенность дисперсий остатков.
+- Отсутствие коллинеарности предикторов.
+
+## Проверка на коллинеарность
+
+```{r}
+vif(update(mod, . ~ . - Age:Month))
+```
+
+Коллинеарности нет.
+
+## Данные для анализа остатков
+
+```{r}
+mod_diag <- fortify(mod) # функция из пакета ggplot2
+head(mod_diag)
+```
+
+## График расстояния Кука
+
+```{r}
+ggplot(mod_diag, aes(x = 1:nrow(mod_diag), y = .cooksd)) +
+  geom_bar(stat = 'identity') +
+  geom_hline(yintercept = 1, linetype = 2)
+```
+
+Влиятельных наблюдений нет.
+
+
+## График остатков от предсказанных значений
+
+```{r}
+gg_resid <- ggplot(data = mod_diag, aes(x = .fitted, y = .stdresid)) +
+  geom_point() + geom_hline(yintercept = 0)
+gg_resid
+```
+
+Влиятельных наблюдений нет
+
+## График зависимости остатков от предикторов в модели
+
+
+```{r eval=FALSE, purl=TRUE}
+ggplot(data = mod_diag, aes(x = Age, y = .stdresid)) +
+  geom_point() + geom_hline(yintercept = 0)
+ggplot(data = mod_diag, aes(x = Month, y = .stdresid)) +
+  geom_boxplot() + geom_hline(yintercept = 0)
+```
+
+```{r echo=FALSE, purl=FALSE}
+library(cowplot)
+plot_grid(
+ggplot(data = mod_diag, aes(x = Age, y = .stdresid)) +
+  geom_point() + geom_hline(yintercept = 0),
+ggplot(data = mod_diag, aes(x = Month, y = .stdresid)) +
+  geom_boxplot() + geom_hline(yintercept = 0),
+nrow = 1, align = 'h')
+```
+
+Гетерогенности дисперсий нет.
+
+
+# Тестирование значимости коэффициентов
+
+## Тест Вальда для коэффициентов GLM
+
+$H_0: \beta_k = 0$
+
+$H_A: \beta_k \ne 0$
+
+
+$$\frac{b_k - \beta_k} {SE_{b_k}} = \frac{b_k} {SE_{b_k}} \sim N(0, 1)$$
+
+- $b_k$ --- оценка коэффициента GLM.
+
+Хорошо работает только на больших выборках.
+
+Если приходится оценивать $\sigma$, то
+$\frac{b_k} {SE_{b_k}} \sim t_{(df = n - p)}$
+
+- $n$ --- объем выборки.
+- $p$ --- число параметров модели.
+
+\note{Wasserman, 2006. All of Statistics. Краткий рассказ о тесте Вальда. Agresty 2007/ An introduction to categorical data analysis. Предостережение о том, что тест Вальда плохо себя ведет на малых выборках. \url{https://en.wikipedia.org/wiki/Abraham_Wald} Абрахам Вальд, венгерский математик, в 1938 г эмигрировал в США, во время войны изучал как распределены повреждения самолетов, в 1950м погиб в авиакатастрофе в Индии.}
+
+## В summary() записаны результаты теста Вальда
+
+\columnsbegin
+\column{0.58\textwidth}
+
+\footnotesize
+
+```{r}
+summary(mod)
+```
+
+\normalsize
+\pause
+\column{0.4\textwidth}
+
+С увеличением возраста рыбы на год процент сухого вещества в икре снижается на 0.24 \% (тест Вальда, $t_{df = 31} = -2.62$, p = 0.013). Это происходит одинаково в сентябре и ноябре. Энергетическая ценность икры в сентябре и ноябре не различается.
+
+\columnsend
+
+
+## Анализ девиансы
+
+## Насыщенная и нулевая модели задают шкалу для сравнений с предложенной
+
+\textbf{Насыщенная модель} -- каждое уникальное наблюдение (сочетание значений предикторов) описывается одним из $n$ параметров.
+
+$lnL_{saturated} = 0$  
+$df_{saturated} = n - p_{saturated} = n - n = 0$
+
+\textbf{Предложенная модель} -- модель, подобранная в данном анализе $\hat y_i = \beta_0 + \beta_1x_{1i} + \ldots + \beta_{p - 1} x_{p - 1\,i}$.
+
+$lnL_{model} \ne 0$   
+$df_{model} = n - p_{model}$
+
+\textbf{Нулевая модель} -- все наблюдения описываются одним параметром (средним) $\hat y_i = \beta_0$.
+
+$lnL_{null} \ne 0$   
+$df_{null} = n - p_{null} = n - 1$
+
+## Девианса
+
+Это мера различия правдоподобий двух моделей (оценка разницы логарифмов правдоподобий).
+
+**Остаточная девианса**
+
+$d_{residual} = 2(lnL_{saturated} - lnL_{model}) = -2 lnL_{model}$
+
+**Нулевая девианса**
+
+$d_{null} = 2(lnL_{saturated} - lnL_{null}) = -2 lnL_{null}$
+
+\note{Остаточная девианса показывает, насколько предложенная модель хуже насыщенной. Нулевая девианса показывает насколько нулевая отличается от насыщенной - т.е. полный диапазон изменения логарифма правдоподобия. Сравнение нулевой и остаточной девианс девианс показывает, насколько предложенная модель лучше нулевой.}
+
+\vspace{\baselineskip}
+
+Сравнение нулевой и остаточной девианс позволяет судить о статистической значимости модели в целом (при помощи теста отношения правдоподобий).
+
+$d_{null} - d_{residual} = - 2(lnL_{null} - lnL_{model}) = 2(lnL_{model} - lnL_{null})$
 
 ## Тест отношения правдоподобий (Likelihood Ratio Test)
 
-Тест отношения правдоподобий позволяет определить какая модель более правдоподобна с учетом данных.
+Используется для сравнения правдоподобий
 
-$$LRT = 2ln\Big(\frac{L_{full}}{L_{reduced}}\Big) = -2ln\Big(\frac{L_{reduced}}{L_{full}}\Big) = -2(lnL_{reduced} - lnL_{full})$$
+$$LRT = 2ln\Big(\frac{L_{M_1}}{L_{M_2}}\Big) = 2(lnL_{M_1} - lnL_{M_2})$$
 
-- $L_{full}$, $L_{reduced}$ - правдоподобия более полной из двух моделей и уменьшенной модели
-- $lnL_{full}$, $lnL_{reduced$ - логарифмы правдоподобий
+- $M_1$ и $M_2$ --- вложенные модели ($M_1$ --- более полная, $M_2$ --- уменьшенная),
+- $L_{M_1}$, $L_{M_2}$ - правдоподобия,
+- $lnL_{M_1}$, $lnL_{M_2}$ - логарифмы правдоподобий.
 
-Разница логарифмов правдоподобий имеет распределение, которое можно апроксимировать $\chi^2$, с числом степеней свободы $df = df_{full} - df_{reduced}$ (Wilks, 1938)
+Разница логарифмов правдоподобий имеет распределение, которое можно апроксимировать распределением $\chi^2$ с числом степеней свободы $df = df_{M_2} - df_{M_1}$.
 
-# Тест отношения правдоподобий в R
+\note{(Wilks, 1938)}
 
-## Задание
+## LRT используется для сравнения моделей
 
-Для этой полной модели
+Для тестирования значимости модели целиком:
 
-```{r}
-GLM1 <- glm(ABUND ~ logAREA + YRISOL + logDIST + logLDIST + ALT, data = bird)
-```
-
-Подберите оптимальную модель при помощи тестов отношения правдоподобий
-
-Тест отношения правдоподобий можно сделать с помощью тех же функций, что и частный F-критерий:
-
-- по-одному `anova(mod3, mod2, test = "Chisq")`
-- все сразу `drop1(mod3, test = "Chisq")`
+$$LRT = 2ln\Big(\frac{L_{model}}{L_{null}}\Big) = 2(lnL_{model} - lnL_{null}) = d_{null} - d_{residual}$$
 
 
-## Решение (шаг 1)
+$df = df_{null} - df_{model} = (n - 1) - (n - p_{model}) = p_{model} - 1$
 
-```{r purl=FALSE}
-drop1(GLM1, test = "Chisq")
-# Нужно убрать logDIST
-```
+\vspace{\baselineskip}
 
-## Решение (шаг 2)
+Для тестирования значимости предикторов:
 
-```{r purl=FALSE}
-# Убираем logDIST
-GLM2 <- update(GLM1, . ~ . - logDIST)
-drop1(GLM2, test = "Chisq")
-# Нужно убрать logLDIST
-```
-
-## Решение (шаг 3)
-
-```{r purl=FALSE}
-# Убираем logLDIST
-GLM3 <- update(GLM2, . ~ . - logLDIST)
-drop1(GLM3, test = "Chisq")
-# Нужно убрать ALT
-```
-
-## Решение (шаг 4)
-
-```{r purl=FALSE}
-# Убираем ALT
-GLM4 <- update(GLM3, . ~ . - ALT)
-drop1(GLM4, test = "Chisq")
-# Больше ничего убрать не получается
-```
-
-## Решение (шаг 5)
-
-```{r purl=FALSE}
-summary(GLM4)
-```
-
-Финальную модель нужно проверить на выполнение условий применимости
-
-# Информационные критерии
-
-## AIC - Информационный критерий Акаике (Akaike Information Criterion)
-
-$AIC = -2 logLik + 2p$
-
-- $logLik$ - логарифм правдоподобия для модели
-- $2p$ - штраф за введение в модель $p$ параметров, т.е. за "сложность" модели
-
-AIC --- это мера потери информации, которая происходит, если реальность описывать этой моделью (Akaike 1974)
-
-AIC --- относительная мера качества модели. Т.е. не бывает какого-то "хорошего" AIC. Значения AIC можно интерпретировать только в сравнении с AIC для других моделей: чем меньше AIC --- тем лучше модель.
-
-__Важно!__   Информационные критерии можно использовать для сравнения __даже для невложенных моделей__. Но модели должны быть __подобраны с помощью ML__ и __на одинаковых данных__!
-
-## Некоторые другие информационные критерии
-
-|Критерий | Название  | Формула|
-|------ | ------ | ------|
-|AIC | Информационный критерий Акаике | $AIC = -2 logLik + 2p$|
-|BIC | Баесовский информационный критерий | $BIC = -2 logLik + p \cdot ln(n)$|
-|AICc | Информационный критерий Акаике с коррекцией для малых выборок (малых относительно числа параметров: $n/p < 40$, Burnham, Anderson, 2004) | $AIC_c = -2 logLik + 2p + \frac{2p(p + 1)}{n - p - 1}$|
-
-- $logLik$ - логарифм правдоподобия для модели
-- $p$ - число параметров
-- $n$ - число наблюдений
+$$LRT = 2ln\Big(\frac{L_{model}}{L_{reduced}}\Big) = 2(lnL_{model} - lnL_{reduced})$$
 
 
-# Информационные критерии в R
+$df = df_{reduced} - df_{model} = (n - p_{reduced}) - (n - p_{model}) = p_{model} - p_{reduced}$
 
-```{r echo=FALSE, purl=FALSE}
-lm_equation <- function(fit, strict = TRUE, rnd = 2){
-#   extracting call formula 
-  frml <- as.character(fit$call)[2]
-#   extract signs
-    sign <- ifelse(grepl("-", coef(fit)[-1]), " - ", " + ")
-  # extract coefficients
-  coeffs <- format(round(abs(coef(fit)), rnd), digits = 2, nsmall = rnd, trim = TRUE)
-  if(strict == TRUE){
-    i <- 1:(length(coeffs) - 1)
-    vars <- c("Y", paste0(" X", i))
-    
-  } else {
-# extract vector of variable names
-  vars <- c(all.vars(formula(fit))[1], names(fit$coefficients)[-1])
-# combine everything
-  }
-  start <- ifelse(coef(fit)[1] > 0, paste(vars[1], coeffs[1], sep = " = "), paste(vars[1], coeffs[1], sep = " = - "))
-  end <- paste(sign, coeffs[-1], vars[-1], sep = "", collapse = "")
-  return(paste0(start, end, sep = ""))
-}
-```
 
-## Рассчитаем AIC для наших моделей
+\note{Остаточная девианса показывает, насколько предложенная модель хуже насыщенной. Нулевая девианса показывает насколько нулевая отличается от насыщенной - т.е. полный диапазон изменения логарифма правдоподобия. Сравнение нулевой и остаточной девианс девианс показывает, насколько предложенная модель лучше нулевой.}
+
+## Тестируем значимость модели целиком при помощи LRT
 
 ```{r}
-AIC(GLM1, GLM2, GLM3, GLM4)
+null_model <- glm(PctDM ~ 1, data = FishEggs)
+anova(null_model, mod, test = 'Chi')
 ```
 
->- Судя по AIC, лучшая модель GLM3 или GLM4. Если значения AIC различаются всего на 1-2 единицу --- такими различиями можно пренебречь и выбрать более простую модель (GLM4).
 
->- Уравнение модели: $`r lm_equation(GLM4, strict = FALSE)`$
+## Тестируем значимость предикторов при помощи LRT
 
+\small
 
+Используем II тип тестов ("II тип сумм квадратов"):
+
+### 1. Тестируем значимость взаимодействия
+```{r}
+drop1(mod, test = 'Chi')
+```
+
+### 2. Тестируем значимость предикторов, когда взаимодействие удалено
+
+```{r}
+mod_no_int <- update(mod, . ~ . -Age:Month)
+drop1(mod_no_int, test = 'Chi')
+```
+
+## Запись результатов
+
+Содержание сухого вещества в икре зависит от возраста рыбы и месяца (p < 0.01, тест отношения правдоподобий, табл. 1). Характер зависимости энергетической ценности икры от возраста одинаков в сентябре и ноябре.
+
+\small
+
+```{r echo=FALSE}
+tmp <- drop1(mod, test = 'Chi')
+tmp1 <- drop1(mod_no_int, test = 'Chi')
+
+dfr <- data.frame(
+  `Предиктор` = c('-', 'Возраст:Месяц', 'Возраст', 'Месяц'),
+  df = c(tmp$Df, tmp1$Df[2:3]),
+  D = round(c(tmp$Deviance, tmp1$Deviance[2:3]), 3),
+  p = c(tmp$`Pr(>Chi)`, tmp1$`Pr(>Chi)`[2:3]))
+
+dfr$p <- format.pval(dfr$p, digits = 2, eps = 0.01)
+dfr$p[1] <- NA
+options(knitr.kable.NA = '')
+kable(dfr, format = 'latex', caption = 'Анализ девиансы для модели зависимости энергетической ценности икры от возраста рыбы, месяца и их взаимодействия. Тесты II типа. df --- число степеней свободы, D --- девианса, p --- уровень значимости.')
+```
+
+## Доля объясненной девиансы
+
+**Остаточная девианса**
+
+$d_{residual} = 2(lnL_{saturated} - lnL_{model}) = -2 lnL_{model}$
+
+**Нулевая девианса**
+
+$d_{null} = 2(lnL_{saturated} - lnL_{null}) = -2 lnL_{null}$
+
+\vspace{\baselineskip}
+
+**Доля объясненной девиансы**
+
+$\cfrac{d_{null} - d_{residual}}{d_{null}}$
+
+\vspace{\baselineskip}
+
+Долю объясненной девиансы легко вычислить
+
+```{r}
+(mod$null.deviance - mod$deviance) / mod$null.deviance
+```
+
+Модель объясняет `r round((mod$null.deviance - mod$deviance) / mod$null.deviance *100, 1)`\% общей девиансы.
+
+## Данные для графика предсказаний
+
+```{r}
+library(dplyr)
+New_Data <- FishEggs %>% group_by(Month) %>%
+  do(data.frame(Age = seq(min(.$Age), max(.$Age), length.out = 100)))
+head(New_Data)
+```
+
+## Предсказания при помощи `predict()`
+
+```{r}
+Predictions <- predict(mod, newdata = New_Data, se.fit = TRUE)
+New_Data$fit <- Predictions$fit  # Предсказанные значения
+New_Data$se <- Predictions$se.fit # Стандартные ошибки
+t_crit <- qt(0.975, df = nrow(FishEggs) - length(coef(mod))) # t для дов. инт.
+New_Data$lwr <- New_Data$fit - t_crit * New_Data$se
+New_Data$upr <- New_Data$fit + t_crit * New_Data$se
+
+head(New_Data)
+```
+
+## Данные для графика вручную
+
+```{r}
+X <- model.matrix(~ Age * Month, data = New_Data) # Модельная матрица
+betas <- coef(mod) # Коэффициенты
+New_Data$fit <- X %*% betas  # Предсказанные значения
+New_Data$se <- sqrt(diag(X %*% vcov(mod) %*% t(X))) # Стандартные ошибки
+t_crit <- qt(0.975, df = nrow(FishEggs) - length(coef(mod))) # t для дов. инт.
+New_Data$lwr <- New_Data$fit - t_crit * New_Data$se
+New_Data$upr <- New_Data$fit + t_crit * New_Data$se
+
+head(New_Data)
+```
+
+## График предсказаний модели
+
+```{r}
+Plot_egg <- ggplot(New_Data, aes(x = Age, y = fit)) +
+  geom_ribbon(alpha = 0.2, aes(ymin = lwr, ymax = upr, group = Month)) +
+  geom_line(aes(colour = Month), size = 1) +
+  geom_point(data = FishEggs, aes(x = Age, y = PctDM, colour = Month))
+Plot_egg
+```
 
 ## Take-home messages
 
-
+- Обобщенные линейные модели (Generalized Linear Models, GLM) позволяют моделировать зависимости для откликов с распределением из семейства экспоненциальных
+- Для тестирования предикторов в GLM используются:
+    - Тесты Вальда для коэффициентов (плохо на малых выборках).
+    - Тесты отношения правдоподобий вложенных моделей (более точно).
+- Доля объясненной девиансы оценивает качество подгонки GLM
 
 ## Что почитать
 
-+ <span style="color:red">Must read paper!</span> Zuur, A.F. and Ieno, E.N., 2016. A protocol for conducting and presenting results of regression‐type analyses. Methods in Ecology and Evolution, 7(6), pp.636-645.
-
++ Zuur, A.F. and Ieno, E.N., 2016. A protocol for conducting and presenting results of regression‐type analyses. Methods in Ecology and Evolution, 7(6), pp.636-645.
 + Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014
 + Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data. Springer Science & Business Media.
 + Quinn G.P., Keough M.J. 2002. Experimental design and data analysis for biologists

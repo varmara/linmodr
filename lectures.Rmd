@@ -158,11 +158,17 @@ install.packages(c("DAAG", "multcomp"))
 - Код: [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R)
 - Данные: [hall.csv](data/hall.csv)
 
+- Код заданий:
+    - [11_anova_practice_ants.R](11_anova_practice_ants.R)
+    - [11_anova_practice_rice.R](11_anova_practice_rice.R)
+
+
 ## Обобщенные линейные модели (GLM)
 
 ### 12 GLM для нормально распределенных данных (12 нояб 2 пара и 15 нояб)
 
-
+<!-- - Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf) -->
+- Код: [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R)
 
 ### 13 GLM для счетных данных (19 нояб 1-2 пары)
 
