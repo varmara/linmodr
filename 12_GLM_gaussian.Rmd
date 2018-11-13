@@ -686,6 +686,7 @@ resid(mod, type = 'pearson')[1:5]
 ## Проверка на коллинеарность
 
 ```{r}
+library(car)
 vif(update(mod, . ~ . - Age:Month))
 ```
 
