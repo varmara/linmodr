@@ -125,8 +125,8 @@ $$f(y)= \frac {1}{\sqrt{2 \pi \sigma^2}} \cdot e^{-\frac{1}{2 \sigma^2} (y - \mu
 Свойства:
 
 - $E(y)  = \mu$ -- мат.ожидание
-- $var(y) = 1$ -- функция дисперсии (variance function)
-- $-\infty \le y \le +\infty$,  $y \in \mathbb R$ -- диапазон значений
+- $var(y) = \sigma^2$ -- дисперсия
+- $-\infty \le y \le +\infty$,  $y \in \mathbb R$ -- значения
 
 \columnsend
 
@@ -174,8 +174,8 @@ $$f(y) = \frac{1}{\Gamma(\nu)}\cdot (\frac{\nu}{\mu})^{\nu} \cdot y^{\nu-1} \cdo
 Свойства:
 
 - $E(y) = \mu$ -- мат.ожидание
-- $var(y) = \frac {\mu^2}{\nu}$ -- функция дисперсии
-- $0 < y \le +\infty$, $y \in \mathbb R$ -- диапазон значений
+- $var(y) = \frac {\mu^2}{\nu}$ -- дисперсия
+- $0 < y \le +\infty$, $y \in \mathbb R$ -- значения
 
 
 \columnsend
@@ -215,8 +215,8 @@ $$f(y) = \frac{n!}{y! \cdot (n-y)!} \cdot \pi^y \cdot (1 - \pi)^{n-y}$$
 Свойства:
 
 - $E(y)  = n \cdot \pi$ -- мат.ожидание
-- $var(y) = n \cdot \pi \cdot (1-\pi)$ -- функция дисперсии
-- $0 \le y \le +\infty$, $y \in \mathbb{N}$ -- диапазон значений
+- $var(y) = n \cdot \pi \cdot (1-\pi)$ -- дисперсия
+- $0 \le y \le +\infty$, $y \in \mathbb{N}$ -- значения
 
 \columnsend
 
@@ -261,8 +261,8 @@ $$f(y)= \frac{\mu^y \cdot e{-\mu}}{y!}$$
 Свойства:
 
 - $E(y) = \mu$ --- мат.ожидание
-- $var(y) = \mu$ --- функция дисперсии
-- $0 \le y \le +\infty$, $y \in \mathbb{N}$ --- диапазон значений
+- $var(y) = \mu$ --- дисперсия
+- $0 \le y \le +\infty$, $y \in \mathbb{N}$ --- значения
 
 
 \columnsend
@@ -311,8 +311,8 @@ $$f(y) = \frac{\Gamma(y + k)}{\Gamma(k) \cdot \Gamma(y+1)} \cdot (\frac{k}{\mu +
 Свойства:
 
 - $E(y)  = \mu$ -- мат.ожидание
-- $var(y) = \mu + \frac {\mu^2}{k}$ -- функция дисперсии
-- $0 \le y \le +\infty$, $y \in \mathbb{N}$ -- диапазон значений
+- $var(y) = \mu + \frac {\mu^2}{k}$ -- дисперсия
+- $0 \le y \le +\infty$, $y \in \mathbb{N}$ -- значения
 
 \note{Это смесь Пуассоновского и Гамма распределений: $y$ подчиняется распределению Пуассона с Гамма-распределенным $\mu$. Приближается к распр. Пуассона при очень больших $k$.}
 

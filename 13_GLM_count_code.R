@@ -1,286 +1,329 @@
-# title: "Линейные модели для счетных данных"
-# author: Марина Варфоломеева, Вадим Хайтов
+# ---
+# title: "Обобщенные линейные модели с нормальным распределением остатков"
+# subtitle: "Линейные модели..."
+# author: "Марина Варфоломеева, Вадим Хайтов"
 
-## Пример: Гадючий лук, копеечник и визиты опылителей #####
-#
-# [Гадючий
-# лук](https://ru.wikipedia.org/wiki/Гадючий_лук_хохлатый)
-# (_Leopoldia comosa_, сем. спаржевые) ---
-# представитель родной флоры острова Менорка
-# (Балеарские острова, Средиземное море). В
-# 18-19вв на остров завезли [копеечник
-# венечный](https://ru.wikipedia.org/wiki/Копеечник_венечный)
-# (_Hedysarum coronarium_, сем. бобовые), который
-# быстро натурализовался. Оба вида цветут
-# одновременно и нуждаются в опылении насекомыми.
-#
-# Как зависит опыление гадючьего лука от
-# присутствия вида-вселенца и разнообразия флоры в
-# ближайшей окрестности (Montero-Castaño, Vilà,
-# 2015)?
-#
-# - `Visits` --- число визитов всех опылителей на
-# цветок _Leopoldia_
-# - `Treatment`:
-# `Invaded` --- _Leopoldia_ в смеси с видом-вселенцем _Hedysarum_;
-# `Removal` --- _Leopoldia_ в смеси с видом-вселенцем с удаленными цветками;
-# `Control` --- _Leopoldia_ без вида вселенца
-# - `DiversityD_1` --- Разнообразие флоры ---
-# $exp(H’)$,  где $H'$ --- индекс Шеннона,
-# расчитанный с использованием натурального
-# логарифма
-# - `Flowers` --- число цветков _Leopoldia_
-# - `Hours` --- продолжительность наблюдений
 
+# ## Гадючий лук, копеечник и визиты опылителей
+# Гадючий лук (мускари, _Leopoldia comosa_) ---
+# представитель родной флоры острова Менорка. В
+# 18-19вв на остров завезли копеечник венечный
+# (_Hedysarum coronarium_), который быстро
+# натурализовался. Оба вида цветут одновременно и
+# нуждаются в опылении насекомыми.
+#
+# Как зависит число визитов опылителей на цветки
+# мускари от присутствия вселенца и разнообразия
+# флоры в ближайшей окрестности? (Данные
+# Montero-Castaño, Vilà, 2015)
+
+# ## Переменные
+#
+# - `Visits` --- число визитов всех опылителей на цветок _Leopoldia_
+# - `Treatment` --- тип площадки, тритмент (фактор с 3 уровнями):
+#     - `Invaded` --- _Leopoldia_ в смеси с видом-вселенцем;
+#     - `Removal` --- _Leopoldia_ в смеси с видом-вселенцем с удаленными цветками;
+#     - `Control` --- _Leopoldia_ без вида вселенца.
+# - `DiversityD_1` --- Разнообразие флоры на площадке ($exp(H’)$,
+# где $H'$ --- индекс Шеннона-Уивера)  (на луг с более разнообразной
+# растительностью прилетит больше опылителей).
+# - `Flowers` --- число цветков _Leopoldia_ на площадке (чем больше, тем больше опылителей).
+# - `Hours` --- продолжительность наблюдений (чем дольше, тем больше насчитали).
+
+# Другие переменные:
+# - `Total_1` --- общая плотность цветков
+# - `Visits_NO_Apis` --- посещения опылителей без учета пчел
+# - `Fruit` --- число цветов с плодами через месяц
+# - `No_Fruit` --- число цветов без плодов через месяц
+
+
+# ## Открываем и знакомимся с данными
 library(readxl)
 pol <- read_excel("data/Pollinators_Montero-Castano, Vila, 2015.xlsx", sheet = 1)
 head(pol)
 
-# Есть ли пропущенные значения?
-sum(is.na(pol))
+# Сколько пропущенных значений?
+colSums(is.na(pol))
 
-# Сколько площадок в каждом тритменте?
-table(pol$Treatment)
-
-# Как распределено число визитов насекомых?
+# ## Есть ли выбросы?
+library(cowplot)
 library(ggplot2)
-ggplot(pol, aes(x = Visits)) + geom_histogram()
+theme_set(theme_bw())
 
-# Нет ли выбросов?
-gg_dot <- ggplot(pol, aes(y = 1:nrow(pol))) + geom_point()
-library(gridExtra)
-grid.arrange(gg_dot + aes(x = DiversityD_1),
-             gg_dot + aes(x = Flowers),
-             gg_dot + aes(x = Hours),
-             nrow = 1)
+dot_plot <- ggplot(pol, aes(y = 1:nrow(pol))) + geom_point()
+plot_grid(dot_plot + aes(x = DiversityD_1), dot_plot + aes(x = Flowers),
+          dot_plot + aes(x = Hours), nrow = 1)
+
+# ## Каков объем выборки?
 
 
-## GLM с Гауссовым распределением отклика ###############
 
-M0 <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol)
-## Результаты
-summary(M0)
-
-## Анализ девиансы для гауссовой модели {.smaller}
-# К какому бы мы пришли выводу, глядя на этот анализ?
-library(car)
-Anova(M0)
-# Можем ли мы доверять этим результатам?
+# Как распределены короткие периоды наблюдений по тритментам?
 
 
-## Визуализируем предсказания простой линейной модели ####
 
-## Код для графика
-library(plyr)
-NewData <- ddply(
-  .data = pol, .variables = .(Treatment), .fun = summarise,
-  Flowers = seq(min(Flowers), max(Flowers), length = 100))
-NewData$DiversityD_1 = mean(pol$DiversityD_1)
-NewData$Hours = max(pol$Hours)
-# модельная матрица
+# ## Коллинеарны ли непрерывные и дискретные предикторы?
+box_plot <- ggplot(pol, aes(x = Treatment)) + geom_boxplot()
+
+plot_grid(box_plot + aes(y = DiversityD_1),
+          box_plot + aes(y = Flowers), nrow = 1)
+
+
+# ## Как распределена переменная-отклик?
+
+
+
+# Какова пропорция нулей?
+
+
+
+# ## Линейна ли связь между предикторами и откликом?
+gg_shape <- ggplot(pol, aes(y = Visits/Hours, colour = Treatment)) +
+  theme(legend.position = 'bottom')
+plot_grid(
+  gg_shape + geom_point(aes(x = Flowers)),
+  gg_shape + geom_point(aes(x = DiversityD_1)),
+nrow = 1)
+
+
+# ## Если мы подберем GLM с нормальным распределением отклика
+
+M_norm <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol)
+coef(M_norm)
+sigma(M_norm)
+
+
+# ## Данные для графика предсказаний простой линейной модели
+NewData <- pol %>% group_by(Treatment)%>%
+  do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
+  mutate(DiversityD_1 = mean(pol$DiversityD_1),
+         Hours = mean(pol$Hours))
+
+head(NewData)
+
+# Модельная матрица и коэффициенты
 X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
-# коэффициенты
-betas <- coef(M0)
-# предсказанные значения
-NewData$mu <- X %*% betas  # в масштабе функции связи
-NewData$fit <- NewData$mu  # в масштабе значений отклика
-# стандартные ошибки
-NewData$SE <- sqrt(diag(X %*% vcov(M0) %*% t(X)))
-# доверительный интервал
-NewData$upr <- NewData$mu + 1.96 * NewData$SE
-NewData$lwr <- NewData$mu - 1.96 * NewData$SE
-# график предсказаний
-ggplot(NewData, aes(x = Flowers, y = fit, group = Treatment)) +
-  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = Treatment), alpha = 0.3) +
+b <- coef(M_norm)
+# Предсказания в масштабе функции связи (eta) совпадают с масштабом отклика (mu)
+NewData$mu <- X %*% b
+NewData$SE_mu <- sqrt(diag(X %*% vcov(M_norm) %*% t(X)))  # SE
+
+head(NewData, 3)
+
+# ## График предсказаний
+ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha=0.3)+
   geom_line(aes(colour = Treatment)) +
   geom_hline(yintercept = 0)
 
 
-## Задание 1 -------------------------------------
-# Постройте график пирсоновских остатков этой модели.
-# Какие нарушения условий применимости вы на нем увидите?
-# Дополните код
+# ## Смотрим на результаты подбора модели
+summary(M_norm)
 
-# Данные для анализа остатков
-M0_diag <- data.frame(.fitted = ,
-                      .pears_resid = )
-# График остатков
-ggplot(M0_diag, aes(x=, y = )) +
-  geom_ + geom_(yintercept = 0) +
-  geom_(se = FALSE, method = "loess")
+# ## Анализ девиансы для модели с нормальным распределением отклика
+drop1(M_norm, test = 'Chi')
+
+# ## Нет ли коллинеарности предикторов
+library(car)
+vif(M_norm)
 
 
-# GLM с Пуассоновским распределением отклика #############
-
-M1 <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol,  family = "poisson")
-## Результаты
-summary(M1)
-
-
-## Анализ девиансы для Пуассоновской модели
-# К какому бы мы пришли выводу, глядя на этот анализ?
-Anova(M1)
-# Можем ли мы доверять этим результатам?
-
-
-## Задание 2 -------------------------------------
+# ## Задание 1 -------------------------------------------------------
 #
-# Постройте график предсказаний модели
-# Дополните код
+# Постройте график пирсоновских остатков от предсказанных значений для модели `M_norm`.
+# Какие нарушения условий применимости вы на нем видите?
 
-NewData <- ddply(
-  .data = , .variables = .(), .fun = summarise,
-  DiversityD_1 = seq(min(), max(), length = 100))
-NewData$Flowers = mean(pol$Flowers)
-NewData$Hours = mean(pol$Hours)
-# модельная матрица
-X <- model.matrix(, data = NewData)
-# коэффициенты
-betas <-
-# предсказанные значения
-NewData$mu <-       # в масштабе функции связи
-NewData$fit <-  # в масштабе значений отклика
-# стандартные ошибки
-NewData$SE <- sqrt(diag(X %*% vcov(M1) %*% t(X)))
-# доверительный интервал в масштабе значений отклика
-NewData$upr <- (NewData$mu + 1.96 * NewData$SE)
-NewData$lwr <- (NewData$mu - 1.96 * NewData$SE)
-# график предсказаний
-ggplot(NewData, aes(x = , y = , group = Treatment)) +
-  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = ), alpha = 0.3) +
-  geom_line(aes(colour = )) +
+# Дополните код:
+
+M_norm_diag <- data.frame(.fitted = fitted(),
+                          .resid_p = residuals())
+
+ggplot(data = , aes()) + geom_hline( = 0) +
+  geom_point()
+
+
+
+
+# ## GLM с Пуассоновским распределением отклика #############################
+
+M_pois <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol,
+                   family = "poisson")
+coef(M_pois)
+
+
+# ## Смотрим на результаты подбора модели
+summary(M_pois)
+
+# ## Анализ девиансы для модели с Пуассоновским распределением отклика
+drop1(M_pois, test = 'Chi')
+
+
+# ## Данные для предсказаний
+NewData <- pol %>% group_by(Treatment)%>%
+  do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
+  mutate(DiversityD_1 = mean(pol$DiversityD_1),
+         Hours = mean(pol$Hours))
+
+
+# ## Предсказания модели при помощи операций с матрицами
+
+# Модельная матрица и коэффициенты
+X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
+b <- coef(M_pois)
+
+# Предсказанные значения и стандартные ошибки...
+# ...в масштабе функции связи (логарифм)
+NewData$fit_eta <- X %*% b
+NewData$SE_eta <- sqrt(diag(X %*% vcov(M_pois) %*% t(X)))
+
+# ...в масштабе отклика (применяем функцию, обратную функции связи)
+NewData$fit_mu <- exp(NewData$fit_eta)
+NewData$SE_mu <- exp(NewData$SE_eta)
+
+head(NewData, 2)
+
+# ## График предсказаний в масштабе функции связи
+ggplot(NewData, aes(x = Flowers, y = eta, fill = Treatment)) +
+  geom_ribbon(aes(ymin = eta - 2 * SE_eta, ymax = eta + 2 * SE_eta), alpha=0.3)+
+  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+
+# ## График предсказаний в масштабе переменной-отклика
+ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha=0.3)+
+  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+
+
+# Предсказания при помощи функции predict()
+# ...в масштабе функции связи
+predict_eta <- predict(M_pois, newdata = NewData, se.fit = TRUE)
+NewData$eta <- predict_eta$fit
+NewData$SE_eta <- predict_eta$se.fit
+# ...в масштабе отклика
+predict_mu <- predict(M_pois, newdata = NewData,
+                      se.fit = TRUE, type = 'response')
+NewData$mu <- predict_mu$fit
+NewData$SE_mu <- predict_mu$se.fit
+
+head(NewData, 2)
+
+
+# ## Условия применимости GLM с Пуассоновским распределением отклика
+
+# - Случайность и независимость наблюдений внутри групп.
+# - Отсутствие сверхдисперсии. (Дисперсия остатков равна мат.ожиданию при каждом уровне значений предикторов).
+# - Отсутствие коллинеарности предикторов.
+
+
+# ## График остатков
+M_pois_diag <- data.frame(.fitted = predict(M_pois, type = "response"),
+                            .resid_p = residuals(M_pois, type = "pearson"))
+ggplot(M_pois_diag, aes(x = .fitted, y = .resid_p)) +
+  geom_point() +
   geom_hline(yintercept = 0)
 
 
-## Диагностика модели ############################
+# ## Проверка на сверхдисперсию
+# Функция для проверки наличия сверхдисперсии в модели (автор Ben Bolker)
+# http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html
+overdisp_fun <- function(model) {
+    rdf <- df.residual(model) # Число степеней свободы N - p
+    rp <- residuals(model,type="pearson") # Пирсоновские остатки
+    Pearson.chisq <- sum(rp^2) # Сумма квадратов остатков
+    prat <- Pearson.chisq/rdf  # Степень избыточности дисперсии
+    pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE) # Уровень значимости
+    c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)        # Вывод результатов
+}
 
-### График остатков
-M1_diag <- data.frame(.fitted = predict(M1, type = "response"),
-                      .pears_resid = residuals(M1, type = "pearson"))
-ggplot(M1_diag, aes(x=.fitted, y = .pears_resid)) + geom_point() +
-  geom_hline(yintercept = 0) + geom_smooth(se = FALSE, method = "loess")
-
-
-
-## Проверка на сверхдисперсию
-pear_res <- resid(M1, type = "pearson") # Пирсоновские остатки
-p <- length(coef(M1))                   # число параметров в модели
-N <- nrow(model.frame(M1)) # объем выборки
-df <- N - p       # число степеней свободы
-Overdisp <- sum(pear_res^2) / df
-
-Overdisp
+overdisp_fun(M_pois)
 
 
-## Квазипуассоновская модель #####################
-M2 <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol, family = "quasipoisson")
-## Результаты
-summary(M2)
 
-## Анализ девиансы для квази-пуассоновской модели
-# К какому бы мы пришли выводу, глядя на этот анализ?
-Anova(M2, test = "F")
-# Можем ли мы доверять этим результатам?
+# ## Квази-пуассоновские модели
 
+M_quasi <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol,
+                 family = "quasipoisson")
 
-## GLM с отрицательным биномиальным распределением отклика ############
+coef(M_quasi)
+summary(M_quasi)$dispersion
 
+# ## Смотрим на результаты подбора модели
+summary(M_quasi)
+
+# ## Анализ девиансы для квази-пуассоновской модели
+drop1(M_quasi, test = "F")
+
+# ## GLM с отрицательным биномиальным распределением отклика
 library(MASS)
-M3 <- glm.nb(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol, link = "log")
-## Результаты
-summary(M3)
+M_nb <- glm.nb(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol,
+                 link = "log")
+coef(M_nb)
+summary(M_nb)$theta
 
-## Анализ девиансы для модели с отрицательным биномиальным распределением отклика
-# К какому бы мы пришли выводу, глядя на этот анализ?
-Anova(M3)
-# Можем ли мы доверять этим результатам?
+# ## Смотрим на результаты подбора модели
+summary(M_nb)
 
-## Диагностика модели
-### График остатков
-M3_diag <- data.frame(.fitted = predict(M3, type = "response"),
-                      .pears_resid = residuals(M3, type = "pearson"))
-ggplot(M3_diag, aes(x = .fitted, y = .pears_resid)) + geom_point() +
-  geom_hline(yintercept = 0) + geom_smooth(se = FALSE, method = "loess")
-
-## Проверка на сверхдисперсию
-pear_res <- resid(M3, type = "pearson") # Пирсоновские остатки
-p <- length(coef(M3))  + 1             # число параметров в модели
-N <- nrow(model.frame(M3))             # объем выборки
-df <- N - p                            # число степеней свободы
-Overdisp <- sum(pear_res^2) / df
-
-Overdisp
+# ## Анализ девиансы модели с отрицательным биномиальным распределением отклика
+drop1(M_nb, test = 'Chi')
 
 
-## Задание 3 --------------------------------------
+# ## Задание 2 ----------------------------------------------------------
+
+# Проведите диагностику модели `M_nb`.
+# Видите ли вы какие-нибудь нарушения условий применимости?
+
+
+
+# ## Данные для предсказаний
 #
-# Визуализируйте предсказания модели, основанной на отрицательном биномиальном распределении
-
-NewData <- ddply(
-  .data = , .variables = .(), .fun = summarise,
-  DiversityD_1 = )
-NewData$Flowers = mean(pol$Flowers)
-NewData$Hours = mean(pol$Hours)
-# предсказанные значения
-Predictions <- predict()
-NewData$fit <- Predictions$fit
-# стандартные ошибки
-NewData$SE <- Predictions$se.fit
-# доверительный интервал
-NewData$upr <- NewData$fit + 1.96 * NewData$SE
-NewData$lwr <- NewData$fit - 1.96 * NewData$SE
-
-ggplot(NewData, aes(x = , y = , group = )) +
-  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.3) +
-  geom_line() +
-  geom_hline(yintercept = 0)
+## ------------------------------------------------------------------------
+NewData <- pol %>% group_by(Treatment)%>%
+  do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
+  mutate(DiversityD_1 = mean(pol$DiversityD_1),
+         Hours = mean(pol$Hours))
 
 
+# Задание 3 -----------------------------------------------------------
 
-# Пример: Неверность #############################
-# Какие факторы определяют супружескую неверность?
-data(Affairs, package = "AER")
-af <- Affairs
+# Получите предсказания при помощи операций с матрицами,
 
-# Fair, R.C. (1978). A Theory of Extramarital Affairs. Journal of Political Economy, 86, 45–61.
+# Модельная матрица и коэффициенты
+X <- model.matrix(~, data = NewData)
+b <-
 
-# `affairs` - Количество внебрачных свзяей за последний год
-# `gender` - пол
-# `age` - возраст
-# `yearsmarried` - сколько ле в браке
-# `children` - наличие детей
-# `religiousness` - уровеь религиозности
-# `education` - уровень образования
-# `rating` - самооценка ощущений от брака
+# Предсказанные значения и стандартные ошибки...
+# ...в масштабе функции связи (логарифм)
+NewData$fit_eta <-
+NewData$SE_eta <- sqrt(diag(X %*% vcov(M_nb) %*% t(X)))
 
-## Задание 4 -------------------------------------
+# ...в масштабе отклика (применяем функцию, обратную функции связи)
+NewData$fit_mu <-
+NewData$SE_mu <-
 
-# 1. Постройте оптимальную модель, описывающую зависимость количества внебрачных связей в зависимости от пола, времени, проведенного в браке, наличия детей, уровня религиозности и уровня образованности.
-# 2. Проверьте валидность данной модели
+head(NewData, 2)
 
 
 
-## Визуализируем предсказание модели ##############
+# ## График предсказаний в масштабе функции связи
+ggplot(NewData, aes(x = Flowers, y = eta, fill = Treatment)) +
+  geom_ribbon(aes(ymin = eta - 2 * SE_eta, ymax = eta + 2 * SE_eta), alpha = 0.3) +
+  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
 
-Mod_nb_final <- glm.nb(formula = affairs ~ yearsmarried + religiousness, data = af,
-       init.theta = 0.1297897878, link = log)
+# ## График предсказаний в масштабе переменной-отклика
+ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha = 0.3) +
+  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
 
-NewData <- expand.grid(
-  yearsmarried = seq(min(af$yearsmarried), max(af$yearsmarried)),
-  religiousness = seq(min(af$religiousness), max(af$religiousness), length.out = 3))
 
-# предсказанные значения
-Predictions <- predict(Mod_nb_final, newdata = NewData, se.fit = TRUE, type = "response")
-NewData$fit <- Predictions$fit
-# стандартные ошибки
-NewData$SE <- Predictions$se.fit
-# доверительный интервал
-NewData$upr <- NewData$fit + 1.96 * NewData$SE
-NewData$lwr <- NewData$fit - 1.96 * NewData$SE
-# график предсказаний модели
-ggplot(NewData, aes(x = yearsmarried, y = fit, group = religiousness)) +
-  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = religiousness), alpha = 0.2) +
-  geom_line(aes(colour = religiousness), size = 1.5) +
-  geom_hline(yintercept = 0) +
-  scale_color_gradient(low = "yellow2", high = "red") +
-  scale_fill_gradient(low = "yellow2", high = "red")
+
+# Предсказания модели при помощи predict()
+# ...в масштабе функции связи
+predict_eta <- predict(M_nb, newdata = NewData, se.fit = TRUE)
+NewData$eta <- predict_eta$fit
+NewData$SE_eta <- predict_eta$se.fit
+# ...в масштабе отклика
+predict_mu <- predict(M_nb, newdata = NewData, se.fit = TRUE, type = 'response')
+NewData$mu <- predict_mu$fit
+NewData$SE_mu <- predict_mu$se.fit
+
+
+

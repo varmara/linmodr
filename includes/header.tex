@@ -12,6 +12,16 @@
 \usepackage{cmap}					    % поиск в PDF
 \usepackage{mathtext} 				% русские буквы в формулах
 
+% Межабзацный интервал в columns
+\makeatletter
+\newcommand{\@minipagerestore}{\setlength{\parskip}{4pt plus 2pt minus 1pt}}
+\makeatother
+
+% Межстрочный интервал в verabtim
+\makeatletter
+\def\verbatim@font{\linespread{0.7}\normalfont\ttfamily}
+\makeatother
+
 % Для разметки слайдов и картинок
 \usepackage{tikz}
 \usepackage{animate}
@@ -26,7 +36,7 @@
 \usepackage{hyperref}
 
 % decrease text margins
-\setbeamersize{text margin left = 8pt, text margin right = 16pt}
+\setbeamersize{text margin left = 12pt, text margin right = 16pt}
 
 \newcommand{\columnsbegin}{\begin{columns}}
 \newcommand{\columnsend}{\end{columns}}
