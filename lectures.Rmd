@@ -178,12 +178,12 @@ install.packages(c("DAAG", "multcomp"))
 install.packages("AER")
 ```
 
-<!-- - Презентация: [13_GLM_count.pdf](13_GLM_count.pdf) -->
+- Презентация: [13_GLM_count.pdf](13_GLM_count.pdf)
 - Код: [13_GLM_count_code.R](13_GLM_count_code.R)
 - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx)
 
 - Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R)
-
+- Частичное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R)
 
 ### 14 GLM для бинарных данных (=логистическая регрессия) (22 нояб и 26 нояб 1 пара)
 

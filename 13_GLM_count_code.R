@@ -55,11 +55,11 @@ plot_grid(dot_plot + aes(x = DiversityD_1), dot_plot + aes(x = Flowers),
           dot_plot + aes(x = Hours), nrow = 1)
 
 # ## Каков объем выборки?
-
-
+nrow(pol)
+table(pol$Treatment)
 
 # Как распределены короткие периоды наблюдений по тритментам?
-
+table(pol$Hours, pol$Treatment)
 
 
 # ## Коллинеарны ли непрерывные и дискретные предикторы?
@@ -70,11 +70,12 @@ plot_grid(box_plot + aes(y = DiversityD_1),
 
 
 # ## Как распределена переменная-отклик?
-
+ggplot(data = pol, aes(x = Visits)) + geom_histogram()
 
 
 # Какова пропорция нулей?
-
+sum(pol$Visits == 0) / nrow(pol)
+mean(pol$Visits == 0)
 
 
 # ## Линейна ли связь между предикторами и откликом?
@@ -94,6 +95,7 @@ sigma(M_norm)
 
 
 # ## Данные для графика предсказаний простой линейной модели
+library(dplyr)
 NewData <- pol %>% group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
@@ -111,7 +113,7 @@ NewData$SE_mu <- sqrt(diag(X %*% vcov(M_norm) %*% t(X)))  # SE
 head(NewData, 3)
 
 # ## График предсказаний
-ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
+gg_norm <- ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
   geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha=0.3)+
   geom_line(aes(colour = Treatment)) +
   geom_hline(yintercept = 0)
@@ -135,8 +137,9 @@ vif(M_norm)
 
 # Дополните код:
 
-M_norm_diag <- data.frame(.fitted = fitted(),
-                          .resid_p = residuals())
+M_norm_diag <- data.frame(
+  .fitted = fitted(M_norm),
+  .resid_p = residuals(M_norm, type = 'pearson'))
 
 ggplot(data = , aes()) + geom_hline( = 0) +
   geom_point()
@@ -178,18 +181,19 @@ NewData$SE_eta <- sqrt(diag(X %*% vcov(M_pois) %*% t(X)))
 
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
 NewData$fit_mu <- exp(NewData$fit_eta)
-NewData$SE_mu <- exp(NewData$SE_eta)
-
+# +- 2 SE
+NewData$lwr <- exp(NewData$fit_eta - 2 * NewData$SE_eta)
+NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
 head(NewData, 2)
 
 # ## График предсказаний в масштабе функции связи
-ggplot(NewData, aes(x = Flowers, y = eta, fill = Treatment)) +
-  geom_ribbon(aes(ymin = eta - 2 * SE_eta, ymax = eta + 2 * SE_eta), alpha=0.3)+
+ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
+  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, ymax = fit_eta + 2 * SE_eta), alpha=0.3)+
   geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
 
 # ## График предсказаний в масштабе переменной-отклика
-ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha=0.3)+
+ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha=0.3)+
   geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
 
 
@@ -205,6 +209,16 @@ NewData$mu <- predict_mu$fit
 NewData$SE_mu <- predict_mu$se.fit
 
 head(NewData, 2)
+
+# ## График предсказаний в масштабе функции связи
+ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
+  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, ymax = fit_eta + 2 * SE_eta), alpha=0.3)+
+  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+
+# ## График предсказаний в масштабе переменной-отклика
+gg_pois <- ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = fit_mu - 2 * SE_mu, ymax = fit_mu + 2 * SE_mu), alpha=0.3)+
+  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
 
 
 # ## Условия применимости GLM с Пуассоновским распределением отклика
@@ -271,49 +285,67 @@ drop1(M_nb, test = 'Chi')
 # Проведите диагностику модели `M_nb`.
 # Видите ли вы какие-нибудь нарушения условий применимости?
 
+M_nb_diag <- data.frame(
+  # .fitted = predict(M_nb, type = "response"),
+  .fitted = fitted(M_nb, type = "response"),
+  .resid_p = residuals(M_nb, type = "pearson"),
+  pol)
+
+gg_resid <- ggplot(M_nb_diag, aes(y = .resid_p)) +
+  geom_hline(yintercept = 0)
+gg_resid + geom_point(aes(x = .fitted))
+
+overdisp_fun(M_nb)
+
+
+
+
 
 
 # ## Данные для предсказаний
-#
-## ------------------------------------------------------------------------
 NewData <- pol %>% group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
          Hours = mean(pol$Hours))
 
 
-# Задание 3 -----------------------------------------------------------
+# Задание 3 -----------------------------------------------
 
 # Получите предсказания при помощи операций с матрицами,
 
 # Модельная матрица и коэффициенты
-X <- model.matrix(~, data = NewData)
-b <-
+X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
+b <- coef(M_nb)
 
 # Предсказанные значения и стандартные ошибки...
 # ...в масштабе функции связи (логарифм)
-NewData$fit_eta <-
+NewData$fit_eta <- X %*% b
 NewData$SE_eta <- sqrt(diag(X %*% vcov(M_nb) %*% t(X)))
 
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
-NewData$fit_mu <-
-NewData$SE_mu <-
+NewData$fit_mu <- exp(NewData$fit_eta)
+NewData$lwr <- exp(NewData$fit_eta - 2 * NewData$SE_eta)
+NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
 
 head(NewData, 2)
 
 
 
 # ## График предсказаний в масштабе функции связи
-ggplot(NewData, aes(x = Flowers, y = eta, fill = Treatment)) +
-  geom_ribbon(aes(ymin = eta - 2 * SE_eta, ymax = eta + 2 * SE_eta), alpha = 0.3) +
+ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
+  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, ymax = fit_eta + 2 * SE_eta), alpha = 0.3) +
   geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
 
 # ## График предсказаний в масштабе переменной-отклика
-ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha = 0.3) +
+gg_nb <- ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.3) +
   geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+gg_nb
 
 
+plot_grid(gg_norm + theme(legend.position = 'bottom'),
+          gg_pois+ theme(legend.position = 'bottom'),
+          gg_nb+ theme(legend.position = 'bottom'), nrow = 1)
 
 # Предсказания модели при помощи predict()
 # ...в масштабе функции связи

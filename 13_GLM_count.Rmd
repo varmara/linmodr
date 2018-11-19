@@ -82,8 +82,8 @@ $$f(y)= \frac{\mu^y \cdot e{-\mu}}{y!}$$
 Свойства:
 
 - $E(y) = \mu$ --- мат.ожидание
-- $var(y) = \mu$ --- функция дисперсии
-- $0 \le y \le +\infty$, $y \in \mathbb{N}$ --- диапазон значений
+- $var(y) = \mu$ --- дисперсия
+- $0 \le y \le +\infty$, $y \in \mathbb{N}$ --- значения
 
 
 \columnsend
@@ -132,12 +132,125 @@ $$f(y) = \frac{\Gamma(y + k)}{\Gamma(k) \cdot \Gamma(y+1)} \cdot (\frac{k}{\mu +
 Свойства:
 
 - $E(y)  = \mu$ -- мат.ожидание
-- $var(y) = \mu + \frac {\mu^2}{k}$ -- функция дисперсии
-- $0 \le y \le +\infty$, $y \in \mathbb{N}$ -- диапазон значений
+- $var(y) = \mu + \frac {\mu^2}{k}$ -- дисперсия
+- $0 \le y \le +\infty$, $y \in \mathbb{N}$ -- значения
 
 \note{Это смесь Пуассоновского и Гамма распределений: $y$ подчиняется распределению Пуассона с Гамма-распределенным $\mu$. Приближается к распр. Пуассона при очень больших $k$.}
 
 \columnsend
+
+
+## GLM в "туннеле" из распределений
+
+В каждом конкретном случае при анализе данных нам предстоит выяснить, какое из распределений больше подходит для моделирования отклика.
+
+- Достаточно ли возможностей распределения Пуассона, чтобы описать связь среднего и дисперсии? 
+- Если нет, то справится ли отрицательное биномиальное распределениие, у которого есть параметр, для описания этой связи?
+
+
+```{r echo=FALSE, fig.height=2.5*1.5, out.height='2.5in'}
+# A Graphical Look at Poisson Regression
+# https://bookdown.org/roback/bookdown-bysh/ch-poissonreg.html
+# https://github.com/broadenyourstatisticalhorizons/bysh_book/blob/1be2441d7dc0ac57e428218cac504ed3147fd8c6/04-Poisson-Regression.Rmd#L109
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)    # enable ggplot
+library(gridExtra)  # enable multiple plotting
+library(MASS)
+
+# Now make Poisson regression picture
+set.seed(42)
+nbreaks <- 6
+b0 <- 0
+b1 <- 0.1
+N <- 1000
+
+
+dat <- data.frame(x=(x = runif(N, 0, 20)),
+                  y=rpois(N, lambda = exp(b0  + b1 * x)))
+## breaks: where you want to compute densities
+breaks <- seq(0, max(dat$x), len=nbreaks)
+dat$section <- cut(dat$x, breaks)
+
+## Get the residuals
+dat$res <- dat$y - (b0  + b1 * dat$x)
+## Compute densities for each section, flip the axes, add means of sections
+## Note: densities need to be scaled in relation to section size
+dens <- do.call(rbind, lapply(split(dat, dat$section), function(x) {
+  d <- density(x$res, n=500)
+  res <- data.frame(x = max(x$x) - d$y * 10, y = d$x + mean(x$y))
+  res <- res[order(res$y), ]
+  n_obs <- nrow(res)
+  ## Get some data for poisson lines as well
+  xs <- seq(min(x$y), max(x$y), len = 500)
+  res <- rbind(res, data.frame(y = xs,
+                               x = max(x$x) - 10 * dpois(round(xs), exp(b0 + b1 * max(x$x) ))))
+  res$type <- rep(c("empirical", "poisson"), each = n_obs)
+  res
+}))
+
+dens$section <- rep(levels(dat$section), each=N)
+
+pois_assume <- ggplot(dat, aes(x, y)) +
+  geom_point(size = 0.75, alpha = 0.5, position = position_jitter(height = 0.1)) +
+  geom_smooth(method="loess", fill=NA, lwd=1) +
+  geom_path(data=dens[dens$type=="poisson",], aes(x, y, group=section),
+            color='red', lwd=1.1) +
+  # geom_path(data=dens[dens$type=="empirical",], aes(x, y, group=section),
+  #           color="powderblue", lwd=1.1) +
+  theme_bw() +
+  geom_vline(xintercept=breaks, lty=1, colour = 'grey80')
+# pois_assume
+
+
+# Negative Binomial
+set.seed(42)
+th <- 10
+dat <- data.frame(x=runif(N, 0, 20),
+                  y=rnegbin(N, mu = exp(b0  + b1 * x), theta = th))
+## breaks: where you want to compute densities
+breaks <- seq(0, max(dat$x), len=nbreaks)
+dat$section <- cut(dat$x, breaks)
+## Get the residuals
+dat$res <- dat$y - (b0  + b1 * dat$x)
+## Compute densities for each section, flip the axes, add means of sections
+## Note: densities need to be scaled in relation to section size
+dens <- do.call(rbind, lapply(split(dat, dat$section), function(x) {
+  d <- density(x$res, n=500)
+  res <- data.frame(x = max(x$x) - d$y * 10, y = d$x + mean(x$y))
+  res <- res[order(res$y), ]
+  n_obs <- nrow(res)
+  ## Get some data for nb lines as well
+  xs <- seq(min(x$y), max(x$y), len = 500)
+  res <- rbind(res, data.frame(y = xs,
+                               x = max(x$x) - 10 * dnbinom(round(xs), mu = exp(b0 + b1 * max(x$x) ), size = th)))
+  res$type <- rep(c("empirical", "nb"), each = n_obs)
+  res
+}))
+
+dens$section <- rep(levels(dat$section), each=N)
+
+nb_assume <- ggplot(dat, aes(x, y)) +
+  geom_point(size = 0.75, alpha = 0.5, position = position_jitter(height = 0.1)) +
+  geom_smooth(method="loess", fill=NA, lwd=1) +
+  geom_path(data=dens[dens$type=="nb",], aes(x, y, group=section),
+            color='red', lwd=1.1) +
+  # geom_path(data=dens[dens$type=="empirical",], aes(x, y, group=section),
+            # color="powderblue", lwd=1.1) +
+  theme_bw() +
+  geom_vline(xintercept=breaks, lty=1, colour = 'grey80')
+# nb_assume
+
+grid.arrange(
+  pois_assume + 
+    labs(title = 'GLM с Пуассоновским \nраспределением отклика') +
+    coord_cartesian(ylim = c(0, 20)),
+  nb_assume + 
+    labs(title = 'GLM с отрицательным биномиальным \nраспределением отклика') +
+    coord_cartesian(ylim = c(0, 20)),
+  ncol = 2)
+```
 
 
 ## Гадючий лук, копеечник и визиты опылителей
@@ -291,7 +404,7 @@ nrow = 1)
 
 $Visits_i \sim N(\mu_i, \sigma)$ 
 
-$E(Visits_i) = \mu_i$, $var(Visits_i) = \mu_i$
+$E(Visits_i) = \mu_i$, $var(Visits_i) = \sigma^2$
 
 $\mu_i = \eta_i$ -- функция связи "идентичность"
 
@@ -338,7 +451,7 @@ ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
 
 ## Смотрим на результаты подбора модели
 
-\small
+\footnotesize
 
 ```{r}
 summary(M_norm)
@@ -456,11 +569,25 @@ coef(M_pois)
 
 ## Смотрим на результаты подбора модели
 
-\small
+\vspace{-\baselineskip}
+
+\columnsbegin
+\column{0.7\textwidth}
+
+\footnotesize
 
 ```{r}
 summary(M_pois)
 ```
+
+\column{0.3\textwidth}
+
+Угловые коэффициенты показывают, на сколько единиц меняется значение логарифма отклика, если соответствующий предиктор изменяется на единицу.
+
+Это значит, что сам отклик изменяется в $e^{b_k}$ раз при изменении предиктора на единицу.
+
+\columnsend
+
 
 ## Анализ девиансы для модели с Пуассоновским распределением отклика
 
@@ -517,7 +644,8 @@ NewData$SE_eta <- sqrt(diag(X %*% vcov(M_pois) %*% t(X)))
 
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
 NewData$fit_mu <- exp(NewData$fit_eta)
-NewData$SE_mu <- exp(NewData$SE_eta)
+NewData$lwr <- exp(NewData$fit_eta - 2 * NewData$SE_eta)
+NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
 
 head(NewData, 2)
 ```
@@ -776,7 +904,7 @@ summary(M_quasi)$dispersion
 
 ## Смотрим на результаты подбора модели
 
-\small
+\footnotesize
 
 ```{r}
 summary(M_quasi)
@@ -843,11 +971,23 @@ summary(M_nb)$theta
 
 \vspace{-0.7\baselineskip}
 
-\small
+\columnsbegin
+\column{0.7\textwidth}
+
+\footnotesize
 
 ```{r}
 summary(M_nb)
 ```
+
+\column{0.3\textwidth}
+
+Угловые коэффициенты показывают, на сколько единиц меняется значение логарифма отклика, если соответствующий предиктор изменяется на единицу.
+
+Это значит, что сам отклик изменяется в $e^{b_k}$ раз при изменении предиктора на единицу.
+
+\columnsend
+
 
 ## Анализ девиансы модели с отрицательным биномиальным распределением отклика
 
@@ -941,7 +1081,8 @@ NewData$SE_eta <- sqrt(diag(X %*% vcov(M_nb) %*% t(X)))
 
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
 NewData$fit_mu <- exp(NewData$fit_eta)
-NewData$SE_mu <- exp(NewData$SE_eta)
+NewData$lwr <- exp(NewData$fit_eta - 2 * NewData$SE_eta)
+NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
 
 head(NewData, 2)
 ```
