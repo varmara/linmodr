@@ -189,14 +189,17 @@ install.packages("AER")
 
 ```{r eval=FALSE}
 install.packages("ISwR")
+install.packages("cowplot")
+
 ```
 
 
-<!-- - Презентация: [14_GLM_binary.html](14_GLM_binary.html) -->
-<!-- - Код: [14_GLM_binary_code.R](14_GLM_binary_code.R) -->
-<!-- - Данные:  -->
-<!--     + [polis.csv](data/polis.csv) -->
-<!--     + [ICU.csv](data/ICU.csv) -->
+<!-- - Презентация: [14_GLM_binary.html](14_GLM_binary_new.pdf) -->
+- Код: [14_GLM_binary_code_new.R](14_GLM_binary_code_new.R)
+- Данные:
+    + [aster_mussel.csv](data/aster_mussel.csv)
+    + [polis.csv](data/polis.csv)
+    + [ICU.csv](data/ICU.csv)
 
 
 ## Смешанные модели (GLMM)
