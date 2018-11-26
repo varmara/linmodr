@@ -1,0 +1,1380 @@
+---
+title: "Смешанные линейные модели (случайный интерсепт и случайный угол наклона)"
+subtitle: "Линейные модели..."
+author: "Марина Варфоломеева, Вадим Хайтов"
+institute: "Кафедра Зоологии беспозвоночных, Биологический факультет, СПбГУ"
+fontsize: 10pt
+classoption: 't,xcolor=table'
+language: russian, english
+output:
+  beamer_presentation:
+    theme: default
+    toc: no
+    colortheme: beaver
+    latex_engine: xelatex
+    slide_level: 2
+    fig_crop: false
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+options(width = 70, scipen = 4)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7, R.options=list(width=70))
+# library("extrafont")
+source("support_linmodr.R")
+```
+
+
+## Вы узнаете
+
+- Что такое смешаные модели и когда они применяются
+- Что такое фиксированные и случайные факторы
+
+### Вы сможете
+
+- Рассказать чем фиксированные факторы отличаются от случайных
+- Привести примеры факторов, которые могут быть фиксированными или случайными в зависимости от задачи исследования
+- Рассказать, что оценивает коэффициент внутриклассовой корреляции и вычислить его для  случая с одним случайным фактором
+- Подобрать смешаную линейную модель со случайным отрезком и случайным углом наклона в R при помощи методов максимального правдоподобия
+
+# "Многоуровневые" данные
+
+## Независимость наблюдений
+
+Обычные линейные модели предполагают, что наблюдения должны быть независимы друг от друга.
+
+Но так происходит совсем не всегда.
+
+\pause
+
+### Многоуровневые (multilevel), сгруппированные (clustered) данные
+
+Иногда наблюдения бывают сходны по каким-то признакам:
+
+- измерения в разные периоды времени
+    - измерения, сделанные в химической лаборатории в разные дни
+
+- измерения в разных участках пространства
+    - урожай на участках одного поля
+    - детали, произведенные на одном из нескольких аналогичных станков
+  
+- повторные измерения на одних и тех же субъектах
+    - измерения до и после какого-то воздействия
+    
+- измерения на разных субъектах, которые сами объединены в группы
+    - ученики в классах, классы в школах, школы в районах, районы в городах и т.п.
+
+## Внутригрупповые корреляции
+
+Детали, произведенные на одном станке будут более похожи, чем детали, сделанные на разных.
+
+Аналогично, у учеников из одного класса будет более похожий уровень подготовки к какому-нибудь предмету, чем у учеников из разных классов.
+
+Таким образом, можно сказать, что есть корреляции значений внутри групп.
+
+\pause
+
+### Последствия для анализа
+
+Игнорировать такую группирующую структуру данных нельзя -- можно ошибиться с выводами.
+
+Моделировать группирующие факторы обычными методами тоже нельзя -- придется подбирать очень много параметров.
+
+Решение -- случайные факторы.  О том, что это такое и чем они принципиально отличаются от фиксированных, мы поговорим позже. А сейчас давайте на примере убедимся в том, что без случайных факторов бывает сложно справиться с анализом.
+
+## Пример -- недосып и время реакции
+
+В ночь перед нулевым днем всем испытуемым давали поспать нормальное время, а в следующие 9 ночей --- только по 3 часа. Каждый день измеряли время реакции в серии тестов. (Данные Belenky et al., 2003)
+
+Как время реакции людей зависит от бессонницы?
+
+- `Reaction` --- среднее время реакции в серии тестов в день наблюдения, мс
+- `Days` --- число дней депривации сна
+- `Subject` --- номер испытуемого
+
+```{r}
+library(lme4)
+data(sleepstudy)
+
+sl <- sleepstudy
+str(sl)
+```
+
+## Знакомимся с данными
+
+```{r}
+# Есть ли пропущенные значения?
+colSums(is.na(sl))
+# Сколько субъектов?
+length(unique(sl$Subject))
+# Сколько наблюдений для каждого субъекта?
+table(sl$Subject)
+```
+
+## Есть ли выбросы?
+
+
+```{r}
+library(ggplot2)
+theme_set(theme_bw())
+
+ggplot(sl, aes(x = Reaction, y = 1:nrow(sl))) +
+  geom_point()
+```
+
+Мы пока еще не учли информацию о субъектах...
+
+
+## Как меняется время реакции разных людей?
+
+
+```{r fig.height=2*1.5, out.height='2in'}
+ggplot(sl, aes(x = Reaction, y = Subject, colour = Days)) +
+  geom_point() 
+```
+
+У разных людей разное время реакции.
+
+Межиндивидуальную изменчивость нельзя игнорировать.
+
+
+## Что делать с разными субъектами?
+
+\pause
+\begin{minipage}{\linewidth}
+\setlength\intextsep{0pt}
+\begin{wrapfigure}{l}{0.4\textwidth}
+\includegraphics{images/the_good1.jpg}
+\end{wrapfigure}
+The Good --- подбираем смешанную модель, в которой есть фиксированный фактор `Days` и случайный фактор `Subject`, который опишет межиндивидуальную изменчивость.
+\end{minipage}
+
+
+\vspace{18mm}
+
+\pause
+
+\begin{minipage}{\linewidth}
+\setlength\intextsep{0pt}
+\begin{wrapfigure}{l}{0.4\textwidth}
+\includegraphics{images/the_bad1.jpg}
+\end{wrapfigure}
+The Bad --- игнорируем структуру данных, подбираем модель с единственным фиксированным фактором `Days`. (Не учитываем группирующий фактор `Subject`). Неправильный вариант.
+\end{minipage}
+
+\pause
+
+\vfill
+
+\begin{minipage}{\linewidth}
+\setlength\intextsep{0pt}
+\begin{wrapfigure}{l}{0.4\textwidth}
+\includegraphics{images/the_ugly1.jpg}
+\end{wrapfigure}
+The Ugly --- подбираем модель с двумя фиксированными факторами: `Days` и `Subject`. (Группирующий фактор `Subject` опишет межиндивидуальную изменчивость как обычный фиксированный фактор).
+\end{minipage}
+
+
+## Плохое решение: не учитываем группирующий фактор
+
+$Reaction_{i} = \beta_0 + \beta_1 Days_{i} + \varepsilon_{i}$
+
+$\varepsilon_i \sim N(0, \sigma)$  
+
+\pause
+
+В матричном виде это можно записать так:
+
+$\begin{pmatrix} Reaction _{1} \\ Reaction _{2} \\ \vdots \\ Reaction _{180} \end{pmatrix} 
+= \begin{pmatrix}
+1 & Days _{1} \\ 1 & Days _{2} \\ \vdots \\ 1 & Days _{180}
+\end{pmatrix} 
+ \begin{pmatrix}
+\beta _0 \\ \beta _1
+\end{pmatrix} +
+ \begin{pmatrix} \varepsilon _{1} \\ \varepsilon _{2}\\ \vdots \\ \varepsilon _{180} \end{pmatrix}$
+
+что можно сокращенно записать так:
+
+$\mathbf{Reaction} = \mathbf{X} \pmb{\beta} + \pmb{\varepsilon}$
+
+
+## Плохое решение: не учитываем группирующий фактор
+
+\columnsbegin
+\column{0.58\textwidth}
+
+\small
+
+```{r}
+W1 <- glm(Reaction ~ Days, data = sl)
+summary(W1)
+```
+
+\column{0.38\textwidth}
+
+\normalsize
+
+Объем выборки завышен (180 наблюдений, вместо 18 субъектов). Стандартные ошибки и уровни значимости занижены. Увеличивается вероятность ошибок I рода.
+
+Нарушено условие независимости наблюдений.
+
+\columnsend
+
+## Плохое решение: не учитываем группирующий фактор
+
+```{r}
+ggplot(sl, aes(x = Days, y = Reaction)) +
+  geom_point() +
+  geom_smooth(se = TRUE, method = "lm", size = 1)
+```
+
+Доверительная зона регрессии "заужена". 
+
+Большие остатки, т.к. неучтенная межиндивидуальная изменчивость "ушла" в остаточную.
+
+## Громоздкое решение: группирующий фактор как фиксированный
+
+$Reaction_{i} = \beta_0 + \beta_1 Days_{i} + \beta_{2}Subject_{2\,i} + ... + \beta_{2}Subject_{`r length(unique(sl$Subject))`\,i} + \varepsilon_{i}$
+
+$\varepsilon_{i} \sim N(0, \sigma)$
+
+\pause
+
+В матричном виде это можно записать так:
+
+$\begin{pmatrix} Reaction _{1} \\ Reaction _{2} \\ \vdots \\ Reaction _{180} \end{pmatrix} 
+= \begin{pmatrix}
+1 & Days _{1} & Subject_{2\,1} & \cdots & Subject_{`r length(unique(sl$Subject))`\,1} \\ 1 & Days _{2}  & Subject_{2\,2} & \cdots & Subject_{`r length(unique(sl$Subject))`\,2} \\ \vdots \\ 1 & Days _{180}  & Subject_{2\,180} & \cdots & Subject_{`r length(unique(sl$Subject))`\,180}
+\end{pmatrix} 
+ \begin{pmatrix}
+\beta _0 \\ \beta _1
+\end{pmatrix} +
+ \begin{pmatrix} \varepsilon _{1} \\ \varepsilon _{2}\\ \vdots \\ \varepsilon _{180} \end{pmatrix}$
+
+То есть: $\mathbf{Reaction} = \mathbf{X} \pmb{\beta} + \pmb{\varepsilon}$
+
+
+## Громоздкое решение: группирующий фактор как фиксированный
+
+\columnsbegin
+\column{0.6\textwidth}
+
+\small
+
+```{r R.options=list(width = 50)}
+W2 <- glm(Reaction ~ Days + Subject, data = sl)
+coef(W2)
+```
+
+Фрагмент `summary(W2)`:
+
+```
+Residual standard error: 30.99 on 161 degrees of freedom
+Multiple R-squared:  0.7277,	Adjusted R-squared:  0.6973 
+F-statistic: 23.91 on 18 and 161 DF,  p-value: < 2.2e-16
+```
+
+\column{0.4\textwidth}
+
+`r length(coef(W2)) + 1` параметров (`r length(unique(sl$Subject))` для `Subject`, один для `Days` и $\sigma$), а наблюдений всего `r sum(complete.cases(sl))`.
+
+Нужно минимум 10--20 наблюдений на каждый параметр (Harrell, 2013) --- у нас всего `r sum(complete.cases(sl))/(length(coef(W2)) + 1)`.
+
+\columnsend
+
+## Громоздкое решение: что нам делать с этим множеством прямых?
+
+```{r}
+ggplot(fortify(W2), aes(x = Days, colour = Subject)) +
+  geom_line(aes(y = .fitted, group = Subject)) +
+  geom_point(data = sl, aes(y = Reaction)) +
+  guides(colour = guide_legend(ncol = 2))
+```
+
+В модели, где субъект --- фиксированный фактор, для каждого субъекта есть "поправка" для значения свободного члена в уравнении регрессии.  
+Универсальность модели теряется: предсказания можно сделать только с учетом субъекта.
+
+# Фиксированные и случайные факторы {.segue}
+
+## Фиксированные факторы
+
+До сих пор мы имели дело только с фиксированными факторами.
+
+Мы моделировали средние значения для уровней фиксированного фактора. Если групп было много, то приходилось моделировать много средних значений. 
+
+Поступая так, мы считали, что сравниваемые группы -- фиксированные, и нам интересны именно сравнения между ними.
+
+```{r echo=FALSE, purl=FALSE}
+ggplot(fortify(W2), aes(x = Days, colour = Subject)) +
+  geom_line(aes(y = .fitted, group = Subject)) +
+  geom_point(data = sl, aes(y = Reaction)) +
+  guides(colour = guide_legend(ncol = 2)) +
+  labs(y = 'Reaction')
+```
+
+## Можно посмотреть на группирующий фактор иначе!
+
+Когда нам не важны конкретные значения интерсептов для разных уровней фактора, мы можем представить, что эффект фактора (величина "поправки") --- случайная величина, и можем оценить дисперсию между уровнями группирующего фактора.
+
+Такие факторы называются __случайными факторами__.
+
+```{r echo=FALSE, purl=FALSE}
+M1 <- lmer(Reaction ~ Days + (1 | Subject), data = sl)
+# Исходные данные
+library(dplyr)
+NewData <- sl %>% group_by(Subject) %>% 
+  do(data.frame(Days = seq(min(.$Days), max(.$Days), length = 10)))
+
+# Предсказанные значения при помощи predict()
+# re.form = NA - для фиксированных эффектов (т.е. без учета субъекта)
+NewData$fit <- predict(M1, NewData, type = 'response', re.form = NA)
+# Предсказанные значения при помощи матриц
+X <- model.matrix(~ Days, data = NewData)
+# Cтандартные ошибки и дов. интервалы
+NewData$SE <- sqrt( diag(X %*% vcov(M1) %*% t(X)) )
+NewData$lwr <- NewData$fit - 2 * NewData$SE
+NewData$upr <- NewData$fit + 2 * NewData$SE
+
+ggplot(data = NewData, aes(x = Days, y = fit)) +
+  geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) +
+  geom_line() + geom_point(data = sl, aes(x = Days, y = Reaction)) +
+  labs(y = 'Reaction')
+```
+
+
+## Случайные факторы
+
+- измерения в разные периоды времени
+    - измерения, сделанные в химической лаборатории в разные дни
+
+- измерения в разных участках пространства
+    - урожай на участках одного поля
+    - детали, произведенные на одном из нескольких аналогичных станков
+  
+- повторные измерения на одних и тех же субъектах
+    - измерения до и после какого-то воздействия
+    
+- измерения на разных субъектах, которые сами объединены в группы
+    - ученики в классах, классы в школах, школы в районах, районы в городах и т.п.
+    
+### Случайные факторы в моделях
+
+На один и тот же фактор можно посмотреть и как на фиксированный и как на случайный в зависимости от целей исследователя.
+
+Поскольку моделируя случайный фактор мы оцениваем дисперсию между уровнями, то хорошо, если у случайного фактора будет минимум пять градаций.
+
+
+# GLMM со случайным отрезком
+
+## GLMM со случайным отрезком
+
+$Reaction_{ij} = \beta_0 + \beta_1 Days_{ij} + c_{i} + \varepsilon_{ij}$
+
+$c_{i} \sim N(0, \sigma_b)$ --- случайный эффект субъекта (случайный отрезок, интерсепт)  
+$\varepsilon_{ij} \sim N(0, \sigma)$ --- остатки модели  
+$i$ --- субъекты, $j$ --- дни
+
+\pause
+
+Для каждого субъекта $i$ в матричном виде это записывается так:
+
+$\begin{pmatrix} Reaction _{i1} \\ Reaction _{i2} \\ \vdots \\ Reaction _{i10} \end{pmatrix} 
+= \begin{pmatrix}
+1 & Days _{i1} \\ 1 & Days _{i2} \\ \vdots \\ 1 & Days _{i10}
+\end{pmatrix} 
+ \begin{pmatrix}
+\beta _0 \\ \beta _1
+\end{pmatrix}  +
+ \begin{pmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{pmatrix} 
+c_{i} +
+ \begin{pmatrix} \varepsilon _{i1} \\ \varepsilon _{i2}\\ \vdots \\ \varepsilon _{i10} \end{pmatrix}$
+
+То есть для всех субъектов: $\mathbf{Reaction}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$
+
+## Подберем модель со случайным отрезком
+
+Используем `lmer` из пакета `lme4`.
+
+```{r eval=FALSE}
+?lmer # справка о lmer
+```
+
+`lmer` по умолчанию использует REML для подбора параметров. Это значит, что случайные эффекты будут оценены более точно, чем при использовании ML.
+
+\vspace{\baselineskip}
+
+```{r}
+M1 <- lmer(Reaction ~ Days + (1 | Subject), data = sl)
+```
+
+## Запишем уравнение модели со случайным отрезком
+
+\columnsbegin
+\column{0.45\textwidth}
+\footnotesize
+
+```{r}
+summary(M1)
+```
+
+\column{0.55\textwidth}
+
+$Reaction_{ij} = 251.4 + 10.5 Days_{ij} + c_{i} + \varepsilon_{ij}$
+
+$c_{i} \sim N(0, 37.12)$ --- случайный эффект субъекта  
+$\varepsilon_{ij} \sim N(0, 30.99)$ --- остатки модели  
+$i$ --- субъекты, $j$ --- дни
+
+\columnsend
+
+
+## Предсказания смешанных моделей бывают двух типов
+
+- Предсказания с учетом лишь фиксированных эффектов,
+- Предсказания с одновременным учетом как фиксированных, так и случайных эффектов.
+
+Данные для графика предсказаний фиксированной части модели:
+
+```{r}
+library(dplyr)
+NewData <- sl %>% group_by(Subject) %>% 
+  do(data.frame(Days = seq(min(.$Days), max(.$Days), length = 10)))
+
+head(NewData, 3)
+```
+
+## Предсказания фиксированной части модели при помощи predict()
+
+
+```{r eval=FALSE}
+?predict.merMod
+```
+
+Функция `predict()` в `lme4` не считает стандартные ошибки и доверительные интервалы. Это потому, что нет способа адекватно учесть неопределенность, связанную со случайными эффектами. 
+
+
+```{r}
+NewData$fit <- predict(M1, NewData, type = 'response', re.form = NA)
+head(NewData, 3)
+```
+
+## Предсказания фиксированной части модели в матричном виде
+
+Стандартные ошибки, рассчитанные обычным методом,  
+позволят получить __приблизительные__ доверительные интервалы. 
+
+```{r}
+# Предсказанные значения при помощи матриц
+X <- model.matrix(~ Days, data = NewData)
+betas <- fixef(M1)
+NewData$fit <- X %*% betas
+
+# Cтандартные ошибки
+NewData$SE <- sqrt( diag(X %*% vcov(M1) %*% t(X)) )               
+
+NewData$lwr <- NewData$fit - 2 * NewData$SE
+NewData$upr <- NewData$fit + 2 * NewData$SE
+```
+
+Более точные доверительные интервалы  можно получить при помощи бутстрепа.  
+Мы сделаем это позже для финальной модели.
+
+\note{Здесь доверительный интервал без учета неопределенности, связанной со случайным эффектом. Чтобы ее учесть нужно взять корень из суммы дисперсий фиксированной и случайного эффекта. См. GLMM FAQ}
+
+## График предсказаний фиксированной части модели
+
+
+```{r}
+ggplot(data = NewData, aes(x = Days, y = fit)) +
+  geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) +
+  geom_line() + geom_point(data = sl, aes(x = Days, y = Reaction))
+```
+
+
+Зависимость времени реакции от продолжительности периода бессонницы без учета субъекта:
+
+$\widehat{Reaction}_{ij} = 251.4 + 10.5 Days_{ij}$
+
+
+<!-- ## Предсказания фиксированной части модели с бутстрапом -->
+
+<!-- ```{r} -->
+<!-- merBoot <- bootMer(M1, function(x)predict(x, new_data = NewData, re.form = NA), nsim = 1000) -->
+<!-- b_se <- apply(merBoot$t, 2, function(x) quantile(x, probs=c(.025, .975), na.rm=TRUE)) -->
+<!-- NewData$lwr <- b_se[1, ] -->
+<!-- NewData$upr <- b_se[2, ] -->
+
+<!-- ggplot(data = NewData, aes(x = Days, y = fit)) + -->
+<!--   geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) + -->
+<!--   geom_line() + geom_point(data = sl, aes(x = Days, y = Reaction)) -->
+<!-- ``` -->
+
+<!-- ## Предсказания фиксированной части модели при помощи merTools -->
+
+<!-- ```{r} -->
+<!-- NewData <- sl %>% group_by(Subject) %>%  -->
+<!--   do(data.frame(Days = seq(min(.$Days), max(.$Days), length = 10))) -->
+
+<!-- NewData$regFit <- predict(M1, newdata = NewData, type = "response") -->
+<!-- library(merTools) -->
+<!-- exampPreds <- predictInterval(M1, newdata = NewData, stat = 'median', -->
+<!--                               type = "linear.prediction", level = 0.95, n.sims = 1000) -->
+
+<!-- head(data.frame(NewData, exampPreds)) -->
+<!-- ``` -->
+
+
+## Предсказания для каждого уровня случайного фактора
+
+
+<!-- # ```{r} -->
+<!-- # NewData$fit_subj <- predict(M1, NewData, type = 'response') -->
+<!-- # # или то же самое при помощи матриц -->
+<!-- # # случайные эффекты для каждого субъекта -->
+<!-- # ref <- ranef(M1) -->
+<!-- # # "разворачиваем" для каждой строки данных -->
+<!-- # all_ref <- ref$Subject[as.numeric(NewData$Subject), 1] -->
+<!-- # # прибавляем случайные эффекты к предсказаниям фикс. части -->
+<!-- # NewData$fit_subj <- X %*% betas + all_ref -->
+<!-- # ``` -->
+
+```{r gg_M1_subj}
+NewData$fit_subj <- predict(M1, NewData, type = 'response')
+ggplot(NewData, aes(x = Days, y = fit_subj)) +
+  geom_ribbon(alpha = 0.3, aes(ymin = lwr, ymax = upr)) + 
+  geom_line(aes(colour = Subject)) +
+  geom_point(data = sl, aes(x = Days, y = Reaction, colour = Subject))  +
+  guides(colour = guide_legend(ncol = 2))
+```
+
+Зависимость времени реакции от продолжительности периода бессонницы для обследованных субъектов: 
+
+$\widehat{Reaction}_{ij} = 251.4 + 10.5 Days_{ij} + c_{i}$
+
+
+## Важные замечания
+
+Случайный фактор помогает учесть взаимозависимость наблюдений для каждого из субъектов -- "индуцированные" корреляции.
+
+После анализа остатков модели можно будет понять, стоит ли с ней работать дальше. Одна из потенциальных проблем -- время реакции разных субъектов может меняться непараллельно. Возможно, модель придется переформулировать.
+
+
+```{r gg_M1_subj, echo=FALSE}
+```
+
+# Индуцированная корреляция {.segue}
+
+## Рaзберемся со случайной частью модели
+
+$\mathbf{Reaction} = \mathbf{X} \pmb{\beta} + \mathbf{Z} \mathbf{b} + \pmb{\varepsilon}$  
+$\mathbf{b} \sim N(0, \mathbf{D})$ - случайные эффекты $b _i$ нормально распределены со средним 0 и матрицей ковариаций $\mathbf{D}$   
+$\pmb{\varepsilon} \sim N(0, \pmb{\Sigma})$ - остатки модели нормально распределены со средним 0 и матрицей ковариаций $\pmb{\Sigma}$
+
+\pause
+
+Матрица ковариаций остатков:
+$\pmb{\Sigma} = \sigma^2 \cdot
+ \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & 1
+\end{pmatrix} = \begin{pmatrix}
+\sigma^2 & 0 & 0 & 0 \\
+0 & \sigma^2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & \sigma^2
+\end{pmatrix}$
+
+
+## Остатки модели должны быть независимы друг от друга
+
+В матрице ковариаций остатков вне диагонали стоят нули, т.е. ковариация разных остатков равна нулю. Т.е. остатки независимы друг от друга.
+
+$\pmb{\Sigma} = 
+\begin{pmatrix}
+\sigma^2 & 0 & 0 & 0 \\
+0 & \sigma^2 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & \sigma^2
+\end{pmatrix}$
+
+В то же время, отдельные значения переменной-отклика $\mathbf{Y}$ уже не будут независимы друг от друга при появлении в модели случайного фактора.
+
+## Матрица ковариаций переменной-отклика
+
+$\mathbf{Reaction} = \mathbf{X} \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$  
+$\mathbf{b} \sim N(0, \mathbf{D})$   
+$\pmb{\varepsilon} \sim N(0, \pmb{\Sigma})$
+
+
+Можно показать, что переменная-отклик $\mathbf{Y}$ нормально распределена: 
+
+$\mathbf{Y} \sim N(\mathbf{X} \pmb{\beta}, \mathbf{V} )$
+
+\pause
+
+Матрица ковариаций переменной-отклика:
+
+$\mathbf{V} = \mathbf{Z} \mathbf{D} \mathbf{Z'} + \pmb{\Sigma}$
+
+где $\mathbf{D}$ --- матрица ковариаций случайных эффектов.
+
+Т.е. __добавление случайных эффектов приводит  
+к изменению ковариационной матрицы__ $\mathbf{V}$
+
+\note{Кстати, $\mathbf{Z} \mathbf{D} \mathbf{Z'}$ называется преобразование Холецкого (Cholesky decomposition)}
+
+## Добавление случайных эффектов приводит к изменению ковариационной матрицы
+
+$$\mathbf{V} = \mathbf{Z} \mathbf{D} \mathbf{Z'} + \pmb{\Sigma}$$
+
+Для простейшей смешанной модели со случайным отрезком:
+
+$\mathbf{V} =  \begin{pmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{pmatrix}
+\cdot \sigma_b^2
+\cdot  \begin{pmatrix} 1 & 1 & \cdots & 1 \end{pmatrix} +
+\sigma^2
+\cdot
+ \begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0 & \cdots & 1
+\end{pmatrix}  =  \begin{pmatrix}
+\sigma^2 + \sigma_b^2 & \sigma_b^2 & \cdots & \sigma_b^2 \\
+\sigma_b^2 & \sigma^2 + \sigma_b^2 & \cdots & \sigma_b^2 \\
+\vdots & \vdots & \ddots & \vdots \\
+\sigma_b^2 & \sigma_b^2 & \sigma_b^2 & \sigma^2 + \sigma_b^2
+\end{pmatrix}$
+
+## Индуцированная корреляция --- следствие  включения в модель случайных эффектов
+
+$\mathbf{V} =
+ \begin{pmatrix}
+\sigma^2 + \sigma_b^2 & \sigma_b^2 & \cdots & \sigma_b^2 \\
+\sigma_b^2 & \sigma^2 + \sigma_b^2 & \cdots & \sigma_b^2 \\
+\vdots & \vdots & \ddots & \vdots \\
+\sigma_b^2 & \sigma_b^2 & \sigma_b^2 & \sigma^2 + \sigma_b^2
+\end{pmatrix}$
+
+- $\sigma_b^2$ --- ковариация между наблюдениями одного субъекта. 
+- $\sigma^2 + \sigma_b^2$ --- дисперсия.
+
+Т.е. корреляция между наблюдениями одного субъекта $\sigma_b^2 / (\sigma^2 + \sigma_b^2)$
+
+
+## Коэффициент внутриклассовой корреляции \newline (intra-class correlation, ICC)
+
+$ICC = \sigma_b^2 / (\sigma^2 + \sigma_b^2)$
+
+Способ измерить, насколько коррелируют друг с другом наблюдения из одной и той же группы, заданной случайным фактором. 
+
+Если ICC низок, то наблюдения очень разные внутри каждой из групп. Значит, чтобы надежно оценить эффект этого случайного фактора, нужно брать больше наблюдений в группе.
+
+Если ICC высок, то наблюдения очень похожи внутри каждой из групп, заданных случайным фактором. Значит, можно брать меньше наблюдений в группе.
+
+## Вычислим коэффициент внутриклассовой корреляции
+
+\columnsbegin
+\column{0.48\textwidth}
+\footnotesize
+
+```{r}
+summary(M1)
+```
+
+\column{0.48\textwidth}
+
+```{r}
+VarCorr(M1)  # Случайные эффекты отдельно
+
+37.124^2 / (37.124^2 + 30.991^2)
+```
+
+\columnsend
+
+\note{Есть функции для ICC, подождем, когда они станут пакетом. https://github.com/timothyslau/ICC.merMod}
+
+
+# Диагностика модели 
+
+## Условия применимости
+
+- Случайность и независимость наблюдений.
+- Линейная связь.
+- Нормальное распределение остатков.
+- Гомогенность дисперсий остатков.
+- Отсутствие коллинеарности предикторов.
+
+## Данные для анализа остатков
+
+```{r}
+M1_diag <- data.frame(
+  sl,
+  .fitted = predict(M1),
+  .resid = resid(M1, type = 'pearson'),
+  .scresid = resid(M1, type = 'pearson', scaled = TRUE))
+
+head(M1_diag, 4)
+```
+
+- `.fitted` --- предсказанные значения.
+- `.resid` --- Пирсоновские остатки.
+- `.scresid` --- стандартизованные Пирсоновские остатки.
+
+## График остатков от предсказанных значений
+
+```{r}
+gg_resid <- ggplot(M1_diag, aes(y = .scresid)) +
+  geom_hline(yintercept = 0)
+gg_resid + geom_point(aes(x = .fitted))
+```
+
+
+Большие остатки.
+
+Гетерогенность дисперсий.
+
+
+## Графики остатков от ковариат в модели и не в модели
+
+```{r}
+gg_resid + geom_boxplot(aes(x = factor(Days)))
+```
+
+
+Большие остатки в некоторые дни.
+
+Гетерогенность дисперсий.
+
+
+
+
+## Графики остатков от ковариат в модели и не в модели
+
+
+```{r fig.width=3*1.5, out.width='3in'}
+gg_resid + geom_boxplot(aes(x = Subject))
+```
+
+
+
+Большие остатки у 332 субъекта.
+
+Гетерогенность дисперсий.
+
+
+# GLMM со случайным отрезком и углом наклона
+
+## GLMM со случайным отрезком и углом наклона
+
+На графике индивидуальных эффектов было видно, что измерения для разных субъектов, возможно, идут непараллельно. Усложним модель --- добавим случайные изменения угла наклона для каждого из субъектов.
+
+
+```{r gg_M1_subj, echo=FALSE}
+```
+
+
+Это можно биологически объяснить. Возможно, в зависимости от продолжительности бессонницы у разных субъектов скорость реакции будет ухудшаться разной скоростью: одни способны выдержать 9 дней почти без потерь, а другим уже пары дней может быть достаточно.
+
+## Уравнение модели со случайным отрезком и углом наклона
+
+$Reaction_{ij} = \beta_0 + \beta_1 Days_{ij} + c_{i} + d_{ij} Days_{ij} + \varepsilon_{ij}$
+  
+$c_{i} \sim N(0, \sigma_b)$ --- случайный интерсепт для субъекта  
+$d_{ij} \sim N(0, \sigma_c)$ --- случайный угол наклона для субъекта  
+$\varepsilon_{ij} \sim N(0, \sigma)$ --- остатки модели  
+$i$ --- субъекты, $j$ --- дни
+
+\pause
+
+Для каждого субъекта $i$ в матричном виде это записывается так:
+
+$\begin{pmatrix} Reaction _{i1} \\ Reaction _{i2} \\ \vdots \\ Reaction _{i10} \end{pmatrix} 
+= 
+\begin{pmatrix} 1 & Days _{i1} \\ 1 & Days _{i2} \\ \vdots \\ 1 & Days _{i10} \end{pmatrix} 
+\begin{pmatrix} \beta _0 \\ \beta _1 \end{pmatrix}  +
+\begin{pmatrix} 1 & Days _{i1} \\ 1 & Days _{i2} \\ \vdots \\ 1 & Days _{i10} \end{pmatrix} 
+\begin{pmatrix} c_{i} \\ d_{i} \end{pmatrix} +
+\begin{pmatrix} \varepsilon _{i1} \\ \varepsilon _{i2}\\ \vdots \\ \varepsilon _{i10} \end{pmatrix}$
+
+То есть для всех субъектов: $\mathbf{Reaction}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$
+
+## Подберем модель со случайным отрезком и углом наклона
+
+Формат записи формулы для случайных эффектов в `lme4`
+
+```{r eval=FALSE}
+(1 + угловой_коэффициент | отрезок)
+```
+
+\vspace{\baselineskip}
+
+```{r}
+MS1 <- lmer(Reaction ~ Days + ( 1 + Days|Subject), data = sl)
+```
+
+## Запишем уравнение модели со случайным отрезком
+
+\columnsbegin
+\column{0.45\textwidth}
+\footnotesize
+
+```{r}
+summary(MS1)
+```
+
+\column{0.55\textwidth}
+
+$Reaction_{ij} = 251.4 + 10.5 Days_{ij} + c_{i} + d_{ij} Days_{ij} + \varepsilon_{ij}$
+  
+$c_{i} \sim N(0, 24.74)$ --- случайный интерсепт для субъекта  
+$d_{ij} \sim N(0, 5.92)$ --- случайный угол наклона для субъекта  
+$\varepsilon_{ij} \sim N(0, 25.59)$ --- остатки модели  
+$i$ --- субъекты, $j$ --- дни
+
+\columnsend
+
+
+## Данные для графика предсказаний фиксированной части модели
+
+```{r}
+library(dplyr)
+NewData <- sl %>% group_by(Subject) %>% 
+  do(data.frame(Days = seq(min(.$Days), max(.$Days), length = 10)))
+
+NewData$fit <- predict(MS1, NewData, type = 'response', re.form = NA)
+head(NewData, 3)
+```
+
+## Предсказания фиксированной части модели в матричном виде
+
+Вычислим __приблизительные__ доверительные интервалы. 
+
+```{r}
+# Предсказанные значения при помощи матриц
+X <- model.matrix(~ Days, data = NewData)
+betas <- fixef(MS1)
+NewData$fit <- X %*% betas
+
+# Cтандартные ошибки
+NewData$SE <- sqrt( diag(X %*% vcov(MS1) %*% t(X)) )               
+
+NewData$lwr <- NewData$fit - 2 * NewData$SE
+NewData$upr <- NewData$fit + 2 * NewData$SE
+```
+
+Более точные доверительные интервалы  можно получить при помощи бутстрепа.
+
+\note{Здесь доверительный интервал без учета неопределенности, связанной со случайным эффектом. Чтобы ее учесть нужно взять корень из суммы дисперсий фиксированной и случайного эффекта. См. GLMM FAQ}
+
+## График предсказаний фиксированной части модели
+
+
+```{r}
+ggplot(data = NewData, aes(x = Days, y = fit)) +
+  geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) +
+  geom_line() + geom_point(data = sl, aes(x = Days, y = Reaction))
+```
+
+
+Зависимость времени реакции от продолжительности периода бессонницы без учета субъекта:
+
+$\widehat{Reaction}_{ij} = 251.4 + 10.5 Days_{ij}$
+
+
+## Предсказания для каждого уровня случайного фактора
+
+<!-- ```{r purl=FALSE} -->
+<!-- NewData$fit_subj <- predict(MS1, NewData, type = 'response') -->
+<!-- # или то же самое при помощи матриц -->
+<!-- # случайные эффекты для каждого субъекта -->
+<!-- # это датафрейм с двумя столбцами -->
+<!-- ref <- ranef(MS1) -->
+<!-- # "разворачиваем" для каждой строки данных -->
+<!-- all_ref <- ref$Subject[as.numeric(NewData$Subject), ] -->
+<!-- # прибавляем случайные эффекты к предсказаниям фикс. части -->
+<!-- NewData$fit_subj <- (betas[1] + all_ref[, 1]) + (betas[2] + all_ref[, 2]) * NewData$Days -->
+<!-- ``` -->
+
+```{r gg_MS1_subj}
+NewData$fit_subj <- predict(MS1, NewData, type = 'response')
+ggplot(NewData, aes(x = Days, y = fit_subj)) +
+  geom_ribbon(alpha = 0.3, aes(ymin = lwr, ymax = upr)) + 
+  geom_line(aes(colour = Subject)) +
+  geom_point(data = sl, aes(x = Days, y = Reaction, colour = Subject))  +
+  guides(colour = guide_legend(ncol = 2))
+```
+
+
+
+Зависимость времени реакции от продолжительности периода бессонницы для обследованных субъектов: 
+
+$\widehat{Reaction}_{ij} = 251.4 + 10.5 Days_{ij} + c_{i} + d_{ij} Days_{ij}$
+
+
+
+# Диагностика модели со случайным отрезком и углом наклона {.segue}
+
+## Данные для анализа остатков
+
+```{r}
+MS1_diag <- data.frame(
+  sl,
+  .fitted = predict(MS1),
+  .resid = resid(MS1, type = 'pearson'),
+  .scresid = resid(MS1, type = 'pearson', scaled = TRUE))
+
+head(MS1_diag, 4)
+```
+
+## График остатков от предсказанных значений
+
+
+```{r}
+gg_resid <- ggplot(MS1_diag, aes(y = .scresid)) +
+  geom_hline(yintercept = 0)
+gg_resid + geom_point(aes(x = .fitted))
+```
+
+
+Несколько больших остатков.
+
+Гетерогенность дисперсий не выражена.
+
+
+
+## Графики остатков от ковариат в модели и не в модели
+
+
+
+```{r}
+gg_resid + geom_boxplot(aes(x = factor(Days)))
+```
+
+
+
+Большие остатки в некоторые дни.
+
+Нет гетерогенности дисперсий остатков.
+
+
+
+
+## Графики остатков от ковариат в модели и не в модели
+
+
+
+```{r fig.width=3*1.5, out.width='3in'}
+gg_resid + geom_boxplot(aes(x = Subject))
+```
+
+
+Большие остатки у 332 субъекта.
+
+Гетерогенность дисперсий не выражена.
+
+
+# Смешанные линейные модели {.segue}
+
+
+## Смешанные модели (Mixed Models)
+
+Смешанными называются модели, включающие случайные факторы.
+
+- Общие смешанные модели (General Linear Mixed Models) --- только нормальное распределение зависимой переменной.
+
+- Обобщенные смешанные модели (Generalized Linear Mixed Models) --- распределения зависимой переменной могут быть другими (из семейства экспоненциальных распределений).
+
+## Cмешанная линейная модель в общем виде
+
+$$\mathbf{Y} = \mathbf{X} \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon} $$
+
+$\mathbf{b} \sim N(0, \mathbf{D})$ --- случайные эффекты нормально распределены со средним 0 и матрицей ковариаций $\mathbf{D}$ (ее диагональные элементы -- стандартное отклонение $\sigma_{b}$).
+
+$\pmb{\varepsilon} \sim N(0, \pmb{\Sigma})$ --- остатки модели нормально распределены со средним 0 и матрицей ковариаций $\pmb{\Sigma}$ (ее диагональные элементы -- стандартное отклонение $\sigma$).
+
+$\mathbf{X} \pmb{\beta}$ --- фиксированная часть модели.
+
+$\mathbf{Z} \mathbf{b}$ --- случайная часть модели.
+
+\vspace{\baselineskip}
+
+В зависимости от устройства модельной матрицы для случайных эффектов $\mathbf{Z}$ смешанные модели делят на модели со случайным отрезком и случайным углом наклона.
+
+
+## Методы подбора параметров в смешанных моделях
+
+Метод максимального правдоподобия (Maximum Likelihood, ML)
+
+Метод ограниченного максимального правдоподобия (Restricted Maximum Likelihood, REML)
+
+\note{Faraway, 2017, p.196}
+
+## Метод максимального правдоподобия, ML
+
+Правдоподобие (likelihood) --- способ измерить соответствие имеющихся данных тому, что можно получить при определенных значениях параметров модели.
+
+\columnsbegin
+\column{0.48\textwidth}
+
+```{r gg-norm-tunnel0, echo=FALSE, fig.height=4, purl=FALSE}
+# Based on code by Arthur Charpentier:
+# http://freakonometrics.hypotheses.org/9593
+# TODO: wrap it into a function and adapt it for use with other distributions
+# as Markus Gesmann has done here
+# http://www.magesblog.com/2015/08/visualising-theoretical-distributions.html
+library(boot)
+data(catsM)
+cat <- catsM
+op <- par(mar = c(0, 0, 0, 0))
+n <- 2
+X <- cat$Bwt
+Y <- cat$Hwt
+df <- data.frame(X,Y)
+
+# regression
+reggig <- glm(Y ~ X, data = df, family = gaussian(link = "identity"))
+
+# empty plot
+vX <- seq(min(X) - 0.1, max(X) + 0.1, length = n)
+vY <- seq(min(Y) - 10, max(Y) + 10, length = n)
+mat <- persp(x = vX, y = vY, z = matrix(0, n, n),
+             zlim = c(0, 0.1),
+             theta =  -30, phi = 20, expand = 0.1,
+             ticktype  = "detailed",  box = FALSE, border = "gray60")
+
+x <- seq(min(X), max(X), length = 501)
+
+# expected values
+C <- trans3d(x, predict(reggig, newdata = data.frame(X = x), type = "response"), rep(0, length(x)), mat)
+lines(C, lwd = 2)
+
+sdgig <- sqrt(summary(reggig)$dispersion)
+
+# 1SD
+y1 <- qnorm(.95, predict(reggig, newdata = data.frame(X = x), type = "response"),  sdgig)
+C <- trans3d(x, y1, rep(0, length(x)), mat)
+lines(C, lty = 2, col = "#d95f02")
+y2 <- qnorm(.05, predict(reggig, newdata = data.frame(X = x), type = "response"),  sdgig)
+C <- trans3d(x, y2, rep(0, length(x)), mat)
+lines(C, lty = 2, col = "#d95f02")
+
+# C <- trans3d(c(x, rev(x)), c(y1, rev(y2)), rep(0, 2 * length(x)), mat)
+# polygon(C, border = NA, col = "yellow")
+
+# data points
+C <- trans3d(X, Y, rep(0, length(X)), mat)
+points(C, pch = 1, col = "black", cex = 0.4)
+
+# density curves
+n <- 6
+vX <- seq(min(X), max(X), length = n)
+
+mgig <- predict(reggig, newdata = data.frame(X = vX))
+
+sdgig <- sqrt(summary(reggig)$dispersion)
+
+for(j in n:1){
+  stp <- 251
+  x <- rep(vX[j], stp)
+  y <- seq(min(min(Y) - 10,
+               qnorm(.05,
+                     predict(reggig,
+                             newdata = data.frame(X = vX[j]),
+                             type = "response"),
+                     sdgig)),
+           max(Y) + 10,
+           length = stp)
+  z0 <- rep(0, stp)
+  z <- dnorm(y,  mgig[j],  sdgig)
+  C <- trans3d(c(x, x), c(y, rev(y)), c(z, z0), mat)
+  polygon(C, border = NA, col = "light blue", density = 40)
+  C <- trans3d(x, y, z0, mat)
+  lines(C, lty = 2, col = "grey60")
+  C <- trans3d(x, y, z, mat)
+  lines(C, col = "steelblue")
+}
+par(op)
+```
+
+\column{0.48\textwidth}
+
+Это произведение вероятностей получения каждой из точек данных:
+
+$$L(\theta| \text{data}) = \Pi^n _{i = 1}f(\text{data}| \theta)$$
+
+- $f(\text{data}| \theta)$ --- функция распределения с параметрами $\theta$
+
+Параметры модели должны максимизировать значение логарифма правдоподобия
+
+$$lnL(\theta| \text{data}) \longrightarrow \text{max}$$
+
+\columnsend
+
+## ML-оценки для дисперсий -- смещенные
+
+Например, ML оценка дисперсии будет смещенной:
+
+$\hat\sigma^2 = \cfrac{\sum(x_i - \bar x)^2}{n}$,
+
+т.к. в знаменателе не $n - 1$, а $n$.
+
+\vspace{\baselineskip}
+
+Аналогичные проблемы возникают при ML оценках для случайных эффектов в линейных моделях.
+
+Это происходит потому, что в смешанной линейной модели
+
+$\mathbf{Y}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$
+
+${Y} \sim N(\mathbf{X}  \pmb{\beta}, \mathbf{V})$, где $\mathbf{ZDZ'} + \pmb{\Sigma}$
+
+т.е. одновременно приходится оценивать $\beta$ и $\mathbf{V}$.
+
+## Метод ограниченного максимального правдоподобия, REML
+
+$\mathbf{Y}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$
+
+${Y} \sim N(\mathbf{X}  \pmb{\beta}, \mathbf{V})$, где $\mathbf{ZDZ'} + \pmb{\Sigma}$
+
+т.е. одновременно приходится оценивать $\beta$ и $\mathbf{V}$.
+
+Если найти матрицу $\mathbf{A}$, ортогональную к $\mathbf{X}$ (т.е. $\mathbf{AX} = 0$), то умножив ее на Y можно избавиться от $\pmb{\beta}$:
+
+$\mathbf{A'Y}  = \mathbf{A'X}  \pmb{\beta} + \mathbf{A'V} = \mathbf{0} + \mathbf{A'V}$
+
+${A'Y} \sim N(\mathbf{0}, \mathbf{A'VA})$
+
+Тогда можно воспользоваться ML, чтобы найти $V$.
+
+В результате получатся несмещенные оценки дисперсий, но немного другие оценки $\beta$.
+
+## ML или REML
+
+Если нужно работать с правдоподобиями -- ML
+
+Если нужны точные оценки случайных эффектов -- REML
+
+
+# Тестирование гипотез в смешанных моделях {.segue}
+
+
+## Использование смешанных моделей для получения выводов
+
+Тесты, которые традиционно применяются для GLM, дадут лишь __приблизительные результаты__ для GLMM:
+
+- t-(или z-) тесты Вальда для коэффициентов,
+- тесты отношения правдоподобий (Likelihood ratio tests, LRT).
+
+Поэтому для отбора моделей применяют подход, не связанный с тестами:
+
+- информационные критерии (AIC, BIC и т.п.).
+
+Наиболее точные результаты тестов можно получить, используя __"золотой стандарт"__:
+
+- параметрический бутстреп.
+
+
+## t-(или -z) тесты Вальда
+
+
+$H_0: \beta_k = 0$, $\qquad H_A: \beta_k \ne 0$
+
+\vspace{0.5\baselineskip}
+
+$\cfrac{b_k} {SE_{b_k}} \sim N(0, 1)\qquad$ или $\qquad\cfrac{b_k} {SE_{b_k}} \sim t_{(df = n - p)}$, если нужно оценивать $\sigma$
+
+$b_k$ --- оценка коэффициента, $n$ --- объем выборки, $p$ --- число параметров модели.
+
+t-(или -z) тесты Вальда дают лишь приблизительный результат,  
+поэтому в пакете `lme4` даже не приводят уровни значимости в `summary()`.  
+Не рекомендуется ими пользоваться.
+
+```{r}
+coef(summary(MS1))
+```
+
+## Тесты отношения правдоподобий (LRT)
+
+$LRT = 2ln\Big(\frac{L_{M_1}}{L_{M_2}}\Big) = 2(lnL_{M_1} - lnL_{M_2})$
+
+- $M_1$ и $M_2$ --- вложенные модели ($M_1$ --- более полная, $M_2$ --- уменьшенная),
+- $L_{M_1}$, $L_{M_2}$ -- правдоподобия моделей и $lnL_{M_1}$, $lnL_{M_2}$ -- логарифмы правдоподобий.
+
+Распределение LRT __аппроксимируют__ распределением $\chi^2$ с $df = df_{M_2} - df_{M_1}$.
+
+- LRT консервативен для случайных эффектов, т.к. тест гипотезы вида $H_0: \hat\sigma_k^2 = 0$ происходит на границе области возможных значений параметра.
+
+- LRT либерален для фиксированных эффектов,  
+дает заниженные уровни значимости.
+
+## LRT для случайных эффектов
+
+\small
+
+Модели __с одинаковой фиксированной частью__, подобранные REML. Уровни значимости будут завышены.
+
+```{r}
+MS1 <- lmer(Reaction ~ Days + (1 + Days | Subject), data = sl, REML = TRUE)
+MS0 <- lmer(Reaction ~ Days + (1 | Subject), data = sl, REML = TRUE)
+anova(MS1, MS0, refit = FALSE)
+```
+
+Время реакции у разных людей по-разному зависит от продолжительности бессонницы.
+
+Обычно тесты не делают, набор случайных эффектов определяется устройством данных.
+
+## LRT для фиксированных эффектов
+
+\small
+
+Модели __с одинаковой случайной частью__, подобранные ML.  Уровни значимости будут занижены.
+
+```{r}
+MS1.ml <- lmer(Reaction ~ Days + (1 + Days | Subject), data = sl, REML = FALSE)
+MS0.ml <- lmer(Reaction ~ 1 + (1 + Days | Subject), data = sl, REML = FALSE)
+anova(MS1.ml, MS0.ml)
+```
+
+Время реакции зависит от продолжительности бессонницы.
+
+## Сравнение моделей по AIC
+
+Можно сравнить вложенные или невложенные модели, подобранные ML, с одинаковой случайной частью.
+
+```{r}
+AIC(MS1.ml, MS0.ml)
+```
+
+Время реакции зависит от продолжительности бессонницы (AIC).
+
+
+## Бутстреп для тестирования значимости и для предсказаний {.segue}
+
+
+<!-- ## Параметрический бутстреп для тестирования случайных эффектов -->
+<!-- ```{r} -->
+<!-- # Значение LRT для сравниваемых моделей -->
+<!-- my_LRT <- as.numeric(2 * (logLik(MS1) - logLik(MS0))) -->
+<!-- # Бутстреп -->
+<!-- boot_LRT <- numeric(500) -->
+<!-- set.seed(42) -->
+<!-- for(i in 1:500){ -->
+<!--   y <- unlist(simulate(MS0)) -->
+<!--   m0 <- lmer(y ~ Days + (1 | Subject), sl, REML = TRUE) -->
+<!--   m1 <- lmer(y ~ Days + (1 + Days | Subject), sl, REML = TRUE) -->
+<!--   boot_LRT[i] <- as.numeric(2  * (logLik(m1) - logLik(m0))) -->
+<!-- } -->
+<!-- (p_val <- mean(boot_LRT > my_LRT))  # уровень значимости p -->
+<!-- sqrt(p_val * (1 - p_val) / 500)  # SE для p -->
+<!-- ``` -->
+
+
+## Параметрический бутстреп для LRT
+
+Чтобы при помощи бутстрепа получить оценку уровня значимости для LRT при сравнении двух моделей $M_{full}$ и $M_{reduced}$, нужно
+
+1.Многократно повторить:  
+    - сгенерировать новые данные из уменьшенной модели,
+    - по сгенерированным данным подобрать полную и уменьшенную модели и рассчитать LRT.
+
+2.Построить распределение LRT по всем итерациям бутстрепа.
+
+Уровень значимости -- это доля итераций, в которых получено LRT больше, чем данное.
+
+## Параметрический бутстреп для LRT фиксированных эффектов
+
+В строке PBtest -- значение LRT и его уровень значимости, полученный бутстрепом.
+
+```{r pbtest, cache = TRUE}
+library(pbkrtest)
+pmod <- PBmodcomp(MS1.ml, MS0.ml, nsim = 100) # 1000 и больше для реальных данных
+summary(pmod)
+```
+
+## Бутстреп-оценка доверительной зоны регрессии
+
+Чтобы при помощи бутстрепа оценить положение зоны, где с 95% вероятностью будут лежать предсказанные значения, нужно:
+
+1.Многократно повторить:  
+    - сгенерировать новые данные из модели
+    - по сгенерированным данным подобрать модель и получить ее предсказания
+
+2.Построить распределение предсказанных значений по всем итерациям бутстрепа.
+
+95% доверительная зона регрессии --- это область, куда попали предсказанные значения в 95% итераций (т.е. между 0.025 и 0.975 персентилями).
+
+## Бутстреп-оценка доверительной зоны регрессии
+
+```{r boot-conf, cache=TRUE}
+NewData <- sl %>% group_by(Subject) %>% 
+  do(data.frame(Days = seq(min(.$Days), max(.$Days), length = 10)))
+NewData$fit <- predict(MS1, NewData, type = 'response', re.form = NA)
+
+# Многократно симулируем данные из модели и получаем для них предсказанные значения
+bMS1 <- bootMer(x = MS1, 
+                FUN = function(x) predict(x, new_data = NewData, re.form = NA), 
+                nsim = 100)
+
+# Рассчитываем квантили предсказанных значений для всех итераций бутстрепа
+b_se <- apply(X = bMS1$t, 
+              MARGIN = 2, 
+              FUN = function(x) quantile(x, probs = c(0.025, 0.975), na.rm = TRUE))
+
+# Доверительная зона для предсказанных значений
+NewData$lwr <- b_se[1, ]
+NewData$upr <- b_se[2, ]
+```
+
+## График предсказаний фиксированной части модели
+
+```{r}
+ggplot(data = NewData, aes(x = Days, y = fit)) +
+  geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) +
+  geom_line() + geom_point(data = sl, aes(x = Days, y = Reaction))
+```
+
+
+## Take-home messages
+
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{L{0.2\textwidth} C{0.4\textwidth} C{0.4\textwidth}}
+\hline\noalign{\smallskip}
+Свойства & Фиксированные факторы & Случайные факторы \\
+\hline\noalign{\smallskip}
+Уровни фактора & фиксированные, заранее определенные и потенциально воспроизводимые уровни & случайная выборка из всех возможных уровней \\
+Используются для тестирования гипотез & о средних значениях отклика между уровнями фактора \linebreak $H _{0}: \mu _1 = \mu _2 = \ldots = \mu _i = \mu$ & о дисперсии отклика между уровнями фактора \linebreak $H _{0}: \sigma_{rand.fact.}^2 = 0$ \\
+Выводы можно экстраполировать & только на уровни из анализа & на все возможные уровни \\
+Число уровней фактора & Осторожно! Если уровней фактора слишком много, то нужно подбирать слишком много коэффициентов --- должно быть много данных & Важно! Для точной оценки $\sigma$ нужно нужно много уровней фактора --- не менее 5 \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
+
+## Take-home messages
+
+- Смешанные модели могут включать случайные и фиксированные факторы.
+    - Градации фиксированных факторов заранее определены, а выводы можно экстраполировать только на такие уровни, которые были задействованы в анализе. Тестируется гипотеза о равенстве средних в группах.
+    - Градации случайных факторов --- выборка из возможных уровней, а выводы можно экстраполировать на другие уровни. Тестируется гипотеза о дисперсии между группами.
+    
+- Есть два способа подбора коэффициентов в смешанных моделях: ML и REML. Для разных этапов анализа важно, каким именно способом подобрана модель.
+
+- Коэффициент внутриклассовой корреляции оценивает, насколько коррелируют друг с другом наблюдения из одной и той же группы случайного фактора.
+- Случайные факторы могут описывать вариацию как интерсептов, так и коэффициентов угла наклона.
+- Модели со смешанными эффектами позволяют получить предсказания как общем уровне, так и на уровне отдельных субъектов.
+
+## Дополнительные ресурсы
+
+- Crawley, M.J. (2007). The R Book (Wiley).
+- Faraway, J. J. (2017). Extending the linear model with R: generalized linear, mixed effects and nonparametric regression models (Vol. 124). CRC press.
+- Zuur, A. F., Hilbe, J., & Ieno, E. N. (2013). A Beginner's Guide to GLM and GLMM with R: A Frequentist and Bayesian Perspective for Ecologists. Highland Statistics.
+- Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer)
+- Pinheiro, J., Bates, D. (2000). Mixed-Effects Models in S and S-PLUS. Springer
+
+
