@@ -216,6 +216,9 @@ install.packages(c("lme4", "pbkrtest"))
 
 - Код:
     + [15.1_GLMM_gaussian_random_intercept_slope_code.R](15.1_GLMM_gaussian_random_intercept_slope_code.R)
+    
+- Код задания:
+    + [15.1_GLMM_gaussian_choccake_practice.R](15.1_GLMM_gaussian_choccake_practice.R)
 
 <!--     + [15.2_GLMM_gaussian_(nested)_code.R](15.2_GLMM_gaussian_(nested)_code.R) -->
 <!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
