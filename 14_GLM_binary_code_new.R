@@ -119,7 +119,7 @@ overdisp_fun <- function(model) {
 
 overdisp_fun(mod6)
 
-
+summary(mod6)
 
 # Визуализация модели
 
@@ -142,6 +142,9 @@ new_data$se_eta <- sqrt(diag(X %*% vcov(mod6) %*% t(X)))
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
 
 logit_back <- function(x) exp(x)/(1 + exp(x)) # обратная логит-трансформация
+
+logit_back(10)
+
 
 new_data$fit_pi <- logit_back(new_data$fit_eta)
 
@@ -273,11 +276,23 @@ ggplot(MyData, aes(x=, y = Predicted, color = , group = )) + geom_line() + facet
 
 ##########################################
 
-# Загрузите датасет malaria из пакета ISwR и выясните есть ли связь между вероятностью заболевания малярией и возрастом
+
+liz <- read.csv('data/polis.csv', header = TRUE)
+
+dat <- read.table('data/ICU.csv', header = TRUE, sep = ";")
 
 
-library(ISwR)
-data("malaria")
+
+liz_model <- glm(PA ~ PARATIO , family="binomial", data = liz)
+summary(liz_model)
 
 
+new_data <- data.frame(PARATIO = liz$PARATIO)
+
+predicted <- predict(liz_model, newdata = new_data, se.fit = TRUE, type = 'response')
+new_data$fit_pi <- predicted$fit
+new_data$se_pi <- predicted$se.fit
+
+ggplot(new_data, aes(x = PARATIO, y = fit_pi)) +
+  geom_ribbon(aes(ymin = fit_pi - 2 * se_pi, ymax = fit_pi + 2 * se_pi), alpha = 0.5)
 

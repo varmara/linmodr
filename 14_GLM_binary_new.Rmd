@@ -998,15 +998,7 @@ new_data <- astr %>% group_by(Sp)%>%
   do(data.frame(L = seq(min(.$L), max(.$L), length.out = 100)))
 ```
 
-Давайте получим предсказания двумя способами:
-
-- при помощи операций с матрицами,  
-чтобы своими глазами увидеть работу функции связи,
-- при помощи функции `predict()`.
-
-```{r eval=FALSE}
-?predict.glm
-```
+Давайте получим предсказания при помощи операций с матрицами, чтобы своими глазами увидеть работу функции связи.
 
 ## Предсказания модели при помощи операций с матрицами
 
@@ -1027,8 +1019,8 @@ new_data$se_eta <- sqrt(diag(X %*% vcov(mod6) %*% t(X)))
 logit_back <- function(x) exp(x)/(1 + exp(x)) # обратная логит-трансформация
 
 new_data$fit_pi <- logit_back(new_data$fit_eta)
-new_data$lwr <- logit_back(new_data$fit_eta - 2 * new_data$se_eta)
-new_data$upr <- logit_back(new_data$fit_eta - 2 * new_data$se_eta)
+new_data$lwr_pi <- logit_back(new_data$fit_eta - 2 * new_data$se_eta)
+new_data$upr_pi <- logit_back(new_data$fit_eta + 2 * new_data$se_eta)
 
 head(new_data, 2)
 ```
@@ -1039,10 +1031,6 @@ head(new_data, 2)
 \column{0.48\textwidth}
 
 ```{r fig.height=1.4*1.5, out.height='1.4in'}
-predicted <- predict(mod6, newdata = new_data, se.fit = TRUE)
-
-new_data$fit_eta <- predicted$fit
-new_data$se_eta <- predicted$se.fit
 
 ggplot(new_data, aes(x = L, y = fit_eta, fill = Sp)) + 
   geom_ribbon(aes(ymin = fit_eta - 2 * se_eta, ymax = fit_eta + 2 * se_eta), alpha = 0.5) +
@@ -1066,11 +1054,8 @@ ggplot(new_data, aes(x = L, y = fit_eta, fill = Sp)) +
 \small
 
 ```{r fig.height=1.4*1.5, out.height='1.4in'}
-predicted <- predict(mod6, newdata = new_data, se.fit = TRUE, type = 'response')
-new_data$fit_pi <- predicted$fit
-new_data$se_pi <- predicted$se.fit
 ggplot(new_data, aes(x = L, y = fit_pi, fill = Sp)) + 
-  geom_ribbon(aes(ymin = fit_pi - 2 * se_pi, ymax = fit_pi + 2 * se_pi), alpha = 0.5) +
+  geom_ribbon(aes(ymin = lwr_pi, ymax = upr_pi), alpha = 0.5) +
   geom_line(aes(color = Sp)) +
   labs(y='Вероятность', title = 'Вероятность быть съеденной')
 ```
@@ -1090,7 +1075,7 @@ ggplot(new_data, aes(x = L, y = fit_pi, fill = Sp)) +
 
 ```{r echo=FALSE, fig.height=1.4*1.5, out.height='1.4in'}
 ggplot(new_data, aes(x = L, y = fit_pi, fill = Sp)) + 
-  geom_ribbon(aes(ymin = fit_pi - 2 * se_pi, ymax = fit_pi + 2 * se_pi), alpha = 0.5) +
+  geom_ribbon(aes(ymin = lwr_pi, ymax = upr_pi), alpha = 0.5) +
   geom_line(aes(color = Sp)) +
   labs(y='Вероятность', title = 'Вероятность быть съеденной')
 ```
