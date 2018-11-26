@@ -252,7 +252,7 @@ $\begin{pmatrix} Reaction _{1} \\ Reaction _{2} \\ \vdots \\ Reaction _{180} \en
 1 & Days _{1} & Subject_{2\,1} & \cdots & Subject_{`r length(unique(sl$Subject))`\,1} \\ 1 & Days _{2}  & Subject_{2\,2} & \cdots & Subject_{`r length(unique(sl$Subject))`\,2} \\ \vdots \\ 1 & Days _{180}  & Subject_{2\,180} & \cdots & Subject_{`r length(unique(sl$Subject))`\,180}
 \end{pmatrix} 
  \begin{pmatrix}
-\beta _0 \\ \beta _1
+\beta _0 \\ \beta _1 \\ \vdots \\ \beta_{18}
 \end{pmatrix} +
  \begin{pmatrix} \varepsilon _{1} \\ \varepsilon _{2}\\ \vdots \\ \varepsilon _{180} \end{pmatrix}$
 
@@ -373,28 +373,28 @@ ggplot(data = NewData, aes(x = Days, y = fit)) +
 
 ## GLMM со случайным отрезком
 
-$Reaction_{ij} = \beta_0 + \beta_1 Days_{ij} + c_{i} + \varepsilon_{ij}$
+$Reaction_{ij} = \beta_0 + \beta_1 Days_{ij} + b_{i} + \varepsilon_{ij}$
 
-$c_{i} \sim N(0, \sigma_b)$ --- случайный эффект субъекта (случайный отрезок, интерсепт)  
+$b_{i} \sim N(0, \sigma_b)$ --- случайный эффект субъекта (случайный отрезок, интерсепт)  
 $\varepsilon_{ij} \sim N(0, \sigma)$ --- остатки модели  
 $i$ --- субъекты, $j$ --- дни
 
 \pause
 
-Для каждого субъекта $i$ в матричном виде это записывается так:
+В матричном виде это записывается так:
 
-$\begin{pmatrix} Reaction _{i1} \\ Reaction _{i2} \\ \vdots \\ Reaction _{i10} \end{pmatrix} 
+$\begin{pmatrix} Reaction _{1} \\ Reaction _{2} \\ \vdots \\ Reaction _{180} \end{pmatrix} 
 = \begin{pmatrix}
-1 & Days _{i1} \\ 1 & Days _{i2} \\ \vdots \\ 1 & Days _{i10}
+1 & Days _{1} \\ 1 & Days _{2} \\ \vdots \\ 1 & Days _{180}
 \end{pmatrix} 
  \begin{pmatrix}
 \beta _0 \\ \beta _1
 \end{pmatrix}  +
  \begin{pmatrix} 1 \\ 1 \\ \vdots \\ 1 \end{pmatrix} 
-c_{i} +
- \begin{pmatrix} \varepsilon _{i1} \\ \varepsilon _{i2}\\ \vdots \\ \varepsilon _{i10} \end{pmatrix}$
+\begin{pmatrix} b \end{pmatrix} +
+ \begin{pmatrix} \varepsilon _{1} \\ \varepsilon _{2}\\ \vdots \\ \varepsilon _{180} \end{pmatrix}$
 
-То есть для всех субъектов: $\mathbf{Reaction}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$
+То есть: $\mathbf{Reaction}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$
 
 ## Подберем модель со случайным отрезком
 
@@ -424,9 +424,9 @@ summary(M1)
 
 \column{0.55\textwidth}
 
-$Reaction_{ij} = 251.4 + 10.5 Days_{ij} + c_{i} + \varepsilon_{ij}$
+$Reaction_{ij} = 251.4 + 10.5 Days_{ij} + b_{i} + \varepsilon_{ij}$
 
-$c_{i} \sim N(0, 37.12)$ --- случайный эффект субъекта  
+$b_{i} \sim N(0, 37.12)$ --- случайный эффект субъекта  
 $\varepsilon_{ij} \sim N(0, 30.99)$ --- остатки модели  
 $i$ --- субъекты, $j$ --- дни
 
@@ -554,7 +554,7 @@ ggplot(NewData, aes(x = Days, y = fit_subj)) +
 
 Зависимость времени реакции от продолжительности периода бессонницы для обследованных субъектов: 
 
-$\widehat{Reaction}_{ij} = 251.4 + 10.5 Days_{ij} + c_{i}$
+$\widehat{Reaction}_{ij} = 251.4 + 10.5 Days_{ij} + b_{i}$
 
 
 ## Важные замечания
@@ -621,9 +621,7 @@ $\mathbf{Y} \sim N(\mathbf{X} \pmb{\beta}, \mathbf{V} )$
 
 Матрица ковариаций переменной-отклика:
 
-$\mathbf{V} = \mathbf{Z} \mathbf{D} \mathbf{Z'} + \pmb{\Sigma}$
-
-где $\mathbf{D}$ --- матрица ковариаций случайных эффектов.
+$\mathbf{V} = \mathbf{Z} \mathbf{D} \mathbf{Z'} + \pmb{\Sigma}$, где $\mathbf{D}$ --- матрица ковариаций случайных эффектов.
 
 Т.е. __добавление случайных эффектов приводит  
 к изменению ковариационной матрицы__ $\mathbf{V}$
@@ -785,26 +783,26 @@ gg_resid + geom_boxplot(aes(x = Subject))
 
 ## Уравнение модели со случайным отрезком и углом наклона
 
-$Reaction_{ij} = \beta_0 + \beta_1 Days_{ij} + c_{i} + d_{ij} Days_{ij} + \varepsilon_{ij}$
+$Reaction_{ij} = \beta_0 + \beta_1 Days_{ij} + b_{i} + c_{ij} Days_{ij} + \varepsilon_{ij}$
   
-$c_{i} \sim N(0, \sigma_b)$ --- случайный интерсепт для субъекта  
-$d_{ij} \sim N(0, \sigma_c)$ --- случайный угол наклона для субъекта  
+$b_{i} \sim N(0, \sigma_b)$ --- случайный интерсепт для субъекта  
+$c_{ij} \sim N(0, \sigma_c)$ --- случайный угол наклона для субъекта  
 $\varepsilon_{ij} \sim N(0, \sigma)$ --- остатки модели  
 $i$ --- субъекты, $j$ --- дни
 
 \pause
 
-Для каждого субъекта $i$ в матричном виде это записывается так:
+В матричном виде это записывается так:
 
-$\begin{pmatrix} Reaction _{i1} \\ Reaction _{i2} \\ \vdots \\ Reaction _{i10} \end{pmatrix} 
+$\begin{pmatrix} Reaction _{1} \\ Reaction _{2} \\ \vdots \\ Reaction _{180} \end{pmatrix} 
 = 
-\begin{pmatrix} 1 & Days _{i1} \\ 1 & Days _{i2} \\ \vdots \\ 1 & Days _{i10} \end{pmatrix} 
+\begin{pmatrix} 1 & Days _{1} \\ 1 & Days _{2} \\ \vdots \\ 1 & Days _{180} \end{pmatrix} 
 \begin{pmatrix} \beta _0 \\ \beta _1 \end{pmatrix}  +
-\begin{pmatrix} 1 & Days _{i1} \\ 1 & Days _{i2} \\ \vdots \\ 1 & Days _{i10} \end{pmatrix} 
-\begin{pmatrix} c_{i} \\ d_{i} \end{pmatrix} +
-\begin{pmatrix} \varepsilon _{i1} \\ \varepsilon _{i2}\\ \vdots \\ \varepsilon _{i10} \end{pmatrix}$
+\begin{pmatrix} 1 & Days _{1} \\ 1 & Days _{2} \\ \vdots \\ 1 & Days _{180} \end{pmatrix} 
+\begin{pmatrix} b \\ c \end{pmatrix} +
+\begin{pmatrix} \varepsilon _{1} \\ \varepsilon _{2}\\ \vdots \\ \varepsilon _{180} \end{pmatrix}$
 
-То есть для всех субъектов: $\mathbf{Reaction}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$
+То есть: $\mathbf{Reaction}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$
 
 ## Подберем модель со случайным отрезком и углом наклона
 
@@ -820,7 +818,7 @@ $\begin{pmatrix} Reaction _{i1} \\ Reaction _{i2} \\ \vdots \\ Reaction _{i10} \
 MS1 <- lmer(Reaction ~ Days + ( 1 + Days|Subject), data = sl)
 ```
 
-## Запишем уравнение модели со случайным отрезком
+## Запишем уравнение модели со случайным отрезком и углом наклона
 
 \columnsbegin
 \column{0.45\textwidth}
@@ -832,10 +830,10 @@ summary(MS1)
 
 \column{0.55\textwidth}
 
-$Reaction_{ij} = 251.4 + 10.5 Days_{ij} + c_{i} + d_{ij} Days_{ij} + \varepsilon_{ij}$
+$Reaction_{ij} = 251.4 + 10.5 Days_{ij} + b_{i} + c_{ij} Days_{ij} + \varepsilon_{ij}$
   
-$c_{i} \sim N(0, 24.74)$ --- случайный интерсепт для субъекта  
-$d_{ij} \sim N(0, 5.92)$ --- случайный угол наклона для субъекта  
+$b_{i} \sim N(0, 24.74)$ --- случайный интерсепт для субъекта  
+$c_{ij} \sim N(0, 5.92)$ --- случайный угол наклона для субъекта  
 $\varepsilon_{ij} \sim N(0, 25.59)$ --- остатки модели  
 $i$ --- субъекты, $j$ --- дни
 
@@ -916,7 +914,7 @@ ggplot(NewData, aes(x = Days, y = fit_subj)) +
 
 Зависимость времени реакции от продолжительности периода бессонницы для обследованных субъектов: 
 
-$\widehat{Reaction}_{ij} = 251.4 + 10.5 Days_{ij} + c_{i} + d_{ij} Days_{ij}$
+$\widehat{Reaction}_{ij} = 251.4 + 10.5 Days_{ij} + b_{i} + c_{ij} Days_{ij}$
 
 
 
@@ -1002,7 +1000,7 @@ $\pmb{\varepsilon} \sim N(0, \pmb{\Sigma})$ --- остатки модели но
 
 $\mathbf{X} \pmb{\beta}$ --- фиксированная часть модели.
 
-$\mathbf{Z} \mathbf{b}$ --- случайная часть модели.
+$\mathbf{Z} \mathbf{b} + \pmb{\varepsilon}$ --- случайная часть модели.
 
 \vspace{\baselineskip}
 
@@ -1120,7 +1118,7 @@ $$lnL(\theta| \text{data}) \longrightarrow \text{max}$$
 
 ## ML-оценки для дисперсий -- смещенные
 
-Например, ML оценка дисперсии будет смещенной:
+Например, ML оценка обычной выборочной дисперсии будет смещенной:
 
 $\hat\sigma^2 = \cfrac{\sum(x_i - \bar x)^2}{n}$,
 
@@ -1134,9 +1132,9 @@ $\hat\sigma^2 = \cfrac{\sum(x_i - \bar x)^2}{n}$,
 
 $\mathbf{Y}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsilon}$
 
-${Y} \sim N(\mathbf{X}  \pmb{\beta}, \mathbf{V})$, где $\mathbf{ZDZ'} + \pmb{\Sigma}$
+$\mathbf{Y} \sim N(\mathbf{X}  \pmb{\beta}, \mathbf{V})$, где $\mathbf{V} = \mathbf{ZDZ'} + \pmb{\Sigma}$
 
-т.е. одновременно приходится оценивать $\beta$ и $\mathbf{V}$.
+т.е. одновременно приходится оценивать $\pmb{\beta}$ и $\mathbf{V}$.
 
 ## Метод ограниченного максимального правдоподобия, REML
 
@@ -1144,23 +1142,32 @@ $\mathbf{Y}  = \mathbf{X}  \pmb{\beta} + \mathbf{Z} \mathbf{b}  + \pmb{\varepsil
 
 ${Y} \sim N(\mathbf{X}  \pmb{\beta}, \mathbf{V})$, где $\mathbf{ZDZ'} + \pmb{\Sigma}$
 
-т.е. одновременно приходится оценивать $\beta$ и $\mathbf{V}$.
+\vspace{\baselineskip}
 
-Если найти матрицу $\mathbf{A}$, ортогональную к $\mathbf{X}$ (т.е. $\mathbf{AX} = 0$), то умножив ее на Y можно избавиться от $\pmb{\beta}$:
+Если найти матрицу $\mathbf{A}$, ортогональную к $\mathbf{X'}$ (т.е. $\mathbf{A'X} = 0$), то умножив ее на $\mathbf{Y}$ можно избавиться от $\pmb{\beta}$:
 
-$\mathbf{A'Y}  = \mathbf{A'X}  \pmb{\beta} + \mathbf{A'V} = \mathbf{0} + \mathbf{A'V}$
+$\mathbf{A'Y}  = \mathbf{A'X}  \pmb{\beta} + \mathbf{A'V} = \mathbf{0} + \mathbf{A'V} = \mathbf{A'V}$
 
 ${A'Y} \sim N(\mathbf{0}, \mathbf{A'VA})$
 
-Тогда можно воспользоваться ML, чтобы найти $V$.
+Тогда можно воспользоваться ML, чтобы найти $\mathbf{V}$.
 
-В результате получатся несмещенные оценки дисперсий, но немного другие оценки $\beta$.
+В результате получатся несмещенные оценки дисперсий.
 
-## ML или REML
+REML-оценки $\pmb{\beta}$ будут стремится к ML-оценкам при увеличении объема выборки.
 
-Если нужно работать с правдоподобиями -- ML
 
-Если нужны точные оценки случайных эффектов -- REML
+## ML или REML?
+
+Если нужны точные оценки фиксированных эффектов -- ML.
+
+Если нужны точные оценки случайных эффектов -- REML.
+
+Если нужно работать с правдоподобиями -- следите, чтобы в моделях, подобранных REML была одинаковая фиксированная часть.
+
+\vspace{\baselineskip}
+
+Для обобщенных (негауссовых) смешанных линейных моделей REML не определен -- там используется ML.
 
 
 # Тестирование гипотез в смешанных моделях {.segue}
@@ -1256,7 +1263,7 @@ AIC(MS1.ml, MS0.ml)
 Время реакции зависит от продолжительности бессонницы (AIC).
 
 
-## Бутстреп для тестирования значимости и для предсказаний {.segue}
+# Бутстреп для тестирования значимости и для предсказаний {.segue}
 
 
 <!-- ## Параметрический бутстреп для тестирования случайных эффектов -->
@@ -1276,6 +1283,15 @@ AIC(MS1.ml, MS0.ml)
 <!-- sqrt(p_val * (1 - p_val) / 500)  # SE для p -->
 <!-- ``` -->
 
+## Бутстреп
+
+Способ тестирования гипотез, при котором из данных многократно получают выборки (с повторениями).
+
+Если по таким многократным выборкам построить распределение статистики, то оно будет стремиться к истинному распределению этой статистики.
+
+Сгенерированное бутстрепом распределение статистики можно использовать для тестирования гипотез.
+
+Бутстреп особенно удобен, когда невозможно получить распределение статистики аналитическим путем.
 
 ## Параметрический бутстреп для LRT
 
