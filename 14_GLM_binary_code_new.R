@@ -143,23 +143,14 @@ new_data$se_eta <- sqrt(diag(X %*% vcov(mod6) %*% t(X)))
 
 logit_back <- function(x) exp(x)/(1 + exp(x)) # обратная логит-трансформация
 
-logit_back(10)
-
 
 new_data$fit_pi <- logit_back(new_data$fit_eta)
 
-new_data$lwr <- logit_back(new_data$fit_eta - 2 * new_data$se_eta)
-new_data$upr <- logit_back(new_data$fit_eta - 2 * new_data$se_eta)
+new_data$lwr_pi <- logit_back(new_data$fit_eta - 2 * new_data$se_eta)
+new_data$upr_pi <- logit_back(new_data$fit_eta + 2 * new_data$se_eta)
 
 head(new_data, 2)
 
-
-# Предсказания с помощью функции predict.glm()
-
-predicted <- predict(mod6, newdata = new_data, se.fit = TRUE)
-
-new_data$fit_eta <- predicted$fit
-new_data$se_eta <- predicted$se.fit
 
 ggplot(new_data, aes(x = L, y = fit_eta, fill = Sp)) +
   geom_ribbon(aes(ymin = fit_eta - 2 * se_eta, ymax = fit_eta + 2 * se_eta), alpha = 0.5) +   geom_line(aes(color = Sp))
@@ -169,13 +160,8 @@ ggplot(new_data, aes(x = L, y = fit_eta, fill = Sp)) +
 
 ## Визуализация в шкале вероятностей интуитивно понятнее
 
-predicted <- predict(mod6, newdata = new_data, se.fit = TRUE, type = 'response')
-
-new_data$fit_pi <- predicted$fit
-new_data$se_pi <- predicted$se.fit
-
 ggplot(new_data, aes(x = L, y = fit_pi, fill = Sp)) +
-  geom_ribbon(aes(ymin = fit_pi - 2 * se_pi, ymax = fit_pi + 2 * se_pi), alpha = 0.5) +
+  geom_ribbon(aes(ymin = lwr_pi, ymax = upr_pi), alpha = 0.5) +
   geom_line(aes(color = Sp)) +
   labs(y='Вероятность', title = 'Вероятность быть съеденной')
 
@@ -184,6 +170,12 @@ ggplot(new_data, aes(x = L, y = fit_pi, fill = Sp)) +
 
 
 
+
+
+##########################################
+#Самостоятельная работа
+
+##########################################
 
 
 
@@ -268,31 +260,4 @@ MyData$Predicted <- predict(M15, newdata = MyData, type = )
 
 
 ggplot(MyData, aes(x=, y = Predicted, color = , group = )) + geom_line() + facet_grid(LOC~ CAN, labeller = label_both) + scale_color_gradient(low = "green",  high = "red") + labs(label = list(x = "Давление в момент реанимации (SYS)", y = "Вероятность гибели", color = "Возраст", title = "Предсказания модели"))
-
-
-
-##########################################
-#Самостоятельная работа
-
-##########################################
-
-
-liz <- read.csv('data/polis.csv', header = TRUE)
-
-dat <- read.table('data/ICU.csv', header = TRUE, sep = ";")
-
-
-
-liz_model <- glm(PA ~ PARATIO , family="binomial", data = liz)
-summary(liz_model)
-
-
-new_data <- data.frame(PARATIO = liz$PARATIO)
-
-predicted <- predict(liz_model, newdata = new_data, se.fit = TRUE, type = 'response')
-new_data$fit_pi <- predicted$fit
-new_data$se_pi <- predicted$se.fit
-
-ggplot(new_data, aes(x = PARATIO, y = fit_pi)) +
-  geom_ribbon(aes(ymin = fit_pi - 2 * se_pi, ymax = fit_pi + 2 * se_pi), alpha = 0.5)
 
