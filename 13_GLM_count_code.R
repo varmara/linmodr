@@ -188,48 +188,31 @@ head(NewData, 2)
 
 # ## График предсказаний в масштабе функции связи
 ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
-  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, ymax = fit_eta + 2 * SE_eta), alpha=0.3)+
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
-
-# ## График предсказаний в масштабе переменной-отклика
-ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha=0.3)+
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
-
-
-# Предсказания при помощи функции predict()
-# ...в масштабе функции связи
-predict_eta <- predict(M_pois, newdata = NewData, se.fit = TRUE)
-NewData$eta <- predict_eta$fit
-NewData$SE_eta <- predict_eta$se.fit
-# ...в масштабе отклика
-predict_mu <- predict(M_pois, newdata = NewData,
-                      se.fit = TRUE, type = 'response')
-NewData$mu <- predict_mu$fit
-NewData$SE_mu <- predict_mu$se.fit
-
-head(NewData, 2)
-
-# ## График предсказаний в масштабе функции связи
-ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
-  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, ymax = fit_eta + 2 * SE_eta), alpha=0.3)+
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta,
+                  ymax = fit_eta + 2 * SE_eta),
+              alpha = 0.5) +
+  geom_line(aes(colour = Treatment)) +
+  geom_hline(yintercept = 0)
 
 # ## График предсказаний в масштабе переменной-отклика
 gg_pois <- ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = fit_mu - 2 * SE_mu, ymax = fit_mu + 2 * SE_mu), alpha=0.3)+
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
-
+  geom_ribbon(aes(ymin = lwr,
+                  ymax = upr),
+              alpha = 0.5) +
+  geom_line(aes(colour = Treatment)) +
+  geom_hline(yintercept = 0)
+gg_pois
 
 # ## Условия применимости GLM с Пуассоновским распределением отклика
 
 # - Случайность и независимость наблюдений внутри групп.
+# - Линейность связи (с учетом функции связи)
 # - Отсутствие сверхдисперсии. (Дисперсия остатков равна мат.ожиданию при каждом уровне значений предикторов).
 # - Отсутствие коллинеарности предикторов.
 
 
 # ## График остатков
-M_pois_diag <- data.frame(.fitted = predict(M_pois, type = "response"),
+M_pois_diag <- data.frame(.fitted = fitted(M_pois, type = "response"),
                             .resid_p = residuals(M_pois, type = "pearson"))
 ggplot(M_pois_diag, aes(x = .fitted, y = .resid_p)) +
   geom_point() +
@@ -239,13 +222,15 @@ ggplot(M_pois_diag, aes(x = .fitted, y = .resid_p)) +
 # ## Проверка на сверхдисперсию
 # Функция для проверки наличия сверхдисперсии в модели (автор Ben Bolker)
 # http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html
+# Код модифицирован, чтобы учесть дополнительный параметр в NegBin GLMM, подобранных MASS::glm.nb()
 overdisp_fun <- function(model) {
-    rdf <- df.residual(model) # Число степеней свободы N - p
-    rp <- residuals(model,type="pearson") # Пирсоновские остатки
-    Pearson.chisq <- sum(rp^2) # Сумма квадратов остатков
-    prat <- Pearson.chisq/rdf  # Степень избыточности дисперсии
-    pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE) # Уровень значимости
-    c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)        # Вывод результатов
+  rdf <- df.residual(model)  # Число степеней свободы N - p
+  if (any(class(model) == 'negbin')) rdf <- rdf - 1 ## учитываем k в NegBin GLMM
+  rp <- residuals(model,type='pearson') # Пирсоновские остатки
+  Pearson.chisq <- sum(rp^2) # Сумма квадратов остатков, подчиняется Хи-квадрат распределению
+  prat <- Pearson.chisq/rdf  # Отношение суммы квадратов остатков к числу степеней свободы
+  pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE) # Уровень значимости
+  c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)        # Вывод результатов
 }
 
 overdisp_fun(M_pois)
@@ -330,32 +315,27 @@ NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
 head(NewData, 2)
 
 
-
 # ## График предсказаний в масштабе функции связи
 ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
-  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, ymax = fit_eta + 2 * SE_eta), alpha = 0.3) +
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta,
+                  ymax = fit_eta + 2 * SE_eta),
+              alpha = 0.5) +
+  geom_line(aes(colour = Treatment)) +
+  geom_hline(yintercept = 0)
 
 # ## График предсказаний в масштабе переменной-отклика
 gg_nb <- ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.3) +
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+  geom_ribbon(aes(ymin = lwr,
+                  ymax = upr),
+              alpha = 0.3) +
+  geom_line(aes(colour = Treatment)) +
+  geom_hline(yintercept = 0)
+
 gg_nb
 
-
+library(cowplot)
 plot_grid(gg_norm + theme(legend.position = 'bottom'),
-          gg_pois+ theme(legend.position = 'bottom'),
-          gg_nb+ theme(legend.position = 'bottom'), nrow = 1)
-
-# Предсказания модели при помощи predict()
-# ...в масштабе функции связи
-predict_eta <- predict(M_nb, newdata = NewData, se.fit = TRUE)
-NewData$eta <- predict_eta$fit
-NewData$SE_eta <- predict_eta$se.fit
-# ...в масштабе отклика
-predict_mu <- predict(M_nb, newdata = NewData, se.fit = TRUE, type = 'response')
-NewData$mu <- predict_mu$fit
-NewData$SE_mu <- predict_mu$se.fit
-
+          gg_pois + theme(legend.position = 'bottom'),
+          gg_nb + theme(legend.position = 'bottom'), nrow = 1)
 
 

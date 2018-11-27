@@ -510,7 +510,7 @@ ggplot(data = , aes()) + geom_hline( = 0) +
 
 
 ```{r fig.height=2.4, purl=FALSE}
-M_norm_diag <- data.frame(.fitted = predict(M_norm, type = "response"),
+M_norm_diag <- data.frame(.fitted = fitted(M_norm, type = "response"),
                           .resid_p = residuals(M_norm, type = "pearson"))
 
 ggplot(M_norm_diag, aes(y = .resid_p)) + geom_hline(yintercept = 0) + 
@@ -618,11 +618,10 @@ NewData <- pol %>% group_by(Treatment)%>%
          Hours = mean(pol$Hours))
 ```
 
-Давайте получим предсказания двумя способами:
+Давайте получим предсказания при помощи операций с матрицами,  
+чтобы своими глазами увидеть работу функции связи.
 
-- при помощи операций с матрицами,  
-чтобы своими глазами увидеть работу функции связи,
-- при помощи функции `predict()`.
+Еще можно получить предсказания при помощи функции `predict()`. Но будьте осторожны, **predict() возвращает стандартные ошибки все время только в масштабе функции связи!**
 
 ```{r eval=FALSE}
 ?predict.glm
@@ -654,13 +653,12 @@ head(NewData, 2)
 
 
 ```{r}
-predict_eta <- predict(M_pois, newdata = NewData, se.fit = TRUE)
-NewData$eta <- predict_eta$fit
-NewData$SE_eta <- predict_eta$se.fit
-
-ggplot(NewData, aes(x = Flowers, y = eta, fill = Treatment)) +
-  geom_ribbon(aes(ymin = eta - 2 * SE_eta, ymax = eta + 2 * SE_eta), alpha=0.3)+
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
+  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, 
+                  ymax = fit_eta + 2 * SE_eta), 
+              alpha = 0.5) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0)
 ```
 
 
@@ -671,14 +669,12 @@ ggplot(NewData, aes(x = Flowers, y = eta, fill = Treatment)) +
 
 
 ```{r}
-predict_mu <- predict(M_pois, newdata = NewData, 
-                       se.fit = TRUE, type = 'response')
-NewData$mu <- predict_mu$fit
-NewData$SE_mu <- predict_mu$se.fit
-
-ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha=0.3)+
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, 
+                  ymax = upr), 
+              alpha = 0.5) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0)
 ```
 
 
@@ -693,9 +689,12 @@ GLM с Пуассоновским распределением отклика у
 Но достаточно ли этого для моделирования данных? Нет ли здесь сверхдисперсии?
 
 ```{r echo=FALSE}
-ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha = 0.3) +
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0) + ylab('Visits')
+ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, 
+                  ymax = upr), 
+              alpha = 0.5) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0)
 ```
 
 
@@ -708,7 +707,7 @@ ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
 ## График остатков
 
 ```{r}
-M_pois_diag <- data.frame(.fitted = predict(M_pois, type = "response"),
+M_pois_diag <- data.frame(.fitted = fitted(M_pois, type = "response"),
                             .resid_p = residuals(M_pois, type = "pearson"))
 ggplot(M_pois_diag, aes(x = .fitted, y = .resid_p)) + 
   geom_point() + 
@@ -730,16 +729,16 @@ ggplot(M_pois_diag, aes(x = .fitted, y = .resid_p)) +
 
 Используем предложенную Беном Болкером функцию проверки на сверхдисперсию
 
-
-
 ```{r}
 # Функция для проверки наличия сверхдисперсии в модели (автор Ben Bolker)
 # http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html
+# Код модифицирован, чтобы учесть дополнительный параметр в NegBin GLMM, подобранных MASS::glm.nb()
 overdisp_fun <- function(model) {
-    rdf <- df.residual(model) # Число степеней свободы N - p
-    rp <- residuals(model,type="pearson") # Пирсоновские остатки
-    Pearson.chisq <- sum(rp^2) # Сумма квадратов остатков
-    prat <- Pearson.chisq/rdf  # Степень избыточности дисперсии
+    rdf <- df.residual(model)  # Число степеней свободы N - p
+    if (any(class(model) == 'negbin')) rdf <- rdf - 1 ## учитываем k в NegBin GLMM
+    rp <- residuals(model,type='pearson') # Пирсоновские остатки
+    Pearson.chisq <- sum(rp^2) # Сумма квадратов остатков, подчиняется Хи-квадрат распределению 
+    prat <- Pearson.chisq/rdf  # Отношение суммы квадратов остатков к числу степеней свободы
     pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE) # Уровень значимости
     c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)        # Вывод результатов
 }
@@ -1017,7 +1016,7 @@ drop1(M_nb, test = 'Chi')
 ## График остатков
 
 ```{r}
-M_nb_diag <- data.frame(.fitted = predict(M_nb, type = "response"),
+M_nb_diag <- data.frame(.fitted = fitted(M_nb, type = "response"),
                           .resid_p = residuals(M_nb, type = "pearson"),
                           pol)
 gg_resid <- ggplot(M_nb_diag, aes(y = .resid_p)) + geom_hline(yintercept = 0)
@@ -1060,11 +1059,11 @@ NewData <- pol %>% group_by(Treatment)%>%
          Hours = mean(pol$Hours))
 ```
 
-Как и в прошлый раз, мы получим предсказания двумя способами:
+Как и в прошлый раз, давайте получим предсказания при помощи операций с матрицами,  
+чтобы своими глазами увидеть работу функции связи.
 
-- при помощи операций с матрицами,  
-чтобы своими глазами увидеть работу функции связи,
-- при помощи функции `predict.glm()`.
+Еще можно получить предсказания при помощи функции `predict()`. Но будьте осторожны, **predict() возвращает стандартные ошибки все время только в масштабе функции связи!**
+
 
 ## Предсказания модели при помощи операций с матрицами
 
@@ -1091,13 +1090,12 @@ head(NewData, 2)
 
 
 ```{r}
-predict_eta <- predict(M_nb, newdata = NewData, se.fit = TRUE)
-NewData$eta <- predict_eta$fit
-NewData$SE_eta <- predict_eta$se.fit
-
-ggplot(NewData, aes(x = Flowers, y = eta, fill = Treatment)) +
-  geom_ribbon(aes(ymin = eta - 2 * SE_eta, ymax = eta + 2 * SE_eta), alpha = 0.3) +
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
+  geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, 
+                  ymax = fit_eta + 2 * SE_eta), 
+              alpha = 0.5) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0)
 ```
 
 В масштабе функции связи мы моделируем линейную зависимость логарифмов мат. ожидания отклика от предикторов.
@@ -1106,13 +1104,12 @@ ggplot(NewData, aes(x = Flowers, y = eta, fill = Treatment)) +
 ## График предсказаний в масштабе переменной-отклика
 
 ```{r}
-predict_mu <- predict(M_nb, newdata = NewData, se.fit = TRUE, type = 'response')
-NewData$mu <- predict_mu$fit
-NewData$SE_mu <- predict_mu$se.fit
-
-ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha = 0.3) +
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0)
+ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, 
+                  ymax = upr), 
+              alpha = 0.3) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0)
 ```
 
 
@@ -1127,9 +1124,12 @@ GLM с отрицательным биномиальным распределе�
 
 
 ```{r echo=FALSE}
-ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha = 0.3) +
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0) + ylab('Visits')
+ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, 
+                  ymax = upr), 
+              alpha = 0.3) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0) + ylab('Visits')
 ```
 
 
@@ -1140,9 +1140,12 @@ ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
 При этом, чем больше цветов самого гадючьего лука, тем больше прилетает опылителей (тест отношения правдоподобий, $p = 0.01$).
 
 ```{r echo=FALSE}
-ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha = 0.3) +
-  geom_line(aes(colour = Treatment)) + geom_hline(yintercept = 0) + 
+ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, 
+                  ymax = upr), 
+              alpha = 0.3) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0) + 
   labs(y = 'Visits')
 ```
 

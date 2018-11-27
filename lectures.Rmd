@@ -178,6 +178,11 @@ install.packages(c("DAAG", "multcomp"))
 install.packages("AER")
 ```
 
+<p style="color:red">Внимание, update!</p>
+
+1. Убрали из презентации и кода куски с предсказаниями при помощи predict(), т.к. он выдает только стандартные ошибки в масштабе функции связи.
+2. Модифицировали код `overdisp_fun()`, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция.
+
 - Презентация: [13_GLM_count.pdf](13_GLM_count.pdf)
 - Код: [13_GLM_count_code.R](13_GLM_count_code.R)
 - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx)
@@ -188,13 +193,15 @@ install.packages("AER")
 ### 14 GLM для бинарных данных (=логистическая регрессия) (22 нояб и 26 нояб 1 пара)
 
 ```{r eval=FALSE}
-install.packages("ISwR")
-install.packages("cowplot")
-
+install.packages(c("ISwR", "cowplot"))
 ```
 
+<p style="color:red">Внимание, update!</p>
 
-- Презентация: [14_GLM_binary.html](14_GLM_binary_new.pdf)
+1. Убрали из презентации и кода куски с предсказаниями при помощи predict(), т.к. он выдает только стандартные ошибки в масштабе функции связи.
+2. Модифицировали код `overdisp_fun()`, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция.
+
+- Презентация: [14_GLM_binary_new.pdf](14_GLM_binary_new.pdf)
 - Код: [14_GLM_binary_code_new.R](14_GLM_binary_code_new.R)
 - Данные:
     + [aster_mussel.csv](data/aster_mussel.csv)

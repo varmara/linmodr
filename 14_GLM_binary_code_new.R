@@ -95,7 +95,7 @@ Anova(mod)
 
 # Диагностика финальной модели
 
-mod6_diag <- data.frame(.fitted = predict(mod6, type = 'response'),
+mod6_diag <- data.frame(.fitted = fitted(mod6, type = 'response'),
                         .resid_p = resid(mod6, type = 'pearson'))
 
 ggplot(mod6_diag, aes(y = .resid_p, x = .fitted)) + geom_point() +
@@ -107,8 +107,10 @@ ggplot(mod6_diag, aes(y = .resid_p, x = .fitted)) + geom_point() +
 
 # Функция для проверки наличия сверхдисперсии в модели (автор Ben Bolker)
 # http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html
+# Код модифицирован, чтобы учесть дополнительный параметр в NegBin GLMM, подобранных MASS::glm.nb()
 overdisp_fun <- function(model) {
   rdf <- df.residual(model)  # Число степеней свободы N - p
+  if (any(class(model) == 'negbin')) rdf <- rdf - 1 ## учитываем k в NegBin GLMM
   rp <- residuals(model,type='pearson') # Пирсоновские остатки
   Pearson.chisq <- sum(rp^2) # Сумма квадратов остатков, подчиняется Хи-квадрат распределению
   prat <- Pearson.chisq/rdf  # Отношение суммы квадратов остатков к числу степеней свободы

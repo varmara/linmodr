@@ -552,6 +552,13 @@ div.tocify {
 <div id="glm----19--1-2-" class="section level3">
 <h3>13 GLM для счетных данных (19 нояб 1-2 пары)</h3>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;AER&quot;</span>)</a></code></pre></div>
+<p style="color:red">
+Внимание, update!
+</p>
+<ol style="list-style-type: decimal">
+<li>Убрали из презентации и кода куски с предсказаниями при помощи predict(), т.к. он выдает только стандартные ошибки в масштабе функции связи.</li>
+<li>Модифицировали код <code>overdisp_fun()</code>, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция.</li>
+</ol>
 <ul>
 <li>Презентация: <a href="13_GLM_count.pdf" class="uri">13_GLM_count.pdf</a></li>
 <li>Код: <a href="13_GLM_count_code.R" class="uri">13_GLM_count_code.R</a></li>
@@ -562,10 +569,16 @@ div.tocify {
 </div>
 <div id="glm------22---26--1-" class="section level3">
 <h3>14 GLM для бинарных данных (=логистическая регрессия) (22 нояб и 26 нояб 1 пара)</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;ISwR&quot;</span>)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;ISwR&quot;</span>, <span class="st">&quot;cowplot&quot;</span>))</a></code></pre></div>
+<p style="color:red">
+Внимание, update!
+</p>
+<ol style="list-style-type: decimal">
+<li>Убрали из презентации и кода куски с предсказаниями при помощи predict(), т.к. он выдает только стандартные ошибки в масштабе функции связи.</li>
+<li>Модифицировали код <code>overdisp_fun()</code>, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция.</li>
+</ol>
 <ul>
-<li>Презентация: <a href="14_GLM_binary_new.pdf">14_GLM_binary.html</a></li>
+<li>Презентация: <a href="14_GLM_binary_new.pdf" class="uri">14_GLM_binary_new.pdf</a></li>
 <li>Код: <a href="14_GLM_binary_code_new.R" class="uri">14_GLM_binary_code_new.R</a></li>
 <li>Данные:
 <ul>
