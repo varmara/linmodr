@@ -211,7 +211,7 @@ install.packages(c("ISwR", "cowplot"))
 
 ## Смешанные модели (GLMM)
 
-### 15.1--15.2 GLMM для нормально-распределенных данных (26 нояб 2 пара и 29 нояб)
+### 15.1--15.2 GLMM для нормально-распределенных данных (26 нояб 2 пара, 29 нояб, и 3 дек 1 пара)
 
 ```{r eval=FALSE}
 install.packages(c("lme4", "pbkrtest"))
@@ -231,7 +231,7 @@ install.packages(c("lme4", "pbkrtest"))
 <!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
 
 
-### 16 Моделирование структуры дисперсии в смешаных моделях (3 дек 1-2 пары)
+### 16 Моделирование структуры дисперсии в смешаных моделях (3 дек 2 пара и 6 дек)
 
 <!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
 <!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
