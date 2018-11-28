@@ -675,11 +675,11 @@ MyData$Pi  <- exp(MyData$eta) / (1 + exp(MyData$eta))
   MyData$se <- sqrt(diag(X %*% Covbetas %*% t(X)))
 
 # Вычисляем доверительные интервалы
-MyData$CiUp  <- exp(MyData$eta + 1.96 *MyData$se) / 
-  (1 + exp(MyData$eta  + 1.96 *MyData$se))
+MyData$CiUp  <- exp(MyData$eta + 2 * MyData$se) / 
+  (1 + exp(MyData$eta  + 2 * MyData$se))
 
-MyData$CiLow  <- exp(MyData$eta - 1.96 *MyData$se) / 
-  (1 + exp(MyData$eta  - 1.96 *MyData$se))
+MyData$CiLow  <- exp(MyData$eta - 2 * MyData$se) / 
+  (1 + exp(MyData$eta  - 2 * MyData$se))
 
 
 ```

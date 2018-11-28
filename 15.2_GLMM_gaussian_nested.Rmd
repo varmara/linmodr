@@ -2,20 +2,21 @@
 title: "Смешанные линейные модели (вложенные случайные факторы)"
 subtitle: "Линейные модели..."
 author: "Марина Варфоломеева, Вадим Хайтов"
+institute: "Кафедра Зоологии беспозвоночных, Биологический факультет, СПбГУ"
+fontsize: 10pt
+classoption: 't,xcolor=table'
+language: russian, english
 output:
   beamer_presentation:
+    theme: default
+    toc: no
     colortheme: beaver
+    latex_engine: xelatex
+    slide_level: 2
+    fig_crop: false
     highlight: tango
     includes:
       in_header: ./includes/header.tex
-    pandoc_args:
-    - --latex-engine=xelatex
-    - -V fontsize=10pt
-    - -V lang=russian
-    slide_level: 2
-    theme: default
-    toc: no
-institute: "СПбГУ"
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
@@ -105,6 +106,7 @@ Gennet, S., Spotswood, E., Hammond, M. and Bartolome, J.W., 2017. Livestock graz
 
 ## Открываем данные
 
+Исходные данные не опрятны (this data is not tidy)! Каждый участок в каждом году фигурирует два раза (т.к. информация о присутствии-отсутствии каких-то видов на участке записана в разных строчках).
 Откроем и переформатируем данные так, чтобы не было дублирования и каждому участку соответствовала одна строчка.
 
 ```{r}
@@ -126,6 +128,12 @@ sum(is.na(graz))
 
 ```{r}
 with(graz, table(Park, year))
+```
+
+## Как закодированы переменные?
+
+```{r}
+str(graz)
 ```
 
 ## Наводим порядок
@@ -156,39 +164,39 @@ graz$nativecov_sq <- sqrt(graz$nativecov)
 
 Кроме того, нужно учесть, что в разных парках и на разных участках растения будут расти сходным образом в разные годы. У нас есть иерархические факторы парк и участок в парке
 
-\pause
+Подбираем модель методом максимального правдоподобия, т.к. она нам понадобится, чтобы проверить значимость фиксированных эффектов при помощи теста отношения правдоподобий.
 
 ```{r}
-library(nlme)
-MN1 <- lme(height ~ graze_f*AspectCat + year_f + nativecov_sq + slope,
-          random = ~ 1|Park/plotID, 
-          data = graz, method = "ML")
+library(lme4)
+ML1 <- lmer(height ~ graze_f*AspectCat + year_f + 
+              nativecov_sq + slope + (1|Park/plotID), 
+          data = graz, REML = FALSE)
 ```
 
 ## Анализ остатков
 
 ```{r}
 # Данные для анализа остатков
-MN1_diag <- data.frame(
+ML1_diag <- data.frame(
   graz,
-  pear_res = residuals(MN1, type = "pearson"),
-  fitted = fitted(MN1, type = "response"))
+  .pear_res = residuals(ML1, type = "pearson"),
+  .fitted = fitted(ML1, type = "response"))
 ```
 
 ## График остатков
 
 ```{r}
-library(ggplot2)
-gg_res <- ggplot(data = MN1_diag, aes(y = pear_res))
-gg_res + geom_point(aes(x = fitted)) +
-  geom_smooth(aes(x = fitted))
+library(ggplot2); library(cowplot); theme_set(theme_bw())
+gg_res <- ggplot(data = ML1_diag, aes(y = .pear_res))
+gg_res + geom_point(aes(x = .fitted)) +
+  geom_smooth(aes(x = .fitted))
 ```
 
 ## Графики остатков от переменных в модели
 
 ```{r}
-library(gridExtra)
-grid.arrange(gg_res + geom_boxplot(aes(x = graze_f)),
+
+plot_grid(gg_res + geom_boxplot(aes(x = graze_f)),
 gg_res + geom_boxplot(aes(x = AspectCat)),
 gg_res + geom_boxplot(aes(x = year_f)),
 gg_res + geom_point(aes(x = nativecov_sq)),
@@ -201,7 +209,7 @@ ncol = 3)
 ## Графики остатков от переменных не в модели
 
 ```{r}
-grid.arrange(
+plot_grid(
   gg_res + geom_point(aes(x = heatloadrel)),
   gg_res + geom_point(aes(x = sqrt(litt))),
   gg_res + geom_point(aes(x = sqrt(bare))),
@@ -213,11 +221,10 @@ grid.arrange(
 
 ## Тесты отношения правдоподобий для полной модели
 
-Модель `MN1` была подобрана при помощи ML, поэтому можно применять тесты отношения правдоподобий прямо к ней
+Модель `ML1` была подобрана при помощи ML, поэтому можно применять тесты отношения правдоподобий прямо к ней
 
 ```{r}
-library(car)
-Anova(MN1)
+drop1(ML1, test = 'Chi')
 ```
 
 Высота растительного покрова:
@@ -226,7 +233,7 @@ Anova(MN1)
 - различается в разные годы
 - не зависит от покрытия местных растений и крутизны склона
 
-## Задание 3
+## Задание 1
 
 Рассчитайте внутриклассовую корреляцию
 
@@ -240,15 +247,13 @@ Anova(MN1)
 \small
 
 ```{r purl=FALSE}
-MN1_fin <-  lme(height ~ graze_f*AspectCat + year_f + nativecov_sq + slope,
-           random = ~ 1|Park/plotID,
-           data = graz, method = "REML")
+REML1 <- lmer(height ~ graze_f*AspectCat + year_f + 
+                nativecov_sq + slope + (1|Park/plotID),
+           data = graz, REML = TRUE)
 ```
 
-\tiny
-
 ```{r purl=FALSE}
-MN1_fin
+summary(REML1)
 ```
 
 ## Внутриклассовая корреляция
@@ -258,35 +263,33 @@ MN1_fin
 Для наблюдений на одном и том же участке $\sigma_{plotID}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)$
 
 ```{r purl=FALSE}
-3.3702^2 / (1.574143^2 + 3.3702^2 + 5.133291^2)
+3.370^2 / (1.574^2 + 3.370^2 + 5.133^2)
 ```
 
 Для наблюдений в одном и том же парке $\sigma_{Park}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)$
 
 ```{r purl=FALSE}
-1.574143^2 / (1.574143^2 + 3.3702^2 + 5.133291^2)
+1.574^2 / (1.574^2 + 3.370^2 + 5.133^2)
 ```
 
 ```
-В результатах
+В результатах summary(REML1)
 Random effects:
- Formula: ~1 | Park
-        (Intercept)
-StdDev:    1.574143
-
- Formula: ~1 | plotID %in% Park
-        (Intercept) Residual
-StdDev:      3.3702 5.133291
+ Groups      Name        Variance Std.Dev.
+ plotID:Park (Intercept) 11.358   3.370   
+ Park        (Intercept)  2.478   1.574   
+ Residual                26.351   5.133   
+Number of obs: 271, groups:  plotID:Park, 36; Park, 4
 ```
 
 - Значения высоты травяного покрова похожи внутри участка. Сходство наблюдений внутри одного парка слабее.
 
 ## Результаты полной модели
 
-\tiny
+\small
 
 ```{r}
-summary(MN1_fin)
+summary(REML1)
 ```
 
 ## Данные для графика предсказаний фиксированной части модели
@@ -295,22 +298,22 @@ summary(MN1_fin)
 
 ```{r}
 # Исходные данные
-NewData_MN1_fin <- expand.grid(graze_f = levels(graz$graze_f),
+NewData_REML1 <- expand.grid(graze_f = levels(graz$graze_f),
             AspectCat = levels(graz$AspectCat),
             year_f = levels(graz$year_f))
-NewData_MN1_fin$nativecov_sq <- mean(graz$nativecov_sq)
-NewData_MN1_fin$slope <- mean(graz$slope)
+NewData_REML1$nativecov_sq <- mean(graz$nativecov_sq)
+NewData_REML1$slope <- mean(graz$slope)
 
 # Предсказанные значения при помощи матриц
 X <- model.matrix(~ graze_f * AspectCat + year_f + nativecov_sq + slope, 
-                  data = NewData_MN1_fin)
-betas = fixef(MN1_fin)
-NewData_MN1_fin$fitted <- X %*% betas
+                  data = NewData_REML1)
+betas = fixef(REML1)
+NewData_REML1$fit <- X %*% betas
 
 # Cтандартные ошибки и дов. интервалы
-NewData_MN1_fin$se <- sqrt( diag(X %*% vcov(MN1_fin) %*% t(X)) )
-NewData_MN1_fin$lwr <- NewData_MN1_fin$fit - 1.96 * NewData_MN1_fin$se
-NewData_MN1_fin$upr <- NewData_MN1_fin$fit + 1.96 * NewData_MN1_fin$se
+NewData_REML1$se <- sqrt( diag(X %*% vcov(REML1) %*% t(X)) )
+NewData_REML1$lwr <- NewData_REML1$fit - 2 * NewData_REML1$se
+NewData_REML1$upr <- NewData_REML1$fit + 2 * NewData_REML1$se
 ```
 
 ## График предсказаний фиксированной части модели
@@ -318,7 +321,7 @@ NewData_MN1_fin$upr <- NewData_MN1_fin$fit + 1.96 * NewData_MN1_fin$se
 На южных склонах высота травы выше там, где не пасут скот, а на северных нет. (Строго говоря, нужен еще пост хок тест, чтобы это утверждать.)
 
 ```{r}
-ggplot(data = NewData_MN1_fin, aes(x = year_f, y = fitted, colour = graze_f)) +
+ggplot(data = NewData_REML1, aes(x = year_f, y = fit, colour = graze_f)) +
   geom_pointrange(aes(ymin = lwr, ymax = upr)) +
   facet_wrap(~ AspectCat) +
   geom_jitter(data = graz, aes(y = height), alpha = 0.35, size = 1) +
@@ -327,7 +330,7 @@ ggplot(data = NewData_MN1_fin, aes(x = year_f, y = fitted, colour = graze_f)) +
 
 # Вариант решения с подбором оптимальной модели (самостоятельно)
 
-## Задание 4
+## Задание 2
 
 Оптимизируйте модель с предыдущего шага
 
@@ -340,47 +343,47 @@ ggplot(data = NewData_MN1_fin, aes(x = year_f, y = fitted, colour = graze_f)) +
 Для подбора оптимальной модели воспользуемся тестами отношения правдоподобий. Для него нужно использовать модели, подобранные при помощи ML
 
 ```{r purl=FALSE}
-drop1(MN1, test = "Chi")
+drop1(ML1, test = "Chi")
 ```
 
 
 ## Решение: Подбор оптимальной модели (2)
 
 ```{r purl=FALSE}
-MN1.1 <- update(MN1, .~.-slope)
-drop1(MN1.1, test = "Chi")
+ML1.1 <- update(ML1, .~.-slope)
+drop1(ML1.1, test = "Chi")
 ```
 
 
 ## Решение: Подбор оптимальной модели (3)
 
 ```{r purl=FALSE}
-MN1.2 <- update(MN1.1, .~.-nativecov_sq)
-drop1(MN1.2, test = "Chi")
+ML1.2 <- update(ML1.1, .~.-nativecov_sq)
+drop1(ML1.2, test = "Chi")
 ```
 
 ## Решение: Анализ остатков
 
 ```{r purl=FALSE}
 # Данные для анализа остатков
-MN1.2_diag <- data.frame(
+ML1.2_diag <- data.frame(
   graz,
-  pear_res = residuals(MN1.2, type = "pearson"),
-  fitted = fitted(MN1.2, type = "response"))
+  .pear_res = residuals(ML1.2, type = "pearson"),
+  .fitted = fitted(ML1.2, type = "response"))
 ```
 
 ## Решение: График остатков
 
 ```{r purl=FALSE}
-gg_res <- ggplot(data = MN1.2_diag, aes(y = pear_res))
-gg_res + geom_point(aes(x = fitted)) +
-  geom_smooth(aes(x = fitted))
+gg_res <- ggplot(data = ML1.2_diag, aes(y = .pear_res))
+gg_res + geom_point(aes(x = .fitted)) +
+  geom_smooth(aes(x = .fitted))
 ```
 
 ## Решение: Графики остатков от переменных в модели
 
 ```{r purl=FALSE}
-grid.arrange(gg_res + geom_boxplot(aes(x = graze_f)),
+plot_grid(gg_res + geom_boxplot(aes(x = graze_f)),
 gg_res + geom_boxplot(aes(x = AspectCat)),
 gg_res + geom_boxplot(aes(x = year_f)),
 ncol = 3)
@@ -390,7 +393,7 @@ ncol = 3)
 ## Решение: Графики остатков от переменных не в модели
 
 ```{r purl=FALSE}
-grid.arrange(
+plot_grid(
   gg_res + geom_point(aes(x = heatloadrel)),
   gg_res + geom_point(aes(x = sqrt(litt))),
   gg_res + geom_point(aes(x = sqrt(bare))),
@@ -406,7 +409,7 @@ grid.arrange(
 Для тестов отношения правдоподобий используем финальную модель, подобранную при помощи ML
 
 ```{r purl=FALSE}
-Anova(MN1.2)
+drop1(ML1.2, test = 'Chi')
 ```
 
 Высота растительного покрова:
@@ -421,15 +424,15 @@ Anova(MN1.2)
 Для описания результатов используем модель, подобранную при помощи REML, т.к. он дает больее точные оценки случайных эффектов
 
 ```{r purl=FALSE}
-MN1.2_fin <- update(MN1.2, method = "REML")
+REML1.2 <- update(ML1.2, REML = TRUE)
 ```
 
 ## Решение: Результаты
 
-\tiny
+\small
 
 ```{r purl=FALSE}
-summary(MN1.2_fin)
+summary(REML1.2)
 ```
 
 ## Решение: Внутриклассовая корреляция
@@ -438,32 +441,25 @@ summary(MN1.2_fin)
 
 Для расчета нужна модель, подобранная при помощи REML
 
-```{r, eval=FALSE, purl=FALSE}
-MN1.2_fin
+```
+Random effects:
+ Groups      Name        Variance Std.Dev.
+ plotID:Park (Intercept) 13.761   3.710   
+ Park        (Intercept)  1.384   1.177   
+ Residual                25.916   5.091   
+Number of obs: 271, groups:  plotID:Park, 36; Park, 4
 ```
 
 Для наблюдений на одном и том же участке $\sigma_{plotID}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)$
 
 ```{r purl=FALSE}
-3.709642^2 / (1.176709^2 + 3.709642^2 + 5.090746^2)
+3.710^2 / (1.177^2 + 3.710^2 + 5.091^2)
 ```
 
 Для наблюдений в одном и том же парке $\sigma_{Park}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)$
 
 ```{r purl=FALSE}
-1.176709^2 / (1.176709^2 + 3.709642^2 + 5.090746^2)
-```
-
-```
-В результатах
-Random effects:
- Formula: ~1 | Park
-        (Intercept)
-StdDev:    1.176709
-
- Formula: ~1 | plotID %in% Park
-        (Intercept) Residual
-StdDev:    3.709642 5.090746
+1.177^2 / (1.177^2 + 3.7010^2 + 5.091^2)
 ```
 
 - Значения высоты травяного покрова похожи внутри участка. Сходство наблюдений внутри одного парка слабее.
@@ -474,21 +470,21 @@ StdDev:    3.709642 5.090746
 
 ```{r purl=FALSE}
 # Исходные данные
-NewData_MN1.2_fin <- expand.grid(graze_f = levels(graz$graze_f),
+NewData_REML1.2 <- expand.grid(graze_f = levels(graz$graze_f),
             AspectCat = levels(graz$AspectCat),
             year_f = levels(graz$year_f))
-NewData_MN1.2_fin$nativecov_sq <- mean(graz$nativecov_sq)
-NewData_MN1.2_fin$slope <- mean(graz$slope)
+NewData_REML1.2$nativecov_sq <- mean(graz$nativecov_sq)
+NewData_REML1.2$slope <- mean(graz$slope)
 
 # Предсказанные значения при помощи матриц
-X <- model.matrix(~ graze_f * AspectCat + year_f, data = NewData_MN1.2_fin)
-betas = fixef(MN1.2_fin)
-NewData_MN1.2_fin$fitted <- X %*% betas
+X <- model.matrix(~ graze_f * AspectCat + year_f, data = NewData_REML1.2)
+betas = fixef(REML1.2)
+NewData_REML1.2$fit <- X %*% betas
 
 # Cтандартные ошибки и дов. интервалы
-NewData_MN1.2_fin$se <- sqrt( diag(X %*% vcov(MN1.2_fin) %*% t(X)) )
-NewData_MN1.2_fin$lwr <- NewData_MN1.2_fin$fit - 1.96 * NewData_MN1.2_fin$se
-NewData_MN1.2_fin$upr <- NewData_MN1.2_fin$fit + 1.96 * NewData_MN1.2_fin$se
+NewData_REML1.2$se <- sqrt( diag(X %*% vcov(REML1.2) %*% t(X)) )
+NewData_REML1.2$lwr <- NewData_REML1.2$fit - 2 * NewData_REML1.2$se
+NewData_REML1.2$upr <- NewData_REML1.2$fit + 2 * NewData_REML1.2$se
 ```
 
 ## Решение: График предсказаний фиксированной части модели
@@ -498,7 +494,7 @@ NewData_MN1.2_fin$upr <- NewData_MN1.2_fin$fit + 1.96 * NewData_MN1.2_fin$se
 Не удивляйтесь тому, что график похож на предыдущий, т.к. те факторы, которые мы удалили из модели и так не влияли.
 
 ```{r purl=FALSE}
-ggplot(data = NewData_MN1.2_fin, aes(x = year_f, y = fitted, colour = graze_f)) +
+ggplot(data = NewData_REML1.2, aes(x = year_f, y = fit, colour = graze_f)) +
   geom_pointrange(aes(ymin = lwr, ymax = upr)) +
   facet_wrap(~ AspectCat) +
   geom_jitter(data = graz, aes(y = height), alpha = 0.35, size = 1) +
@@ -515,6 +511,7 @@ ggplot(data = NewData_MN1.2_fin, aes(x = year_f, y = fitted, colour = graze_f)) 
 ## Дополнительные ресурсы
 
 - Crawley, M.J. (2007). The R Book (Wiley).
+- Faraway, J. J. (2017). Extending the linear model with R: generalized linear, mixed effects and nonparametric regression models (Vol. 124). CRC press.
 - Zuur, A. F., Hilbe, J., & Ieno, E. N. (2013). A Beginner's Guide to GLM and GLMM with R: A Frequentist and Bayesian Perspective for Ecologists. Highland Statistics.
 - Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer)
 - Pinheiro, J., Bates, D. (2000). Mixed-Effects Models in S and S-PLUS. Springer

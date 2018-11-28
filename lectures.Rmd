@@ -221,14 +221,19 @@ install.packages(c("lme4", "pbkrtest"))
     + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf)
 - Код:
     + [15.1_GLMM_gaussian_random_intercept_slope_code.R](15.1_GLMM_gaussian_random_intercept_slope_code.R)
+    
+29 ноября 
+
 - Код задания:
     + [15.1_GLMM_gaussian_choccake_practice.R](15.1_GLMM_gaussian_choccake_practice.R)
 
+3 дек 1 пара
+
 <!-- - Презентация: -->
-<!--     + [15.2_GLMM_gaussian__nested_.pdf](15.2_GLMM_gaussian__nested_.pdf) -->
-<!-- - Код: -->
-<!--     + [15.2_GLMM_gaussian_(nested)_code.R](15.2_GLMM_gaussian_(nested)_code.R) -->
-<!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
+<!--     + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf) -->
+- Код:
+    + [15.2_GLMM_gaussian_nested_code.R](15.2_GLMM_gaussian_nested_code.R)
+- Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx)
 
 
 ### 16 Моделирование структуры дисперсии в смешаных моделях (3 дек 2 пара и 6 дек)
