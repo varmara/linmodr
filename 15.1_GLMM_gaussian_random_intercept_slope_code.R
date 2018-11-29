@@ -152,9 +152,10 @@ NewData$upr <- NewData$fit + 2 * NewData$SE
 
 
 # ## График предсказаний фиксированной части модели
-ggplot(data = NewData, aes(x = Days, y = fit)) +
+gg_MS1_normal <- ggplot(data = NewData, aes(x = Days, y = fit)) +
   geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) +
   geom_line() + geom_point(data = sl, aes(x = Days, y = Reaction))
+gg_MS1_normal
 
 # ## Предсказания для каждого уровня случайного фактора
 NewData$fit_subj <- predict(MS1, NewData, type = 'response')
@@ -216,7 +217,6 @@ pmod <- PBmodcomp(MS1.ml, MS0.ml, nsim = 100) # 1000 и больше для ре
 summary(pmod)
 
 
-
 # ## Бутстреп-оценка доверительной зоны регрессии
 NewData <- sl %>% group_by(Subject) %>%
   do(data.frame(Days = seq(min(.$Days), max(.$Days), length = 10)))
@@ -237,7 +237,12 @@ NewData$lwr <- b_se[1, ]
 NewData$upr <- b_se[2, ]
 
 # ## График предсказаний фиксированной части модели
-ggplot(data = NewData, aes(x = Days, y = fit)) +
+gg_MS1_boot <- ggplot(data = NewData, aes(x = Days, y = fit)) +
   geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) +
   geom_line() + geom_point(data = sl, aes(x = Days, y = Reaction))
+gg_MS1_boot
 
+library(cowplot)
+plot_grid(gg_MS1_normal + labs(title = "normal"),
+          gg_MS1_boot + labs(title = "bootstrap"),
+          ncol = 2)
