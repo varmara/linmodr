@@ -241,9 +241,15 @@ install.packages(c("lme4", "pbkrtest"))
 
 ### 16 Моделирование структуры дисперсии в смешаных моделях (3 дек 2 пара и 6 дек)
 
-<!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
-<!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
-<!-- - Данные: [Khaitov_2013_myt.csv](data/myt.csv) -->
+<!-- - Презентация: [16_variance_structure_new.pdf](16_variance_structure_new.pdf) -->
+- Код: [16_variance_structure_code_new.R](16_variance_structure_code_new.R)
+
+
+```{r eval=FALSE}
+install.packages(c("faraway"))
+```
+
+
 
 ### 17 GLMM для счетных данных (10 дек 1-2 пары)
 
