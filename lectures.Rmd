@@ -232,8 +232,8 @@ install.packages(c("lme4", "pbkrtest"))
 
 3 дек 1 пара
 
-<!-- - Презентация: -->
-<!--     + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf) -->
+- Презентация:
+    + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf)
 - Код:
     + [15.2_GLMM_gaussian_nested_code.R](15.2_GLMM_gaussian_nested_code.R)
 - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx)
