@@ -246,7 +246,7 @@ install.packages(c("lme4", "pbkrtest"))
 
 
 ```{r eval=FALSE}
-install.packages(c("faraway"))
+install.packages("faraway")
 ```
 
 
