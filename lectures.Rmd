@@ -243,7 +243,7 @@ install.packages(c("lme4", "pbkrtest"))
 
 - Презентация: [16_variance_structure_new.pdf](16_variance_structure_new.pdf)
 - Код: [16_variance_structure_code_new.R](16_variance_structure_code_new.R)
-- Код: [16_variance_structure_code_new.R](16_variance_structure_code_practice.R)
+- Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R)
 
 - Данные:
     + [mussel_juv_ad.csv](data/mussel_juv_ad.csv)
