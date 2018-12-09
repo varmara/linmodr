@@ -249,7 +249,6 @@ install.packages(c("lme4", "pbkrtest"))
     + [mussel_juv_ad.csv](data/mussel_juv_ad.csv)
 
 
-
 ```{r eval=FALSE}
 install.packages("faraway")
 ```
@@ -259,12 +258,12 @@ install.packages("faraway")
 ### 17 GLMM для счетных данных (10 дек 1-2 пары)
 
 <!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
-<!-- - Код:  -->
-<!--     + [17_GLMM_count_code.R](17_GLMM_count_code.R) -->
-<!--     + [17_Morris_2015_Ants.R](17_Morris_2015_Ants.R) -->
-<!-- - Данные: -->
-<!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
-<!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
+- Код:
+    + [17_GLMM_count_code.R](17_GLMM_count_code.R)
+    + [17_GLMM_count_Ants_practice.R](17_GLMM_count_Ants_practice.R)
+- Данные:
+    + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv)
+    + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx)
 
 ### 18 GLMM для бинарных данных (17 дек 1-2 пары)
 

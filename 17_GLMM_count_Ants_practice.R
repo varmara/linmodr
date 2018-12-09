@@ -42,25 +42,12 @@ library(car)
 library(dplyr)
 library(tidyr)
 library(lme4)
+library(sjstats)
 
 stand <- function(x) {
   (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 }
 
-overdisp_fun <- function(model) {
-  ## number of variance parameters in
-  ##   an n-by-n variance-covariance matrix
-  vpars <- function(m) {
-    nrow(m)*(nrow(m)+1)/2
-  }
-  model.df <- sum(sapply(VarCorr(model),vpars))+length(fixef(model))
-  rdf <- nrow(model.frame(model))-model.df
-  rp <- residuals(model,type="pearson")
-  Pearson.chisq <- sum(rp^2)
-  prat <- Pearson.chisq/rdf
-  pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE)
-  c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)
-}
 
 ## Подготовка данных ####
 ants <- read_excel("Morris_2015_Ants.xlsx", sheet = "Data", na = "NA")
@@ -73,7 +60,6 @@ colnames(ants)[c(10, 12)] <- c("BranchBerries", "ClusterBerries")
 ants$Site <- factor(ants$Site)
 ants$Branch <- factor(ants$Branch)
 ants$Treatment <- factor(ants$Treatment)
-
 
 # Пропущенные значения
 colSums(is.na(ants))

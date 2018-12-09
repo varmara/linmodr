@@ -39,7 +39,7 @@ editor_options:
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, cache = TRUE)
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, message = FALSE, cache = TRUE)
 ```
 
 # Cмешанные модели для счетных данных
@@ -82,14 +82,12 @@ sum(!complete.cases(Owls))
 ## Есть ли выбросы?
 
 ```{r dot-plots, tidy=FALSE}
-library(ggplot2)
-theme_set(theme_bw())
+library(ggplot2); library(cowplot); theme_set(theme_bw())
 gg_dot <- ggplot(Owls, aes(y = 1:nrow(Owls))) + 
   geom_point(colour = "steelblue")
 
-library(gridExtra)
-grid.arrange(gg_dot + aes(x = NCalls),
-  gg_dot + aes(x = ArrivalTime), nrow = 1)
+plot_grid(gg_dot + aes(x = NCalls),
+          gg_dot + aes(x = ArrivalTime), nrow = 1)
 ```
 
 >- Выбросов нет
@@ -121,16 +119,14 @@ ggplot(Owls, aes(x = NCalls)) +
 Напоминает распределение Пуассона
 
 ```{r}
-mean(Owls$NCalls == 0)
+mean(Owls$NCalls == 0) # доля нулей
 ```
-
-`r round(mean(Owls$NCalls == 0)*100, 0)`% нулей
 
 ## Какого размера выводки в гнездах?
 
 Это нужно учесть, потому что чем больше выводок, тем больше птенцов будут разговаривать. 
 
-```{r BroodSize-by-Nest, echo=FALSE}
+```{r BroodSize-by-Nest}
 range(Owls$BroodSize)
 
 ggplot(Owls, aes(x = Nest, y = BroodSize)) + 
@@ -148,11 +144,9 @@ ggplot(Owls) +
                fun.data = "mean_cl_boot", position = position_dodge(width = 0.2))
 ```
 
-> - Похоже, что может быть взаимодействие
+> - Похоже, что может быть взаимодействие, но не понятно значимое ли.
 
 ## Задание: Постройте такой график
-
-Нарисуем все данные для будущей модели
 
 ```{r owls-all, fig.height=5, fig.width=10, echo=FALSE, purl=FALSE}
 ggplot(Owls, aes(x = ArrivalTime, y = NCalls,
@@ -170,7 +164,7 @@ ggplot(Owls, aes(x = ArrivalTime, y = NCalls,
 ```{r owls-all, eval=FALSE, purl=FALSE}
 ```
 
-## Колинеарность
+## Коллинеарность
 
 
 ```{r, R.options=list(digits=5)}
@@ -185,21 +179,12 @@ vif(M0)
 
 ## Линейная модель с пуассоновским распределением остатков {.smaller}
 
-$$NCalls_{ij} = e^{\beta_0 + \beta_{1}SexP_{M} + \beta_{2}FoodT_{S} + \beta_{3}ArrivalT + \beta_{4} SexP_{M}:FoodT_{S} + \beta_{5}SexP{M}:ArrivalT + log(BroodSize) + a_{i} + \epsilon_{ij}}$$
-
-- $NCalls \sim \boldsymbol{P}(\mu_{ij})$  --- отклик подчиняется распределению Пуассона с параметром $\mu$
-- $E(NCalls_{ij}) = \mu_{ij}$
-- $var(NCalls_{ij}) = \mu_{ij}$
+- $NCalls \sim Poisson(\mu_{ij})$  --- отклик подчиняется распределению Пуассона с параметром $\mu$
+- $E(NCalls_{ij}) = \mu_{ij}$, $var(NCalls_{ij}) = \mu_{ij}$
 - $ln(\mu_{ij}) = \eta_{ij}$  --- функция связи --- логарифм
-
-$\begin{array}{l}
-\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \beta_{2}FoodTreatment_{S} + \beta_{3}ArrivalTime + \\
-+ \beta_{4} SexParent_{M}:FoodTreatment_{S} + \beta_{5}SexParent{M}:ArrivalTime + log(BroodSize) + \\
-+ a_{i} + \epsilon_{ij}
-\end{array}$
+- $\begin{array}{l}\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \beta_{2}FoodTreatment_{S} + \beta_{3}ArrivalTime + \\ + \beta_{4} SexParent_{M}:FoodTreatment_{S} + \beta_{5}SexParent{M}:ArrivalTime + log(BroodSize) + a_{i} \end{array}$
 
 - $a_{i}\sim N(0, \sigma^2_{Nest})$ --- случайный эффект гнезда (intercept)
-- $\epsilon_{ij} \sim N(0, \sigma^2)$ --- остатки модели
 - $i$ --- гнездо
 - $j$ --- наблюдение
 
@@ -242,8 +227,11 @@ R_M1 <- resid(M1, type = "pearson") # Пирсоновские остатки
 N <- nrow(Owls) # Объем выборки
 p <- length(fixef(M1)) + 1   # Число параметров в модели
 df <- (N - p) # число степенейсвободы
-overdisp <- sum(R_M1^2) /df  # Показывает во сколько раз в среднем sigma > mu
-overdisp
+overdispersion <- sum(R_M1^2) /df  # во сколько раз var(y) > E(y)
+overdispersion
+
+library(sjstats)
+overdisp(M1)
 ```
 
 > - Избыточность дисперсии.
@@ -299,35 +287,27 @@ abline(h = 0, lty = 2)
 
 ## У нас была сверхдисперсия. Пробуем NB GLMM {.smaller}
 
-$$NCalls_{ij} = e^{\beta_0 + \beta_{1}SexP_{M} + \beta_{2}FoodT_{S} + \beta_{3}ArrivalT + \beta_{4} SexP_{M}:FoodT_{S} + \beta_{5}SexP{M}:ArrivalT + log(BroodSize) + a_{i} + \epsilon_{ij}}$$
-
-- $NCalls_{ij} \sim \boldsymbol{NB}(\mu_{ij}, k)$  --- отклик подчиняется отрицательному биномиальному распределению с параметрами $\mu$ и $k$
-- $E(NCalls_{ij}) = \mu_{ij}$
-- $var(NCalls_{ij}) = \mu_{ij} + \mu^2_{ij} / k$
+- $NCalls_{ij} \sim NegBin(\mu_{ij}, k)$  --- отклик подчиняется отрицательному биномиальному распределению с параметрами $\mu$ и $k$
+- $E(NCalls_{ij}) = \mu_{ij}$, $var(NCalls_{ij}) = \mu_{ij} + \mu^2_{ij} / k$
 - $ln(\mu_{ij}) = \eta_{ij}$  --- функция связи --- логарифм
-
-$\begin{array}{l}
-\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \beta_{2}FoodTreatment_{S} + \beta_{3}ArrivalTime + \\
-+ \beta_{4} SexParent_{M}:FoodTreatment_{S} + \beta_{5}SexParent{M}:ArrivalTime + log(BroodSize) + \\
-+ a_{i} + \epsilon_{ij}
-\end{array}$
+- $\begin{array}{l}\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \beta_{2}FoodTreatment_{S} + \beta_{3}ArrivalTime + \\ + \beta_{4} SexParent_{M}:FoodTreatment_{S} + \beta_{5}SexParent{M}:ArrivalTime + log(BroodSize) + a_{i} \end{array}$
 
 - $a_{i}\sim N(0, \sigma^2_{Nest})$ --- случайный эффект гнезда (intercept)
-- $\epsilon_{ij} \sim N(0, \sigma^2)$ --- остатки модели
+
 - $i$ --- гнездо
 - $j$ --- наблюдение
 
 
 ## Подберем NB GLMM
 
-```{r NB-GLMM, cache=TRUE}
+```{r NB-GLMM}
 M2 <- glmer.nb(NCalls ~ SexParent * FoodTreatment + 
                  SexParent * ArrivalTime_std + 
                  offset(logBroodSize) + (1 | Nest), 
                data = Owls)
 # # Если эта модель вдруг не сходится, есть обходной маневр. Можно попробовать заранее определить k  при помощи внутренней функции. В lme4 параметр k называется theta
-# th <- lme4:::est_theta(M1)
-# M2 <- update(M1, family = negative.binomial(theta=th))
+th <- lme4:::est_theta(M1)
+M2 <- update(M1, family = negative.binomial(theta=th))
 ```
 
 ## Задание:
@@ -345,11 +325,13 @@ R_M2 <- resid(M2, type = "pearson") # Пирсоновские остатки
 N <- nrow(Owls) # Объем выборки
 p <- length(fixef(M2)) + 1 + 1  # Число параметров
 df <- (N - p) # число степенейсвободы
-overdisp <- sum(R_M2^2) /df  # Показывает во сколько раз в среднем sigma > mu
-overdisp
+overdispersion <- sum(R_M2^2) /df  # во сколько раз var(y) > E(y)
+overdispersion
+
+overdisp(M2)
 ```
 
-> - Сносно
+> - Хорошо.
 
 ## Диагностика отр. биномиальной модели
 
@@ -364,7 +346,7 @@ gg_resid <- ggplot(M2_diag, aes(x = .fitted, y = .pears_resid,
 gg_resid
 ```
 
-> - Есть большие остатки
+> - Есть большие остатки.
 
 ## Есть ли еще какие-то паттерны в остатках?
 
@@ -432,7 +414,7 @@ drop1(M4, test = "Chisq")
 
 > - теперь можно выкинуть пол родителя
 
-##
+## Финальная модель
 
 ```{r purl=FALSE}
 M5 <- update(M4, .~.-SexParent)
@@ -456,11 +438,13 @@ R_M5 <- resid(M5, type = "pearson") # Пирсоновские остатки
 N <- nrow(Owls) # Объем выборки
 p <- length(fixef(M5)) + 1 + 1  # Число параметров в модели
 df <- (N - p) # число степенейсвободы
-overdisp <- sum(R_M5^2) /df  # Показывает во сколько раз в среднем sigma > mu
-overdisp
+overdispersion <- sum(R_M5^2) /df  # во сколько раз var(y) > E(y)
+overdispersion
+
+overdisp(M5)
 ```
 
-> - Сносно
+> - Хорошо.
 
 ## Диагностика отр. биномиальной модели
 
@@ -503,20 +487,12 @@ abline(h = 0)
 
 ## Финальная GLMM, которую мы получили, выглядит так {.smaller}
 
-$$NCalls_{ij} = e^{\beta_0 + \beta_{1}SexP_{M} + \beta_{2}FoodT_{S} + \beta_{3}ArrivalT + log(BroodSize) + a_{i} + \epsilon_{ij}}$$
-
-- $NCalls_{ij} \sim \boldsymbol{NB}(\mu_{ij}, k)$  --- отклик подчиняется отрицательному биномиальному распределению с параметрами $\mu$ и $k$
-- $E(NCalls_{ij}) = \mu_{ij}$
-- $var(NCalls_{ij}) = \mu_{ij} + \mu^2_{ij} / k$
+- $NCalls_{ij} \sim NegBin(\mu_{ij}, k)$  --- отклик подчиняется отрицательному биномиальному распределению с параметрами $\mu$ и $k$
+- $E(NCalls_{ij}) = \mu_{ij}$, $var(NCalls_{ij}) = \mu_{ij} + \mu^2_{ij} / k$
 - $ln(\mu_{ij}) = \eta_{ij}$  --- функция связи --- логарифм
-
-$\begin{array}{l}
-\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \beta_{2}FoodTreatment_{S} + \beta_{3}ArrivalTime + log(BroodSize) + \\
-+ a_{i} + \epsilon_{ij}
-\end{array}$
+- $\eta_{ij} = \beta_0 + \beta_{1}SexParent_{M} + \beta_{2}FoodTreatment_{S} + \beta_{3}ArrivalTime + log(BroodSize) + a_{i}$
 
 - $a_{i}\sim N(0, \sigma^2_{Nest})$ --- случайный эффект гнезда (intercept)
-- $\epsilon_{ij} \sim N(0, \sigma^2)$ --- остатки модели
 - $i$ --- гнездо
 - $j$ --- наблюдение
 
@@ -524,11 +500,11 @@ $\begin{array}{l}
 ## Готовим данные для графика модели
 
 ```{r}
-library(plyr)
-NewData <- ddply(Owls, .variables = .(FoodTreatment), summarise, 
-                 ArrivalTime_std = seq(min(ArrivalTime_std),  
-                                       max(ArrivalTime_std), 
-                                       length = 100))
+library(dplyr)
+NewData <- Owls %>% group_by(FoodTreatment) %>% 
+  do(data.frame(ArrivalTime_std = seq(min(.$ArrivalTime_std),  
+                                       max(.$ArrivalTime_std), 
+                                       length = 100)))
 NewData$ArrivalTime <- NewData$ArrivalTime_std * sd(Owls$ArrivalTime) + 
   mean(Owls$ArrivalTime)
 ```
@@ -541,11 +517,13 @@ NewData$ArrivalTime <- NewData$ArrivalTime_std * sd(Owls$ArrivalTime) +
 X <- model.matrix(~ FoodTreatment + ArrivalTime_std, data = NewData)
 # К предсказанным значениям нужно прибавить оффсет. 
 # Мы будем делать предсказания для среднего размера выводка.
-NewData$Pred <- exp(X %*% fixef(M5) + log(mean(Owls$BroodSize)))
-# Стандартные ошибки предсказаний
-NewData$SE <- sqrt(diag(X %*% vcov(M5) %*% t(X)))
-NewData$lwr <- exp(NewData$Pred - 1.96 * NewData$SE)
-NewData$upr <- exp(NewData$Pred + 1.96 * NewData$SE)
+# В масштабе функции связи
+NewData$fit_eta <- X %*% fixef(M5) + log(mean(Owls$BroodSize))
+NewData$SE_eta <- sqrt(diag(X %*% vcov(M5) %*% t(X)))
+# В масштабе отклика
+NewData$fit_mu <- exp(NewData$fit_eta)
+NewData$lwr <- exp(NewData$fit_eta - 2 * NewData$SE_eta)
+NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
 ```
 
 ## График предсказанных значений
@@ -554,7 +532,7 @@ NewData$upr <- exp(NewData$Pred + 1.96 * NewData$SE)
 ggplot() + 
   geom_point(data = Owls, aes(x = ArrivalTime, y = NCalls), colour = "steelblue") + 
   geom_ribbon(data = NewData, aes(x = ArrivalTime,  ymax = upr,  ymin = lwr), alpha = 0.3) + 
-  geom_line(data = NewData,  aes(x = ArrivalTime, y = Pred, group = FoodTreatment)) + 
+  geom_line(data = NewData,  aes(x = ArrivalTime, y = fit_mu, group = FoodTreatment)) + 
   facet_wrap(~ FoodTreatment)
 ```
 
@@ -562,7 +540,6 @@ ggplot() +
 
 ```{r owls-pred, eval=FALSE, purl=FALSE}
 ```
-
 
 ## Take home messages
 
