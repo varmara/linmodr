@@ -261,6 +261,7 @@ install.packages("faraway")
 - Код:
     + [17_GLMM_count_code.R](17_GLMM_count_code.R)
     + [17_GLMM_count_Ants_practice.R](17_GLMM_count_Ants_practice.R)
+    + [17_GLMM_count_Ants_practice_solution.R](17_GLMM_count_Ants_practice_solution.R)
 - Данные:
     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv)
     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx)
