@@ -257,7 +257,7 @@ install.packages("faraway")
 
 ### 17 GLMM для счетных данных (10 дек 1-2 пары)
 
-<!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
+- Презентация: [17_GLMM_count.html](17_GLMM_count.html)
 - Код:
     + [17_GLMM_count_code.R](17_GLMM_count_code.R)
     + [17_GLMM_count_Ants_practice.R](17_GLMM_count_Ants_practice.R)
