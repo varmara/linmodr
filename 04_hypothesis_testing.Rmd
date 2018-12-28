@@ -15,6 +15,7 @@ library(knitr)
 # chunk default options
 opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, message = FALSE)
 library(scales)
+library(grid)
 ar <- arrow(type = 'closed', length = unit(0.15,'cm'))
 arb <- arrow(type = 'closed', length = unit(0.15,'cm'), ends = 'both')
 ```
@@ -586,6 +587,7 @@ ggplot(data = diamonds, aes(x = cut, y = price, colour = clarity)) +
   facet_wrap(~ clarity)
 ```
 
+Осторожно! Группы могут быть неоднородны. Здесь неучтен размер и т.п.
 
 # Как устроено тестирование гипотез
 
