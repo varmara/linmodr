@@ -26,7 +26,7 @@
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
+<style type="text/css" data-origin="pandoc">
 a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
 a.sourceLine:empty { height: 1.2em; }
@@ -83,7 +83,29 @@ code span.st { color: #008080; } /* String */
 code span.va { } /* Variable */
 code span.vs { color: #008080; } /* VerbatimString */
 code span.wa { color: #008000; font-weight: bold; } /* Warning */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 <style type="text/css">
   pre:not([class]) {
     background-color: white;
@@ -147,6 +169,9 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
@@ -161,7 +186,6 @@ body {
   padding-top: 46px;
   margin-top: -46px;
 }
-
 .section h2 {
   padding-top: 46px;
   margin-top: -46px;
@@ -181,6 +205,43 @@ body {
 .section h6 {
   padding-top: 46px;
   margin-top: -46px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -202,18 +263,77 @@ $(document).ready(function () {
 });
 </script>
 
-
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -362,7 +482,7 @@ div.tocify {
 <h3>01 Знакомство с R (24 сент.)</h3>
 <ul>
 <li>Презентация: <a href="01_intro_to_r.html">Знакомство с R</a></li>
-<li>Код: <a href="01_intro_to_r_code.R" class="uri">01_intro_to_r_code.R</a></li>
+<li>Код: <a href="01_intro_to_r_code.R">01_intro_to_r_code.R</a></li>
 </ul>
 </div>
 <div id="-ggplot2-27-.--1-.-1-" class="section level3">
@@ -373,7 +493,7 @@ div.tocify {
 <a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">install.packages</span>(<span class="st">&quot;MASS&quot;</span>)</a></code></pre></div>
 <ul>
 <li>Презентация: <a href="02_intro_ggplot.html">Основы ggplot2</a></li>
-<li>Код: <a href="02_intro_ggplot.R" class="uri">02_intro_ggplot.R</a></li>
+<li>Код: <a href="02_intro_ggplot.R">02_intro_ggplot.R</a></li>
 <li>Данные: <a href="data/Titanic.csv">Titanic.csv</a></li>
 <li>Данные: <a href="data/fev.xls">fev.xls</a></li>
 </ul>
@@ -382,22 +502,22 @@ div.tocify {
 <h3>03 Описательная статистика (1 окт 2 пара и 4 окт.)</h3>
 <p>Часть 1</p>
 <ul>
-<li>Презентация <a href="03_descriptive_statistics.html" class="uri">03_descriptive_statistics.html</a></li>
-<li>Код <a href="03_descriptive_statistics_code.R" class="uri">03_descriptive_statistics_code.R</a></li>
+<li>Презентация <a href="03_descriptive_statistics.html">03_descriptive_statistics.html</a></li>
+<li>Код <a href="03_descriptive_statistics_code.R">03_descriptive_statistics_code.R</a></li>
 <li>Данные <a href="data/diatome_count.csv">diatome_count.csv</a></li>
 </ul>
 <p>Часть 2</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;car&quot;</span>)</a></code></pre></div>
 <ul>
-<li>Презентация <a href="03.2_descriptive_statistics_normal_d.html" class="uri">03.2_descriptive_statistics_normal_d.html</a></li>
-<li>Код <a href="03.2_descriptive_statistics_normal_d_code.R" class="uri">03.2_descriptive_statistics_normal_d_code.R</a></li>
+<li>Презентация <a href="03.2_descriptive_statistics_normal_d.html">03.2_descriptive_statistics_normal_d.html</a></li>
+<li>Код <a href="03.2_descriptive_statistics_normal_d_code.R">03.2_descriptive_statistics_normal_d_code.R</a></li>
 </ul>
 </div>
 <div id="--8--1-2-" class="section level3">
 <h3>04 Тестирование гипотез (8 окт 1-2 пары)</h3>
 <ul>
-<li>Презентация <a href="04_hypothesis_testing.html" class="uri">04_hypothesis_testing.html</a></li>
-<li>Код <a href="04_hypothesis_testing_code.R" class="uri">04_hypothesis_testing_code.R</a></li>
+<li>Презентация <a href="04_hypothesis_testing.html">04_hypothesis_testing.html</a></li>
+<li>Код <a href="04_hypothesis_testing_code.R">04_hypothesis_testing_code.R</a></li>
 <li>Данные <a href="data/aml.csv">aml.csv</a></li>
 </ul>
 </div>
@@ -407,8 +527,8 @@ div.tocify {
 <div id="---11-" class="section level3">
 <h3>05.1 Простая линейная регрессия (11 окт)</h3>
 <ul>
-<li>Презентация: <a href="05.1_LM.html" class="uri">05.1_LM.html</a></li>
-<li>Код: <a href="05.1_LM_code.R" class="uri">05.1_LM_code.R</a></li>
+<li>Презентация: <a href="05.1_LM.html">05.1_LM.html</a></li>
+<li>Код: <a href="05.1_LM_code.R">05.1_LM_code.R</a></li>
 <li>Данные:
 <ul>
 <li><a href="data/IQ_brain.csv">IQ_brain.csv</a> <!--     + [secher.xls](data/secher.xls) --></li>
@@ -418,8 +538,8 @@ div.tocify {
 <div id="------15-.-1-" class="section level3">
 <h3>05.2 Краткое введение в мир матричной алгебры (15 окт. 1 пара)</h3>
 <ul>
-<li>Презентация: <a href="05.2_Introduction_to_matrix_algebra.html" class="uri">05.2_Introduction_to_matrix_algebra.html</a></li>
-<li>Код: <a href="05.2_Introduction_to_matrix_algebra_code.R" class="uri">05.2_Introduction_to_matrix_algebra_code.R</a></li>
+<li>Презентация: <a href="05.2_Introduction_to_matrix_algebra.html">05.2_Introduction_to_matrix_algebra.html</a></li>
+<li>Код: <a href="05.2_Introduction_to_matrix_algebra_code.R">05.2_Introduction_to_matrix_algebra_code.R</a></li>
 </ul>
 </div>
 <div id="-------15-.-2---18-." class="section level3">
@@ -428,13 +548,13 @@ div.tocify {
 <ul>
 <li>Презентация:
 <ul>
-<li><a href="06.1_model_description.html" class="uri">06.1_model_description.html</a></li>
+<li><a href="06.1_model_description.html">06.1_model_description.html</a></li>
 </ul></li>
 <li>Код:
 <ul>
-<li><a href="06.1_model_description_code.R" class="uri">06.1_model_description_code.R</a></li>
-<li><a href="06_task_assumptions_catsM.R" class="uri">06_task_assumptions_catsM.R</a></li>
-<li><a href="06_task_assumptions_GAG.R" class="uri">06_task_assumptions_GAG.R</a></li>
+<li><a href="06.1_model_description_code.R">06.1_model_description_code.R</a></li>
+<li><a href="06_task_assumptions_catsM.R">06_task_assumptions_catsM.R</a></li>
+<li><a href="06_task_assumptions_GAG.R">06_task_assumptions_GAG.R</a></li>
 </ul></li>
 <li>Данные:
 <ul>
@@ -447,11 +567,11 @@ div.tocify {
 <ul>
 <li>Презентация:
 <ul>
-<li><a href="06.2_model_validation.html" class="uri">06.2_model_validation.html</a></li>
+<li><a href="06.2_model_validation.html">06.2_model_validation.html</a></li>
 </ul></li>
 <li>Код:
 <ul>
-<li><a href="06.2_model_validation_code.R" class="uri">06.2_model_validation_code.R</a></li>
+<li><a href="06.2_model_validation_code.R">06.2_model_validation_code.R</a></li>
 <li>Задания про котов и GAG из прошлой части (работайте в том же коде)</li>
 </ul></li>
 <li>Данные:
@@ -468,16 +588,16 @@ div.tocify {
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;gridExtra&quot;</span>)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">&quot;ISwR&quot;</span>)</a></code></pre></div>
 <ul>
-<li><p>Презентация: <a href="07.1_multiple_LM.html" class="uri">07.1_multiple_LM.html</a></p></li>
-<li>Код: <a href="07.1_multiple_LM_code.R" class="uri">07.1_multiple_LM_code.R</a></li>
+<li><p>Презентация: <a href="07.1_multiple_LM.html">07.1_multiple_LM.html</a></p></li>
+<li>Код: <a href="07.1_multiple_LM_code.R">07.1_multiple_LM_code.R</a></li>
 <li><p>Данные: <a href="data/loyn.csv">loyn.csv</a></p></li>
 </ul>
 </div>
 <div id="---22--2-" class="section level3">
 <h3>07.2 Выбор оптимальной модели (22 окт 2 пара)</h3>
 <ul>
-<li><p>Презентация: <a href="07.2_model_selection.html" class="uri">07.2_model_selection.html</a></p></li>
-<li>Код: <a href="07.2_model_selection_code.R" class="uri">07.2_model_selection_code.R</a></li>
+<li><p>Презентация: <a href="07.2_model_selection.html">07.2_model_selection.html</a></p></li>
+<li>Код: <a href="07.2_model_selection_code.R">07.2_model_selection_code.R</a></li>
 <li><p>Данные: <a href="data/loyn.csv">loyn.csv</a></p></li>
 </ul>
 </div>
@@ -489,9 +609,9 @@ div.tocify {
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</a></code></pre></div>
 <ul>
-<li>Презентация: <a href="08_LM_with_continuous_and_discrete_predictors_2.html" class="uri">08_LM_with_continuous_and_discrete_predictors_2.html</a></li>
+<li>Презентация: <a href="08_LM_with_continuous_and_discrete_predictors_2.html">08_LM_with_continuous_and_discrete_predictors_2.html</a></li>
 <li><p>Код: <a href="08_LM_with_continuous_and_discrete_predictors_code_2.R">08_LM_with_continuous_and_discrete_predictors_code.R</a></p></li>
-<li><p>Код: <a href="08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R" class="uri">08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R</a></p></li>
+<li><p>Код: <a href="08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R">08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R</a></p></li>
 <li>Данные:
 <ul>
 <li><a href="data/goats.xlsx">goats.xlsx</a></li>
@@ -504,11 +624,11 @@ div.tocify {
 <div id="--------29--1-2-" class="section level3">
 <h3>09 Модели с разными значениями угла наклона для групп (29 окт 1-2 пары)</h3>
 <ul>
-<li>Презентация: <a href="09_LM_with_continuous_and_discrete_predictors_interactions.html" class="uri">09_LM_with_continuous_and_discrete_predictors_interactions.html</a></li>
+<li>Презентация: <a href="09_LM_with_continuous_and_discrete_predictors_interactions.html">09_LM_with_continuous_and_discrete_predictors_interactions.html</a></li>
 <li>Код:
 <ul>
-<li><a href="09_LM_with_continuous_and_discrete_predictors_interactions.R" class="uri">09_LM_with_continuous_and_discrete_predictors_interactions.R</a></li>
-<li><a href="09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R" class="uri">09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R</a></li>
+<li><a href="09_LM_with_continuous_and_discrete_predictors_interactions.R">09_LM_with_continuous_and_discrete_predictors_interactions.R</a></li>
+<li><a href="09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R">09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R</a></li>
 </ul></li>
 <li>Данные:
 <ul>
@@ -521,20 +641,20 @@ div.tocify {
 <h3>10 Однофакторный дисперсионный анализ (1 нояб)</h3>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;DAAG&quot;</span>, <span class="st">&quot;multcomp&quot;</span>))</a></code></pre></div>
 <ul>
-<li>Презентация: <a href="10_anova.pdf" class="uri">10_anova.pdf</a></li>
-<li>Код: <a href="10_anova_code.R" class="uri">10_anova_code.R</a></li>
+<li>Презентация: <a href="10_anova.pdf">10_anova.pdf</a></li>
+<li>Код: <a href="10_anova_code.R">10_anova_code.R</a></li>
 </ul>
 </div>
 <div id="---8--1--12--1-" class="section level3">
 <h3>11 Многофакторный дисперсионный анализ (8 нояб 1 пара, 12 нояб 1 пара)</h3>
 <ul>
-<li>Презентация: <a href="11_two-way_anova_and_interactions.pdf" class="uri">11_two-way_anova_and_interactions.pdf</a></li>
-<li>Код: <a href="11_two-way_anova_and_interactions_code.R" class="uri">11_two-way_anova_and_interactions_code.R</a></li>
+<li>Презентация: <a href="11_two-way_anova_and_interactions.pdf">11_two-way_anova_and_interactions.pdf</a></li>
+<li>Код: <a href="11_two-way_anova_and_interactions_code.R">11_two-way_anova_and_interactions_code.R</a></li>
 <li><p>Данные: <a href="data/hall.csv">hall.csv</a></p></li>
 <li>Код заданий:
 <ul>
-<li><a href="11_anova_practice_ants.R" class="uri">11_anova_practice_ants.R</a></li>
-<li><a href="11_anova_practice_rice.R" class="uri">11_anova_practice_rice.R</a></li>
+<li><a href="11_anova_practice_ants.R">11_anova_practice_ants.R</a></li>
+<li><a href="11_anova_practice_rice.R">11_anova_practice_rice.R</a></li>
 </ul></li>
 </ul>
 </div>
@@ -544,9 +664,9 @@ div.tocify {
 <div id="glm-----12--2---15-" class="section level3">
 <h3>12 GLM для нормально распределенных данных (12 нояб 2 пара и 15 нояб)</h3>
 <ul>
-<li>Презентация: <a href="12_GLM_gaussian.pdf" class="uri">12_GLM_gaussian.pdf</a></li>
-<li><p>Код: <a href="12_GLM_gaussian_code.R" class="uri">12_GLM_gaussian_code.R</a></p></li>
-<li><p>Код задания: <a href="12_GLM_gaussian_practice_model_selection.R" class="uri">12_GLM_gaussian_practice_model_selection.R</a></p></li>
+<li>Презентация: <a href="12_GLM_gaussian.pdf">12_GLM_gaussian.pdf</a></li>
+<li><p>Код: <a href="12_GLM_gaussian_code.R">12_GLM_gaussian_code.R</a></p></li>
+<li><p>Код задания: <a href="12_GLM_gaussian_practice_model_selection.R">12_GLM_gaussian_practice_model_selection.R</a></p></li>
 </ul>
 </div>
 <div id="glm----19--1-2-" class="section level3">
@@ -560,11 +680,10 @@ div.tocify {
 <li>Модифицировали код <code>overdisp_fun()</code>, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция.</li>
 </ol>
 <ul>
-<li>Презентация: <a href="13_GLM_count.pdf" class="uri">13_GLM_count.pdf</a></li>
-<li>Код: <a href="13_GLM_count_code.R" class="uri">13_GLM_count_code.R</a></li>
+<li>Презентация: <a href="13_GLM_count.pdf">13_GLM_count.pdf</a></li>
+<li>Код: <a href="13_GLM_count_code.R">13_GLM_count_code.R</a></li>
 <li><p>Данные: <a href="data/Pollinators_Montero-Castano,%20Vila,%202015.xlsx">Pollinators_Montero-Castano, Vila, 2015.xlsx</a></p></li>
-<li>Код задания: <a href="13_GLM_count_practice.R" class="uri">13_GLM_count_practice.R</a></li>
-<li><p>Частичное решение: <a href="13_GLM_count_practice_solution.R" class="uri">13_GLM_count_practice_solution.R</a></p></li>
+<li><p>Код задания: <a href="13_GLM_count_practice.R">13_GLM_count_practice.R</a> <!-- - Частичное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R) --></p></li>
 </ul>
 </div>
 <div id="glm------22---26--1-" class="section level3">
@@ -578,8 +697,8 @@ div.tocify {
 <li>Модифицировали код <code>overdisp_fun()</code>, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция.</li>
 </ol>
 <ul>
-<li>Презентация: <a href="14_GLM_binary_new.pdf" class="uri">14_GLM_binary_new.pdf</a></li>
-<li>Код: <a href="14_GLM_binary_code_new.R" class="uri">14_GLM_binary_code_new.R</a></li>
+<li>Презентация: <a href="14_GLM_binary_new.pdf">14_GLM_binary_new.pdf</a></li>
+<li>Код: <a href="14_GLM_binary_code_new.R">14_GLM_binary_code_new.R</a></li>
 <li>Данные:
 <ul>
 <li><a href="data/aster_mussel.csv">aster_mussel.csv</a></li>
@@ -597,31 +716,31 @@ div.tocify {
 <ul>
 <li>Презентация:
 <ul>
-<li><a href="15.1_GLMM_gaussian_random_intercept_slope.pdf" class="uri">15.1_GLMM_gaussian_random_intercept_slope.pdf</a></li>
+<li><a href="15.1_GLMM_gaussian_random_intercept_slope.pdf">15.1_GLMM_gaussian_random_intercept_slope.pdf</a></li>
 </ul></li>
 <li>Код:
 <ul>
-<li><a href="15.1_GLMM_gaussian_random_intercept_slope_code.R" class="uri">15.1_GLMM_gaussian_random_intercept_slope_code.R</a></li>
+<li><a href="15.1_GLMM_gaussian_random_intercept_slope_code.R">15.1_GLMM_gaussian_random_intercept_slope_code.R</a></li>
 </ul></li>
 </ul>
 <p>29 ноября</p>
-<p>Демонстрация LRT при помощи бутстрепа: <a href="15.1_GLMM_bootstrap_demo_sleepstudy.R" class="uri">15.1_GLMM_bootstrap_demo_sleepstudy.R</a></p>
+<p>Демонстрация LRT при помощи бутстрепа: <a href="15.1_GLMM_bootstrap_demo_sleepstudy.R">15.1_GLMM_bootstrap_demo_sleepstudy.R</a></p>
 <ul>
 <li>Задание:
 <ul>
-<li>Код: <a href="15.1_GLMM_gaussian_choccake_practice.R" class="uri">15.1_GLMM_gaussian_choccake_practice.R</a></li>
-<li>Решение (частичное): <a href="15.1_GLMM_gaussian_choccake_solution.R" class="uri">15.1_GLMM_gaussian_choccake_solution.R</a></li>
+<li>Код: <a href="15.1_GLMM_gaussian_choccake_practice.R">15.1_GLMM_gaussian_choccake_practice.R</a></li>
 </ul></li>
 </ul>
+<!-- + Решение (частичное): [15.1_GLMM_gaussian_choccake_solution.R](15.1_GLMM_gaussian_choccake_solution.R) -->
 <p>3 дек 1 пара</p>
 <ul>
 <li>Презентация:
 <ul>
-<li><a href="15.2_GLMM_gaussian_nested.pdf" class="uri">15.2_GLMM_gaussian_nested.pdf</a></li>
+<li><a href="15.2_GLMM_gaussian_nested.pdf">15.2_GLMM_gaussian_nested.pdf</a></li>
 </ul></li>
 <li>Код:
 <ul>
-<li><a href="15.2_GLMM_gaussian_nested_code.R" class="uri">15.2_GLMM_gaussian_nested_code.R</a></li>
+<li><a href="15.2_GLMM_gaussian_nested_code.R">15.2_GLMM_gaussian_nested_code.R</a></li>
 </ul></li>
 <li>Данные: <a href="data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx">Grazing_native_plants_Gennet_et_al._2017_S1.xlsx</a></li>
 </ul>
@@ -629,9 +748,9 @@ div.tocify {
 <div id="------3--2---6-" class="section level3">
 <h3>16 Моделирование структуры дисперсии в смешаных моделях (3 дек 2 пара и 6 дек)</h3>
 <ul>
-<li>Презентация: <a href="16_variance_structure_new.pdf" class="uri">16_variance_structure_new.pdf</a></li>
-<li>Код: <a href="16_variance_structure_code_new.R" class="uri">16_variance_structure_code_new.R</a></li>
-<li><p>Код: <a href="16_variance_structure_code_practice.R" class="uri">16_variance_structure_code_practice.R</a></p></li>
+<li>Презентация: <a href="16_variance_structure_new.pdf">16_variance_structure_new.pdf</a></li>
+<li>Код: <a href="16_variance_structure_code_new.R">16_variance_structure_code_new.R</a></li>
+<li><p>Код: <a href="16_variance_structure_code_practice.R">16_variance_structure_code_practice.R</a></p></li>
 <li>Данные:
 <ul>
 <li><a href="data/mussel_juv_ad.csv">mussel_juv_ad.csv</a></li>
@@ -642,12 +761,12 @@ div.tocify {
 <div id="glmm----10--1-2-" class="section level3">
 <h3>17 GLMM для счетных данных (10 дек 1-2 пары)</h3>
 <ul>
-<li>Презентация: <a href="17_GLMM_count.html" class="uri">17_GLMM_count.html</a></li>
+<li>Презентация: <a href="17_GLMM_count.html">17_GLMM_count.html</a></li>
 <li>Код:
 <ul>
-<li><a href="17_GLMM_count_code.R" class="uri">17_GLMM_count_code.R</a></li>
-<li><a href="17_GLMM_count_Ants_practice.R" class="uri">17_GLMM_count_Ants_practice.R</a></li>
-<li><a href="17_GLMM_count_Ants_practice_solution.R" class="uri">17_GLMM_count_Ants_practice_solution.R</a></li>
+<li><a href="17_GLMM_count_code.R">17_GLMM_count_code.R</a></li>
+<li><a href="17_GLMM_count_Ants_practice.R">17_GLMM_count_Ants_practice.R</a></li>
+<li><a href="17_GLMM_count_Ants_practice_solution.R">17_GLMM_count_Ants_practice_solution.R</a></li>
 </ul></li>
 <li>Данные:
 <ul>
@@ -663,8 +782,8 @@ div.tocify {
 <!-- ``` -->
 <ul>
 <li>Презентация: <a href="18_GLMM_binary.html">18_GLMM_binary_new.html</a></li>
-<li>Старая презентация с разбором примера про балянусов: <a href="18_GLMM_binary.html" class="uri">18_GLMM_binary.html</a></li>
-<li>Код: <a href="18_GLMM_binary_code_new.R" class="uri">18_GLMM_binary_code_new.R</a></li>
+<li>Старая презентация с разбором примера про балянусов: <a href="18_GLMM_binary.html">18_GLMM_binary.html</a></li>
+<li>Код: <a href="18_GLMM_binary_code_new.R">18_GLMM_binary_code_new.R</a></li>
 <li>Данные:
 <ul>
 <li><a href="data/aster_mussel_full.csv">aster_mussel_full.csv</a></li>

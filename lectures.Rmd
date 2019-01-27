@@ -188,7 +188,7 @@ install.packages("AER")
 - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx)
 
 - Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R)
-- Частичное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R)
+<!-- - Частичное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R) -->
 
 ### 14 GLM для бинарных данных (=логистическая регрессия) (22 нояб и 26 нояб 1 пара)
 
@@ -228,7 +228,8 @@ install.packages(c("lme4", "pbkrtest"))
   
 - Задание:
     + Код: [15.1_GLMM_gaussian_choccake_practice.R](15.1_GLMM_gaussian_choccake_practice.R)
-    + Решение (частичное): [15.1_GLMM_gaussian_choccake_solution.R](15.1_GLMM_gaussian_choccake_solution.R)
+
+<!-- + Решение (частичное): [15.1_GLMM_gaussian_choccake_solution.R](15.1_GLMM_gaussian_choccake_solution.R) -->
 
 3 дек 1 пара
 
