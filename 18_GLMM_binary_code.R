@@ -2,9 +2,205 @@
 # subtitle    : "Линейные модели..."
 # author: Вадим Хайтов, Марина Варфоломеева
 
+
+
+
+## Читаем данные
+astr2 <- read.csv('data/aster_mussel_full.csv', header = TRUE)
+head(astr2)
+
+## Наводим порядок в кодировке переменных
+
+astr2$Year <- factor(astr2$Year)
+astr2$Box <- factor(astr2$Box)
+astr2$Sp <- factor(astr2$Sp)
+astr2$Out <- ifelse(test = astr2$Outcome == 'eaten', yes = 1,  no = 0)
+
+## Знакомимся с данными
+
+# Нет ли пропущенных значений?
+colSums(is.na(astr2))
+
+## Каковы объемы выборок?
+table(astr2$Box)
+
+## Нет ли коллинеарности
+
+library(cowplot); library(ggplot2); theme_set(theme_bw())
+
+Pl_Sp <- ggplot(astr2, aes(x = Sp, y = L)) + geom_boxplot()
+Pl_exp <- ggplot(astr2, aes(x = Experiment, y = L)) + geom_boxplot()
+Pl_year <- ggplot(astr2, aes(x = Year, y = L)) + geom_boxplot()
+plot_grid(Pl_Sp, Pl_exp, Pl_year, ncol = 3)
+
+## Есть ли выбросы?
+
+ggplot(astr2, aes(y = 1:nrow(astr2))) + geom_point(aes(x = L) )
+
+library(lme4)
+
+model1_ri <- glmer(Out ~ L*Sp*Year + (1|Experiment/Box) , data = astr2,
+                   family = binomial(link = "logit"))
+
+
+
+astr2$L_scaled <-
+
+model1_ri <- glmer(Out ~ L_scaled*Sp*Year +
+                     (1|Experiment/Box) , data = astr2,
+                   family = binomial(link = "logit"))
+
+
+model1_rsi_1<- glmer(Out ~ L_scaled * Sp * Year + (1 + Sp|Experiment/Box) ,
+                     data = astr2, family = binomial(link = "logit"))
+
+model1_rsi_2 <- glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box) ,
+                      data = astr2, family = binomial(link = "logit"))
+
+
+
+
+
+
+
+
+model1_rsi_1<- glmer(Out ~ L_scaled * Sp * Year + (1 + Sp|Experiment/Box) ,
+                     data = astr2, family = binomial(link = "logit"),
+                     control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+model1_rsi_2 <- glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box) ,
+                      data = astr2, family = binomial(link = "logit"),
+                      control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
+
+## Сравниваем три модели
+
+
+
+
+
+## Диагностика модели: линейность связи
+library(ggplot2)
+model1_diagn <- fortify(model1_ri)
+ggplot(model1_diagn, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smooth()
+
+
+
+
+
+
+
+
+
+## Диагностика модели: избыточность дисперсии
+
+library(sjstats)
+overdisp(model1_ri)
+
+## Задание: Проведите упрощение модели в соответствии с протоколом backward selection
+
+
+
+
+
+
+
+
+## Диагностика финальной модели: линейность связи
+model6_diagn <- fortify(model6)
+ggplot(model6_diagn, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smooth()
+
+
+
+## Диагностика финальной модели: избыточность дисперсии
+
+overdisp(model6)
+
+
+#Случайные эффекты
+
+icc(model6)
+
+
+## Подготовка к визуализации в виде логистических кривых
+
+logit_back <- function(x) exp(x)/(1 + exp(x)) # обратная логит-трансформация
+
+library(dplyr)
+new_data <- astr2 %>% group_by(Sp) %>% do(data.frame(L_scaled = seq(min(.$L_scaled),
+                                                                    max(.$L_scaled),
+                                                                    length.out = 100)))
+
+X <- model.matrix(~  L_scaled + Sp, data = new_data)
+b <- fixef(model6)
+
+new_data$fit_eta <- X %*% b
+new_data$se_eta <- sqrt(diag(X %*% vcov(model6) %*% t(X)))
+
+new_data$fit_pi <- logit_back(new_data$fit_eta)
+new_data$lwr <- logit_back(new_data$fit_eta - 2 * new_data$se_eta)
+new_data$upr <- logit_back(new_data$fit_eta + 2 * new_data$se_eta)
+
+Pl_log <- ggplot(new_data, aes(x = L_scaled, y = fit_pi)) +
+  geom_ribbon(aes(ymin = lwr, ymax = upr, fill = Sp), alpha = 0.2) +
+  geom_line(aes(color = Sp)) + labs(x = "Стандартизированная длина", y = "Вероятность \n быть съеденной" )
+Pl_log
+
+
+
+# Задание: Визуализируйте модель в виде столбчатой диаграммы
+
+
+
+
+
+
+## Как можно показать перввичные данные
+
+# Разбиваем на размерные классы приблизительно рвного объема
+astr2$Size_class <- ntile(astr2$L_scaled, 10)
+
+table(astr2$Size_class, astr2$Sp)
+
+
+# Средние показатели в каждом из размерных классов
+
+Mean_Out <- astr2 %>% group_by(Size_class, Sp) %>%
+  do(data.frame(Out = mean(.$Out), L_scaled = mean(.$L_scaled)))
+Pl_log + geom_point(data = Mean_Out, aes(x = L_scaled, y = Out, color = Sp))
+
+
+
+
+# Тестовая выборка
+
+astr_test <- read.csv('data/aster_mussel.csv', header = TRUE)
+
+
+model6_unscaled <- glmer(Out ~ L + Sp +
+                           (1|Experiment/Box) , data = astr2,
+                         family = binomial(link = "logit"))
+
+# Задание: Сделайте предсказания для новых данных
+
+
+
+
+
+# Задание: Предложите способ визуализировать соотношение предсказанных и наблюдаемых значений.
+
+
+
+
+
+########### Самостоятельная работа  ###########################
 #Читаем данные
 
 bal <- read.table("data/Yakovis2.csv", header = TRUE, sep = ";")
+
+
+# Задание: Как связана вероятность гибели балнуса от
+BorN ALength  Position  Site
 
 #Some housekeeping
 bal$Site <- factor(bal$Site)
@@ -27,143 +223,18 @@ mean(bal[bal$Status == "empty_test", ]$Drill)
 bal2 <- bal[bal$Status == "empty_test", ]
 
 
-#Формулы для фиксированных и случайных эффектов
 
-
-
-
-##Подбираем модель с помощью функции `glmmPQL`
-library(MASS)
-
-M1_PQL <- glmmPQL(Drill ~ BorN + ALength  + Position + Site, random = ~1|Sample/Substrate_ID, data = bal2, family = "binomial")
-
-summary(M1_PQL)
-
-length(unique(bal2$Substrate_ID))
-
-##Подбираем модель с помощью функции `glmmML()`
-
-library(glmmML)
-
-M1_ML <- glmmML(Drill ~ BorN + ALength  + Position + Site, cluster = Substrate_ID, data = bal2)
-
-M2_ML <- glmmML(Drill ~ BorN + ALength  + Position + Site, cluster = Sample, data = bal2)
-
-summary(M1_ML)
-
-summary(M2_ML)
-
-AIC(M1_ML, M2_ML)
 
 ##Подбираем модель с помощью функции `glmer()`
 
 library(lme4)
-M1_glmer <- glmer(Drill ~ BorN + ALength + Position + Site +  (1|Sample/Substrate_ID), data = bal2, family = "binomial", nAGQ = 1)
 
 summary(M1_glmer)
 
-##Сравним коэффициенты, подобранные разными функциями
-library(nlme)
-
-GLMMPQL <- round(as.numeric(fixed.effects(M1_PQL)), 3)
-GLMMML_1 = round(as.numeric(coefficients(M1_ML)), 3)
-GLMMML_2 = round(as.numeric(coefficients(M2_ML)), 3)
-GLMER <- round(as.numeric(fixed.effects(M1_glmer)), 3)
-
-Coef <- data.frame(Parameter = names(fixed.effects(M1_glmer)), glmmPQL = GLMMPQL, glmmML_1 = GLMMML_1, glmmML_2 = GLMMML_2, glmer = GLMER )
-
-Coef
-
-
-
-##Выбор оптимальной модели
-
-drop1(M1_glmer, test = "Chi")
-
-##Выбор оптимальной модели
-M2_glmer <- update(M1_glmer, .~.- Site)
-anova(M1_glmer, M2_glmer)
-
-
-##Выбор оптимальной модели
-
-drop1(M2_glmer, test = "Chi")
-
-##Выбор оптимальной модели
-
-M3_glmer <- update(M2_glmer, .~.-Age)
-anova(M2_glmer, M3_glmer)
-
-
-M3_glmer <- M2_glmer
-
-##Выбор оптимальной модели
-
-drop1(M3_glmer, test = "Chi")
-
-##Результаты
-summary(M3_glmer)
-
-##Проверка валидности модели
-plot(M3_glmer)
-
-
-##Проверка валидности модели
-library(ggplot2)
-library(gridExtra)
-diagnost <- fortify(M3_glmer)
-
-# diagnost <- data.frame(.fitted = fitted(M3_glmer), .resid = residuals(M3_glmer, type ="pearson"))
-
-diagnost<-cbind(diagnost, bal2)
-head(diagnost)
-
-Pl1 <- ggplot(diagnost, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smooth(se=F)
-
-Pl2 <- ggplot(diagnost, aes(x = BorN, y = .scresid)) + geom_point() + geom_smooth(method = "loess", se=F)
-
-Pl3 <- ggplot(diagnost, aes(x = ALength, y = .scresid)) + geom_point() + geom_smooth( se=F)
-
-Pl4 <- ggplot(diagnost, aes(x = Position, y = .scresid)) + geom_boxplot()
 
 
 
 
-grid.arrange(Pl1, Pl2, Pl3, Pl4, ncol = 2)
-
-
-http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html#overdispersion
-
-overdisp_fun <- function(model) {
-  ## number of variance parameters in
-  ##   an n-by-n variance-covariance matrix
-  vpars <- function(m) {
-    nrow(m)*(nrow(m)+1)/2
-  }
-  model.df <- sum(sapply(VarCorr(model),vpars))+length(fixef(model))
-  rdf <- nrow(model.frame(model))-model.df
-  rp <- residuals(model,type="pearson")
-  Pearson.chisq <- sum(rp^2)
-  prat <- Pearson.chisq/rdf
-  pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE)
-  c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)
-}
-
-
-
-overdisp_fun(model = M3_glmer )
-
-
-
-
-#Визуализация предсказаний модели
-MyData <- expand.grid(BorN = seq(min(bal2$BorN), max(bal2$BorN)), ALength = seq(min(bal2$ALength), max(bal2$ALength)),Position = levels(bal2$Position))
-
-
-MyData$Predicted <- predict(M3_glmer,newdata = MyData, re.form = ~0, type = "response")
-
-
-ggplot(MyData, aes(x = ALength, y = Predicted, color = BorN)) + geom_line(aes(group = BorN), size = 1.5) + facet_grid(~Position, labeller = label_both) + scale_color_gradient(low = "green", high = "red")
 
 
 
@@ -212,115 +283,7 @@ grid.arrange(Pl1, Pl2, Pl3, ncol = 2)
 overdisp_fun(Myt_M1)
 
 
-Myt_M1_A <- glmer(Sp ~ Z + (1|population), data = myt, family = binomial(link = "logit"))
-
-Myt_M1_B <- glmer(Sp ~ Z + (1|population), data = myt, family = binomial(link = "cloglog"))
-
-Myt_M1_C <- glmer(Sp ~ Z + (1|population), data = myt, family = binomial(link = "probit"))
-
-
-AIC(Myt_M1_A, Myt_M1_B, Myt_M1_C)
-
-
-Myt_M2 <- glmer(Sp ~ Z + L + (1|population), data = myt, family = binomial(link = "logit"))
-
-AIC(Myt_M1, Myt_M2)
-
-overdisp_fun(Myt_M2)
-
-Myt_M3 <- glmer(Sp ~ Z + L + (1 + L|population), data = myt, family = binomial(link = "logit"))
-
-Myt_M4 <- glmer(Sp ~ Z + L + (1 + Z|population), data = myt, family = binomial(link = "logit"))
-
-AIC(Myt_M1, Myt_M2, Myt_M3, Myt_M4)
-
-overdisp_fun(Myt_M4)
-
-
-
-
-
-
-diagnost <- fortify(Myt_M4)
-
-
-diagnost<-cbind(diagnost, myt)
-head(diagnost)
-
-Pl1 <- ggplot(diagnost, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smooth(se=F)
-
-Pl2 <- ggplot(diagnost, aes(x = Z, y = .scresid)) + geom_point() + geom_smooth(method = "loess", se=F)
-
-Pl3 <- ggplot(diagnost, aes(x = L, y = .scresid)) + geom_point() + geom_smooth( se=F)
-
-
-
-
-grid.arrange(Pl1, Pl2, Pl3, ncol = 2)
-
-
-
-
-
-
-# Визуализация модели
-
-MyData <- unique(myt[, c("Z", "population")])
-
-MyData$L <- mean(myt$L)
-
-
-MyData$Predict_random <- predict(Myt_M4, newdata = MyData, type ="response")
-
-
-
-MyData2 <- data.frame (Z = seq(0, max(myt$Z), length.out = 100), L = mean(myt$L))
-
-MyData2$Predict_fix <- predict(Myt_M4, newdata = MyData2, re.form = ~0, type = "response" )
-
-ggplot(MyData, aes(x = Z)) + geom_line(aes(y = Predict_random, group = population), color = "gray") + geom_line(data = MyData2, aes(x = Z, y = Predict_fix), color = "red", size = 2) + theme_bw() + labs(x = "Z-индекс", y = "Вероятость быть M.trossulus")
-
-
-library(dplyr)
-library(doBy)
-
-myt$Z_class <- ntile(myt$Z, 20)
-
-
-myt_prop <- summaryBy(Z + Sp ~ Z_class, data  = myt, keep.names = T, FUN = mean)
-
-ggplot(MyData, aes(x = Z)) + geom_line(aes(y = Predict_random, group = population), color = "gray") +
-  geom_line(data = MyData2, aes(x = Z, y = Predict_fix), color = "red", size = 2) + theme_bw() +
-  labs(x = "Z-индекс", y = "Вероятость быть M.trossulus") +
-  geom_point(data = myt_prop, aes(x = Z, y = Sp), color = "blue", size  = 4 )
-
-
-
-
-hist(myt$Z)
-
-
-#Самостоятельная работа
-
-
-# ▶ graze - выпас коров (0, 1)
-# ▶ AspectCat - экспозиция (S, N)
-# ▶ nativecov - покрытие местной флоры %
-# ▶ slope - наклон
-# ▶ year - год наблюдений
-# ▶ Park - парк
-# ▶ plotID - уникальный идентификатор участка
-
-# Моделируем встречаемость разных видов птиц
-
-# Western Meadowlark (Sturnella neglecta)
-# Horned Lark (Eremophila alpestris)
-# Grasshopper Sparrow (Ammodramus savannarum)
-
-
-
-
-
+# Как решить эту проблему?
 
 
 

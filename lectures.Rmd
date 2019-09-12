@@ -27,8 +27,8 @@ title: Презентации и данные
 
 <!-- Часть 1 -->
 
-<!-- - Презентация [03_descriptive_statistics.html](03_descriptive_statistics.html) -->
-<!-- - Код [03_descriptive_statistics_code.R](03_descriptive_statistics_code.R) -->
+<!-- - Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html) -->
+<!-- - Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R) -->
 <!-- - Данные [diatome_count.csv](data/diatome_count.csv) -->
 
 <!-- Часть 2 -->
@@ -50,27 +50,29 @@ title: Презентации и данные
 
 ### 05 Простая линейная регрессия  (30 сент., ВХ)
 
-<!-- - Презентация: [05.1_LM.html](05.1_LM.html) -->
-<!-- - Код: [05.1_LM_code.R](05.1_LM_code.R) -->
+<!-- - Презентация: [05_LM.html](05_LM.html) -->
+<!-- - Код:  -->
+<!--     + [05_LM_code.R](05_LM_code.R) -->
+<!--     + [05_LM_task.R](05_LM_task.R) -->
 <!-- - Данные: -->
 <!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!-- <!--     + [secher.xls](data/secher.xls) --> -->
+<!--     + [secher.xls](data/secher.xls) -->
 
 ### 06 Основы линейной алгебры (3 окт., ВХ)
 
-<!-- - Презентация: [05.2_Introduction_to_matrix_algebra.html](05.2_Introduction_to_matrix_algebra.html) -->
-<!-- - Код: [05.2_Introduction_to_matrix_algebra_code.R](05.2_Introduction_to_matrix_algebra_code.R) -->
+<!-- - Презентация: [06_Introduction_to_linear_algebra.html](06_intro_to_linear_algebra.html) -->
+<!-- - Код: [06_Introduction_to_linear_algebra_code.R](06_intro_to_linear_algebra_code.R) -->
 
 ### 07 Описание, проверка значимости и валидности линейной модели (7 окт., МВ)
 
 <!-- Часть 1 -->
 
 <!-- - Презентация: -->
-<!--     + [06.1_model_description.html](06.1_model_description.html) -->
+<!--     + [07.1_model_description.html](07.1_model_description.html) -->
 <!-- - Код: -->
-<!--     + [06.1_model_description_code.R](06.1_model_description_code.R) -->
-<!--     + [06_task_assumptions_catsM.R](06_task_assumptions_catsM.R) -->
-<!--     + [06_task_assumptions_GAG.R](06_task_assumptions_GAG.R) -->
+<!--     + [07.1_model_description_code.R](07.1_model_description_code.R) -->
+<!--     + [07.1_task_assumptions_catsM.R](07.1_task_assumptions_catsM.R) -->
+<!--     + [07.1_task_assumptions_GAG.R](07.1_task_assumptions_GAG.R) -->
 <!-- - Данные: -->
 <!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
 <!--     + [catsM.xlsx](data/catsM.xlsx) -->
@@ -79,9 +81,9 @@ title: Презентации и данные
 <!-- Часть 2 -->
 
 <!-- - Презентация: -->
-<!--     + [06.2_model_validation.html](06.2_model_validation.html) -->
+<!--     + [07.2_model_validation.html](07.2_model_validation.html) -->
 <!-- - Код: -->
-<!--     + [06.2_model_validation_code.R](06.2_model_validation_code.R) -->
+<!--     + [07.2_model_validation_code.R](07.2_model_validation_code.R) -->
 <!--     + Задания про котов и GAG из прошлой части (работайте в том же коде) -->
 <!-- - Данные: -->
 <!--     + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt) -->
@@ -91,23 +93,23 @@ title: Презентации и данные
 
 ### 08 Множественная линейная регрессия. Выбор оптимальной модели. (10 окт., ВХ)
 
-<!-- Часть 1 -->
+<!-- #### Часть 1. Множественная линейная регрессия -->
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("gridExtra") -->
 <!-- install.packages("ISwR") -->
 <!-- ``` -->
 
-<!-- - Презентация: [07.1_multiple_LM.html](07.1_multiple_LM.html) -->
+<!-- - Презентация: [08.1_multiple_LM.html](08.1_multiple_LM.html) -->
 
-<!-- - Код: [07.1_multiple_LM_code.R](07.1_multiple_LM_code.R) -->
+<!-- - Код: [08.1_multiple_LM_code.R](08.1_multiple_LM_code.R) -->
 <!-- - Данные: [loyn.csv](data/loyn.csv) -->
 
-<!-- Часть 2 -->
+<!-- #### Часть 2. Выбор оптимальной модели -->
 
-<!-- - Презентация: [07.2_model_selection.html](07.2_model_selection.html) -->
+<!-- - Презентация: [08.2_model_selection.html](08.2_model_selection.html) -->
 
-<!-- - Код: [07.2_model_selection_code.R](07.2_model_selection_code.R) -->
+<!-- - Код: [08.2_model_selection_code.R](08.2_model_selection_code.R) -->
 <!-- - Данные: [loyn.csv](data/loyn.csv) -->
 
 ## Общие линейные модели
@@ -119,12 +121,12 @@ title: Презентации и данные
 <!-- install.packages("cowplot") -->
 <!-- ``` -->
 
-#### Часть 1. Модели с разными значениями отрезка для групп
+<!-- #### Часть 1. Модели с разными значениями отрезка для групп -->
 
-<!-- - Презентация: [08_LM_with_continuous_and_discrete_predictors_2.html](08_LM_with_continuous_and_discrete_predictors_2.html) -->
-<!-- - Код: [08_LM_with_continuous_and_discrete_predictors_code.R](08_LM_with_continuous_and_discrete_predictors_code_2.R) -->
+<!-- - Презентация: [09.1_LM_with_continuous_and_discrete_predictors_2.html](09.1_LM_with_continuous_and_discrete_predictors_2.html) -->
+<!-- - Код: [09.1_LM_with_continuous_and_discrete_predictors_code.R](09.1_LM_with_continuous_and_discrete_predictors_code_2.R) -->
 
-<!-- - Код: [08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R](08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R) -->
+<!-- - Код: [09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R](09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R) -->
 
 
 <!-- - Данные: -->
@@ -133,12 +135,12 @@ title: Презентации и данные
 <!--     + [Puromycin.xlsx](data/Puromycin.xlsx) -->
 <!--     + [birthwt.csv](data/birthwt.csv) -->
 
-#### Часть 2. Модели с разными значениями угла наклона для групп
+<!-- #### Часть 2. Модели с разными значениями угла наклона для групп -->
 
-<!-- - Презентация: [09_LM_with_continuous_and_discrete_predictors_interactions.html](09_LM_with_continuous_and_discrete_predictors_interactions.html) -->
+<!-- - Презентация: [09.2_LM_with_continuous_and_discrete_predictors_interactions.html](09.2_LM_with_continuous_and_discrete_predictors_interactions.html) -->
 <!-- - Код: -->
-<!--     + [09_LM_with_continuous_and_discrete_predictors_interactions.R](09_LM_with_continuous_and_discrete_predictors_interactions.R) -->
-<!--     + [09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R) -->
+<!--     + [09.2_LM_with_continuous_and_discrete_predictors_interactions.R](09.2_LM_with_continuous_and_discrete_predictors_interactions.R) -->
+<!--     + [09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R) -->
 
 <!-- - Данные:      -->
 <!--     + [loyn.csv](data/loyn.csv) -->
@@ -179,11 +181,6 @@ title: Презентации и данные
 <!-- install.packages("AER") -->
 <!-- ``` -->
 
-<!-- <p style="color:red">Внимание, update!</p> -->
-
-<!-- 1. Убрали из презентации и кода куски с предсказаниями при помощи predict(), т.к. он выдает только стандартные ошибки в масштабе функции связи. -->
-<!-- 2. Модифицировали код `overdisp_fun()`, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция. -->
-
 <!-- - Презентация: [13_GLM_count.pdf](13_GLM_count.pdf) -->
 <!-- - Код: [13_GLM_count_code.R](13_GLM_count_code.R) -->
 <!-- - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx) -->
@@ -197,13 +194,8 @@ title: Презентации и данные
 <!-- install.packages(c("ISwR", "cowplot")) -->
 <!-- ``` -->
 
-<!-- <p style="color:red">Внимание, update!</p> -->
-
-<!-- 1. Убрали из презентации и кода куски с предсказаниями при помощи predict(), т.к. он выдает только стандартные ошибки в масштабе функции связи. -->
-<!-- 2. Модифицировали код `overdisp_fun()`, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция. -->
-
-<!-- - Презентация: [14_GLM_binary_new.pdf](14_GLM_binary_new.pdf) -->
-<!-- - Код: [14_GLM_binary_code_new.R](14_GLM_binary_code_new.R) -->
+<!-- - Презентация: [14_GLM_binary.pdf](14_GLM_binary.pdf) -->
+<!-- - Код: [14_GLM_binary_code.R](14_GLM_binary_code.R) -->
 <!-- - Данные: -->
 <!--     + [aster_mussel.csv](data/aster_mussel.csv) -->
 <!--     + [polis.csv](data/polis.csv) -->
@@ -223,16 +215,12 @@ title: Презентации и данные
 <!-- - Код: -->
 <!--     + [15.1_GLMM_gaussian_random_intercept_slope_code.R](15.1_GLMM_gaussian_random_intercept_slope_code.R) -->
 
-<!-- 29 ноября  -->
-
-<!-- Демонстрация LRT при помощи бутстрепа: [15.1_GLMM_bootstrap_demo_sleepstudy.R](15.1_GLMM_bootstrap_demo_sleepstudy.R) -->
+<!-- Демонстрация LRT при помощи бутстрепа: [15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R](15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R) -->
 
 <!-- - Задание: -->
 <!--     + Код: [15.1_GLMM_gaussian_choccake_practice.R](15.1_GLMM_gaussian_choccake_practice.R) -->
 
-<!-- <!-- + Решение (частичное): [15.1_GLMM_gaussian_choccake_solution.R](15.1_GLMM_gaussian_choccake_solution.R) --> -->
-
-<!-- 3 дек 1 пара -->
+<!-- + Решение (частичное): [15.1_GLMM_gaussian_choccake_solution.R](15.1_GLMM_gaussian_choccake_solution.R) -->
 
 <!-- - Презентация: -->
 <!--     + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf) -->
@@ -243,8 +231,8 @@ title: Презентации и данные
 
 ### 16 Моделирование структуры дисперсии в смешаных моделях (5 дек., ВХ)
 
-<!-- - Презентация: [16_variance_structure_new.pdf](16_variance_structure_new.pdf) -->
-<!-- - Код: [16_variance_structure_code_new.R](16_variance_structure_code_new.R) -->
+<!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
+<!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
 <!-- - Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R) -->
 
 <!-- - Данные: -->
@@ -274,9 +262,9 @@ title: Презентации и данные
 <!-- install.packages(c("MASS", "glmmML", "lme4", "doBy")) -->
 <!-- ``` -->
 
-<!-- - Презентация: [18_GLMM_binary_new.html](18_GLMM_binary.html) -->
-<!-- - Старая презентация с разбором примера про балянусов: [18_GLMM_binary.html](18_GLMM_binary.html) -->
-<!-- - Код: [18_GLMM_binary_code_new.R](18_GLMM_binary_code_new.R) -->
+<!-- - Презентация: [18_GLMM_binary.html](18_GLMM_binary.html) -->
+
+<!-- - Код: [18_GLMM_binary_code.R](18_GLMM_binary_code.R) -->
 <!-- - Данные: -->
 <!--     + [aster_mussel_full.csv](data/aster_mussel_full.csv) -->
 <!--     + [aster_mussel.csv](data/aster_mussel.csv) -->
