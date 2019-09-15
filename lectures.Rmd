@@ -4,279 +4,269 @@ title: Презентации и данные
 
 ## Знакомство с R и базовая статистика
 
-### 01 Знакомство с R (24 сент.)
+### 01 Знакомство с R (16 сент., МВ)
 
-- Презентация: [Знакомство с R](01_intro_to_r.html)
+<!-- - Презентация: [Знакомство с R](01_intro_to_r.html) -->
 - Код: [01_intro_to_r_code.R](01_intro_to_r_code.R)
 
-### 02 Основы ggplot2 (27 сент. и 1 окт. 1 пара)
+### 02 Основы ggplot2 (19 сент., ВХ)
 
-```{r eval=FALSE}
-install.packages("ggplot2")
-install.packages("readxl")
-install.packages("tidyr")
-install.packages("MASS")
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("ggplot2") -->
+<!-- install.packages("readxl") -->
+<!-- install.packages("tidyr") -->
+<!-- install.packages("MASS") -->
+<!-- ``` -->
 
-- Презентация: [Основы ggplot2](02_intro_ggplot.html)
-- Код: [02_intro_ggplot.R](02_intro_ggplot.R)
-- Данные: [Titanic.csv](data/Titanic.csv)
-- Данные: [fev.xls](data/fev.xls)
+<!-- - Презентация: [Основы ggplot2](02_intro_ggplot.html) -->
+<!-- - Код: [02_intro_ggplot.R](02_intro_ggplot.R) -->
+<!-- - Данные: [Titanic.csv](data/Titanic.csv) -->
+<!-- - Данные: [fev.xls](data/fev.xls) -->
 
-### 03 Описательная статистика (1 окт 2 пара и 4 окт.)
+### 03 Описательная статистика (23 сент., МВ)
 
-Часть 1
+<!-- Часть 1 -->
 
-- Презентация [03_descriptive_statistics.html](03_descriptive_statistics.html)
-- Код [03_descriptive_statistics_code.R](03_descriptive_statistics_code.R)
-- Данные [diatome_count.csv](data/diatome_count.csv)
+<!-- - Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html) -->
+<!-- - Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R) -->
+<!-- - Данные [diatome_count.csv](data/diatome_count.csv) -->
 
-Часть 2
+<!-- Часть 2 -->
 
-```{r eval=FALSE}
-install.packages("car")
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("car") -->
+<!-- ``` -->
 
-- Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html)
-- Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R)
+<!-- - Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html) -->
+<!-- - Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R) -->
 
-### 04 Тестирование гипотез (8 окт 1-2 пары)
+### 04 Тестирование гипотез (26 сент., МВ)
 
-- Презентация [04_hypothesis_testing.html](04_hypothesis_testing.html)
-- Код [04_hypothesis_testing_code.R](04_hypothesis_testing_code.R)
-- Данные [aml.csv](data/aml.csv)
+<!-- - Презентация [04_hypothesis_testing.html](04_hypothesis_testing.html) -->
+<!-- - Код [04_hypothesis_testing_code.R](04_hypothesis_testing_code.R) -->
+<!-- - Данные [aml.csv](data/aml.csv) -->
 
 ## Линейная регрессия
 
-### 05.1 Простая линейная регрессия  (11 окт)
+### 05 Простая линейная регрессия  (30 сент., ВХ)
 
-- Презентация: [05.1_LM.html](05.1_LM.html)
-- Код: [05.1_LM_code.R](05.1_LM_code.R)
-- Данные:
-    + [IQ_brain.csv](data/IQ_brain.csv)
+<!-- - Презентация: [05_LM.html](05_LM.html) -->
+<!-- - Код:  -->
+<!--     + [05_LM_code.R](05_LM_code.R) -->
+<!--     + [05_LM_task.R](05_LM_task.R) -->
+<!-- - Данные: -->
+<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
 <!--     + [secher.xls](data/secher.xls) -->
 
-### 05.2 Краткое введение в мир матричной алгебры (15 окт. 1 пара)
+### 06 Основы линейной алгебры (3 окт., ВХ)
 
-- Презентация: [05.2_Introduction_to_matrix_algebra.html](05.2_Introduction_to_matrix_algebra.html)
-- Код: [05.2_Introduction_to_matrix_algebra_code.R](05.2_Introduction_to_matrix_algebra_code.R)
+<!-- - Презентация: [06_Introduction_to_linear_algebra.html](06_intro_to_linear_algebra.html) -->
+<!-- - Код: [06_Introduction_to_linear_algebra_code.R](06_intro_to_linear_algebra_code.R) -->
 
-### 06 Описание, проверка значимости и валидности линейной модели (15 окт. 2 пара и 18 окт.)
+### 07 Описание, проверка значимости и валидности линейной модели (7 окт., МВ)
 
-Часть 1
+<!-- Часть 1 -->
 
-- Презентация:
-    + [06.1_model_description.html](06.1_model_description.html)
-- Код:
-    + [06.1_model_description_code.R](06.1_model_description_code.R)
-    + [06_task_assumptions_catsM.R](06_task_assumptions_catsM.R)
-    + [06_task_assumptions_GAG.R](06_task_assumptions_GAG.R)
-- Данные:
-    + [IQ_brain.csv](data/IQ_brain.csv)
-    + [catsM.xlsx](data/catsM.xlsx)
-    + [GAGurine.xlsx](data/GAGurine.xlsx)
-    
-Часть 2
+<!-- - Презентация: -->
+<!--     + [07.1_model_description.html](07.1_model_description.html) -->
+<!-- - Код: -->
+<!--     + [07.1_model_description_code.R](07.1_model_description_code.R) -->
+<!--     + [07.1_task_assumptions_catsM.R](07.1_task_assumptions_catsM.R) -->
+<!--     + [07.1_task_assumptions_GAG.R](07.1_task_assumptions_GAG.R) -->
+<!-- - Данные: -->
+<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
+<!--     + [catsM.xlsx](data/catsM.xlsx) -->
+<!--     + [GAGurine.xlsx](data/GAGurine.xlsx) -->
 
-- Презентация:
-    + [06.2_model_validation.html](06.2_model_validation.html)
-- Код:
-    + [06.2_model_validation_code.R](06.2_model_validation_code.R)
-    + Задания про котов и GAG из прошлой части (работайте в том же коде)
-- Данные:
-    + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt)
-    + [IQ_brain.csv](data/IQ_brain.csv)
-    + [catsM.xlsx](data/catsM.xlsx)
-    + [GAGurine.xlsx](data/GAGurine.xlsx)
+<!-- Часть 2 -->
 
-### 07.1 Множественная линейная регрессия (22 окт 1 пара)
+<!-- - Презентация: -->
+<!--     + [07.2_model_validation.html](07.2_model_validation.html) -->
+<!-- - Код: -->
+<!--     + [07.2_model_validation_code.R](07.2_model_validation_code.R) -->
+<!--     + Задания про котов и GAG из прошлой части (работайте в том же коде) -->
+<!-- - Данные: -->
+<!--     + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt) -->
+<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
+<!--     + [catsM.xlsx](data/catsM.xlsx) -->
+<!--     + [GAGurine.xlsx](data/GAGurine.xlsx) -->
 
-```{r eval=FALSE}
-install.packages("gridExtra")
-install.packages("ISwR")
-```
+### 08 Множественная линейная регрессия. Выбор оптимальной модели. (10 окт., ВХ)
 
-- Презентация: [07.1_multiple_LM.html](07.1_multiple_LM.html)
+<!-- #### Часть 1. Множественная линейная регрессия -->
 
-- Код: [07.1_multiple_LM_code.R](07.1_multiple_LM_code.R)
-- Данные: [loyn.csv](data/loyn.csv)
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("gridExtra") -->
+<!-- install.packages("ISwR") -->
+<!-- ``` -->
 
-### 07.2 Выбор оптимальной модели (22 окт 2 пара)
+<!-- - Презентация: [08.1_multiple_LM.html](08.1_multiple_LM.html) -->
 
-- Презентация: [07.2_model_selection.html](07.2_model_selection.html)
+<!-- - Код: [08.1_multiple_LM_code.R](08.1_multiple_LM_code.R) -->
+<!-- - Данные: [loyn.csv](data/loyn.csv) -->
 
-- Код: [07.2_model_selection_code.R](07.2_model_selection_code.R)
-- Данные: [loyn.csv](data/loyn.csv)
+<!-- #### Часть 2. Выбор оптимальной модели -->
+
+<!-- - Презентация: [08.2_model_selection.html](08.2_model_selection.html) -->
+
+<!-- - Код: [08.2_model_selection_code.R](08.2_model_selection_code.R) -->
+<!-- - Данные: [loyn.csv](data/loyn.csv) -->
 
 ## Общие линейные модели
 
-### 08 Модели с разными значениями интерсепта для групп (25 окт)
+### 09 Модели с непрерывными и дискретными предикторами (ANCOVA) (17 окт., ВХ)
 
-```{r eval=FALSE}
-install.packages("readxl")
-install.packages("cowplot")
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("readxl") -->
+<!-- install.packages("cowplot") -->
+<!-- ``` -->
 
-```
+<!-- #### Часть 1. Модели с разными значениями отрезка для групп -->
 
-- Презентация: [08_LM_with_continuous_and_discrete_predictors_2.html](08_LM_with_continuous_and_discrete_predictors_2.html)
-- Код: [08_LM_with_continuous_and_discrete_predictors_code.R](08_LM_with_continuous_and_discrete_predictors_code_2.R)
+<!-- - Презентация: [09.1_LM_with_continuous_and_discrete_predictors_2.html](09.1_LM_with_continuous_and_discrete_predictors_2.html) -->
+<!-- - Код: [09.1_LM_with_continuous_and_discrete_predictors_code.R](09.1_LM_with_continuous_and_discrete_predictors_code_2.R) -->
 
-- Код: [08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R](08_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R)
-
-
-
-- Данные:
-    + [goats.xlsx](data/goats.xlsx)
-    + [tlc.csv](data/tlc.csv)
-    + [Puromycin.xlsx](data/Puromycin.xlsx)
-    + [birthwt.csv](data/birthwt.csv)
-
-### 09 Модели с разными значениями угла наклона для групп (29 окт 1-2 пары)
-
-- Презентация: [09_LM_with_continuous_and_discrete_predictors_interactions.html](09_LM_with_continuous_and_discrete_predictors_interactions.html)
-- Код:
-    + [09_LM_with_continuous_and_discrete_predictors_interactions.R](09_LM_with_continuous_and_discrete_predictors_interactions.R)
-    + [09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](09_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R)
-
-- Данные:     
-    + [loyn.csv](data/loyn.csv)
-    + [birthwt.csv](data/birthwt.csv)
+<!-- - Код: [09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R](09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R) -->
 
 
-### 10 Однофакторный дисперсионный анализ (1 нояб)
+<!-- - Данные: -->
+<!--     + [goats.xlsx](data/goats.xlsx) -->
+<!--     + [tlc.csv](data/tlc.csv) -->
+<!--     + [Puromycin.xlsx](data/Puromycin.xlsx) -->
+<!--     + [birthwt.csv](data/birthwt.csv) -->
 
-```{r eval=FALSE}
-install.packages(c("DAAG", "multcomp"))
-```
+<!-- #### Часть 2. Модели с разными значениями угла наклона для групп -->
 
-- Презентация: [10_anova.pdf](10_anova.pdf)
-- Код: [10_anova_code.R](10_anova_code.R)
+<!-- - Презентация: [09.2_LM_with_continuous_and_discrete_predictors_interactions.html](09.2_LM_with_continuous_and_discrete_predictors_interactions.html) -->
+<!-- - Код: -->
+<!--     + [09.2_LM_with_continuous_and_discrete_predictors_interactions.R](09.2_LM_with_continuous_and_discrete_predictors_interactions.R) -->
+<!--     + [09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R) -->
 
-### 11 Многофакторный дисперсионный анализ (8 нояб 1 пара, 12 нояб 1 пара)
+<!-- - Данные:      -->
+<!--     + [loyn.csv](data/loyn.csv) -->
+<!--     + [birthwt.csv](data/birthwt.csv) -->
 
-- Презентация: [11_two-way_anova_and_interactions.pdf](11_two-way_anova_and_interactions.pdf)
-- Код: [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R)
-- Данные: [hall.csv](data/hall.csv)
 
-- Код заданий:
-    - [11_anova_practice_ants.R](11_anova_practice_ants.R)
-    - [11_anova_practice_rice.R](11_anova_practice_rice.R)
+### 10 Однофакторный дисперсионный анализ (24 окт., МВ)
+
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("DAAG", "multcomp")) -->
+<!-- ``` -->
+<!-- - Презентация: [10_anova.pdf](10_anova.pdf) -->
+<!-- - Код: [10_anova_code.R](10_anova_code.R) -->
+
+### 11 Многофакторный дисперсионный анализ (31 окт., МВ)
+
+<!-- - Презентация: [11_two-way_anova_and_interactions.pdf](11_two-way_anova_and_interactions.pdf) -->
+<!-- - Код: [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R) -->
+<!-- - Данные: [hall.csv](data/hall.csv) -->
+
+<!-- - Код заданий: -->
+<!--     - [11_anova_practice_ants.R](11_anova_practice_ants.R) -->
+<!--     - [11_anova_practice_rice.R](11_anova_practice_rice.R) -->
 
 
 ## Обобщенные линейные модели (GLM)
 
-### 12 GLM для нормально распределенных данных (12 нояб 2 пара и 15 нояб)
+### 12 GLM для нормально распределенных данных (7 нояб., МВ)
 
-- Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf)
-- Код: [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R)
+<!-- - Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf) -->
+<!-- - Код: [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R) -->
 
-- Код задания: [12_GLM_gaussian_practice_model_selection.R](12_GLM_gaussian_practice_model_selection.R)
+<!-- - Код задания: [12_GLM_gaussian_practice_model_selection.R](12_GLM_gaussian_practice_model_selection.R) -->
 
-### 13 GLM для счетных данных (19 нояб 1-2 пары)
+### 13 GLM для счетных данных (14 нояб., МВ)
 
-```{r eval=FALSE}
-install.packages("AER")
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("AER") -->
+<!-- ``` -->
 
-<p style="color:red">Внимание, update!</p>
+<!-- - Презентация: [13_GLM_count.pdf](13_GLM_count.pdf) -->
+<!-- - Код: [13_GLM_count_code.R](13_GLM_count_code.R) -->
+<!-- - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx) -->
 
-1. Убрали из презентации и кода куски с предсказаниями при помощи predict(), т.к. он выдает только стандартные ошибки в масштабе функции связи.
-2. Модифицировали код `overdisp_fun()`, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция.
+<!-- - Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R) -->
+<!-- - Частичное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R) -->
 
-- Презентация: [13_GLM_count.pdf](13_GLM_count.pdf)
-- Код: [13_GLM_count_code.R](13_GLM_count_code.R)
-- Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx)
+### 14 GLM для бинарных данных (=логистическая регрессия) (21 нояб., ВХ)
 
-- Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R)
-- Частичное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R)
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("ISwR", "cowplot")) -->
+<!-- ``` -->
 
-### 14 GLM для бинарных данных (=логистическая регрессия) (22 нояб и 26 нояб 1 пара)
-
-```{r eval=FALSE}
-install.packages(c("ISwR", "cowplot"))
-```
-
-<p style="color:red">Внимание, update!</p>
-
-1. Убрали из презентации и кода куски с предсказаниями при помощи predict(), т.к. он выдает только стандартные ошибки в масштабе функции связи.
-2. Модифицировали код `overdisp_fun()`, чтобы он учитывал дополнительный параметр в NegBin GLM. Теперь у вас относительно универсальная функция.
-
-- Презентация: [14_GLM_binary_new.pdf](14_GLM_binary_new.pdf)
-- Код: [14_GLM_binary_code_new.R](14_GLM_binary_code_new.R)
-- Данные:
-    + [aster_mussel.csv](data/aster_mussel.csv)
-    + [polis.csv](data/polis.csv)
-    + [ICU.csv](data/ICU.csv)
+<!-- - Презентация: [14_GLM_binary.pdf](14_GLM_binary.pdf) -->
+<!-- - Код: [14_GLM_binary_code.R](14_GLM_binary_code.R) -->
+<!-- - Данные: -->
+<!--     + [aster_mussel.csv](data/aster_mussel.csv) -->
+<!--     + [polis.csv](data/polis.csv) -->
+<!--     + [ICU.csv](data/ICU.csv) -->
 
 
 ## Смешанные модели (GLMM)
 
-### 15.1--15.2 GLMM для нормально-распределенных данных (26 нояб 2 пара, 29 нояб, и 3 дек 1 пара)
+### 15 GLMM для нормально-распределенных данных (28 нояб., МВ)
 
-```{r eval=FALSE}
-install.packages(c("lme4", "pbkrtest"))
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("lme4", "pbkrtest")) -->
+<!-- ``` -->
 
-- Презентация:
-    + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf)
-- Код:
-    + [15.1_GLMM_gaussian_random_intercept_slope_code.R](15.1_GLMM_gaussian_random_intercept_slope_code.R)
-    
-29 ноября 
+<!-- - Презентация: -->
+<!--     + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf) -->
+<!-- - Код: -->
+<!--     + [15.1_GLMM_gaussian_random_intercept_slope_code.R](15.1_GLMM_gaussian_random_intercept_slope_code.R) -->
 
-Демонстрация LRT при помощи бутстрепа: [15.1_GLMM_bootstrap_demo_sleepstudy.R](15.1_GLMM_bootstrap_demo_sleepstudy.R)
-  
-- Задание:
-    + Код: [15.1_GLMM_gaussian_choccake_practice.R](15.1_GLMM_gaussian_choccake_practice.R)
-    + Решение (частичное): [15.1_GLMM_gaussian_choccake_solution.R](15.1_GLMM_gaussian_choccake_solution.R)
+<!-- Демонстрация LRT при помощи бутстрепа: [15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R](15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R) -->
 
-3 дек 1 пара
+<!-- - Задание: -->
+<!--     + Код: [15.1_GLMM_gaussian_choccake_practice.R](15.1_GLMM_gaussian_choccake_practice.R) -->
 
-- Презентация:
-    + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf)
-- Код:
-    + [15.2_GLMM_gaussian_nested_code.R](15.2_GLMM_gaussian_nested_code.R)
-- Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx)
+<!-- + Решение (частичное): [15.1_GLMM_gaussian_choccake_solution.R](15.1_GLMM_gaussian_choccake_solution.R) -->
+
+<!-- - Презентация: -->
+<!--     + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf) -->
+<!-- - Код: -->
+<!--     + [15.2_GLMM_gaussian_nested_code.R](15.2_GLMM_gaussian_nested_code.R) -->
+<!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
 
 
-### 16 Моделирование структуры дисперсии в смешаных моделях (3 дек 2 пара и 6 дек)
+### 16 Моделирование структуры дисперсии в смешаных моделях (5 дек., ВХ)
 
-- Презентация: [16_variance_structure_new.pdf](16_variance_structure_new.pdf)
-- Код: [16_variance_structure_code_new.R](16_variance_structure_code_new.R)
-- Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R)
+<!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
+<!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
+<!-- - Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R) -->
 
-- Данные:
-    + [mussel_juv_ad.csv](data/mussel_juv_ad.csv)
+<!-- - Данные: -->
+<!--     + [mussel_juv_ad.csv](data/mussel_juv_ad.csv) -->
 
 
-```{r eval=FALSE}
-install.packages("faraway")
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("faraway") -->
+<!-- ``` -->
 
 
 
-### 17 GLMM для счетных данных (10 дек 1-2 пары)
+### 17 GLMM для счетных данных (12 дек., МВ)
 
-- Презентация: [17_GLMM_count.html](17_GLMM_count.html)
-- Код:
-    + [17_GLMM_count_code.R](17_GLMM_count_code.R)
-    + [17_GLMM_count_Ants_practice.R](17_GLMM_count_Ants_practice.R)
-    + [17_GLMM_count_Ants_practice_solution.R](17_GLMM_count_Ants_practice_solution.R)
-- Данные:
-    + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv)
-    + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx)
+<!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
+<!-- - Код: -->
+<!--     + [17_GLMM_count_code.R](17_GLMM_count_code.R) -->
+<!--     + [17_GLMM_count_Ants_practice.R](17_GLMM_count_Ants_practice.R) -->
+<!--     + [17_GLMM_count_Ants_practice_solution.R](17_GLMM_count_Ants_practice_solution.R) -->
+<!-- - Данные: -->
+<!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
+<!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
 
-### 18 GLMM для бинарных данных (17 дек 1-2 пары)
+### 18 GLMM для бинарных данных (19 дек., ВХ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("MASS", "glmmML", "lme4", "doBy")) -->
 <!-- ``` -->
 
-- Презентация: [18_GLMM_binary_new.html](18_GLMM_binary.html)
-- Старая презентация с разбором примера про балянусов: [18_GLMM_binary.html](18_GLMM_binary.html)
-- Код: [18_GLMM_binary_code_new.R](18_GLMM_binary_code_new.R)
-- Данные:
-    + [aster_mussel_full.csv](data/aster_mussel_full.csv)
-    + [aster_mussel.csv](data/aster_mussel.csv)
-    + [myt_gen_morph.csv](data/myt_gen_morph.csv)
-    + [Yakovis2.csv](data/Yakovis2.csv)
+<!-- - Презентация: [18_GLMM_binary.html](18_GLMM_binary.html) -->
+
+<!-- - Код: [18_GLMM_binary_code.R](18_GLMM_binary_code.R) -->
+<!-- - Данные: -->
+<!--     + [aster_mussel_full.csv](data/aster_mussel_full.csv) -->
+<!--     + [aster_mussel.csv](data/aster_mussel.csv) -->
+<!--     + [myt_gen_morph.csv](data/myt_gen_morph.csv) -->
+<!--     + [Yakovis2.csv](data/Yakovis2.csv) -->
