@@ -114,7 +114,7 @@ install.packages("MASS")
 
 ## Общие линейные модели
 
-### 09 Модели с непрерывными и дискретными предикторами (ANCOVA) (17 окт., ВХ)
+### 09 Модели с непрерывными и дискретными предикторами (ANCOVA) (14 окт., ВХ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("readxl") -->
@@ -147,7 +147,7 @@ install.packages("MASS")
 <!--     + [birthwt.csv](data/birthwt.csv) -->
 
 
-### 10 Однофакторный дисперсионный анализ (24 окт., МВ)
+### 10 Однофакторный дисперсионный анализ (21 окт., МВ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("DAAG", "multcomp")) -->
@@ -155,7 +155,7 @@ install.packages("MASS")
 <!-- - Презентация: [10_anova.pdf](10_anova.pdf) -->
 <!-- - Код: [10_anova_code.R](10_anova_code.R) -->
 
-### 11 Многофакторный дисперсионный анализ (31 окт., МВ)
+### 11 Многофакторный дисперсионный анализ (28 окт., МВ)
 
 <!-- - Презентация: [11_two-way_anova_and_interactions.pdf](11_two-way_anova_and_interactions.pdf) -->
 <!-- - Код: [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R) -->
@@ -168,14 +168,14 @@ install.packages("MASS")
 
 ## Обобщенные линейные модели (GLM)
 
-### 12 GLM для нормально распределенных данных (7 нояб., МВ)
+### 12 GLM для нормально распределенных данных (11 нояб., МВ)
 
 <!-- - Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf) -->
 <!-- - Код: [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R) -->
 
 <!-- - Код задания: [12_GLM_gaussian_practice_model_selection.R](12_GLM_gaussian_practice_model_selection.R) -->
 
-### 13 GLM для счетных данных (14 нояб., МВ)
+### 13 GLM для счетных данных (18 нояб., МВ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("AER") -->
@@ -188,7 +188,7 @@ install.packages("MASS")
 <!-- - Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R) -->
 <!-- - Частичное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R) -->
 
-### 14 GLM для бинарных данных (=логистическая регрессия) (21 нояб., ВХ)
+### 14 GLM для бинарных данных (=логистическая регрессия) (25 нояб., ВХ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("ISwR", "cowplot")) -->
@@ -204,7 +204,7 @@ install.packages("MASS")
 
 ## Смешанные модели (GLMM)
 
-### 15 GLMM для нормально-распределенных данных (28 нояб., МВ)
+### 15 GLMM для нормально-распределенных данных (2 дек., МВ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("lme4", "pbkrtest")) -->
@@ -229,7 +229,7 @@ install.packages("MASS")
 <!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
 
 
-### 16 Моделирование структуры дисперсии в смешаных моделях (5 дек., ВХ)
+### 16 Моделирование структуры дисперсии в смешаных моделях (9 дек., ВХ)
 
 <!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
 <!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
@@ -245,7 +245,7 @@ install.packages("MASS")
 
 
 
-### 17 GLMM для счетных данных (12 дек., МВ)
+### 17 GLMM для счетных данных (16 дек., МВ)
 
 <!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
 <!-- - Код: -->
@@ -256,7 +256,7 @@ install.packages("MASS")
 <!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
 <!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
 
-### 18 GLMM для бинарных данных (19 дек., ВХ)
+### 18 GLMM для бинарных данных (23 дек., ВХ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("MASS", "glmmML", "lme4", "doBy")) -->
