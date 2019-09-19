@@ -142,9 +142,7 @@ h6 {
 
 <link rel="stylesheet" href="my_styles.css" type="text/css" />
 
-</head>
 
-<body>
 
 <style type = "text/css">
 .main-container {
@@ -262,8 +260,6 @@ $(document).ready(function () {
   menuAnchor.closest('li.dropdown').addClass('active');
 });
 </script>
-
-<div class="container-fluid main-container">
 
 <!-- tabsets -->
 
@@ -428,6 +424,16 @@ div.tocify {
 
 </style>
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
 <div class="col-xs-12 col-sm-4 col-md-3">
@@ -482,7 +488,7 @@ div.tocify {
 <h3>01 Знакомство с R (16 сент., МВ)</h3>
 <ul>
 <li>Презентация: <a href="01_intro_to_r.html">Знакомство с R</a></li>
-<li>Код: <a href="01_intro_to_r_code.R" class="uri">01_intro_to_r_code.R</a></li>
+<li>Код: <a href="01_intro_to_r_code.R">01_intro_to_r_code.R</a></li>
 </ul>
 </div>
 <div id="-ggplot2-19-.-" class="section level3">
@@ -493,7 +499,11 @@ div.tocify {
 <a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">install.packages</span>(<span class="st">&quot;MASS&quot;</span>)</a></code></pre></div>
 <ul>
 <li>Презентация: <a href="02_intro_ggplot.html">Основы ggplot2</a></li>
+<<<<<<< HEAD
 <li>Код: <a href="02_intro_ggplot.R" class="uri">02_intro_ggplot.R</a></li>
+=======
+<li>Код: <a href="02_intro_ggplot.R">02_intro_ggplot.R</a></li>
+>>>>>>> 752c8cfd7b3eb4d9ff9ad18d311770f605091c6a
 <li>Данные: <a href="data/Titanic.csv">Titanic.csv</a></li>
 <li>Данные: <a href="data/fev.xls">fev.xls</a></li>
 </ul>
@@ -578,8 +588,8 @@ div.tocify {
 </div>
 <div id="--" class="section level2">
 <h2>Общие линейные модели</h2>
-<div id="------ancova-17-.-" class="section level3">
-<h3>09 Модели с непрерывными и дискретными предикторами (ANCOVA) (17 окт., ВХ)</h3>
+<div id="------ancova-14-.-" class="section level3">
+<h3>09 Модели с непрерывными и дискретными предикторами (ANCOVA) (14 окт., ВХ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("readxl") -->
 <!-- install.packages("cowplot") -->
@@ -602,16 +612,16 @@ div.tocify {
 <!--     + [loyn.csv](data/loyn.csv) -->
 <!--     + [birthwt.csv](data/birthwt.csv) -->
 </div>
-<div id="---24-.-" class="section level3">
-<h3>10 Однофакторный дисперсионный анализ (24 окт., МВ)</h3>
+<div id="---21-.-" class="section level3">
+<h3>10 Однофакторный дисперсионный анализ (21 окт., МВ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("DAAG", "multcomp")) -->
 <!-- ``` -->
 <!-- - Презентация: [10_anova.pdf](10_anova.pdf) -->
 <!-- - Код: [10_anova_code.R](10_anova_code.R) -->
 </div>
-<div id="---31-.-" class="section level3">
-<h3>11 Многофакторный дисперсионный анализ (31 окт., МВ)</h3>
+<div id="---28-.-" class="section level3">
+<h3>11 Многофакторный дисперсионный анализ (28 окт., МВ)</h3>
 <!-- - Презентация: [11_two-way_anova_and_interactions.pdf](11_two-way_anova_and_interactions.pdf) -->
 <!-- - Код: [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R) -->
 <!-- - Данные: [hall.csv](data/hall.csv) -->
@@ -622,14 +632,14 @@ div.tocify {
 </div>
 <div id="---glm" class="section level2">
 <h2>Обобщенные линейные модели (GLM)</h2>
-<div id="glm-----7-.-" class="section level3">
-<h3>12 GLM для нормально распределенных данных (7 нояб., МВ)</h3>
+<div id="glm-----11-.-" class="section level3">
+<h3>12 GLM для нормально распределенных данных (11 нояб., МВ)</h3>
 <!-- - Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf) -->
 <!-- - Код: [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R) -->
 <!-- - Код задания: [12_GLM_gaussian_practice_model_selection.R](12_GLM_gaussian_practice_model_selection.R) -->
 </div>
-<div id="glm----14-.-" class="section level3">
-<h3>13 GLM для счетных данных (14 нояб., МВ)</h3>
+<div id="glm----18-.-" class="section level3">
+<h3>13 GLM для счетных данных (18 нояб., МВ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("AER") -->
 <!-- ``` -->
@@ -639,8 +649,8 @@ div.tocify {
 <!-- - Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R) -->
 <!-- - Частичное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R) -->
 </div>
-<div id="glm------21-.-" class="section level3">
-<h3>14 GLM для бинарных данных (=логистическая регрессия) (21 нояб., ВХ)</h3>
+<div id="glm------25-.-" class="section level3">
+<h3>14 GLM для бинарных данных (=логистическая регрессия) (25 нояб., ВХ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("ISwR", "cowplot")) -->
 <!-- ``` -->
@@ -654,8 +664,8 @@ div.tocify {
 </div>
 <div id="--glmm" class="section level2">
 <h2>Смешанные модели (GLMM)</h2>
-<div id="glmm-----28-.-" class="section level3">
-<h3>15 GLMM для нормально-распределенных данных (28 нояб., МВ)</h3>
+<div id="glmm-----2-.-" class="section level3">
+<h3>15 GLMM для нормально-распределенных данных (2 дек., МВ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("lme4", "pbkrtest")) -->
 <!-- ``` -->
@@ -673,8 +683,8 @@ div.tocify {
 <!--     + [15.2_GLMM_gaussian_nested_code.R](15.2_GLMM_gaussian_nested_code.R) -->
 <!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
 </div>
-<div id="------5-.-" class="section level3">
-<h3>16 Моделирование структуры дисперсии в смешаных моделях (5 дек., ВХ)</h3>
+<div id="------9-.-" class="section level3">
+<h3>16 Моделирование структуры дисперсии в смешаных моделях (9 дек., ВХ)</h3>
 <!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
 <!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
 <!-- - Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R) -->
@@ -684,8 +694,8 @@ div.tocify {
 <!-- install.packages("faraway") -->
 <!-- ``` -->
 </div>
-<div id="glmm----12-.-" class="section level3">
-<h3>17 GLMM для счетных данных (12 дек., МВ)</h3>
+<div id="glmm----16-.-" class="section level3">
+<h3>17 GLMM для счетных данных (16 дек., МВ)</h3>
 <!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
 <!-- - Код: -->
 <!--     + [17_GLMM_count_code.R](17_GLMM_count_code.R) -->
@@ -695,8 +705,8 @@ div.tocify {
 <!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
 <!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
 </div>
-<div id="glmm----19-.-" class="section level3">
-<h3>18 GLMM для бинарных данных (19 дек., ВХ)</h3>
+<div id="glmm----23-.-" class="section level3">
+<h3>18 GLMM для бинарных данных (23 дек., ВХ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("MASS", "glmmML", "lme4", "doBy")) -->
 <!-- ``` -->
