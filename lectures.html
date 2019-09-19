@@ -142,7 +142,9 @@ h6 {
 
 <link rel="stylesheet" href="my_styles.css" type="text/css" />
 
+</head>
 
+<body>
 
 <style type = "text/css">
 .main-container {
@@ -260,6 +262,8 @@ $(document).ready(function () {
   menuAnchor.closest('li.dropdown').addClass('active');
 });
 </script>
+
+<div class="container-fluid main-container">
 
 <!-- tabsets -->
 
@@ -424,16 +428,6 @@ div.tocify {
 
 </style>
 
-
-
-</head>
-
-<body>
-
-
-<div class="container-fluid main-container">
-
-
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
 <div class="col-xs-12 col-sm-4 col-md-3">
@@ -488,7 +482,7 @@ div.tocify {
 <h3>01 Знакомство с R (16 сент., МВ)</h3>
 <ul>
 <li>Презентация: <a href="01_intro_to_r.html">Знакомство с R</a></li>
-<li>Код: <a href="01_intro_to_r_code.R">01_intro_to_r_code.R</a></li>
+<li>Код: <a href="01_intro_to_r_code.R" class="uri">01_intro_to_r_code.R</a></li>
 </ul>
 </div>
 <div id="-ggplot2-19-.-" class="section level3">
@@ -499,11 +493,7 @@ div.tocify {
 <a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">install.packages</span>(<span class="st">&quot;MASS&quot;</span>)</a></code></pre></div>
 <ul>
 <li>Презентация: <a href="02_intro_ggplot.html">Основы ggplot2</a></li>
-<<<<<<< HEAD
 <li>Код: <a href="02_intro_ggplot.R" class="uri">02_intro_ggplot.R</a></li>
-=======
-<li>Код: <a href="02_intro_ggplot.R">02_intro_ggplot.R</a></li>
->>>>>>> 752c8cfd7b3eb4d9ff9ad18d311770f605091c6a
 <li>Данные: <a href="data/Titanic.csv">Titanic.csv</a></li>
 <li>Данные: <a href="data/fev.xls">fev.xls</a></li>
 </ul>
