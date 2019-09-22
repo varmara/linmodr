@@ -14,7 +14,6 @@ editor_options:
 # output options
 options(width = 70, scipen = 6, digits = 3)
 library(knitr)
-library(ggplot2)
 library(gridExtra)
 # chunk default options
 opts_chunk$set(tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, message = FALSE)
@@ -27,7 +26,7 @@ opts_chunk$set(tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, mes
 ```{r g-norm, echo=FALSE, purl=FALSE}
 library(cowplot)
 library(ggplot2)
-theme_set(theme_grey())
+theme_set(theme_bw())
 ND_curve <- ggplot(data = data.frame(x = 0:20), aes(x = x)) +
   stat_function(fun = dnorm, args = list(mean = 10, sd = 2), 
                 colour = 'red3', size = 1) +
@@ -102,6 +101,14 @@ $$z = \frac{x - \mu}{\sigma}$$
 $$Z \sim N(0, 1)$$
 
 </div>
+
+## Задание 1
+
+Стандартизуйте вектор `1:5`
+
+Чему после стандартизации будет равно среднее?
+
+Стандартное отклонение?
 
 ## Стандартизация
 
@@ -209,6 +216,16 @@ library(car)
 qqPlot(my_vector, id = FALSE) # квантильный график
 ```
 
+
+
+## Задание 2
+
+Выполните по одному блоки кода (см. код к этой презентации).
+
+Что вы можете сказать о свойствах распределений, изображенных на квантильных графиках?
+
+
+
 ## Бимодальное (двувершинное) распределение
 
 ```{r echo=FALSE, fig.height=5}
@@ -258,6 +275,40 @@ par(mfrow = c(1, 1))
 ```
 
 <!-- Если интересны подробности, можно посмотреть симуляции, например, здесь https://stats.stackexchange.com/questions/101274/how-to-interpret-a-qq-plot -->
+
+## Задание 3
+
+Проверьте при помощи квантильного графика, подчиняются ли эти переменные нормальному распределению:
+
+- Рост американских женщин (датасет `women`)
+- Длина чашелистиков у ирисов (датасет `iris`)
+- Число пойманных рысей в Канаде с 1821 по 1934г. (датасет `lynx`)
+
+## Решение (3.1)
+
+```{r}
+data("women")
+str(women)
+qqPlot(women$height, id = FALSE)
+```
+
+## Решение (3.2)
+
+```{r}
+data("iris")
+str(iris)
+qqPlot(iris$Sepal.Length, id = FALSE)
+hist(iris$Sepal.Length)
+```
+
+## Решение (3.3)
+
+```{r}
+data("lynx")
+str(lynx)
+qqPlot(lynx, id = FALSE)
+hist(lynx)
+```
 
 
 # Оценка вероятностей при помощи распределений
@@ -434,7 +485,7 @@ dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
 dfr$y[!(dfr$x < X1)] <- NA
 
 ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 1, geom = "line", colour = "steelblue") +
   scale_x_continuous(name = "Диаметр", breaks = 1:9,
                      sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
   labs(y = "Плотность вероятности") +
@@ -463,7 +514,7 @@ dfr <- data.frame(x = seq(0, 10, length.out = 1000))
 dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
 dfr$y[!(dfr$x > X2)] <- NA
 ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 1, geom = "line", colour = "steelblue") +
   scale_x_continuous(name = "Диаметр", breaks = 1:8,
                      sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
   labs(y = "Плотность вероятности") +
@@ -487,7 +538,7 @@ dfr <- data.frame(x = seq(0, 10, length.out = 1000))
 dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
 dfr$y[!(dfr$x > X1 & dfr$x < X2)] <- NA
 ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 1, geom = "line", colour = "steelblue") +
   scale_x_continuous(name = "Диаметр", breaks = 1:9,
                      sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
   labs(y = "Плотность вероятности") +
@@ -497,7 +548,7 @@ ggplot(dfr, aes(x = x)) +
 ```
 
 
-## Задача:
+## Задание 4
 
 Средний рост 18-летних мужчин в России 174.7 см со стандартным отклонением 6.65 см. В пилоты берут только людей с ростом от 160 до 190 см (по приказу Минтранса).
 
@@ -508,7 +559,7 @@ ggplot(dfr, aes(x = x)) +
 - Какова доля мужчин, не подходящих по росту в пилоты, т.е. __меньше 160 и больше 190 см__?
 
 
-## Решение
+## Решение (4.1)
 
 Средний рост 18-летних мужчин в России 174.7 см со стандартным отклонением 6.65 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
 
@@ -527,7 +578,7 @@ dfr <- data.frame(x = seq(150, 200, length.out = 1000))
 dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
 dfr$y[!(dfr$x < X1)] <- NA
 ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 1, geom = "line", colour = "steelblue") +
   scale_x_continuous(name = "Рост",
                      sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
   labs(y = "Плотность вероятности") +
@@ -535,7 +586,7 @@ ggplot(dfr, aes(x = x)) +
   geom_vline(xintercept = X1, colour = "red3", linetype = "dashed")
 ```
 
-## Решение
+## Решение (4.2)
 
 Средний рост 18-летних мужчин в России 174.7 см со стандартным отклонением 6.65 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
 
@@ -549,7 +600,7 @@ ggplot(dfr, aes(x = x)) +
 dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
 dfr$y[!(dfr$x > X2)] <- NA
 ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 1, geom = "line", colour = "steelblue") +
   scale_x_continuous(name = "Рост",
                      sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
   labs(y = "Плотность вероятности") +
@@ -558,7 +609,7 @@ ggplot(dfr, aes(x = x)) +
 ```
 
 
-## Решение
+## Решение (4.3)
 
 Средний рост 18-летних мужчин в России 174.7 см со стандартным отклонением 6.65 см. В пилоты берут только с ростом от 160 до 190 см (по приказу Минтранса).
 
@@ -577,7 +628,7 @@ dfr$y2 <- dnorm(dfr$x, mean = mu, sd = sig)
 dfr$y2[!(dfr$x > X2)] <- NA
 
 ggplot(dfr, aes(x = x)) +
-  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 2, geom = "line", colour = "steelblue") +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 1, geom = "line", colour = "steelblue") +
   scale_x_continuous(name = "Рост",
                      sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
   labs(y = "Плотность вероятности") +
@@ -588,18 +639,20 @@ ggplot(dfr, aes(x = x)) +
 ```
 
 
-## Задача:
+## Задание 5
 
-Средний рост девушек в 16 лет --- 162.2 см со стандартным отклонением 6.0 см. 
-
+Средний рост девушек в 16 лет --- 162.2 см со стандартным отклонением 6.0 см.  
 В пилоты берут только людей с ростом от 160 до 190 см (по приказу Минтранса).
 
-Какая доля девушек подходит по росту в пилоты?
+Какой процент девушек подходит по росту в пилоты?
 
 
-## Какова доля девушек, подходящих по росту в пилоты?
+## Решение
 
-Средний рост девушек в 16 лет --- 162.2 см, со стандартным отклонением 6.0 см.
+Средний рост девушек в 16 лет --- 162.2 см со стандартным отклонением 6.0 см.  
+В пилоты берут только людей с ростом от 160 до 190 см (по приказу Минтранса).
+
+### Какой процент девушек подходит по росту в пилоты?
 
 ```{r}
 pnorm(q = 190, mean = 162.2, sd = 6.0) - 
@@ -614,6 +667,97 @@ prop_fem <- round(p_fem * 100, 1)
 
 Только `r prop_fem` % девушек пройдут в пилоты по росту.
 
+```{r women-pilots, purl=FALSE, echo=FALSE, fig.width = 4, fig.height=2}
+mu <- 162.2; sig <- 6.0; X1 <- 160; X2 <- 190
+
+dfr <- data.frame(x = seq(140, 200, length.out = 1000))
+dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y[(dfr$x < X1) | (dfr$x > X2)] <- NA
+
+ggplot(dfr, aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 1, geom = "line", colour = "orangered") +
+  scale_x_continuous(name = "Рост",
+                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
+  labs(y = "Плотность вероятности") +
+  geom_area(aes(x = x, y = y), fill = "orangered", alpha = 0.5) +
+  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed") +
+  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
+```
+
+## Задание 6
+
+Предположим, что вес новорожденных нормально распределен со средним значением 3500 г и стандартным отклонением 600 г.
+
+- Какой процент детей рождается с весом больше 3200г.?
+- Какой процент детей рождается с весом в пределах 2500-4500г.?
+
+## Решение (1)
+
+Предположим, что вес новорожденных нормально распределен со средним значением 3500 г и стандартным отклонением 600 г.
+
+### Какой процент детей рождается с весом больше 3200г.?
+
+```{r}
+1 - pnorm(q = 3200, mean = 3500, sd = 600)
+```
+
+```{r echo=FALSE}
+p_baby_big <- 1 - pnorm(q = 3200, mean = 3500, sd = 600)
+prop_baby_big <- round(p_baby_big * 100, 1)
+```
+
+`r prop_baby_big` % детей рождается с весом больше 3200г.
+
+```{r baby-big, purl=FALSE, echo=FALSE, fig.width = 4, fig.height=2}
+mu <- 3500; sig <- 600; X1 <- 3200
+
+dfr <- data.frame(x = seq(1500, 5500, length.out = 1000))
+dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y[(dfr$x < X1)] <- NA
+
+ggplot(dfr, aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 1, geom = "line", colour = "forestgreen") +
+  scale_x_continuous(name = "Вес",
+                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
+  labs(y = "Плотность вероятности") +
+  geom_area(aes(x = x, y = y), fill = "forestgreen", alpha = 0.5) +
+  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed")
+```
+
+## Решение (2)
+
+Предположим, что вес новорожденных нормально распределен со средним значением 3500 г и стандартным отклонением 600 г.
+
+### Какой процент детей рождается с весом в пределах 2500-4500г.?
+
+```{r}
+pnorm(q = 4500, mean = 3500, sd = 600) - pnorm(q = 2500, mean = 3500, sd = 600)
+```
+
+```{r echo=FALSE, purl=FALSE}
+p_baby <- pnorm(q = 4500, mean = 3500, sd = 600) - 
+  pnorm(q = 2500, mean = 3500, sd = 600)
+prop_baby <- round(p_baby * 100, 1)
+```
+
+`r prop_baby` % детей рождается с весом в пределах 2500-4500г.
+
+```{r baby-norm, purl=FALSE, echo=FALSE, fig.width = 4, fig.height=2}
+mu <- 3500; sig <- 600; X1 <- 2500; X2 <- 4500
+
+dfr <- data.frame(x = seq(1500, 5500, length.out = 1000))
+dfr$y <- dnorm(dfr$x, mean = mu, sd = sig)
+dfr$y[(dfr$x < X1) | (dfr$x > X2)] <- NA
+
+ggplot(dfr, aes(x = x)) +
+  stat_function(fun = dnorm, args = list(mean = mu, sd = sig), size = 1, geom = "line", colour = "cyan4") +
+  scale_x_continuous(name = "Вес",
+                     sec.axis = sec_axis(~(. - mu)/sig, name = "Z-оценка", breaks = -4:4)) +
+  labs(y = "Плотность вероятности") +
+  geom_area(aes(x = x, y = y), fill = "cyan4", alpha = 0.5) +
+  geom_vline(xintercept = X1, colour = "red3", linetype = "dashed") +
+  geom_vline(xintercept = X2, colour = "red3", linetype = "dashed")
+```
 
 ## Take-home messages
 

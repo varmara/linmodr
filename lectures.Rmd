@@ -25,20 +25,20 @@ install.packages("MASS")
 
 ### 03 Описательная статистика (23 сент., МВ)
 
-<!-- Часть 1 -->
+Часть 1
 
 <!-- - Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html) -->
-<!-- - Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R) -->
-<!-- - Данные [diatome_count.csv](data/diatome_count.csv) -->
+- Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R)
+- Данные [diatome_count.csv](data/diatome_count.csv)
 
-<!-- Часть 2 -->
+Часть 2
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages("car") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages("car")
+```
 
 <!-- - Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html) -->
-<!-- - Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R) -->
+- Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R)
 
 ### 04 Тестирование гипотез (26 сент., МВ)
 
