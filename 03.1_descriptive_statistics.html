@@ -3258,7 +3258,7 @@ font-size: 0.8em;
 
 <slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Характеризуем данные</h2></hgroup><article  id="-">
 
-</article></slide><slide class=""><hgroup><h2>Характеризуем данные через связки описательных статистик</h2></hgroup><article  id="-----" class="columns-2">
+</article></slide><slide class=""><hgroup><h2>Характеризуем данные через связки описательных статистик</h2></hgroup><article  class="columns-2" id="-----">
 
 <h3>Центральные тенденции <br/>(Statistics of location)</h3>
 
@@ -3734,7 +3734,7 @@ raw_deviates</pre>
 
 <p><br /></p>
 
-<p>\(n - 1\) — это число независимых значений (число степеней свободы).</p>
+<p>\(n - 1\) — это число независимых значений (число степеней свободы — <strong>degrees of freedom</strong>).</p>
 
 </article></slide><slide class=""><hgroup><h2>Меры разброса</h2></hgroup><article  id="--3">
 
@@ -3744,7 +3744,7 @@ raw_deviates</pre>
 
 <p>\[s^2=\frac{\sum{(x_i - \bar{x})^2}}{n - 1}= \frac{SS}{n - 1}\]</p>
 
-<pre class = 'prettyprint lang-r'>sum(raw_deviates^2) / length(apples - 1)
+<pre class = 'prettyprint lang-r'>sum(raw_deviates^2) / (length(apples) - 1)
 var(apples)</pre>
 
 <p>Дисперсию не получится нарисовать на графике, т.к. там используются не отклонения, а их квадраты</p>
@@ -3759,10 +3759,10 @@ var(apples)</pre>
 
 <p>Стандартное отклонение — это средняя величина отклонения, и ее уже можно изобразить на графике.</p>
 
-<pre class = 'prettyprint lang-r'>sqrt(sum(raw_deviates^2) / length(apples - 1))
+<pre class = 'prettyprint lang-r'>sqrt(sum(raw_deviates^2) / (length(apples) - 1))
 sd(apples)</pre>
 
-</article></slide><slide class=""><hgroup><h2>Среднее и стандартное отклонение при помощи <code>stat_summary()</code></h2></hgroup><article  id="------stat_summary" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Среднее и стандартное отклонение при помощи <code>stat_summary()</code></h2></hgroup><article  class="smaller" id="------stat_summary">
 
 <pre class = 'prettyprint lang-r'>ggplot(data = apple_data) + 
   stat_summary(geom = &#39;pointrange&#39;, fun.data = mean_sdl, 
@@ -3816,7 +3816,7 @@ mean(example)</pre>
 
 <pre >## [1] 10</pre>
 
-</article></slide><slide class=""><hgroup><h2>Как соотносятся способы оценки центра и размаха в выборке?</h2></hgroup><article  id="--------" class="smaller">
+</article></slide><slide class=""><hgroup><h2>Как соотносятся способы оценки центра и размаха в выборке?</h2></hgroup><article  class="smaller" id="--------">
 
 <pre class = 'prettyprint lang-r'>ggplot(data = apple_data) + 
   geom_boxplot(aes(x = &#39;Медиана \nи квантили&#39;, y = apples)) +

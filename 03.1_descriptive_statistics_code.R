@@ -146,11 +146,11 @@ sum(raw_deviates^2)
 # ### Как усреднить отклонения от среднего значения?
 
 # ### Дисперсия = MS, Mean Square, Variance
-sum(raw_deviates^2) / length(apples - 1)
+sum(raw_deviates^2) / (length(apples) - 1)
 var(apples)
 
 # ### Среднеквадратичное/стандартное отклонение = Standard Deviation
-sqrt(sum(raw_deviates^2) / length(apples - 1))
+sqrt(sum(raw_deviates^2) / (length(apples) - 1))
 sd(apples)
 
 

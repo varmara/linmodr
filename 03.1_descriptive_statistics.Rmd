@@ -488,7 +488,7 @@ $n - 1$ --- это число независимых значений (числ�
 $$s^2=\frac{\sum{(x_i - \bar{x})^2}}{n - 1}= \frac{SS}{n - 1}$$
 
 ```{r results="hide"}
-sum(raw_deviates^2) / length(apples - 1)
+sum(raw_deviates^2) / (length(apples) - 1)
 var(apples)
 ```
 
@@ -506,7 +506,7 @@ $$s = \sqrt{s^2} = \sqrt{\frac{\sum{(x_i - \bar{x})^2}}{n - 1}} = SD$$
 Стандартное отклонение --- это средняя величина отклонения, и ее уже можно изобразить на графике.
 
 ```{r results="hide"}
-sqrt(sum(raw_deviates^2) / length(apples - 1))
+sqrt(sum(raw_deviates^2) / (length(apples) - 1))
 sd(apples)
 ```
 
