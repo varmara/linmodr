@@ -33,6 +33,7 @@ library(knitr)
 # chunk default options
 opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
 ```
+
 # Знакомимся с даными
 
 ## Пример: IQ и размеры мозга
@@ -148,27 +149,15 @@ grid.arrange(pl_pos_cor, pl_neg_cor, pl_zero_cor, ncol = 3)
 
 ## Задание
 
-+ Определите силу и направление связи между всеми парами исследованных признаков
 + Постройте точечную диаграмму, отражающую взаимосвязь между результатами IQ-теста (PIQ) и размером головного мозга (MRINACount)
-+ Оцените достоверность значения коэффициента корреляции Пирсона между этими двумя переменными 
++ Определите силу и направление связи между этими величинами
++ Оцените сатистическую значимость коэффициента корреляции Пирсона между этими двумя переменными 
++ Придумайте способ, как оценить корреляцию между всеми парами исследованных признаков
 
 *Hint 1*: Обратите внимание на то, что в датафрейме есть пропущенные значения. Изучите, как работают с `NA` функции, вычисляющие коэффициенты корреляции. 
 
-*Hint 2* Для построения точечной диаграммы вам понадобится `geom_point()`
+<!-- *Hint 2* Для построения точечной диаграммы вам понадобится `geom_point()` -->
 
-## Решение 
-
-```{r, size=2, tidy=TRUE}
-cor(brain[,2:6], use = "pairwise.complete.obs")
-
-```
-
-
-## Решение
-```{r}
-cor.test(brain$PIQ, brain$MRINACount, method = "pearson", alternative = "two.sided")
-
-```
 
 
 ## Решение
@@ -182,6 +171,21 @@ pl_brain <- ggplot(brain,
 pl_brain
 ```
 
+
+## Решение
+```{r}
+cor.test(brain$PIQ, brain$MRINACount, method = "pearson", alternative = "two.sided")
+
+```
+
+
+
+## Решение 
+
+```{r, size=2, tidy=TRUE}
+cor(brain[,2:6], use = "pairwise.complete.obs")
+
+```
 
 
 
@@ -298,7 +302,7 @@ grid.arrange (pl_brain, pl_1, ncol=2)
 
 
 # Найти оптимальную модель позволяет регрессионный анализ
-<div  align="left">
+<div  align="right">
 
 "Essentially, all models are wrong,     
 but some are useful"     
@@ -337,20 +341,10 @@ stature of their Parents" (цит. по `Legendre & Legendre, 1998`)
 
 
 
-## Кратко о методе макcимального правдоподобия {.columns-2}
-Симулированный пример, в котором 
+## Кратко о методе макcимального правдоподобия {.columns-2 .smaller}
 
-$$
-y_i = 10x_i + \varepsilon_i \\
-\varepsilon \in N(0, 10)
-$$
 
-Точки (данные) - это выборки из нескольких "локальных" генеральных совокупностей с нормальным распределением зависимой переменной (каждая совокупность соответствует одному значению предиктора).    
-
-Линия регрессии проходит через средние значения нормальных распределений.   
-
-Параметры прямой подбираются так, чтобы вероятность существования данных при таких параметрах была бы максимальной.   
-```{r gg-norm-tunnel, echo=FALSE, fig.height=7, purl=FALSE}
+```{r gg-norm-tunnel, echo=FALSE, fig.height=5, fig.width=6, fig.align='left',  purl=FALSE}
 ## Based on code by Arthur Charpentier:
 ## http://freakonometrics.hypotheses.org/9593
 ## TODO: wrap it into a function and adapt it for use with other distributions
@@ -440,11 +434,26 @@ for(j in n:1){
 }
 
 ```
+ 
+
+Симулированный пример, в котором 
+
+$$
+y_i = 10x_i + \varepsilon_i \\
+\varepsilon \in N(0, 10)
+$$
+
+Точки (данные) - это выборки из нескольких "локальных" генеральных совокупностей с нормальным распределением зависимой переменной (каждая совокупность соответствует одному значению предиктора).    
+
+Линия регрессии проходит через средние значения нормальных распределений.   
+
+Параметры прямой подбираются так, чтобы вероятность существования данных при таких параметрах была бы максимальной.   
 
 
 
 
 ## Кратко о методе макcимального правдоподобия 
+
 Аналогичная картинка, но с использованием `geom_violin()`
 ```{r, echo=FALSE, fig.height=5.5}
 
@@ -555,9 +564,9 @@ grid.arrange(pl_1, pl_2, pl_3, nrow = 1)
 
 ## Как трактовать значения параметров регрессионной модели?
 
->- Угловой коэффициент (_slope_) показывает на сколько _единиц_ изменяется предсказанное значение $\hat{y}$ при изменении на _одну единицу_ значения предиктора ($x$)
+>- Угловой коэффициент (_slope_) показывает *на сколько* _единиц_ изменяется предсказанное значение $\hat{y}$ при изменении на _одну единицу_ значения предиктора ($x$)
 
->- Свободный член (_intercept_) - величина во многих случаях не имеющая "смысла", просто поправочный коэффициент, без которого нельзя вычислить $\hat{y}$. _NB!_ В некоторых линейных моделях он имеет смысл, например, значения $\hat{y}$ при $x = 0$. 
+>- Свободный член (_intercept_) - величина во многих случаях не имеющая "смысла", просто поправочный коэффициент, без которого нельзя вычислить $\hat{y}$. <br> _NB!_ В некоторых линейных моделях он имеет смысл, например, значения $\hat{y}$ при $x = 0$. 
 
 >- Остатки (_residuals_) - характеризуют влияние неучтенных моделью факторов.
 
@@ -620,7 +629,7 @@ $\epsilon _i$ | $e_i = y_i - \hat {y_i}$ | $\approx \sqrt{MS_e}$
 >- Их используют в статистических тестах
 
 
-## Графическое представление результатов {.columns-2}
+## Графическое представление результатов {.columns-2 }
 
 ```{r, fig.height=5, fig.width=5}
 pl_brain + geom_smooth(method="lm") 
@@ -633,25 +642,44 @@ pl_brain + geom_smooth(method="lm")
 Возникает из-за неопределенности оценок коэффициентов модели, вследствие выборочного характера оценок.           
 
 
-## Зависимость в генеральной совокупности
+## Зависимость в генеральной совокупности {.columns-2 .smaller}
 
 Симулированный пример: Генеральная совокупность, в которой связь между Y и X, описывается следующей зависимостью
 $$
 y_i = 10 + 10x_i + \varepsilon_i \\
 \varepsilon \in N(0, 20)
 $$
-```{r}
+
+```{r fig.width=5}
 pop_x <- rnorm(1000, 10, 3)
 pop_y <- 10 + 10*pop_x + rnorm(1000, 0, 20)
 population <- data.frame(x=pop_x, y=pop_y)
 
-ggplot(population, aes(x=x, y=y)) + geom_point(alpha=0.3, color="red")+ geom_abline(aes(intercept=10, slope=10), color="blue", size=2)
+ggplot(population, aes(x=x, y=y)) + 
+  geom_point(alpha=0.3, color="red") + 
+  geom_abline(aes(intercept=10, slope=10), 
+              color="blue", size=2)
 ```
 
-##Зависимости, выявленные в нескольких разных выборках
+## Зависимости, выявленные в нескольких разных выборках {.columns-2 .smaller}
 
 Линии регрессии, полученные для 100 выборок (по 20 объектов в каждой), взятых из одной и той же генеральной совокупности 
-```{r, echo=FALSE, fig.align='center', fig.height=5, purl = FALSE}
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+
+
+```{r, echo=FALSE, fig.align='center', fig.width=5, purl = FALSE}
 samp_coef <- data.frame(b0 = rep(NA, 100), b1=rep(NA, 100))
 for(i in 1:100) {
   samp_num <- sample(1:1000, 20)
@@ -698,7 +726,8 @@ grid.arrange(pl_alpha1, pl_alpha2, pl_alpha3, ncol=3)
 ```{r, tidy=TRUE}
 newdata <- data.frame(MRINACount = 900000)
 
-predict(brain_model, newdata, interval = "prediction", 
+predict(brain_model, newdata, 
+        interval = "prediction", 
         level = 0.95, se = TRUE)$fit
 
 ```
@@ -741,13 +770,38 @@ pl_brain +
 ```
 
 
+## Код для построения графика {.smaller}
 
-## Важно!
 
-<div class="columns-2">
-*Модель "работает" только в том диапазоне значений независимой переменной ($x$), для которой она построена (интерполяция). Экстраполяцию надо применять с большой осторожностью.*
+```{r echo=TRUE, eval=FALSE}
+pl_brain + 
 
-```{r, fig.align='center', fig.height=5, fig.width=9, echo=FALSE}
+# 1) Линия регрессии и ее дов. интервал
+# Если мы указываем fill внутри aes() и задаем фиксированное значение - 
+#  появится соотв. легенда с названием.
+# alpha - задает прозрачность
+  geom_smooth(method = "lm", aes(fill = "Conf.interval"), alpha = 0.4) +
+# 2) Интервал предсказаний создаем при помощи геома ribbon ("лента")
+# Данные берем из другого датафрейма - из brain_predicted
+# ymin и ymax - эстетики геома ribbon, которые задают нижний и верхний 
+# край ленты в точках с заданным x (x = MRINACount было задано в ggplot() 
+# при создании pl_brain, поэтому сейчас его указывать не обязательно)
+#
+
+geom_ribbon(data = brain_predicted,  aes(ymin = lwr, ymax = upr, fill = "Conf. area for prediction"), alpha = 0.2) +
+# 3) Вручную настраиваем цвета заливки при помощи шкалы fill_manual.
+# Ее аргумент name - название соотв. легенды, values - вектор цветов
+  scale_fill_manual(name = "Intervals", values = c("green", "gray")) +
+# 4) Название графика
+  ggtitle("Confidence interval \n and confidence area for prediction")
+```
+
+
+## Важно! {.columns-2 .smaller}
+
+Модель "работает" только в том диапазоне значений независимой переменной ($x$), для которой она построена (интерполяция). Экстраполяцию надо применять с большой осторожностью.
+
+```{r, fig.align='center', fig.height=4, fig.width=9, echo=FALSE}
 pl_brain + 
   geom_ribbon(data=brain_predicted, aes(y=fit, ymin=lwr, ymax=upr, fill = "Conf. area for prediction"), alpha=0.2) + 
   geom_smooth(method="lm", aes(fill="Conf.interval"), alpha=0.4) + 

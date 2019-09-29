@@ -7,7 +7,6 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
-<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -99,7 +98,7 @@ code span.wa { color: #008000; font-weight: bold; } /* Warning */
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -143,7 +142,9 @@ h6 {
 
 <link rel="stylesheet" href="my_styles.css" type="text/css" />
 
+</head>
 
+<body>
 
 <style type = "text/css">
 .main-container {
@@ -157,6 +158,7 @@ code {
 }
 img {
   max-width:100%;
+  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -261,6 +263,8 @@ $(document).ready(function () {
 });
 </script>
 
+<div class="container-fluid main-container">
+
 <!-- tabsets -->
 
 <style type="text/css">
@@ -317,9 +321,48 @@ $(document).ready(function () {
 }
 </style>
 
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
 <!-- code folding -->
 
 
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <style type="text/css">
 
@@ -368,6 +411,8 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -382,16 +427,6 @@ div.tocify {
 }
 
 </style>
-
-
-
-</head>
-
-<body>
-
-
-<div class="container-fluid main-container">
-
 
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
@@ -447,7 +482,7 @@ div.tocify {
 <h3>01 Знакомство с R (16 сент., МВ)</h3>
 <ul>
 <li>Презентация: <a href="01_intro_to_r.html">Знакомство с R</a></li>
-<li>Код: <a href="01_intro_to_r_code.R">01_intro_to_r_code.R</a></li>
+<li>Код: <a href="01_intro_to_r_code.R" class="uri">01_intro_to_r_code.R</a></li>
 </ul>
 </div>
 <div id="-ggplot2-19-.-" class="section level3">
@@ -458,7 +493,7 @@ div.tocify {
 <a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">install.packages</span>(<span class="st">&quot;MASS&quot;</span>)</a></code></pre></div>
 <ul>
 <li>Презентация: <a href="02_intro_ggplot.html">Основы ggplot2</a></li>
-<li>Код: <a href="02_intro_ggplot.R">02_intro_ggplot.R</a></li>
+<li>Код: <a href="02_intro_ggplot.R" class="uri">02_intro_ggplot.R</a></li>
 <li>Данные: <a href="data/Titanic.csv">Titanic.csv</a></li>
 <li>Данные: <a href="data/fev.xls">fev.xls</a></li>
 </ul>
@@ -467,22 +502,22 @@ div.tocify {
 <h3>03 Описательная статистика (23 сент., МВ)</h3>
 <p>Часть 1</p>
 <ul>
-<li>Презентация <a href="03.1_descriptive_statistics.html">03.1_descriptive_statistics.html</a></li>
-<li>Код <a href="03.1_descriptive_statistics_code.R">03.1_descriptive_statistics_code.R</a></li>
+<li>Презентация <a href="03.1_descriptive_statistics.html" class="uri">03.1_descriptive_statistics.html</a></li>
+<li>Код <a href="03.1_descriptive_statistics_code.R" class="uri">03.1_descriptive_statistics_code.R</a></li>
 <li>Данные <a href="data/diatome_count.csv">diatome_count.csv</a></li>
 </ul>
 <p>Часть 2</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;car&quot;</span>)</a></code></pre></div>
 <ul>
-<li>Презентация <a href="03.2_descriptive_statistics_normal_d.html">03.2_descriptive_statistics_normal_d.html</a></li>
-<li>Код <a href="03.2_descriptive_statistics_normal_d_code.R">03.2_descriptive_statistics_normal_d_code.R</a></li>
+<li>Презентация <a href="03.2_descriptive_statistics_normal_d.html" class="uri">03.2_descriptive_statistics_normal_d.html</a></li>
+<li>Код <a href="03.2_descriptive_statistics_normal_d_code.R" class="uri">03.2_descriptive_statistics_normal_d_code.R</a></li>
 </ul>
 </div>
 <div id="--26-.-" class="section level3">
 <h3>04 Тестирование гипотез (26 сент., МВ)</h3>
 <ul>
-<li>Презентация <a href="04_hypothesis_testing.html">04_hypothesis_testing.html</a></li>
-<li>Код <a href="04_hypothesis_testing_code.R">04_hypothesis_testing_code.R</a></li>
+<li>Презентация <a href="04_hypothesis_testing.html" class="uri">04_hypothesis_testing.html</a></li>
+<li>Код <a href="04_hypothesis_testing_code.R" class="uri">04_hypothesis_testing_code.R</a></li>
 <li>Данные <a href="data/aml.csv">aml.csv</a></li>
 </ul>
 </div>
@@ -492,12 +527,18 @@ div.tocify {
 <div id="---30-.-" class="section level3">
 <h3>05 Простая линейная регрессия (30 сент., ВХ)</h3>
 <!-- - Презентация: [05_LM.html](05_LM.html) -->
-<!-- - Код:  -->
-<!--     + [05_LM_code.R](05_LM_code.R) -->
-<!--     + [05_LM_task.R](05_LM_task.R) -->
-<!-- - Данные: -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!--     + [secher.xls](data/secher.xls) -->
+<ul>
+<li>Код:
+<ul>
+<li><a href="05_LM_code.R" class="uri">05_LM_code.R</a></li>
+<li><a href="05_LM_task.R" class="uri">05_LM_task.R</a></li>
+</ul></li>
+<li>Данные:
+<ul>
+<li><a href="data/IQ_brain.csv">IQ_brain.csv</a></li>
+<li><a href="data/secher.xls">secher.xls</a></li>
+</ul></li>
+</ul>
 </div>
 <div id="---3-.-" class="section level3">
 <h3>06 Основы линейной алгебры (3 окт., ВХ)</h3>
@@ -702,49 +743,6 @@ $(document).ready(function () {
 });
 
 
-</script>
-
-<!-- tabsets -->
-
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
-<!-- code folding -->
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = false;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
