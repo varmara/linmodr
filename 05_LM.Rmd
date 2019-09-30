@@ -108,25 +108,172 @@ nrow(brain) ## Это без учета пропущенных значений
 
 *Цель практически любого исследования* - поиск взаимосвязи величин и создание базы для предсказания неизвестного на основе имеющихся данных
 
-## Вспомним: _Сила и направление связи между величинами_
+## Корреляционный анализ
 
-```{r, warning=FALSE, echo = FALSE, fig.align='center', fig.height=4, fig.width=8, message=FALSE, purl=FALSE}
+Наличие связи между явлениями __не означает__, что между ними существует причинно-следственная связь.    
+
+Сила связи между явлениями может быть количественно измерена.
+
+## Связь между уровнем интеллекта и размером головного мозга 
+
+```{r fig.width=3.75, fig.height=2.25, out.width='2.5in', out.height='1.5in'}
 library (ggplot2)
-library (gridExtra)
 theme_set(theme_bw())
+pl_brain <- ggplot(data = brain, aes(x = MRINACount, y = PIQ)) + 
+  geom_point() + 
+  labs(x = 'Размер мозга (MRINACount)', y = 'Уровень интеллекта (PIQ)')
+pl_brain
+```
+
+
+## Основные типы линейной связи между величинами
+
+
+```{r, echo = FALSE, purl=FALSE}
+library (gridExtra)
+
 x <- rnorm(100, 10, 5)
 y1 <- 5*x + rnorm(100, 0, 5)
-pl_pos_cor <- ggplot(data.frame(x = x, y = y1), aes(x = x, y = y)) + geom_point() + xlab("First variable") + ylab("Second variable") + ggtitle("Positive correlation")
+pl_pos_cor <- ggplot(data.frame(x = x, y = y1), aes(x = x, y = y)) + 
+  geom_point(colour = 'steelblue') + 
+  xlab('Первая величина') + ylab('Вторая величина') + 
+  ggtitle('Положительная \nкорреляция') 
 
 y2 <- -5*x + rnorm(100, 0, 5)
-pl_neg_cor <- ggplot(data.frame(x = x, y = y2), aes(x = x, y = y)) + geom_point() + xlab("First variable") + ylab("Second variable") + ggtitle("Negative correlation")
+pl_neg_cor <- ggplot(data.frame(x = x, y = y2), aes(x = x, y = y)) + 
+  geom_point(colour = 'steelblue') + 
+  xlab('Первая величина') + ylab('Вторая величина') + 
+  ggtitle('Отрицательная \nкорреляция') 
 
 y3 <- 0*x + rnorm(100, 0, 5)
-pl_zero_cor <- ggplot(data.frame(x = x, y = y3), aes(x = x, y = y)) + geom_point() + xlab("First variable") + ylab("Second variable") + ggtitle("No correlation")
+pl_zero_cor <- ggplot(data.frame(x = x, y = y3), aes(x = x, y = y)) + 
+  geom_point(colour = 'steelblue') + 
+  xlab('Первая величина') + ylab('Вторая величина') + 
+  ggtitle('Корреляции \nнет') 
 
 grid.arrange(pl_pos_cor, pl_neg_cor, pl_zero_cor, ncol = 3)
 
 ```
+
+## Криволинейные связи между величинами
+
+```{r, echo=FALSE, purl=FALSE}
+x <- rep(seq(1, 20, 1), 5)
+y1 <- 10*sin(x) + rnorm(100, 0, 5)
+pl_sin_cor <- ggplot(data.frame(x = x, y = y1), aes(x = x, y = y)) + 
+  geom_point(colour = 'steelblue') + 
+  xlab('Первая величина') + ylab('Вторая величина')
+
+y2 <- exp(x/3) + rnorm(100, 0, 50)
+pl_exp_cor <- ggplot(data.frame(x = x, y = y2), aes(x = x, y = y)) + 
+  geom_point(colour = 'steelblue') + 
+  xlab('Первая величина') + ylab('Вторая величина') 
+
+y3 <- exp(1 + -1*x)/(1 + exp(1 + -1*x)) + rnorm(100, 0, 0.05)
+pl_log_cor <- ggplot(data.frame(x = x, y = y3), aes(x = x, y = y)) + 
+  geom_point(colour = 'steelblue') + 
+  xlab('Первая величина') + ylab('Вторая величина')
+
+grid.arrange(pl_sin_cor, pl_exp_cor, ncol = 2)
+
+
+```
+
+## Коэффициент ковариации
+
+Оценивает \textbf{сонаправленность отклонений} двух величин от своих средних значений
+$$cov_{x,y} = \frac{\sum(x_i-\bar{x})(y_i-\bar{y})}{n - 1}$$
+
+
+Коэффициент ковариации варьирует в интервале $-\infty < cov_{x,y} < +\infty$
+
+
+```{r, echo=FALSE, purl=FALSE}
+X_back <- rnorm(20, 0, 4)
+Y_back <- rnorm(20, 1, 4)
+
+XY <- data.frame(x = X_back, y = Y_back)
+
+meanX <- 0
+meanY <- 1
+Xmin <- -5
+Xmax <- 5
+Ymin <- -5
+Ymax <- 5
+
+X <- 2
+Y <- 4
+X1 <- -2
+Y1 <- -4
+X2 <- 2
+Y2 <- -4
+
+ar <- arrow(type = 'closed', length = unit(0.15,'cm'))
+
+Pl_positiv1 <- 
+  ggplot() + 
+  geom_point(data = XY, aes(x = x, y = y), color = "gray") + 
+  geom_point(aes(x = c(meanX, X), y = c(meanY, Y))) +
+  xlim(Xmin, Xmax) + ylim(Ymin, Ymax) + guides(size = 'none') + 
+  geom_segment(aes(x = meanX, y = meanY, xend = X - 0.2, yend = Y - 0.2), arrow = ar) +
+  geom_segment(aes(x = meanX, y = meanY, xend = meanX, yend = Ymin), linetype = 2) +
+  geom_segment(aes(x = meanX, y = meanY, xend = Xmin, yend = meanY), linetype = 2) +
+  geom_segment(aes(x = X, y = Y, xend = Xmin, yend = Y), linetype = 2) +
+  geom_segment(aes(x = X, y = Y, xend = X, yend = Ymin), linetype = 2) +
+  geom_segment(aes(x = meanX, y = Ymin, xend = X, yend = Ymin), arrow = ar, color ="red", size = 1) + 
+  labs(x = 'x', y = 'y') +
+  geom_segment(aes(x = Xmin, y = meanY, xend = Xmin, yend = Y), arrow = ar, color = "red", size = 1) + 
+  ggtitle('Положительные\nотклонения') 
+
+
+Pl_positiv2 <- 
+  ggplot() + 
+  geom_point(data = XY, aes(x = x, y = y), color = "gray") + 
+  geom_point(aes(x = c(meanX, X1), y = c(meanY, Y1))) +
+  xlim(Xmin, Xmax) + ylim(Ymin, Ymax) + guides(size = 'none') + 
+  geom_segment(aes(x = meanX, y = meanY, xend = X1 + 0.2, yend = Y1 + 0.2), arrow = ar) +
+  geom_segment(aes(x = meanX, y = meanY, xend = meanX, yend = Ymin), linetype = 2) +
+  geom_segment(aes(x = meanX, y = meanY, xend = Xmin, yend = meanY), linetype = 2) +
+  geom_segment(aes(x = X1, y = Y1, xend = Xmin, yend = Y1), linetype = 2) +
+  geom_segment(aes(x = X1, y = Y1, xend = X1, yend = Ymin), linetype = 2) +
+  geom_segment(aes(x = meanX, y = Ymin, xend = X1, yend = Ymin), arrow = ar, color = "blue", size = 1) + 
+  geom_segment(aes(x = Xmin, y = meanY, xend = Xmin, yend = Y1), arrow = ar, color = "blue", size = 1) + 
+  labs(x = 'x', y = 'y') +
+  ggtitle('Отрицательные\nотклонения') 
+
+Pl_negative <- 
+  ggplot() + 
+  geom_point(data = XY, aes(x = x, y = y), color = "gray") + 
+  geom_point(aes(x = c(meanX, X2), y = c(meanY, Y2))) +
+  xlim(Xmin, Xmax) + ylim(Ymin, Ymax) + guides(size = 'none') + 
+  geom_segment(aes(x = meanX, y = meanY, xend = X2 - 0.2, yend = Y2 + 0.2), arrow = ar) +
+  geom_segment(aes(x = meanX, y = meanY, xend = meanX, yend = Ymin), linetype = 2) +
+  geom_segment(aes(x = meanX, y = meanY, xend = Xmin, yend = meanY), linetype = 2) +
+  geom_segment(aes(x = X2, y = Y2, xend = Xmin, yend = Y2), linetype = 2) +
+  geom_segment(aes(x = X2, y = Y2, xend = X, yend = Ymin), linetype = 2) +
+  geom_segment(aes(x = meanX, y = Ymin, xend = X2, yend = Ymin), arrow = ar, color = "red", size = 1)+ 
+  geom_segment(aes(x = Xmin, y = meanY, xend = Xmin, yend = Y2), arrow = ar, color = "blue", size = 1) + 
+  labs(x = 'x', y = 'y') +
+  ggtitle('Отклонения\nв разных направлениях') 
+```
+
+
+```{r echo=FALSE, purl=FALSE, fig.height=2.25}
+grid.arrange(Pl_positiv1, Pl_positiv2, Pl_negative, ncol = 3)
+```
+
+
+
+## Коэффициент корреляции
+
+
+
+Это стандартизованное значение ковариации
+
+$$r_{x,y} = \frac{\sum(x_i-\bar{x})(y_i-\bar{y})} {\sqrt{\sum(x_i-\bar{x})^2}\sqrt{\sum(y_i-\bar{y})^2}} = \frac{cov_{x,y}} {\sigma_x \sigma_y}$$
+
+Коэффициент корреляции варьирует в\ интервале $-1 \le r_{x,y} \le +1$
+
 
 ## Коэффициенты корреляции и условия их применимости   
 

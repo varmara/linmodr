@@ -16,6 +16,7 @@ colSums(is.na(brain))
 brain[!complete.cases(brain), ]
 
 
+
 #Вычисление матрицы корреляций
 
 
@@ -28,6 +29,9 @@ library(ggplot2)
 pl_brain <-
 
 pl_brain
+
+
+
 
 
 ## Подгоняем модель с помощью функции lm()
@@ -43,14 +47,13 @@ brain_model <-
 
 
 #Находим остатки
-brain$PIQ[10] - fitted(brain_model)[10]
 
-residuals(brain_model)[10]
 
 
 ##Находим доверительные интервалы для параметров
 
-confint(brain_model)
+
+
 
 ##Рисуем графики для разных уровней значимости
 pl_alpha1 <- pl_brain + geom_smooth(method="lm", level=0.8) + ggtitle(bquote(alpha==0.2))
