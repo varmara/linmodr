@@ -32,15 +32,18 @@ head(baby)
 
 # Строим модель
 
-baby_M1
+baby_M1 <- lm(bwt ~ bpd, data = baby)
 
 # Результаты
 
-
+summary(baby_M1)
 
 
 
 # Визуализация модели без использования geom_smooth()
+
+Pl_baby <- ggplot(data = baby, aes(x = bpd, y = bwt)) + geom_point()
+
 
 # Создаем искусственный датафрейм, в котором будут все возможные (не только измеренные) значения предиктора
 
@@ -54,7 +57,7 @@ MyData$Predicted <- predict(baby_M1, newdata = MyData, se.fit = TRUE )$fit
 # Вычисляем значения стандартной ошибки для каждой точки
 MyData$SE <- predict(baby_M1, newdata = MyData, se.fit = TRUE)$se.fit
 
-
+head(MyData)
 # Рисуем линию, предсказанную моделью
 
 Pl_predicted <- ggplot(MyData, aes(x = bpd, y = Predicted)) + geom_line(size = 2, color = "blue")
@@ -69,18 +72,41 @@ Pl_predicted_2
 
 # Вписываем в рисунок исходные данные
 
+Pl_predicted_2 + geom_point(data = baby, aes(x = bpd, y = bwt))
 
 
 
 # Рисуем диапазон предсказания
 
-baby_predict_diap <- predict(baby_M1, newdata = MyData, interval="prediction")
-baby_predict_diap <- as.data.frame(baby_predict_diap) [ , -1]
+# Вычисляем диапазон предсказания
+baby_predict_diap <- as.data.frame(predict(baby_M1, newdata = MyData, interval="prediction"))
 
+
+# Соединяем в один датафрейм предсказанные значения
 MyData <- cbind(MyData, baby_predict_diap)
 
 
-Pl_predicted_3 + geom_ribbon(data = MyData, aes(ymin = lwr, ymax = upr, fill = "Conf. area for prediction"), alpha = 0.2, fill = "green")
+
+# Рисуем все вместе
+
+ggplot(data = baby, aes(x = bpd)) + #Базовый уровень с первичными данными
+  geom_point(aes(y = bwt)) + #Наносим точки
+  geom_line(data = MyData, aes(y = Predicted - 1.96*SE), linetype = 2, color = "red") + #Нижняя граница 95% доверительной области для линии регрессии
+  geom_line(data = MyData, aes(y = Predicted + 1.96*SE), linetype = 2, color = "red") + #Верхняя граница 95% доверительной области для линии регрессии
+  geom_line(data = MyData, aes(x = bpd, y = Predicted), color = "blue", size = 2) + # линия регрессии
+  geom_ribbon(data = MyData, aes(x = bpd, ymin = lwr, ymax = upr), alpha = 0.4, fill = "gray") # 95% диапазон предсказания
+
+
+
+# Аналогичный рисунок, но с доверительной областью регрессии, нарисованной с помощью geom_ribbon()
+
+ggplot(data = baby, aes(x = bpd)) +
+  geom_point(aes(y = bwt)) +
+  geom_ribbon(data = MyData, aes(x = bpd, ymin = Predicted - 1.96*SE, ymax = Predicted + 1.96*SE), alpha = 0.6, fill = "gray") +
+  geom_line(data = MyData, aes(x = bpd, y = Predicted), color = "blue", size = 2)
+
+
+
 
 
 ######################################################
@@ -100,11 +126,14 @@ Pl_predicted_3 + geom_ribbon(data = MyData, aes(ymin = lwr, ymax = upr, fill = "
 # предиктор: Petal.Length
 
 
+
+
 # Группа № 2
 # датасет diamonds для группы Good
 # переменная отклка: price
 # предиктор: carat
 
+diamonds
 
 
 # Группа № 3

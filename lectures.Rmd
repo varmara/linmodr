@@ -50,7 +50,7 @@ install.packages("car")
 
 ### 05 Простая линейная регрессия  (30 сент., ВХ)
 
-<!-- - Презентация: [05_LM.html](05_LM.html) -->
+- Презентация: [05_LM.html](05_LM.html)
 - Код:
     + [05_LM_code.R](05_LM_code.R)
     + [05_LM_task.R](05_LM_task.R)
