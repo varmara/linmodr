@@ -4,11 +4,14 @@
 # author: "Вадим Хайтов, Марина Варфоломеева"
 
 #Создаем матрицу из вектора
+# Задание: постройте марицу 4х3 из чисел от 1 до 12
 
-matrix(1:12, ncol = 3)
+matrix(  , )
+
 
 # Единичная матрица
-diag(rep(1,5))
+
+
 
 
 # Создаем искусственный датасет для демонстрации сложения матриц
@@ -34,11 +37,37 @@ Processed_Factor <- 1/Rpocessed_portion
 
 Small * Processed_Factor
 
+
+
+
+
+
 #Матричное произведение двух вектров
+
 N <- c(20, 40, 32, 45, 80, 50, 10)
 Fert <- c( 0,  0,   1,   2,   2,   0,   0)
 
 t(N) %*% (Fert)
+
+###################################
+#
+# Задание:
+# В доме есть следующие электроприборы.
+#
+# Чайник  2 шт по  1200 Вт
+# Обогреватели  3 шт. по 1300 Вт
+# Осушитель  1 шт.  1100 Вт
+# Стиральная машина  1 шт. 1500 Вт
+# Фен  2 шт. по  800 Вт
+
+
+# Какова будет суммарная мощность всех электроприборов, если их включить одновременно?
+
+###################################
+
+
+
+
 
 #Матричные произведения
 
@@ -79,6 +108,21 @@ library(reshape2)
 Pop2 <- melt(Pop)
 ggplot(Pop2, aes(x=Age, y = value)) + geom_bar(stat = "identity") + facet_wrap(~variable, ncol = 2)
 
+
+##########################
+# Задание
+# Найдите выгодноо поставщика
+
+
+
+
+
+
+###########################
+
+
+
+
 #Вычисляем матрицу корреляций с помощью матричной алгебры
 
 
@@ -91,6 +135,20 @@ cor_matrix <- t(br_scaled) %*% br_scaled / (nrow(br_scaled) - 1)
 
 cor_matrix
 
+
+###########################
+# Задание
+# Используя датасет `iris`, вычислите корреляцию между `Sepal.Length`  и `Sepal.Width`
+
+
+
+
+
+###########################
+
+
+###########################
+
 # Решение систем линейных уравнений с помощью матричной алгебры
 
 
@@ -99,67 +157,61 @@ cor_matrix
 
 
 
+###########################
+
+
+
 ##Строим линию регрессии  с помощью средств ggplot2
 
 data(cars)
 Mod <- lm(dist ~ speed, data = cars)
-coefficients(Mod)
 
-library(ggplot2)
-theme_set(theme_bw())
-ggplot(cars, aes(x = speed, y = dist)) + geom_point() + geom_smooth(method = "lm")
+
+
+#####################################
+# Постройте график линейной регрессии, опсанной данной моделью, используя приемы матричной алгебры
+
 
 
 ##Строим линию регрессии вручную
 
-X <- model.matrix(~speed, data = cars)
-Y <- cars$dist
-betas <- solve(t(X) %*% X) %*% (t(X) %*% Y)
+X <- model.matrix()
+Y <-
+betas <- solve(t() %*% ) %*% (t() %*% )
+
 betas
 
 
-predict_values <- X %*% betas
+predict_values <-  %*%
 
-resid_values <- cars$dist - predict_values
+resid_values <- cars$dist -
 
 s2 <- sum(resid_values^2)/(length(resid_values) - length(betas))
 
-covbetas <- s2 * solve(t(X) %*% X)
+covbetas <-
 
 covbetas
 
-MyData <- data.frame(speed = seq(min(cars$speed), max(cars$speed)))
+MyData <- data.frame(speed = seq()))
 head(MyData)
 
-X <- model.matrix( ~ speed, data = MyData)
+X <- model.matrix( ~ , data = )
 head(X)
 
 
-MyData$predicted <- X %*% betas
+MyData$predicted <-  %*%
 
 ##График модели
 
 ggplot(MyData, aes()) + geom_abline(slope = , intercept = )
 
 
-
-
-
-
-MyData$se <- sqrt(diag(X %*% covbetas %*% t(X)))
+MyData$se <- sqrt(diag( %*%  %*%   ))
 
 MyData$CiUp  <- MyData$predicted + 1.96 *MyData$se
 
 MyData$CiLow  <- MyData$predicted - 1.96 *MyData$se
 
 ggplot(MyData, aes(x = speed, y = predicted)) +
-  geom_line(aes(x = speed, y = CiUp),
-            linetype = 2, size = 1) +
-  geom_line(aes(x = speed, y = CiLow),
-            linetype = 2, size = 1)+
-  geom_abline(slope = betas[2], intercept = betas[1],
-              color = "blue", size=2) +
-  geom_point(data = cars, aes(x = speed, y = dist)) +
-  ylab("dist")
 
 
