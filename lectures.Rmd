@@ -68,7 +68,7 @@ install.packages("car")
 Часть 1
 
 <!-- - Презентация: -->
-    <!-- + [07.1_model_description.html](07.1_model_description.html) -->
+<!--     + [07.1_model_description.html](07.1_model_description.html) -->
 - Код:
     + [07.1_model_description_code.R](07.1_model_description_code.R)
     + [07.1_task_assumptions_catsM.R](07.1_task_assumptions_catsM.R)
