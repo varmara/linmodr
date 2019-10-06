@@ -65,31 +65,31 @@ install.packages("car")
 
 ### 07 Описание, проверка значимости и валидности линейной модели (7 окт., МВ)
 
-<!-- Часть 1 -->
+Часть 1
 
 <!-- - Презентация: -->
-<!--     + [07.1_model_description.html](07.1_model_description.html) -->
-<!-- - Код: -->
-<!--     + [07.1_model_description_code.R](07.1_model_description_code.R) -->
-<!--     + [07.1_task_assumptions_catsM.R](07.1_task_assumptions_catsM.R) -->
-<!--     + [07.1_task_assumptions_GAG.R](07.1_task_assumptions_GAG.R) -->
-<!-- - Данные: -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!--     + [catsM.xlsx](data/catsM.xlsx) -->
-<!--     + [GAGurine.xlsx](data/GAGurine.xlsx) -->
+    <!-- + [07.1_model_description.html](07.1_model_description.html) -->
+- Код:
+    + [07.1_model_description_code.R](07.1_model_description_code.R)
+    + [07.1_task_assumptions_catsM.R](07.1_task_assumptions_catsM.R)
+    + [07.1_task_assumptions_GAG.R](07.1_task_assumptions_GAG.R)
+- Данные:
+    + [IQ_brain.csv](data/IQ_brain.csv)
+    + [catsM.xlsx](data/catsM.xlsx)
+    + [GAGurine.xlsx](data/GAGurine.xlsx)
 
-<!-- Часть 2 -->
+Часть 2
 
 <!-- - Презентация: -->
 <!--     + [07.2_model_validation.html](07.2_model_validation.html) -->
-<!-- - Код: -->
-<!--     + [07.2_model_validation_code.R](07.2_model_validation_code.R) -->
-<!--     + Задания про котов и GAG из прошлой части (работайте в том же коде) -->
-<!-- - Данные: -->
-<!--     + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt) -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!--     + [catsM.xlsx](data/catsM.xlsx) -->
-<!--     + [GAGurine.xlsx](data/GAGurine.xlsx) -->
+- Код:
+    + [07.2_model_validation_code.R](07.2_model_validation_code.R)
+    + Задания про котов и GAG из прошлой части (работайте в том же коде)
+- Данные:
+    + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt)
+    + [IQ_brain.csv](data/IQ_brain.csv)
+    + [catsM.xlsx](data/catsM.xlsx)
+    + [GAGurine.xlsx](data/GAGurine.xlsx)
 
 ### 08 Множественная линейная регрессия. Выбор оптимальной модели. (10 окт., ВХ)
 
