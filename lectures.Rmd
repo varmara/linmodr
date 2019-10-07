@@ -67,8 +67,8 @@ install.packages("car")
 
 Часть 1
 
-<!-- - Презентация: -->
-<!--     + [07.1_model_description.html](07.1_model_description.html) -->
+- Презентация:
+    + [07.1_model_description.html](07.1_model_description.html)
 - Код:
     + [07.1_model_description_code.R](07.1_model_description_code.R)
     + [07.1_task_assumptions_catsM.R](07.1_task_assumptions_catsM.R)
@@ -80,8 +80,8 @@ install.packages("car")
 
 Часть 2
 
-<!-- - Презентация: -->
-<!--     + [07.2_model_validation.html](07.2_model_validation.html) -->
+- Презентация:
+    + [07.2_model_validation.html](07.2_model_validation.html)
 - Код:
     + [07.2_model_validation_code.R](07.2_model_validation_code.R)
     + Задания про котов и GAG из прошлой части (работайте в том же коде)
