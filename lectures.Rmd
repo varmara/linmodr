@@ -100,14 +100,14 @@ install.packages("gridExtra")
 install.packages("ISwR")
 ```
 
-<!-- - Презентация: [08.1_multiple_LM.html](08.1_multiple_LM.html) -->
+- Презентация: [08.1_multiple_LM.html](08.1_multiple_LM.html)
 
 - Код: [08.1_multiple_LM_code.R](08.1_multiple_LM_code.R)
 - Данные: [loyn.csv](data/loyn.csv)
 
 #### Часть 2. Выбор оптимальной модели
 
-<!-- - Презентация: [08.2_model_selection.html](08.2_model_selection.html) -->
+- Презентация: [08.2_model_selection.html](08.2_model_selection.html)
 
 - Код: [08.2_model_selection_code.R](08.2_model_selection_code.R)
 - Данные: [loyn.csv](data/loyn.csv)
