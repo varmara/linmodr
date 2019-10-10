@@ -443,7 +443,7 @@ vif(mod1)
 ## Удалим из модели избыточный предиктор
 
 ```{r}
-mod2 <- update(mod1, ~ . -GRAZE)
+mod2 <- update(mod1, . ~ . -GRAZE)
 vif(mod2)
 ```
 
