@@ -30,15 +30,15 @@ table(goat$Treatment)
 goat$Treatment <- factor(goat$Treatment)
 
 #' ## Есть ли выбросы?
-#Строим дотплоты
+#Строим диаграммы Кливленда
 
 library(ggplot2)
 
 
-gg_dot <- ggplot(goat, aes(y = 1:nrow(goat))) + geom_point()
+gg_dot <- ggplot(goat, aes(y = )) + geom_point()
 
-gg_dot + aes(x = Wt)
-gg_dot + aes(x = Stw)
+gg_dot + aes()
+gg_dot + aes()
 
 ##Строим модель#####
 
@@ -47,9 +47,9 @@ Mod_goat_full <- lm(Wt ~ Stw + Treatment + Stw:Treatment, data = goat)
 Mod_goat_full <- lm(Wt ~ Stw * Treatment, data = goat)
 
 
-drop1(Mod_goat_full, test = "F")
+drop1()
 
-Mod_goat_reduced <- update(Mod_goat_full, . ~ . - Stw:Treatment )
+Mod_goat_reduced <- update()
 
 
 #'
@@ -57,14 +57,14 @@ Mod_goat_reduced <- update(Mod_goat_full, . ~ . - Stw:Treatment )
 
 #' ## Нет ли колинеарности между начальным весом и тритментом
 library(car)
-vif(Mod_goat_reduced)
+vif()
 
 ggplot(goat, aes(x = Treatment, y = Stw)) + geom_boxplot()
 
 
-# Создаем диагностические графики (дополниет недописанные части кода)
+# Создаем диагностические графики (дополните недописанные части кода)
 
-MG_diag <- fortify(Mod_goat_reduced)
+MG_diag <- fortify()
 
 
 head(MG_diag)
