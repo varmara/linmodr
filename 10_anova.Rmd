@@ -271,7 +271,22 @@ $$y _{i} = b_0 + b_1 x _{1i} + \ldots + b_5 x_{5i} + e_{i}$$
 - $b_1, ..., b_5$ --- это отклонения от базового уровня для средних с другими уровнями фактора.
 
 
-## Подбираем коэффициенты модели в параметризации индикаторов
+## Коэффициенты модели в параметризации индикаторов
+
+<!-- \begin{adjustbox}{max width=\textwidth} -->
+\begin{tabular}{p{1.1cm}|C{1.3cm} C{1.3cm} C{1.3cm} C{1.3cm} C{1.3cm}}
+\textbf{Фактор} & \multicolumn{5}{c}{\textbf{Переменные-индикаторы}} \\
+\cline{2-6}
+\texttt{sp} &\texttt{spЛугКон} \newline $x_1$ &  \texttt{spМалин} \newline $x_2$ & \texttt{spБелТряс} \newline $x_3$ & \texttt{spЛесКон} \newline $x_4$ & \texttt{spЛесЗав} \newline $x_5$\\
+\hline
+Крапив   &  0 &  0  & 0 & 0 & 0 \\
+ЛугКон   &  1 &  0  & 0 & 0 & 0 \\
+Малин    &  0 &  1  & 0 & 0 & 0 \\
+БелТряс  &  0 &  0  & 1 & 0 & 0 \\
+ЛесКон   &  0 &  0  & 0 & 1 & 0 \\
+ЛесЗав   &  0 &  0  & 0 & 0 & 1 \\
+\end{tabular}
+<!-- \end{adjustbox} -->
 
 ```{r}
 mod_treatment <- lm(len ~ sp, data = cu)
@@ -279,6 +294,33 @@ coef(mod_treatment)
 ```
 
 ## Уравнение модели в параметризации индикаторов
+
+<!-- \begin{adjustbox}{max width=\textwidth} -->
+\begin{tabular}{p{1.1cm}|C{1.3cm} C{1.3cm} C{1.3cm} C{1.3cm} C{1.3cm}}
+\textbf{Фактор} & \multicolumn{5}{c}{\textbf{Переменные-индикаторы}} \\
+\cline{2-6}
+\texttt{sp} &\texttt{spЛугКон} \newline $x_1$ &  \texttt{spМалин} \newline $x_2$ & \texttt{spБелТряс} \newline $x_3$ & \texttt{spЛесКон} \newline $x_4$ & \texttt{spЛесЗав} \newline $x_5$\\
+\hline
+Крапив   &  0 &  0  & 0 & 0 & 0 \\
+ЛугКон   &  1 &  0  & 0 & 0 & 0 \\
+Малин    &  0 &  1  & 0 & 0 & 0 \\
+БелТряс  &  0 &  0  & 1 & 0 & 0 \\
+ЛесКон   &  0 &  0  & 0 & 1 & 0 \\
+ЛесЗав   &  0 &  0  & 0 & 0 & 1 \\
+\end{tabular}
+<!-- \end{adjustbox} -->
+
+```{r purl=FALSE}
+coef(mod_treatment)
+```
+```{r echo=FALSE}
+cf <- round(coef(mod_treatment), 2)
+```
+
+$$\widehat{len}_i = 21.12 + 1.17 sp_{\text{ЛугКон}\ i} + 1.44 sp_{\text{Малин}\ i} + 1.77 sp_{\text{БелТряс}\ i} + 1.96 sp_{\text{ЛесКон}\ i} + 1.99 sp_{\text{ЛесЗав}\ i}$$
+
+## Уравнение модели в параметризации индикаторов
+
 
 ```{r purl=FALSE}
 coef(mod_treatment)
@@ -300,6 +342,8 @@ $$\widehat{len}_i = 21.12 + 1.17 sp_{\text{ЛугКон}\ i} + 1.44 sp_{\text{М
 - $\widehat{len}_i = 21.12 + 1.77 sp_{\text{БелТряс}\ i} = `r sum(cf[c(1, 4)])`$
 - $\widehat{len}_i = 21.12 + 1.96 sp_{\text{ЛесКон}\ i} = `r sum(cf[c(1, 5)])`$
 - $\widehat{len}_i = 21.12 + 1.99 sp_{\text{ЛесЗав}\ i} = `r sum(cf[c(1, 6)])`$
+
+
 
 # Параметризация эффектов
 
@@ -354,7 +398,22 @@ $$y _{i} = b_0 + b_1 x _{1i} + \ldots + b_5 x_{5i} + e_{i}$$
 - для последнего уровня фактора отклонения от общего среднего --- это коэффициенты $b_1, ..., b_5$, взятые с противоположным знаком.
 
 
-## Подбираем коэффициенты модели в параметризации эффектов
+## Коэффициенты модели в параметризации эффектов
+
+<!-- \begin{adjustbox}{max width=\textwidth} -->
+\begin{tabular}{p{1.1cm}|C{0.6cm} C{0.6cm} C{0.6cm} C{0.6cm} C{0.6cm}}
+\textbf{Фактор} & \multicolumn{5}{c}{\textbf{Переменные-эффекты}} \\
+\cline{2-6}
+\texttt{sp} &\texttt{sp1} \newline $x_1$ &  \texttt{sp2} \newline $x_2$ & \texttt{sp3} \newline $x_3$ & \texttt{sp4} \newline $x_4$ & \texttt{sp5} \newline $x_5$\\
+\hline
+Крапив   &  1 &  0  &  0 &  0 &  0 \\
+ЛугКон   &  0 &  1  &  0 &  0 &  0 \\
+Малин    &  0 &  0  &  1 &  0 &  0 \\
+БелТряс  &  0 &  0  &  0 &  1 &  0 \\
+ЛесКон   &  0 &  0  &  0 &  0 &  1 \\
+ЛесЗав   & -1 & -1  & -1 & -1 & -1 \\
+\end{tabular}
+<!-- \end{adjustbox} -->
 
 ```{r}
 mod_sum <- lm(len ~ sp, data = cu, contrasts = list(sp = contr.sum))
@@ -364,6 +423,32 @@ coef(mod_sum)
 \vspace{\baselineskip}
 
 Коэффициенты моделей будут разными в разных параметризациях, но предсказания будут совершенно одинаковыми.
+
+## Уравнение линейной модели в параметризации эффектов
+
+<!-- \begin{adjustbox}{max width=\textwidth} -->
+\begin{tabular}{p{1.1cm}|C{0.6cm} C{0.6cm} C{0.6cm} C{0.6cm} C{0.6cm}}
+\textbf{Фактор} & \multicolumn{5}{c}{\textbf{Переменные-эффекты}} \\
+\cline{2-6}
+\texttt{sp} &\texttt{sp1} \newline $x_1$ &  \texttt{sp2} \newline $x_2$ & \texttt{sp3} \newline $x_3$ & \texttt{sp4} \newline $x_4$ & \texttt{sp5} \newline $x_5$\\
+\hline
+Крапив   &  1 &  0  &  0 &  0 &  0 \\
+ЛугКон   &  0 &  1  &  0 &  0 &  0 \\
+Малин    &  0 &  0  &  1 &  0 &  0 \\
+БелТряс  &  0 &  0  &  0 &  1 &  0 \\
+ЛесКон   &  0 &  0  &  0 &  0 &  1 \\
+ЛесЗав   & -1 & -1  & -1 & -1 & -1 \\
+\end{tabular}
+<!-- \end{adjustbox} -->
+
+```{r purl=FALSE}
+coef(mod_sum)
+```
+```{r echo=FALSE}
+cf <- round(coef(mod_sum), 2)
+```
+
+$$\widehat{len}_i = 22.51 -1.39 sp_{1\ i} -0.22 sp_{2\ i} + 0.05 sp_{3\ i} + 0.38 sp_{4\ i} + 0.57 sp_{5\ i}$$
 
 ## Уравнение линейной модели в параметризации эффектов
 
@@ -769,19 +854,211 @@ qqPlot(mod_treatment, id = FALSE)
 
 Если нас интересуют другие возможные попарные сравнения, нужно сделать пост хок тест.
 
-## Post hoc тесты
+## Есть два способа понять, какие именно группы различаются
 
-Пост хок тесты --- попарные сравнения средних __после того, как дисперсионный анализ показал, что влияние фактора достоверно__
+\columnsbegin
+\column{0.49\textwidth}
 
-### Свойства post hoc тестов:
+\centering{\textbf{Линейные контрасты} (linear contrasts)}
 
-- __Применяются, только если влияние фактора значимо__
-- Делают поправку для снижения вероятности ошибки I рода $\alpha$, (но не слишком большую, чтобы не
-снизилась мощность, и чтобы не возросла вероятность ошибки II рода $\beta$)
-  - Учитывают величину различий между средними
-  - Учитывают количество сравниваемых пар
-- Различаются по степени консервативности (тест Тьюки --- разумный компромисс) 
-- Работают лучше при равных объемах групп, при гомогенности дисперсий
+- Гипотезы о межгрупповых различиях тестируются при помощи комбинаций из коэффициентов линейной модели.
+- Набор гипотез (и сравнений) должен быть определен заранее.
+- Делать можно вне зависимости от результатов дисперсионного анализа.
+
+Этот способ за рамками курса.
+
+\column{0.49\textwidth}
+
+\centering\textbf{Post hoc тесты}
+
+- Сравниваются все возможные группы.
+- Нет четких заранее сформулированных гипотез.
+- Делать можно, только если влияние соответствующего фактора оказалось значимым.
+
+Этот способ мы обсудим.
+
+\columnsend
+
+## Разновидности пост хок тестов
+
+Тесты без поправки на число сравнений:
+
+- Наименьшая значимая разница Фишера (Fisher's Least Significant Difference)
+
+Тесты с поправкой для уровня значимости $\alpha$:
+
+- Поправка Бонферрони (Bonferroni correction)
+- Поправка Сидака (Sidak's correction)
+  
+Тесты, основанные на распределении стьюдентизированного размаха:
+
+- Тест Тьюки (Tuckey's Honest Significant Difference, HSD)
+- Тест Стьюдента-Ньюмена-Кьюлса (Student-Newman-Kewls test, SNK)
+- Тест Даннета (Dunnet's test) --- используется для сравнения с контрольной группой.
+
+Тесты, основанные на F-тестах:
+
+- Критерий Дункана (Dunkan's test)
+- Тест Шеффе (Scheffe's test)
+
+## Наименьшая значимая разница Фишера \newline Fisher's Least Significant Difference
+
+Используется t-критерий с $df = df_e = n - p$:
+
+\vspace{-1\baselineskip}
+
+$$t = \frac{\bar{y}_i - \bar{y}_j}{\sqrt{MS_e \large(\frac{1}{n_i} + \frac{1}{n_j}\large)}}$$
+
+- Подразумевается равенство дисперсий в сравниваемых группах
+
+- Не вносится поправка для уровня значимости, учитывающая множественность сравнений. (Считается, что тест "защищен" от ошибок I рода, т.к. выполняется после того, как в ANOVA была отвергнута гипотеза о равенстве всех внутригрупповых средних).
+
+__Осторожно!__ Этот тест слишком мягок, высока вероятность появления ошибок II рода (т.е. тест находит различия там, где их нет).
+
+## После ANOVA часто приходится сравнивать несколько групп
+
+Фактор в дисперсионном анализе может задавать больше двух групп. (Например, фактор вид птицы-хозяина в нашем примере).
+
+На самом деле _t_-распределение не годится для случая, когда приходится сравнивать больше, чем две группы одновременно.
+
+Вспомните, _t_-распределение --- это распределение стандартизованной разницы \newline средних значений __из\ двух выборок__, взятых из одной генеральной совокупности.
+
+
+\vspace{2\baselineskip}
+
+Нужен способ описать более сложное распределение --- для любого числа выборок.
+
+## Три выборки
+
+Представьте, что мы берем из одной и той же генеральной совокупности три выборки.
+
+Средние значения $\bar y_1$, $\bar y_2$ и $\bar y_3$ в каждой из этих выборок скорее всего окажутся разными и не будут похожи на генеральное среднее $\mu$.
+
+Как оценить, какой может быть эта разница? Нужно построить распределение. Но какое?
+
+\pause
+
+\vspace{2\baselineskip}
+
+1. Возьмем $m$ выборок из одной генеральной совокупности
+
+2. Отсортируем выборочные средние: $\bar y_{1} \ge \bar y_2 \ge \bar y_{3}$
+
+Это можно записать как $\bar y_{max} \ge \bar y_2 \ge \bar y_{min}$
+
+3. Вычислим разницу максимального и минимального средних
+
+$\bar y_{max} - \bar y_{min}$
+
+Если повторить 1--3 много раз, то получится распределение, которое показывает, чему может быть равна разница средних значений в выборках из одной генеральной совокупности. 
+
+Такое распределение можно построить для любого числа выборок $m$.
+
+
+## Распределение стьюдентизированного размаха \newline Studentized range distribution
+
+Это распределение стандартизованной разницы минимального и\ максимального средних __для\ любого числа выборок__ из\ одной генеральной совокупности (форма зависит от\ $df$ и\ от\ числа выборок $m$).
+
+
+```{r echo=FALSE, purl=FALSE}
+# https://en.wikipedia.org/wiki/Studentized_range_distribution
+# https://commons.wikimedia.org/wiki/File:StudentizedRangePDF.svg
+dtukey <- function(q, nmeans, df) {
+    delta = 0.001
+    return (ptukey(q+delta, nmeans, df) - ptukey(q, nmeans, df)) / delta
+}
+
+ggplot(data = data.frame(x = 0:7), aes(x = x)) +
+  stat_function(fun = dtukey, args = list(nmeans = 2, df = 10), 
+                aes(colour = 'm = 2, df = 10'))+
+    stat_function(fun = dtukey, args = list(nmeans = 2, df = 100), 
+                  aes(colour = 'm = 2, df = 100'))+
+  stat_function(fun = dtukey, args = list(nmeans = 3, df = 10), 
+                aes(colour = 'm = 3, df = 10'))+
+    stat_function(fun = dtukey, args = list(nmeans = 3, df = 100), 
+                aes(colour = 'm = 3, df = 100'))+
+  stat_function(fun = dtukey, args = list(nmeans = 5, df = 10), 
+                aes(colour = 'm = 5, df = 10'))+
+  stat_function(fun = dtukey, args = list(nmeans = 5, df = 100), 
+                aes(colour = 'm = 5, df = 100')) +
+  scale_colour_brewer('', palette = 'Paired') +
+  labs(x = 'q', y = 'Плотность вероятности') +
+  theme(legend.position = c(0.8, 0.6), legend.background = element_blank())
+```
+
+
+Формула для случая равных дисперсий и разных объемов групп:
+
+$$q = \frac{\bar{y}_{max} - \bar{y}_{min}}{\sqrt{s^2\frac{1}{2} \large(\frac{1}{n_i} + \frac{1}{n_j}\large)}}$$
+
+
+## Cтьюдентизированный t-критерий консервативнее обычного
+
+\columnsbegin
+
+\column{0.49\textwidth}
+
+\centering\textbf{Обычный t-критерий}
+
+\vspace{-1\baselineskip}
+
+$$t = \frac{\bar{y}_i - \bar{y}_j}{\sqrt{MS_e \large(\frac{1}{n_i} + \frac{1}{n_j}\large)}}$$
+\column{0.49\textwidth}
+
+\centering\textbf{Стьюдентизированный t-критерий}
+
+\vspace{-1\baselineskip}
+
+$$q = \frac{\bar{y}_i - \bar{y}_j}{\sqrt{MS_e \;\frac{1}{2}  \; \large(\frac{1}{n_i} + \frac{1}{n_j}\large)}}$$
+
+<!-- $$q = \frac{\bar{y}_i - \bar{y}_j}{\sqrt{MS_e \;\tikzmarkin<2>{factor} \frac{1}{2} \tikzmarkend{factor} \; \large(\frac{1}{n_i} + \frac{1}{n_j}\large)}}$$ -->
+При этом $\bar{y}_i > \bar{y}_j$, т.е. вычитается из большего меньшее среднее.
+
+\columnsend
+
+\vspace{\baselineskip}
+\pause
+
+\centering{Значение $q$ будет в 1.414 раз больше, чем $t$.
+
+\vspace{-1\baselineskip}
+
+$$q = \frac{t}{\sqrt{\; \frac{1}{2}}} = \sqrt{2} \cdot t = 1.414 \cdot t$$}
+
+<!-- $$q = \frac{t}{\sqrt{\; \tikzmarkin<2>{factor2} \frac{1}{2} \tikzmarkend{factor2} }} = \sqrt{2} \cdot t = 1.414 \cdot t$$} -->
+
+
+## Тест Тьюки (Tuckey's Honest Significant Difference)
+
+Используется стьюдентизированный t-критерий с $df = df_e = n - p$ и $m = p$ (общее число групп):
+
+$$q = \frac{\bar{y}_i - \bar{y}_j}{\sqrt{MS_e\frac{1}{2} \large(\frac{1}{n_i} + \frac{1}{n_j}\large)}}$$
+
+Требуется равенство дисперсий.
+
+## Пост хок тесты различаются по степени консервативности
+
+
+Если посмотреть на критические значения t при сравнении средних при $\alpha = 0.05$ ($m = 4$ группы по 6 наблюдений, $df_e = 20$), становится понятно, что тест Тьюки --- разумный компромисс среди пост хок тестов.
+
+
+<!-- \begin{adjustbox}{max width=0.9\textwidth} -->
+\begin{tabular}{p{4cm}|C{2cm}}
+\textbf{Тест} & \textbf{Критическое значение}\\
+\hline
+Шеффе\textsuperscript{a} & 3.05\\
+Бонферрони (4 группы) &  2.93 \\
+\textbf{Тьюки (HSD)}\textsuperscript{b} &  2.80 \\
+Бонферрони (3 группы) &  2.63 \\
+Даннет\textsuperscript{b} &  2.54 \\
+Дункан\textsuperscript{a, b} &  2.22 \\
+Фишер (LSD) &  2.09 \\
+\end{tabular}
+<!-- \end{adjustbox} -->
+
+\textsuperscript{a} \footnotesize{ --- Значение $t$ соответствующее $F$.} \newline 
+\textsuperscript{b} \footnotesize{ --- Для сопоставимости внесена поправка $\sqrt{2}$.} 
+
 
 ## Пост хок тест Тьюки в R
 
