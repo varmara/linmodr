@@ -7,7 +7,6 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
-<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -99,7 +98,7 @@ code span.wa { color: #008000; font-weight: bold; } /* Warning */
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -143,7 +142,9 @@ h6 {
 
 <link rel="stylesheet" href="my_styles.css" type="text/css" />
 
+</head>
 
+<body>
 
 <style type = "text/css">
 .main-container {
@@ -157,6 +158,7 @@ code {
 }
 img {
   max-width:100%;
+  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -261,6 +263,8 @@ $(document).ready(function () {
 });
 </script>
 
+<div class="container-fluid main-container">
+
 <!-- tabsets -->
 
 <style type="text/css">
@@ -317,9 +321,48 @@ $(document).ready(function () {
 }
 </style>
 
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
 <!-- code folding -->
 
 
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <style type="text/css">
 
@@ -368,6 +411,8 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -382,16 +427,6 @@ div.tocify {
 }
 
 </style>
-
-
-
-</head>
-
-<body>
-
-
-<div class="container-fluid main-container">
-
 
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
@@ -441,16 +476,16 @@ div.tocify {
 </div>
 
 
-<div id="знакомство-с-r-и-базовая-статистика" class="section level2">
+<div id="--r---" class="section level2">
 <h2>Знакомство с R и базовая статистика</h2>
-<div id="знакомство-с-r-16-сент.-мв" class="section level3">
+<div id="--r-16-.-" class="section level3">
 <h3>01 Знакомство с R (16 сент., МВ)</h3>
 <ul>
 <li>Презентация: <a href="01_intro_to_r.html">Знакомство с R</a></li>
-<li>Код: <a href="01_intro_to_r_code.R">01_intro_to_r_code.R</a></li>
+<li>Код: <a href="01_intro_to_r_code.R" class="uri">01_intro_to_r_code.R</a></li>
 </ul>
 </div>
-<div id="основы-ggplot2-19-сент.-вх" class="section level3">
+<div id="-ggplot2-19-.-" class="section level3">
 <h3>02 Основы ggplot2 (19 сент., ВХ)</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</a>
@@ -458,45 +493,45 @@ div.tocify {
 <a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">install.packages</span>(<span class="st">&quot;MASS&quot;</span>)</a></code></pre></div>
 <ul>
 <li>Презентация: <a href="02_intro_ggplot.html">Основы ggplot2</a></li>
-<li>Код: <a href="02_intro_ggplot.R">02_intro_ggplot.R</a></li>
+<li>Код: <a href="02_intro_ggplot.R" class="uri">02_intro_ggplot.R</a></li>
 <li>Данные: <a href="data/Titanic.csv">Titanic.csv</a></li>
 <li>Данные: <a href="data/fev.xls">fev.xls</a></li>
 </ul>
 </div>
-<div id="описательная-статистика-23-сент.-мв" class="section level3">
+<div id="--23-.-" class="section level3">
 <h3>03 Описательная статистика (23 сент., МВ)</h3>
 <p>Часть 1</p>
 <ul>
-<li>Презентация <a href="03.1_descriptive_statistics.html">03.1_descriptive_statistics.html</a></li>
-<li>Код <a href="03.1_descriptive_statistics_code.R">03.1_descriptive_statistics_code.R</a></li>
+<li>Презентация <a href="03.1_descriptive_statistics.html" class="uri">03.1_descriptive_statistics.html</a></li>
+<li>Код <a href="03.1_descriptive_statistics_code.R" class="uri">03.1_descriptive_statistics_code.R</a></li>
 <li>Данные <a href="data/diatome_count.csv">diatome_count.csv</a></li>
 </ul>
 <p>Часть 2</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;car&quot;</span>)</a></code></pre></div>
 <ul>
-<li>Презентация <a href="03.2_descriptive_statistics_normal_d.html">03.2_descriptive_statistics_normal_d.html</a></li>
-<li>Код <a href="03.2_descriptive_statistics_normal_d_code.R">03.2_descriptive_statistics_normal_d_code.R</a></li>
+<li>Презентация <a href="03.2_descriptive_statistics_normal_d.html" class="uri">03.2_descriptive_statistics_normal_d.html</a></li>
+<li>Код <a href="03.2_descriptive_statistics_normal_d_code.R" class="uri">03.2_descriptive_statistics_normal_d_code.R</a></li>
 </ul>
 </div>
-<div id="тестирование-гипотез-26-сент.-мв" class="section level3">
+<div id="--26-.-" class="section level3">
 <h3>04 Тестирование гипотез (26 сент., МВ)</h3>
 <ul>
-<li>Презентация <a href="04_hypothesis_testing.html">04_hypothesis_testing.html</a></li>
-<li>Код <a href="04_hypothesis_testing_code.R">04_hypothesis_testing_code.R</a></li>
+<li>Презентация <a href="04_hypothesis_testing.html" class="uri">04_hypothesis_testing.html</a></li>
+<li>Код <a href="04_hypothesis_testing_code.R" class="uri">04_hypothesis_testing_code.R</a></li>
 <li>Данные <a href="data/aml.csv">aml.csv</a></li>
 </ul>
 </div>
 </div>
-<div id="линейная-регрессия" class="section level2">
+<div id="-" class="section level2">
 <h2>Линейная регрессия</h2>
-<div id="простая-линейная-регрессия-30-сент.-вх" class="section level3">
+<div id="---30-.-" class="section level3">
 <h3>05 Простая линейная регрессия (30 сент., ВХ)</h3>
 <ul>
-<li>Презентация: <a href="05_LM.html">05_LM.html</a></li>
+<li>Презентация: <a href="05_LM.html" class="uri">05_LM.html</a></li>
 <li>Код:
 <ul>
-<li><a href="05_LM_code.R">05_LM_code.R</a></li>
-<li><a href="05_LM_task.R">05_LM_task.R</a></li>
+<li><a href="05_LM_code.R" class="uri">05_LM_code.R</a></li>
+<li><a href="05_LM_task.R" class="uri">05_LM_task.R</a></li>
 </ul></li>
 <li>Данные:
 <ul>
@@ -505,26 +540,26 @@ div.tocify {
 </ul></li>
 </ul>
 </div>
-<div id="основы-линейной-алгебры-3-окт.-вх" class="section level3">
+<div id="---3-.-" class="section level3">
 <h3>06 Основы линейной алгебры (3 окт., ВХ)</h3>
 <ul>
 <li>Презентация: <a href="06_intro_to_linear_algebra.html">06_Introduction_to_linear_algebra.html</a></li>
 <li>Код: <a href="06_intro_to_linear_algebra_code.R">06_Introduction_to_linear_algebra_code.R</a></li>
 </ul>
 </div>
-<div id="описание-проверка-значимости-и-валидности-линейной-модели-7-окт.-мв" class="section level3">
+<div id="-------7-.-" class="section level3">
 <h3>07 Описание, проверка значимости и валидности линейной модели (7 окт., МВ)</h3>
 <p>Часть 1</p>
 <ul>
 <li>Презентация:
 <ul>
-<li><a href="07.1_model_description.html">07.1_model_description.html</a></li>
+<li><a href="07.1_model_description.html" class="uri">07.1_model_description.html</a></li>
 </ul></li>
 <li>Код:
 <ul>
-<li><a href="07.1_model_description_code.R">07.1_model_description_code.R</a></li>
-<li><a href="07.1_task_assumptions_catsM.R">07.1_task_assumptions_catsM.R</a></li>
-<li><a href="07.1_task_assumptions_GAG.R">07.1_task_assumptions_GAG.R</a></li>
+<li><a href="07.1_model_description_code.R" class="uri">07.1_model_description_code.R</a></li>
+<li><a href="07.1_task_assumptions_catsM.R" class="uri">07.1_task_assumptions_catsM.R</a></li>
+<li><a href="07.1_task_assumptions_GAG.R" class="uri">07.1_task_assumptions_GAG.R</a></li>
 </ul></li>
 <li>Данные:
 <ul>
@@ -537,11 +572,11 @@ div.tocify {
 <ul>
 <li>Презентация:
 <ul>
-<li><a href="07.2_model_validation.html">07.2_model_validation.html</a></li>
+<li><a href="07.2_model_validation.html" class="uri">07.2_model_validation.html</a></li>
 </ul></li>
 <li>Код:
 <ul>
-<li><a href="07.2_model_validation_code.R">07.2_model_validation_code.R</a></li>
+<li><a href="07.2_model_validation_code.R" class="uri">07.2_model_validation_code.R</a></li>
 <li>Задания про котов и GAG из прошлой части (работайте в том же коде)</li>
 </ul></li>
 <li>Данные:
@@ -553,40 +588,40 @@ div.tocify {
 </ul></li>
 </ul>
 </div>
-<div id="множественная-линейная-регрессия.-выбор-оптимальной-модели.-10-окт.-вх" class="section level3">
+<div id="--.---.-10-.-" class="section level3">
 <h3>08 Множественная линейная регрессия. Выбор оптимальной модели. (10 окт., ВХ)</h3>
-<div id="часть-1.-множественная-линейная-регрессия" class="section level4">
+<div id="-1.---" class="section level4">
 <h4>Часть 1. Множественная линейная регрессия</h4>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;gridExtra&quot;</span>)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">&quot;ISwR&quot;</span>)</a></code></pre></div>
 <ul>
-<li><p>Презентация: <a href="08.1_multiple_LM.html">08.1_multiple_LM.html</a></p></li>
-<li>Код: <a href="08.1_multiple_LM_code.R">08.1_multiple_LM_code.R</a></li>
+<li><p>Презентация: <a href="08.1_multiple_LM.html" class="uri">08.1_multiple_LM.html</a></p></li>
+<li>Код: <a href="08.1_multiple_LM_code.R" class="uri">08.1_multiple_LM_code.R</a></li>
 <li><p>Данные: <a href="data/loyn.csv">loyn.csv</a></p></li>
 </ul>
 </div>
-<div id="часть-2.-выбор-оптимальной-модели" class="section level4">
+<div id="-2.---" class="section level4">
 <h4>Часть 2. Выбор оптимальной модели</h4>
 <ul>
-<li><p>Презентация: <a href="08.2_model_selection.html">08.2_model_selection.html</a></p></li>
-<li>Код: <a href="08.2_model_selection_code.R">08.2_model_selection_code.R</a></li>
+<li><p>Презентация: <a href="08.2_model_selection.html" class="uri">08.2_model_selection.html</a></p></li>
+<li>Код: <a href="08.2_model_selection_code.R" class="uri">08.2_model_selection_code.R</a></li>
 <li><p>Данные: <a href="data/loyn.csv">loyn.csv</a></p></li>
 </ul>
 </div>
 </div>
 </div>
-<div id="общие-линейные-модели" class="section level2">
+<div id="--" class="section level2">
 <h2>Общие линейные модели</h2>
-<div id="модели-с-непрерывными-и-дискретными-предикторами-ancova-14-окт.-вх" class="section level3">
+<div id="------ancova-14-.-" class="section level3">
 <h3>09 Модели с непрерывными и дискретными предикторами (ANCOVA) (14 окт., ВХ)</h3>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</a></code></pre></div>
-<div id="часть-1.-модели-с-разными-значениями-отрезка-для-групп" class="section level4">
+<div id="-1.-------" class="section level4">
 <h4>Часть 1. Модели с разными значениями отрезка для групп</h4>
 <ul>
-<li>Презентация: <a href="09.1_LM_with_continuous_and_discrete_predictors_2.html">09.1_LM_with_continuous_and_discrete_predictors_2.html</a></li>
+<li>Презентация: <a href="09.1_LM_with_continuous_and_discrete_predictors_2.html" class="uri">09.1_LM_with_continuous_and_discrete_predictors_2.html</a></li>
 <li><p>Код: <a href="09.1_LM_with_continuous_and_discrete_predictors_code_2.R">09.1_LM_with_continuous_and_discrete_predictors_code.R</a></p></li>
-<li><p>Код: <a href="09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R">09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R</a></p></li>
+<li><p>Код: <a href="09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R" class="uri">09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R</a></p></li>
 <li>Данные:
 <ul>
 <li><a href="data/goats.xlsx">goats.xlsx</a></li>
@@ -596,14 +631,14 @@ div.tocify {
 </ul></li>
 </ul>
 </div>
-<div id="часть-2.-модели-с-разными-значениями-угла-наклона-для-групп" class="section level4">
+<div id="-2.--------" class="section level4">
 <h4>Часть 2. Модели с разными значениями угла наклона для групп</h4>
 <ul>
-<li><p>Презентация: <a href="09.2_LM_with_continuous_and_discrete_predictors_interactions.html">09.2_LM_with_continuous_and_discrete_predictors_interactions.html</a></p></li>
+<li><p>Презентация: <a href="09.2_LM_with_continuous_and_discrete_predictors_interactions.html" class="uri">09.2_LM_with_continuous_and_discrete_predictors_interactions.html</a></p></li>
 <li>Код:
 <ul>
-<li><a href="09.2_LM_with_continuous_and_discrete_predictors_interactions.R">09.2_LM_with_continuous_and_discrete_predictors_interactions.R</a></li>
-<li><a href="09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R">09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R</a></li>
+<li><a href="09.2_LM_with_continuous_and_discrete_predictors_interactions.R" class="uri">09.2_LM_with_continuous_and_discrete_predictors_interactions.R</a></li>
+<li><a href="09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R" class="uri">09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R</a></li>
 </ul></li>
 <li>Данные:
 <ul>
@@ -613,16 +648,16 @@ div.tocify {
 </ul>
 </div>
 </div>
-<div id="однофакторный-дисперсионный-анализ-21-окт.-мв" class="section level3">
+<div id="---21-.-" class="section level3">
 <h3>10 Однофакторный дисперсионный анализ (21 окт., МВ)</h3>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;DAAG&quot;</span>, <span class="st">&quot;multcomp&quot;</span>))</a></code></pre></div>
 <ul>
-<li><p>Презентация: <a href="10_anova.pdf">10_anova.pdf</a></p></li>
+<li><p>Презентация: <a href="10_anova.pdf" class="uri">10_anova.pdf</a></p></li>
 <li>Код:
 <ul>
-<li><a href="10_anova_code.R">10_anova_code.R</a></li>
-<li><a href="10_anova_practice_chicks.R">10_anova_practice_chicks.R</a></li>
-<li><a href="10_anova_practice_tomato.R">10_anova_practice_tomato.R</a></li>
+<li><a href="10_anova_code.R" class="uri">10_anova_code.R</a></li>
+<li><a href="10_anova_practice_chicks.R" class="uri">10_anova_practice_chicks.R</a></li>
+<li><a href="10_anova_practice_tomato.R" class="uri">10_anova_practice_tomato.R</a></li>
 </ul></li>
 <li>Данные:
 <ul>
@@ -631,15 +666,15 @@ div.tocify {
 </ul></li>
 </ul>
 </div>
-<div id="многофакторный-дисперсионный-анализ-28-окт.-мв" class="section level3">
+<div id="---28-.-" class="section level3">
 <h3>11 Многофакторный дисперсионный анализ (28 окт., МВ)</h3>
 <ul>
-<li>Презентация: <a href="11_two-way_anova_and_interactions.pdf">11_two-way_anova_and_interactions.pdf</a></li>
+<li>Презентация: <a href="11_two-way_anova_and_interactions.pdf" class="uri">11_two-way_anova_and_interactions.pdf</a></li>
 <li>Код:
 <ul>
-<li><a href="11_two-way_anova_and_interactions_code.R">11_two-way_anova_and_interactions_code.R</a></li>
-<li><a href="11_two-way_anova_practice_ants.R">11_two-way_anova_practice_ants.R</a></li>
-<li><a href="11_two-way_anova_practice_rice.R">11_two-way_anova_practice_rice.R</a></li>
+<li><a href="11_two-way_anova_and_interactions_code.R" class="uri">11_two-way_anova_and_interactions_code.R</a></li>
+<li><a href="11_two-way_anova_practice_ants.R" class="uri">11_two-way_anova_practice_ants.R</a></li>
+<li><a href="11_two-way_anova_practice_rice.R" class="uri">11_two-way_anova_practice_rice.R</a></li>
 </ul></li>
 <li>Данные:
 <ul>
@@ -648,15 +683,17 @@ div.tocify {
 </ul>
 </div>
 </div>
-<div id="обобщенные-линейные-модели-glm" class="section level2">
+<div id="---glm" class="section level2">
 <h2>Обобщенные линейные модели (GLM)</h2>
-<div id="glm-для-нормально-распределенных-данных-11-нояб.-мв" class="section level3">
+<div id="glm-----11-.-" class="section level3">
 <h3>12 GLM для нормально распределенных данных (11 нояб., МВ)</h3>
 <!-- - Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf) -->
-<!-- - Код: [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R) -->
-<!-- - Код задания: [12_GLM_gaussian_practice_model_selection.R](12_GLM_gaussian_practice_model_selection.R) -->
+<ul>
+<li><p>Код: <a href="12_GLM_gaussian_code.R" class="uri">12_GLM_gaussian_code.R</a></p></li>
+<li><p>Код задания: <a href="12_GLM_gaussian_practice_model_selection.R" class="uri">12_GLM_gaussian_practice_model_selection.R</a></p></li>
+</ul>
 </div>
-<div id="glm-для-счетных-данных-18-нояб.-мв" class="section level3">
+<div id="glm----18-.-" class="section level3">
 <h3>13 GLM для счетных данных (18 нояб., МВ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("AER") -->
@@ -667,7 +704,7 @@ div.tocify {
 <!-- - Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R) -->
 <!-- - Частичное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R) -->
 </div>
-<div id="glm-для-бинарных-данных-логистическая-регрессия-25-нояб.-вх" class="section level3">
+<div id="glm------25-.-" class="section level3">
 <h3>14 GLM для бинарных данных (=логистическая регрессия) (25 нояб., ВХ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("ISwR", "cowplot")) -->
@@ -680,9 +717,9 @@ div.tocify {
 <!--     + [ICU.csv](data/ICU.csv) -->
 </div>
 </div>
-<div id="смешанные-модели-glmm" class="section level2">
+<div id="--glmm" class="section level2">
 <h2>Смешанные модели (GLMM)</h2>
-<div id="glmm-для-нормально-распределенных-данных-2-дек.-мв" class="section level3">
+<div id="glmm-----2-.-" class="section level3">
 <h3>15 GLMM для нормально-распределенных данных (2 дек., МВ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("lme4", "pbkrtest")) -->
@@ -701,7 +738,7 @@ div.tocify {
 <!--     + [15.2_GLMM_gaussian_nested_code.R](15.2_GLMM_gaussian_nested_code.R) -->
 <!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
 </div>
-<div id="моделирование-структуры-дисперсии-в-смешаных-моделях-9-дек.-вх" class="section level3">
+<div id="------9-.-" class="section level3">
 <h3>16 Моделирование структуры дисперсии в смешаных моделях (9 дек., ВХ)</h3>
 <!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
 <!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
@@ -712,7 +749,7 @@ div.tocify {
 <!-- install.packages("faraway") -->
 <!-- ``` -->
 </div>
-<div id="glmm-для-счетных-данных-16-дек.-мв" class="section level3">
+<div id="glmm----16-.-" class="section level3">
 <h3>17 GLMM для счетных данных (16 дек., МВ)</h3>
 <!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
 <!-- - Код: -->
@@ -723,7 +760,7 @@ div.tocify {
 <!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
 <!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
 </div>
-<div id="glmm-для-бинарных-данных-23-дек.-вх" class="section level3">
+<div id="glmm----23-.-" class="section level3">
 <h3>18 GLMM для бинарных данных (23 дек., ВХ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("MASS", "glmmML", "lme4", "doBy")) -->
@@ -761,49 +798,6 @@ $(document).ready(function () {
 });
 
 
-</script>
-
-<!-- tabsets -->
-
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
-<!-- code folding -->
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = false;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
