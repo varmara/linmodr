@@ -70,7 +70,7 @@ ggplot(pi, aes(x = y, y = pi)) +
 
 \vspace{-\baselineskip}
 
-$$f(y)= \frac{\mu^y \cdot e{-\mu}}{y!}$$
+$$f(y)= \frac{\mu^y \cdot e^{-\mu}}{y!}$$
 
 Параметр:
 
@@ -1133,7 +1133,7 @@ ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
 ```
 
 
-## Выводы.
+## Выводы
 
 Число визитов опылителей на цветки гадючьего лука зависит не от присутствия вида вселенца или его цветов, а от разнообразия флоры на данном участке (тест отношения правдоподобий, $p = 0.02$).
 
@@ -1166,6 +1166,6 @@ ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
 
 ## Что почитать
 
-+ Zuur, A.F. and Ieno, E.N., 2016. A protocol for conducting and presenting results of regression‐type analyses. Methods in Ecology and Evolution, 7(6), pp.636-645.
++ Zuur, A.F. and Ieno, E.N., 2016. A protocol for conducting and presenting results of regression-type analyses. Methods in Ecology and Evolution, 7(6), pp.636-645.
 + Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014
 + Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data. Springer Science & Business Media.

@@ -96,7 +96,8 @@ sigma(M_norm)
 
 # ## Данные для графика предсказаний простой линейной модели
 library(dplyr)
-NewData <- pol %>% group_by(Treatment)%>%
+NewData <- pol %>%
+  group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
          Hours = mean(pol$Hours))
@@ -117,7 +118,7 @@ gg_norm <- ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
   geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha=0.3)+
   geom_line(aes(colour = Treatment)) +
   geom_hline(yintercept = 0)
-
+gg_norm
 
 # ## Смотрим на результаты подбора модели
 summary(M_norm)
@@ -162,11 +163,12 @@ drop1(M_pois, test = 'Chi')
 
 
 # ## Данные для предсказаний
-NewData <- pol %>% group_by(Treatment)%>%
+NewData <- pol %>%
+  group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
          Hours = mean(pol$Hours))
-
+NewData
 
 # ## Предсказания модели при помощи операций с матрицами
 
@@ -288,11 +290,12 @@ overdisp_fun(M_nb)
 
 
 # ## Данные для предсказаний
-NewData <- pol %>% group_by(Treatment)%>%
+NewData <- pol %>%
+  group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
          Hours = mean(pol$Hours))
-
+NewData
 
 # Задание 3 -----------------------------------------------
 
