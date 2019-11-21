@@ -1,7 +1,7 @@
 # "Регресионный анализ для бинарных данных"
 # Вадим Хайтов, Марина Варфоломеева
 # Каф. Зоологии беспозвоночных, СПбГУ
-# Линейные модели на R, осень 2015
+# Линейные модели на R, осень 2019
 
 
 
@@ -43,14 +43,18 @@ ggplot(astr, aes(y = 1:nrow(astr))) + geom_point(aes(x = L) )
 
 astr$Out <- ifelse(test = astr$Outcome == 'eaten', yes = 1,  no = 0)
 
+# Задание
+# Постройте и визуализируйте glm, основаную на нормальном распределении
 
-mod_norm <- glm(Out ~ Sp * L * Box, data = astr)
+mod_norm <- ( ~  , data = astr)
 
+
+# Визуализаця в зависимости от Sp, Box и L
 library(dplyr)
-new_data <- astr %>% group_by(Sp, Box)%>%
+new_data <- astr %>% group_by( , )%>%
   do(data.frame(L = seq(min(.$L), max(.$L), length.out = 100)))
 
-new_data$fit <- predict(mod_norm, newdata = new_data) # Предсказанные значения
+new_data$fit <- (mod_norm,  = new_data) # Предсказанные значения
 
 ggplot(new_data, aes(x = L, y = fit)) +
   geom_line(aes(group = Box)) + facet_wrap(~ Sp, ncol = 2) +
@@ -68,6 +72,11 @@ ggplot(mod_norm_diag, aes(x = .fitted, y = .stdresid)) +
 # Строим полную модель
 
 mod <- glm(Out ~ Sp*L*Box, family = binomial(link = 'logit'), data = astr)
+
+
+# Задание
+# Оцените, какая связывающая функция лучше подойдет для этой модели
+
 
 
 ## Анализ девиансы для полной модели
