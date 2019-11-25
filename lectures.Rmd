@@ -204,7 +204,11 @@ install.packages(c("ISwR", "cowplot"))
 ```
 
 <!-- - Презентация: [14_GLM_binary.pdf](14_GLM_binary.pdf) -->
+<<<<<<< HEAD
 - Код: [14_GLM_binary_code_new.R](14_GLM_binary_code_new.R)
+=======
+- Код: [14_GLM_binary_code.R](14_GLM_binary_code_new.R)
+>>>>>>> 405dd7f13cec1593283d6e9ab35f6988565809fb
 - Данные:
     + [aster_mussel.csv](data/aster_mussel.csv)
     + [polis.csv](data/polis.csv)
