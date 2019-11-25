@@ -235,9 +235,9 @@ anova(M15, M1, test = "Chi")
 summary(M15)
 
 
-M15_diagn <- fortify(M15)
+M16_diagn <- fortify(M16)
 
-ggplot(M15_diagn, aes(x = .fitted, y =.stdresid)) + geom_point() + geom_smooth()
+ggplot(M16_diagn, aes(x = .fitted, y =.stdresid)) + geom_point() + geom_smooth()
 
 
 
@@ -247,28 +247,24 @@ ggplot(M15_diagn, aes(x = .fitted, y =.stdresid)) + geom_point() + geom_smooth()
 
 library(dplyr)
 
-M15_diagn$group <- ntile(M15_diagn$.fitted, 10)
+M16_diagn$group <- ntile(M16_diagn$.fitted, 10)
 
-resi_and_fit <- M15_diagn %>%  group_by(group) %>%  summarise(mean_fit = mean(.fitted), mean_res = mean(.stdresid))
+resi_and_fit <- M16_diagn %>%  group_by(group) %>%  summarise(mean_fit = mean(.fitted), mean_res = mean(.stdresid))
 
 qplot(resi_and_fit$mean_fit, resi_and_fit$mean_res ) + geom_smooth()
 
-lm(mean_res ~ mean_fit, data = resi_and_fit )
-
-exp(coef(M15)[3])
 
 
 #Визуализируем предсказания модели, взяв пр этом TYPE == mergency
 
-MyData = expand.grid(AGE = ,
-                     CAN = ,
-                     SYS = ,
-                     LOC = ,
-                     TYP = "Emergency")
+MyData = surviv %>% group_by(CAN,  TYP, PH, PCO, LOC) %>% do(data.frame(SYS = seq(min(.$SYS), max(.$SYS), length.out = 100)))
 
-MyData$Predicted <- predict(M15, newdata = MyData, type = )
+MyData$AGE <- mean(surviv$AGE)
 
 
+MyData$Predicted <- predict(M16, newdata = MyData, type = "response" )
 
-ggplot(MyData, aes(x=, y = Predicted, color = , group = )) + geom_line() + facet_grid(LOC~ CAN, labeller = label_both) + scale_color_gradient(low = "green",  high = "red") + labs(label = list(x = "Давление в момент реанимации (SYS)", y = "Вероятность гибели", color = "Возраст", title = "Предсказания модели"))
+
+
+ggplot(MyData[MyData$TYP == "Emergency", ], aes(x=SYS, y = Predicted)) + geom_line() + facet_grid(LOC + PH + PCO ~ CAN, labeller = label_both) + scale_color_gradient(low = "green",  high = "red") + labs(label = list(x = "Давление в момент реанимации (SYS)", y = "Вероятность гибели", title = "Предсказания модели")) + theme_bw()
 
