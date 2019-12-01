@@ -215,14 +215,14 @@ install.packages(c("ISwR", "cowplot"))
 
 ### 15 GLMM для нормально-распределенных данных (2 дек., МВ)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("lme4", "pbkrtest")) -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("lme4", "pbkrtest"))
+```
 
 <!-- - Презентация: -->
 <!--     + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf) -->
-<!-- - Код: -->
-<!--     + [15.1_GLMM_gaussian_random_intercept_slope_code.R](15.1_GLMM_gaussian_random_intercept_slope_code.R) -->
+- Код:
+    + [15.1_GLMM_gaussian_random_intercept_slope_code.R](15.1_GLMM_gaussian_random_intercept_slope_code.R)
 
 <!-- Демонстрация LRT при помощи бутстрепа: [15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R](15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R) -->
 
@@ -233,9 +233,9 @@ install.packages(c("ISwR", "cowplot"))
 
 <!-- - Презентация: -->
 <!--     + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf) -->
-<!-- - Код: -->
-<!--     + [15.2_GLMM_gaussian_nested_code.R](15.2_GLMM_gaussian_nested_code.R) -->
-<!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
+- Код:
+    + [15.2_GLMM_gaussian_nested_code.R](15.2_GLMM_gaussian_nested_code.R)
+- Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx)
 
 
 ### 16 Моделирование структуры дисперсии в смешаных моделях (9 дек., ВХ)
