@@ -228,6 +228,7 @@ install.packages(c("lme4", "pbkrtest"))
 
 - Задание:
     + Код: [15.1_GLMM_gaussian_choccake_practice.R](15.1_GLMM_gaussian_choccake_practice.R)
+    + Данные: [choccake.csv](data/choccake.csv)
 
 <!-- + Решение (частичное): [15.1_GLMM_gaussian_choccake_solution.R](15.1_GLMM_gaussian_choccake_solution.R) -->
 
