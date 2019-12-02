@@ -226,8 +226,8 @@ install.packages(c("lme4", "pbkrtest"))
 
 <!-- Демонстрация LRT при помощи бутстрепа: [15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R](15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R) -->
 
-<!-- - Задание: -->
-<!--     + Код: [15.1_GLMM_gaussian_choccake_practice.R](15.1_GLMM_gaussian_choccake_practice.R) -->
+- Задание:
+    + Код: [15.1_GLMM_gaussian_choccake_practice.R](15.1_GLMM_gaussian_choccake_practice.R)
 
 <!-- + Решение (частичное): [15.1_GLMM_gaussian_choccake_solution.R](15.1_GLMM_gaussian_choccake_solution.R) -->
 
