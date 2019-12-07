@@ -415,7 +415,7 @@ M6_gls$modelStruct
 $$
 \varepsilon_{ij} \sim N(0, \sigma^2 \times (\delta_1 + |VC|^{2\delta_2})^2)
 $$
-То есть подбирается не только показатель степени $\delta_2=0$, но еще и константа $\delta_1=0$
+То есть подбирается не только показатель степени $\delta_2$, но еще и константа $\delta_1$
 
 При $\delta_1=0$ и $\delta_2=0$ выражение $\varepsilon_{ij} \sim N(0,\sigma^2 \times (0 + |VC|^{0})$ будет эквивалентно $\varepsilon_{ij} \sim N(0, \sigma^2)$  
 
@@ -695,7 +695,7 @@ Anova(M3)
 
 ## Диагностика модели
 
-```{r echo=FALSE, purl=FALSE}
+```{r echo=TRUE, purl=FALSE}
 diagnostic <- data.frame(.fitted = fitted(M3), .residuals = residuals(M3, type = "pearson"), Diet = bw$Diet, Time = bw$Time)
 Pl1 <- ggplot(diagnostic, aes(x=.fitted, y=.residuals) ) + geom_point()
 Pl2 <- ggplot(diagnostic, aes(x=Time, y=.residuals) ) + geom_point()
