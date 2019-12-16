@@ -141,7 +141,7 @@ M1 <- glmer(Infestation ~ Treatment * Branch + StartBranchAct + BranchBerries + 
 
 M2 <- glmer(Infestation ~ Treatment * Branch + StartBranchAct_std + BranchBerries_std + (1|Site), data = ants, family = "poisson")
 
-overdisp(M2)
+overdisp_fun(M2)
 # Сверхдисперсия. Почему?
 
 # Есть ли паттерны в остатках
@@ -243,7 +243,7 @@ th <- lme4:::est_theta(M2)
 NB1 <- update(M2, family = negative.binomial(theta = th))
 # Ура!
 
-overdisp(NB1)
+overdisp_fun(NB1)
 # Сверхдисперсия осталась!
 
 # Есть ли паттерны в остатках?
@@ -311,7 +311,7 @@ ctrl.pois = glmerControl(optimizer = 'bobyqa',
 M_ori1 <- glmer(Infestation ~ Treatment * Branch + StartBranchAct_std + BranchBerries_std + (1 | Site) + (1|Index), data = ants, family = "poisson", control = ctrl.pois)
 # Ура!
 
-overdisp(M_ori1)
+overdisp_fun(M_ori1)
 # Сверхдисперсия ушла. Почему и как?
 
 # Давайте посмотрим в summary()

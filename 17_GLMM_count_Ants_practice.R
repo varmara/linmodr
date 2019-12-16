@@ -42,7 +42,7 @@ library(car)
 library(dplyr)
 library(tidyr)
 library(lme4)
-library(sjstats)
+# library(sjstats)
 
 stand <- function(x) {
   (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
@@ -50,7 +50,7 @@ stand <- function(x) {
 
 
 ## Подготовка данных ####
-ants <- read_excel("Morris_2015_Ants.xlsx", sheet = "Data", na = "NA")
+ants <- read_excel("data/Morris_2015_Ants.xlsx", sheet = "Data", na = "NA")
 str(ants)
 
 # Переименовываем переменные
@@ -112,10 +112,10 @@ vif(M)
 # Как бороться за сходимость модели?
 # https://rstudio-pubs-static.s3.amazonaws.com/33653_57fc7b8e5d484c909b615d8633c01d51.html
 
-# M <- glmer(Infestation ~ Treatment * Branch +
-#              StartBranchAct + BranchBerries +
-#              ClusterBerries + TotRemoved + (1|Site),
-#            data = ants, family = "poisson")
+M <- glmer(Infestation ~ Treatment * Branch +
+             StartBranchAct + BranchBerries +
+             ClusterBerries + TotRemoved + (1|Site),
+           data = ants, family = "poisson")
 
 ## Задание #######################################
 
@@ -123,3 +123,6 @@ vif(M)
 # бурильщиком от плотности жуков, доступа
 # муравьев, начальной активности муравьев на
 # ветке, общего числа ягод.
+
+
+
