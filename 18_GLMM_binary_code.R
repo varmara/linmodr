@@ -194,13 +194,17 @@ model6_unscaled <- glmer(Out ~ L + Sp +
 
 
 ########### Самостоятельная работа  ###########################
+
+# Вариант 1. От чего зависит судьба морских желудей?
+# Данные взяты из работы Yakovis, E., & Artemieva, A. (2015). Bored to death: community-wide effect of predation on a foundation Species in a low-Disturbance arctic subtidal system. PloS one, 10(7), e0132973.
+
 #Читаем данные
 
 bal <- read.table("data/Yakovis2.csv", header = TRUE, sep = ";")
 
 
 # Задание: Как связана вероятность гибели балнуса от
-BorN ALength  Position  Site
+# BorN ALength  Position  Site
 
 #Some housekeeping
 bal$Site <- factor(bal$Site)
@@ -238,7 +242,7 @@ summary(M1_glmer)
 
 
 
-#Строим модель для идентификации криптических видов
+#Вариат 2. Можно ли использовать морфологический маркер для идентификации криптических видов мидий
 # Данные взяты из работы M.Katolikova, V.Khaitov, R.Väinölä, M.Gantsevich, P.Strelkov "Genetic, Ecological and Morphological Distinctness of the Blue Mussels Mytilus trossulus Gould and M. edulis L. in the White Sea" PLOS ONE DOI:10.1371/journal.pone.0152963
 
 myt <- read.table("data/myt_gen_morph.csv", header = TRUE, sep = ";")
@@ -257,8 +261,6 @@ myt$Sp[myt$structure < 0.5] <- 0
 
 
 # Строим модели
-
-Myt_M1 <- glmer(Sp ~ Z + (1|population), data = myt, family = "binomial")
 
 
 summary(Myt_M1)
