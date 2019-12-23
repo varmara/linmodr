@@ -236,6 +236,9 @@ library(lme4)
 summary(M1_glmer)
 
 
+# Вот модель, которая нужна!
+M <- glmer(Drill ~ BorN + ALength + Position + Site + (1 |Sample), data = bal2, family = binomial("logit"))
+
 
 
 

@@ -273,7 +273,7 @@ install.packages(c("MASS", "glmmML", "lme4", "doBy"))
 install.packages("sjstats")
 ```
 
-<!-- - Презентация: [18_GLMM_binary.html](18_GLMM_binary.html) -->
+- Презентация: [18_GLMM_binary.html](18_GLMM_binary.html)
 
 - Код: [18_GLMM_binary_code.R](18_GLMM_binary_code.R)
 - Данные:
