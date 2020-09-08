@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -70,7 +70,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -219,6 +218,7 @@ $(document).ready(function () {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -231,48 +231,9 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = false;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <style type="text/css">
 
@@ -286,6 +247,12 @@ $(document).ready(function ()  {
 }
 }
 
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
 
 .toc-content {
   padding-left: 30px;
@@ -321,8 +288,6 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -396,30 +361,34 @@ div.tocify {
 </div>
 
 
-<div id="-" class="section level2">
+<div id="о-курсе" class="section level2">
 <h2>О курсе</h2>
-<div id="---" class="section level3">
+<div id="цель-и-задачи-курса" class="section level3">
 <h3>Цель и задачи курса</h3>
 <p>Курс знакомит с применением различных вариантов линейных моделей в биологии (регрессионный анализ, анализ ковариаций, дисперсионный анализ, логистическая регрессия, смешанные линейные модели). В итоге, вы сможете критически оценивать корректность применения методов статистики в научных статьях, самостоятельно анализировать данные с использованием скриптов на языке статистического программирования R, представлять в наглядном виде результаты анализов, интерпретировать их и представлять в виде научного отчета.</p>
 </div>
-<div id="--" class="section level3">
+<div id="расписание-и-контакты" class="section level3">
 <h3>Расписание и контакты</h3>
-<!-- С 24 сентября 1--2 парой в понедельник и 1 парой в четверг. -->
+<p>Осенью 2020г. курс проходит дистанционно в связи с ситуацией с COVID-19.</p>
+<ul>
+<li>1 часть на Coursera по приглашению “Знакомство с R и базовая статистика” с 10.09 по 11.10.</li>
+<li>2 часть онлайн (в Zoom) c 12 октября 1–2 парой в понедельник и четверг.</li>
+</ul>
 <p>Инструкторы:</p>
 <ul>
 <li>Варфоломеева Марина Александровна - marina.nikolaeva[]gmail.com, <code>varmara</code> в Телеграм</li>
 <li>Хайтов Вадим Михайлович - polydora[]rambler.ru, <code>polydora</code> в Телеграм</li>
 </ul>
 </div>
-<div id="---" class="section level3">
+<div id="задания-дедлайны-и-оценки" class="section level3">
 <h3>Задания, дедлайны и оценки</h3>
 <ol style="list-style-type: decimal">
 <li><p>Тесты по каждой теме будут размещены на платформе Stepik. После мягкого дедлайна (день следующего занятия) за задания начисляется только половина баллов.</p></li>
-<li><p>В конце курса будет финальный тест, тоже на Stepik</p></li>
+<li><p>В конце курса будет финальный тест, тоже на Stepik.</p></li>
 </ol>
 <p>Итоговая оценка:</p>
-<p>Если вы набрали в течение этого курса больше 60% всех возможных баллов (за тесты и финальный тест) - у вас зачет.</p>
-<p>Если вы хотите более тонко оценивать ваш прогресс, вот вам ориентир: 60-69% - это удовлетворительно, 70-79% - хорошо, больше 80% - отлично.</p>
+<p>Если вы набрали в течение этого курса больше 80% всех возможных баллов (за тесты и финальный тест) - у вас зачет. Такой высокий порог в этом году связан с тем, что в бесплатной версии Stepik отменили ограничение числа попыток.</p>
+<p>Если вы хотите более тонко оценивать ваш прогресс, вот вам ориентир: 80-85% - это удовлетворительно, 86-90% - хорошо, больше 90% - отлично.</p>
 <p><strong>NB</strong>: Возможно, точное общее количество баллов будет скорректировано, если вдруг мы добавим несколько заданий.</p>
 </div>
 </div>
@@ -447,6 +416,49 @@ $(document).ready(function () {
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
