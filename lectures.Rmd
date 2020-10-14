@@ -48,7 +48,7 @@ install.packages("car")
 
 ## Линейная регрессия
 
-### 05 Простая линейная регрессия  (12 окт, ВХ)
+### 05 Простая линейная регрессия  (15 окт, ВХ)
 
 <!-- - Презентация: [05_LM.html](05_LM.html) -->
 - Код:
@@ -58,7 +58,7 @@ install.packages("car")
     + [IQ_brain.csv](data/IQ_brain.csv)
     + [secher.xls](data/secher.xls)
 
-### 06 Основы линейной алгебры (15 окт., ВХ)
+### 06 Основы линейной алгебры (19 окт., ВХ)
 
 <!-- - Презентация: [06_Introduction_to_linear_algebra.html](06_intro_to_linear_algebra.html) -->
 <!-- - Код: [06_Introduction_to_linear_algebra_code.R](06_intro_to_linear_algebra_code.R) -->
