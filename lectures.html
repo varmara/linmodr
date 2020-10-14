@@ -44,7 +44,7 @@ a.sourceLine { text-indent: -1em; padding-left: 1em; }
 pre.numberSource a.sourceLine
   { position: relative; left: -4em; }
 pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+  { content: attr(title);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
@@ -458,10 +458,10 @@ div.tocify {
 </div>
 <div id="основы-ggplot2-19-сент.-вх" class="section level3">
 <h3>02 Основы ggplot2 (19 сент., ВХ)</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">install.packages</span>(<span class="st">&quot;tidyr&quot;</span>)</a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">install.packages</span>(<span class="st">&quot;MASS&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">install.packages</span>(<span class="st">&quot;tidyr&quot;</span>)</a>
+<a class="sourceLine" id="cb1-4" title="4"><span class="kw">install.packages</span>(<span class="st">&quot;MASS&quot;</span>)</a></code></pre></div>
 <ul>
 <li>Презентация: <a href="02_intro_ggplot.html">Основы ggplot2</a></li>
 <li>Код: <a href="02_intro_ggplot.R">02_intro_ggplot.R</a></li>
@@ -478,7 +478,7 @@ div.tocify {
 <li>Данные <a href="data/diatome_count.csv">diatome_count.csv</a></li>
 </ul>
 <p>Часть 2</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;car&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;car&quot;</span>)</a></code></pre></div>
 <ul>
 <li>Презентация <a href="03.2_descriptive_statistics_normal_d.html">03.2_descriptive_statistics_normal_d.html</a></li>
 <li>Код <a href="03.2_descriptive_statistics_normal_d_code.R">03.2_descriptive_statistics_normal_d_code.R</a></li>
@@ -498,12 +498,18 @@ div.tocify {
 <div id="простая-линейная-регрессия-12-окт-вх" class="section level3">
 <h3>05 Простая линейная регрессия (12 окт, ВХ)</h3>
 <!-- - Презентация: [05_LM.html](05_LM.html) -->
-<!-- - Код: -->
-<!--     + [05_LM_code.R](05_LM_code.R) -->
-<!--     + [05_LM_task.R](05_LM_task.R) -->
-<!-- - Данные: -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!--     + [secher.xls](data/secher.xls) -->
+<ul>
+<li>Код:
+<ul>
+<li><a href="05_LM_code.R">05_LM_code.R</a></li>
+<li><a href="05_LM_task.R">05_LM_task.R</a></li>
+</ul></li>
+<li>Данные:
+<ul>
+<li><a href="data/IQ_brain.csv">IQ_brain.csv</a></li>
+<li><a href="data/secher.xls">secher.xls</a></li>
+</ul></li>
+</ul>
 </div>
 <div id="основы-линейной-алгебры-15-окт.-вх" class="section level3">
 <h3>06 Основы линейной алгебры (15 окт., ВХ)</h3>
@@ -749,7 +755,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0
