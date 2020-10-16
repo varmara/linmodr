@@ -4,16 +4,16 @@
 # author: "Вадим Хайтов, Марина Варфоломеева"
 
 ## Читаем данные
-brain <- read.csv("data/IQ_brain.csv", header = TRUE)
+brain <- read.csv("data/IQ_brain.csv", sep = ",",  header = TRUE)
 head(brain)
 
 
 ## Находим строки с пропущенными значениями
-sum(!complete.cases(brain))
 
-colSums(is.na(brain))
 
-brain[!complete.cases(brain), ]
+## Строим график
+
+
 
 
 
@@ -21,23 +21,8 @@ brain[!complete.cases(brain), ]
 
 
 
-
-
-library(ggplot2)
-## Строим график
-
-pl_brain <-
-
-pl_brain
-
-
-
-
-
 ## Подгоняем модель с помощью функции lm()
 brain_model <-
-
-
 
 
 
@@ -50,12 +35,13 @@ brain_model <-
 
 
 
+
 ##Находим доверительные интервалы для параметров
 
 
 
-
 ##Рисуем графики для разных уровней значимости
+
 pl_alpha1 <- pl_brain + geom_smooth(method="lm", level=0.8) + ggtitle(bquote(alpha==0.2))
 
 pl_alpha2 <- pl_brain + geom_smooth(method="lm", level=0.95) + ggtitle(bquote(alpha==0.05))
