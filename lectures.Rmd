@@ -60,7 +60,7 @@ install.packages("car")
 
 ### 06 Основы линейной алгебры (19 окт., ВХ)
 
-<!-- - Презентация: [06_Introduction_to_linear_algebra.html](06_intro_to_linear_algebra.html) -->
+- Презентация: [06_Introduction_to_linear_algebra.html](06_intro_to_linear_algebra.html)
 - Код: [06_Introduction_to_linear_algebra_code.R](06_intro_to_linear_algebra_code.R)
 
 ### 07 Описание, проверка значимости и валидности линейной модели (19 окт., МВ)
