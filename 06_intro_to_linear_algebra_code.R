@@ -30,7 +30,7 @@ Small
 Large + Small
 
 
-##Скалярное произведеине
+##Простое произведеине
 
 Rpocessed_portion <- c(1, 1, 1/2, 1/3, 1/4)
 Processed_Factor <- 1/Rpocessed_portion
