@@ -13,6 +13,7 @@
 
 <title>Презентации и данные</title>
 
+<script src="site_libs/header-attrs-2.1/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/simplex.min.css" rel="stylesheet" />
@@ -27,26 +28,27 @@
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -55,9 +57,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; } /* Alert */
 code span.an { color: #008000; } /* Annotation */
@@ -438,6 +440,7 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
+
 <div class="fluid-row" id="header">
 
 
@@ -458,10 +461,10 @@ div.tocify {
 </div>
 <div id="основы-ggplot2-19-сент.-вх" class="section level3">
 <h3>02 Основы ggplot2 (19 сент., ВХ)</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</a>
-<a class="sourceLine" id="cb1-2" title="2"><span class="kw">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</a>
-<a class="sourceLine" id="cb1-3" title="3"><span class="kw">install.packages</span>(<span class="st">&quot;tidyr&quot;</span>)</a>
-<a class="sourceLine" id="cb1-4" title="4"><span class="kw">install.packages</span>(<span class="st">&quot;MASS&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">install.packages</span>(<span class="st">&quot;tidyr&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">install.packages</span>(<span class="st">&quot;MASS&quot;</span>)</span></code></pre></div>
 <ul>
 <li>Презентация: <a href="02_intro_ggplot.html">Основы ggplot2</a></li>
 <li>Код: <a href="02_intro_ggplot.R">02_intro_ggplot.R</a></li>
@@ -478,7 +481,7 @@ div.tocify {
 <li>Данные <a href="data/diatome_count.csv">diatome_count.csv</a></li>
 </ul>
 <p>Часть 2</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">install.packages</span>(<span class="st">&quot;car&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;car&quot;</span>)</span></code></pre></div>
 <ul>
 <li>Презентация <a href="03.2_descriptive_statistics_normal_d.html">03.2_descriptive_statistics_normal_d.html</a></li>
 <li>Код <a href="03.2_descriptive_statistics_normal_d_code.R">03.2_descriptive_statistics_normal_d_code.R</a></li>
@@ -518,8 +521,8 @@ div.tocify {
 <li>Код: <a href="06_intro_to_linear_algebra_code.R">06_Introduction_to_linear_algebra_code.R</a></li>
 </ul>
 </div>
-<div id="описание-проверка-значимости-и-валидности-линейной-модели-19-окт.-мв" class="section level3">
-<h3>07 Описание, проверка значимости и валидности линейной модели (19 окт., МВ)</h3>
+<div id="описание-проверка-значимости-и-валидности-линейной-модели-22-окт.-мв" class="section level3">
+<h3>07 Описание, проверка значимости и валидности линейной модели (22 окт., МВ)</h3>
 <p>Часть 1</p>
 <!-- - Презентация: -->
 <!--     + [07.1_model_description.html](07.1_model_description.html) -->
@@ -543,8 +546,8 @@ div.tocify {
 <!--     + [catsM.xlsx](data/catsM.xlsx) -->
 <!--     + [GAGurine.xlsx](data/GAGurine.xlsx) -->
 </div>
-<div id="множественная-линейная-регрессия.-выбор-оптимальной-модели.-22-окт.-вх" class="section level3">
-<h3>08 Множественная линейная регрессия. Выбор оптимальной модели. (22 окт., ВХ)</h3>
+<div id="множественная-линейная-регрессия.-выбор-оптимальной-модели.-26-окт.-вх" class="section level3">
+<h3>08 Множественная линейная регрессия. Выбор оптимальной модели. (26 окт., ВХ)</h3>
 <p>Часть 1. Множественная линейная регрессия</p>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("gridExtra") -->
@@ -561,8 +564,8 @@ div.tocify {
 </div>
 <div id="общие-линейные-модели" class="section level2">
 <h2>Общие линейные модели</h2>
-<div id="модели-с-непрерывными-и-дискретными-предикторами-ancova-26-окт.-вх" class="section level3">
-<h3>09 Модели с непрерывными и дискретными предикторами (ANCOVA) (26 окт., ВХ)</h3>
+<div id="модели-с-непрерывными-и-дискретными-предикторами-ancova-29-окт.-вх" class="section level3">
+<h3>09 Модели с непрерывными и дискретными предикторами (ANCOVA) (29 окт., ВХ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("readxl") -->
 <!-- install.packages("cowplot") -->
@@ -585,8 +588,8 @@ div.tocify {
 <!--     + [loyn.csv](data/loyn.csv) -->
 <!--     + [birthwt.csv](data/birthwt.csv) -->
 </div>
-<div id="однофакторный-дисперсионный-анализ-29-окт.-мв" class="section level3">
-<h3>10 Однофакторный дисперсионный анализ (29 окт., МВ)</h3>
+<div id="однофакторный-дисперсионный-анализ-2-нояб.-мв" class="section level3">
+<h3>10 Однофакторный дисперсионный анализ (2 нояб., МВ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("DAAG", "multcomp")) -->
 <!-- ``` -->
@@ -599,8 +602,8 @@ div.tocify {
 <!--     + [chickwts.csv](data/chickwts.csv) -->
 <!--     + [tomato.csv](data/tomato.csv) -->
 </div>
-<div id="многофакторный-дисперсионный-анализ-2-ноя.-мв" class="section level3">
-<h3>11 Многофакторный дисперсионный анализ (2 ноя., МВ)</h3>
+<div id="многофакторный-дисперсионный-анализ-5-ноя.-мв" class="section level3">
+<h3>11 Многофакторный дисперсионный анализ (5 ноя., МВ)</h3>
 <!-- - Презентация: [11_two-way_anova_and_interactions.pdf](11_two-way_anova_and_interactions.pdf) -->
 <!-- - Код:  -->
 <!--     + [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R) -->
@@ -612,14 +615,14 @@ div.tocify {
 </div>
 <div id="обобщенные-линейные-модели-glm" class="section level2">
 <h2>Обобщенные линейные модели (GLM)</h2>
-<div id="glm-для-нормально-распределенных-данных-5-нояб.-мв" class="section level3">
-<h3>12 GLM для нормально распределенных данных (5 нояб., МВ)</h3>
+<div id="glm-для-нормально-распределенных-данных-9-нояб.-мв" class="section level3">
+<h3>12 GLM для нормально распределенных данных (9 нояб., МВ)</h3>
 <!-- - Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf) -->
 <!-- - Код: [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R) -->
 <!-- - Код задания: [12_GLM_gaussian_practice_model_selection.R](12_GLM_gaussian_practice_model_selection.R) -->
 </div>
-<div id="glm-для-счетных-данных-9-нояб.-мв" class="section level3">
-<h3>13 GLM для счетных данных (9 нояб., МВ)</h3>
+<div id="glm-для-счетных-данных-12-нояб.-мв" class="section level3">
+<h3>13 GLM для счетных данных (12 нояб., МВ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("AER") -->
 <!-- ``` -->
@@ -629,8 +632,8 @@ div.tocify {
 <!-- - Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R) -->
 <!-- - Примерное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R) -->
 </div>
-<div id="glm-для-бинарных-данных-логистическая-регрессия-12-нояб.-вх" class="section level3">
-<h3>14 GLM для бинарных данных (=логистическая регрессия) (12 нояб., ВХ)</h3>
+<div id="glm-для-бинарных-данных-логистическая-регрессия-16-нояб.-вх" class="section level3">
+<h3>14 GLM для бинарных данных (=логистическая регрессия) (16 нояб., ВХ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("ISwR", "cowplot")) -->
 <!-- ``` -->
@@ -644,8 +647,8 @@ div.tocify {
 </div>
 <div id="смешанные-модели-glmm" class="section level2">
 <h2>Смешанные модели (GLMM)</h2>
-<div id="glmm-для-нормально-распределенных-данных-16-нояб.-мв" class="section level3">
-<h3>15 GLMM для нормально-распределенных данных (16 нояб., МВ)</h3>
+<div id="glmm-для-нормально-распределенных-данных-19-нояб.-мв" class="section level3">
+<h3>15 GLMM для нормально-распределенных данных (19 нояб., МВ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("lme4", "pbkrtest")) -->
 <!-- ``` -->
@@ -664,8 +667,8 @@ div.tocify {
 <!--     + [15.2_GLMM_gaussian_nested_code.R](15.2_GLMM_gaussian_nested_code.R) -->
 <!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
 </div>
-<div id="моделирование-структуры-дисперсии-в-смешаных-моделях-19-нояб.-вх" class="section level3">
-<h3>16 Моделирование структуры дисперсии в смешаных моделях (19 нояб., ВХ)</h3>
+<div id="моделирование-структуры-дисперсии-в-смешаных-моделях-23-нояб.-вх" class="section level3">
+<h3>16 Моделирование структуры дисперсии в смешаных моделях (23 нояб., ВХ)</h3>
 <!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
 <!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
 <!-- - Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R) -->
@@ -675,8 +678,8 @@ div.tocify {
 <!-- install.packages("faraway") -->
 <!-- ``` -->
 </div>
-<div id="glmm-для-счетных-данных-23-нояб.-мв" class="section level3">
-<h3>17 GLMM для счетных данных (23 нояб., МВ)</h3>
+<div id="glmm-для-счетных-данных-26-нояб.-мв" class="section level3">
+<h3>17 GLMM для счетных данных (26 нояб., МВ)</h3>
 <!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
 <!-- - Код: -->
 <!--     + [17_GLMM_count_code.R](17_GLMM_count_code.R) -->
@@ -686,8 +689,8 @@ div.tocify {
 <!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
 <!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
 </div>
-<div id="glmm-для-бинарных-данных-26-нояб.-вх" class="section level3">
-<h3>18 GLMM для бинарных данных (26 нояб., ВХ)</h3>
+<div id="glmm-для-бинарных-данных-30-нояб.-вх" class="section level3">
+<h3>18 GLMM для бинарных данных (30 нояб., ВХ)</h3>
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("MASS", "glmmML", "lme4", "doBy")) -->
 <!-- install.packages("sjstats") -->
@@ -757,7 +760,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0

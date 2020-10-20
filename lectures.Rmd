@@ -63,7 +63,7 @@ install.packages("car")
 - Презентация: [06_Introduction_to_linear_algebra.html](06_intro_to_linear_algebra.html)
 - Код: [06_Introduction_to_linear_algebra_code.R](06_intro_to_linear_algebra_code.R)
 
-### 07 Описание, проверка значимости и валидности линейной модели (19 окт., МВ)
+### 07 Описание, проверка значимости и валидности линейной модели (22 окт., МВ)
 
 Часть 1
 
@@ -91,7 +91,7 @@ install.packages("car")
 <!--     + [catsM.xlsx](data/catsM.xlsx) -->
 <!--     + [GAGurine.xlsx](data/GAGurine.xlsx) -->
 
-### 08 Множественная линейная регрессия. Выбор оптимальной модели. (22 окт., ВХ)
+### 08 Множественная линейная регрессия. Выбор оптимальной модели. (26 окт., ВХ)
 
 Часть 1. Множественная линейная регрессия
 
@@ -114,7 +114,7 @@ install.packages("car")
 
 ## Общие линейные модели
 
-### 09 Модели с непрерывными и дискретными предикторами (ANCOVA) (26 окт., ВХ)
+### 09 Модели с непрерывными и дискретными предикторами (ANCOVA) (29 окт., ВХ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("readxl") -->
@@ -148,7 +148,7 @@ install.packages("car")
 <!--     + [birthwt.csv](data/birthwt.csv) -->
 
 
-### 10 Однофакторный дисперсионный анализ (29 окт., МВ)
+### 10 Однофакторный дисперсионный анализ (2 нояб., МВ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("DAAG", "multcomp")) -->
@@ -164,7 +164,7 @@ install.packages("car")
 <!--     + [chickwts.csv](data/chickwts.csv) -->
 <!--     + [tomato.csv](data/tomato.csv) -->
 
-### 11 Многофакторный дисперсионный анализ (2 ноя., МВ)
+### 11 Многофакторный дисперсионный анализ (5 ноя., МВ)
 
 <!-- - Презентация: [11_two-way_anova_and_interactions.pdf](11_two-way_anova_and_interactions.pdf) -->
 <!-- - Код:  -->
@@ -177,14 +177,14 @@ install.packages("car")
 
 ## Обобщенные линейные модели (GLM)
 
-### 12 GLM для нормально распределенных данных (5 нояб., МВ)
+### 12 GLM для нормально распределенных данных (9 нояб., МВ)
 
 <!-- - Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf) -->
 <!-- - Код: [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R) -->
 
 <!-- - Код задания: [12_GLM_gaussian_practice_model_selection.R](12_GLM_gaussian_practice_model_selection.R) -->
 
-### 13 GLM для счетных данных (9 нояб., МВ)
+### 13 GLM для счетных данных (12 нояб., МВ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages("AER") -->
@@ -197,7 +197,7 @@ install.packages("car")
 <!-- - Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R) -->
 <!-- - Примерное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R) -->
 
-### 14 GLM для бинарных данных (=логистическая регрессия) (12 нояб., ВХ)
+### 14 GLM для бинарных данных (=логистическая регрессия) (16 нояб., ВХ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("ISwR", "cowplot")) -->
@@ -213,7 +213,7 @@ install.packages("car")
 
 ## Смешанные модели (GLMM)
 
-### 15 GLMM для нормально-распределенных данных (16 нояб., МВ)
+### 15 GLMM для нормально-распределенных данных (19 нояб., МВ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("lme4", "pbkrtest")) -->
@@ -237,7 +237,7 @@ install.packages("car")
 <!-- - Данные: [Grazing_native_plants_Gennet_et_al._2017_S1.xlsx](data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx) -->
 
 
-### 16 Моделирование структуры дисперсии в смешаных моделях (19 нояб., ВХ)
+### 16 Моделирование структуры дисперсии в смешаных моделях (23 нояб., ВХ)
 
 <!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
 <!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
@@ -253,7 +253,7 @@ install.packages("car")
 
 
 
-### 17 GLMM для счетных данных (23 нояб., МВ)
+### 17 GLMM для счетных данных (26 нояб., МВ)
 
 <!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
 
@@ -266,7 +266,7 @@ install.packages("car")
 <!--     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv) -->
 <!--     + [Morris_2015_Ants.xlsx](data/Morris_2015_Ants.xlsx) -->
 
-### 18 GLMM для бинарных данных (26 нояб., ВХ)
+### 18 GLMM для бинарных данных (30 нояб., ВХ)
 
 <!-- ```{r eval=FALSE} -->
 <!-- install.packages(c("MASS", "glmmML", "lme4", "doBy")) -->
