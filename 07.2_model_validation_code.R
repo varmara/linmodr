@@ -30,7 +30,7 @@ ggplot(brain, aes(x = MRINACount, y = PIQ)) +
 summary(brain_model)
 
 # ## Оценка качества подгонки модели ####
-summary(brain_model)
+summary(brain_model) # Да, все есть в summary()
 
 
 #### Диагностика линейных моделей ################
