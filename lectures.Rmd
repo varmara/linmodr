@@ -65,9 +65,9 @@ install.packages("car")
 
 ### 07 Описание, проверка значимости и валидности линейной модели (22 окт., МВ)
 
-<!-- - Презентация: -->
-<!--     + Часть 1 [07.1_model_description.html](07.1_model_description.html) -->
-<!--     + Часть 2 [07.2_model_validation.html](07.2_model_validation.html) -->
+- Презентация:
+    + Часть 1 [07.1_model_description.html](07.1_model_description.html)
+    + Часть 2 [07.2_model_validation.html](07.2_model_validation.html)
 
 - Код:
     + [07.1_model_description_code.R](07.1_model_description_code.R)
