@@ -32,6 +32,13 @@ table(tlc$age_group, tlc$sex)
 Mod <- lm(tlc ~ age_group, data = tlc)
 summary(Mod)
 
+X <- model.matrix(Mod)
+
+coef(Mod)
+
+X[2, ]
+
+betas <- coef(Mod)
 
 ## Данные для графика предсказаний модели
 
