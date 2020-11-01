@@ -303,7 +303,7 @@ Anova(mod2)
 Anova(mod2_reordered)
 ```
 
-## F-теста позволяет упростить модель 
+## F-тест позволяет упростить модель 
 
 ```{r}
 Anova(mod2)
@@ -322,7 +322,6 @@ Georg E. P. Box
 Gulielmus Occamus
 
 
-
 ## Важно не только тестирование гипотез, но и построение моделей
 
 - Проверка соответствия наблюдаемых данных предполагаемой связи между зависимой перменной и предикторами:
@@ -335,7 +334,7 @@ Gulielmus Occamus
     - Выбор оптимальной модели
     - Оценка предсказательной способности модели **на новых данных**
 
-```{r echo=FALSE, purl=FALSE, eval=FALSE}
+```{r echo=FALSE, purl=FALSE, eval=TRUE}
 library(tidyr)
 library(dplyr)
 
@@ -359,7 +358,9 @@ mod_training <- data_training %>%
 # Predictions on the training set
 pred_training <- mod_training %>%
   mutate(pred = purrr::map2(model, data, ~ predict(.x, newdata = .y))) %>%
-  unnest(data, pred, .id = "span") %>%
+  group_by(span) %>% 
+  unnest(c(data, pred)) %>%
+  ungroup() %>% 
   mutate(span = factor(span, labels = sort(my_spans, decreasing = TRUE), levels = sort(my_spans, decreasing = TRUE)))
 # MSE training
 MSe_training <- pred_training %>%
@@ -372,13 +373,15 @@ data_testing <- data.frame(x = runif(n, 1, 10)) %>%
   mutate(y = 2 * sin(x) + 1 * x  + rnorm(n, 0, sd_e)) %>%
   crossing(span = my_spans) %>%
   group_by(span) %>%
-  nest(x, y, .key = "data")
+  nest()
 # The same model
 data_testing$model <- mod_training$model
 # Predictions on the testing set
 pred_testing <- data_testing %>%
   mutate(pred = purrr::map2(model, data, ~ predict(.x, newdata = .y))) %>%
-  unnest(data, pred, .id = "span") %>%
+  group_by(span) %>% 
+  unnest(c(data, pred)) %>%
+  ungroup() %>% 
   mutate(span = factor(span, labels = sort(my_spans, decreasing = TRUE), levels = sort(my_spans, decreasing = TRUE)))
   # MSE testing
 MSe_testing <- pred_testing %>% group_by(span) %>%
@@ -388,13 +391,15 @@ MSe_testing <- pred_testing %>% group_by(span) %>%
 data_all <- data.frame(x = seq(1, 10, length.out = 400)) %>%
   crossing(span = my_spans) %>%
   group_by(span) %>%
-  nest(x, .key = "data")
+  nest()
 # The same model
 data_all$model <- mod_training$model
 # Predictions on an artificial grid for plotting
 pred_all <- data_all %>%
   mutate(pred = purrr::map2(model, data, ~ predict(.x, newdata = .y))) %>%
-  unnest(data, pred, .id = "span") %>%
+  group_by(span) %>% 
+  unnest(c(data, pred)) %>%
+  ungroup() %>% 
   mutate(span = factor(span, labels = sort(my_spans, decreasing = TRUE), levels = sort(my_spans, decreasing = TRUE)))
 
 # Plot of predictions -----------------------
@@ -442,9 +447,9 @@ gg_mse <- ggplot(dat_mse, aes(x = Complexity, y = MSe, group = Data)) +
   theme(legend.position = "bottom")
 
 # grid.arrange(
-  # gg_pred, 
-  # gg_mse, 
-  # nrow = 1, widths = c(0.6, 0.4))
+# gg_pred,
+# gg_mse,
+# nrow = 1, widths = c(0.6, 0.4))
 ```
 
 
