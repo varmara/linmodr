@@ -144,7 +144,7 @@ install.packages("cowplot")
 install.packages(c("DAAG", "multcomp"))
 ```
 
-<!-- - Презентация: [10_anova.pdf](10_anova.pdf) -->
+- Презентация: [10_anova.pdf](10_anova.pdf)
 
 - Код:
     + [10_anova_code.R](10_anova_code.R)
