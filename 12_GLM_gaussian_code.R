@@ -38,7 +38,9 @@ library(ggplot2)
 theme_set(theme_bw())
 gg_dot <- ggplot(FishEggs, aes(y = 1:nrow(FishEggs))) + geom_point()
 plot_grid(gg_dot + aes(x = Age),
-          gg_dot + aes(x = PctDM), nrow = 1)
+          gg_dot + aes(x = PctDM),
+          nrow = 1,
+          labels = "AUTO")
 
 # ## Подбираем модель
 mod <- glm(PctDM ~ Age * Month, data = FishEggs)
@@ -60,6 +62,7 @@ resid(mod, type = 'pearson')[1:5]
 
 
 # ## Проверка на коллинеарность
+library(car)
 vif(update(mod, . ~ . - Age:Month))
 
 # ## Данные для анализа остатков
@@ -112,10 +115,17 @@ drop1(mod_no_int, test = 'Chi')
 
 # Визуализация модели ############################################
 
+# Задание 1 ------------------------------------------------------
+
 # ## Данные для графика предсказаний
-library(dplyr)
-New_Data <- FishEggs %>% group_by(Month) %>%
-  do(data.frame(Age = seq(min(.$Age), max(.$Age), length.out = 100)))
+# В искуственном датафрейме для предсказаний нужно получить для каждого месяца последовательность из 100 значений Age от минимального до максимального в этом месяце.
+
+# Дополните код:
+
+library()
+New_Data <- %>%
+  group_by() %>%
+  do(data.frame( = seq(min(.$Age), )
 head(New_Data)
 
 #
@@ -131,11 +141,12 @@ head(New_Data)
 
 #
 # ## Данные для графика вручную
-X <- model.matrix(~ Age * Month, data = New_Data) # Модельная матрица
-betas <- coef(mod) # Коэффициенты
-New_Data$fit <- X %*% betas  # Предсказанные значения
-New_Data$se <- sqrt(diag(X %*% vcov(mod) %*% t(X))) # Стандартные ошибки
-t_crit <- qt(0.975, df = nrow(FishEggs) - length(coef(mod))) # t для дов. инт.
+X <- model.matrix() # Модельная матрица
+betas <-  # Коэффициенты
+New_Data$fit <-   # Предсказанные значения
+New_Data$se <- sqrt((X %*% vcov() %*% t(X))) # Стандартные ошибки
+degrees_of_freedom <- nrow() - length(coef(mod))
+t_crit <- qt(0.975, df = degrees_of_freedom) # t для дов. инт.
 New_Data$lwr <- New_Data$fit - t_crit * New_Data$se
 New_Data$upr <- New_Data$fit + t_crit * New_Data$se
 

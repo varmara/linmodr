@@ -170,9 +170,11 @@ install.packages(c("DAAG", "multcomp"))
 ### 12 GLM для нормально распределенных данных (9 нояб., МВ)
 
 <!-- - Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf) -->
-<!-- - Код: [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R) -->
 
-<!-- - Код задания: [12_GLM_gaussian_practice_model_selection.R](12_GLM_gaussian_practice_model_selection.R) -->
+- Код: 
+    + [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R)
+    + [12_GLM_gaussian_practice_birds.R](12_GLM_gaussian_practice_birds.R)
+    + [12_GLM_gaussian_practice_cystfibr.R](12_GLM_gaussian_practice_cystfibr.R)
 
 ### 13 GLM для счетных данных (12 нояб., МВ)
 
