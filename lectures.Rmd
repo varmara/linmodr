@@ -169,7 +169,7 @@ install.packages(c("DAAG", "multcomp"))
 
 ### 12 GLM для нормально распределенных данных (9 нояб., МВ)
 
-<!-- - Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf) -->
+- Презентация: [12_GLM_gaussian.pdf](12_GLM_gaussian.pdf)
 
 - Код: 
     + [12_GLM_gaussian_code.R](12_GLM_gaussian_code.R)
