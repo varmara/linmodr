@@ -178,15 +178,18 @@ install.packages(c("DAAG", "multcomp"))
 
 ### 13 GLM для счетных данных (12 нояб., МВ)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages("AER") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages("AER")
+```
 
 <!-- - Презентация: [13_GLM_count.pdf](13_GLM_count.pdf) -->
-<!-- - Код: [13_GLM_count_code.R](13_GLM_count_code.R) -->
-<!-- - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx) -->
 
-<!-- - Код задания: [13_GLM_count_practice.R](13_GLM_count_practice.R) -->
+- Код:
+    + [13_GLM_count_code.R](13_GLM_count_code.R)
+    + [13_GLM_count_practice.R](13_GLM_count_practice.R)
+- Данные:
+    + [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx)
+
 <!-- - Примерное решение: [13_GLM_count_practice_solution.R](13_GLM_count_practice_solution.R) -->
 
 ### 14 GLM для бинарных данных (=логистическая регрессия) (16 нояб., ВХ)

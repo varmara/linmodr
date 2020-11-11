@@ -427,13 +427,13 @@ library(dplyr)
 NewData <- pol %>% group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
-         Hours = mean(pol$Hours))
+         Hours = 0.75)
 
 # Модельная матрица и коэффициенты
 X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
-b <- coef(M_norm)
+betas <- coef(M_norm)
 # Предсказания в масштабе функции связи (eta) совпадают с масштабом отклика (mu)
-NewData$mu <- X %*% b       
+NewData$mu <- X %*% betas       
 NewData$SE_mu <- sqrt(diag(X %*% vcov(M_norm) %*% t(X)))  # SE
 
 head(NewData, 3)
@@ -615,7 +615,7 @@ drop1(M_pois, test = 'Chi')
 NewData <- pol %>% group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>% 
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
-         Hours = mean(pol$Hours))
+         Hours = 0.75)
 ```
 
 Давайте получим предсказания при помощи операций с матрицами,  
@@ -634,11 +634,11 @@ NewData <- pol %>% group_by(Treatment)%>%
 ```{r}
 # Модельная матрица и коэффициенты
 X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
-b <- coef(M_pois)
+betas <- coef(M_pois)
 
 # Предсказанные значения и стандартные ошибки...
 # ...в масштабе функции связи (логарифм)
-NewData$fit_eta <- X %*% b       
+NewData$fit_eta <- X %*% betas       
 NewData$SE_eta <- sqrt(diag(X %*% vcov(M_pois) %*% t(X)))
 
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
@@ -1056,7 +1056,7 @@ gg_resid + geom_point(aes(x = Total_1))
 NewData <- pol %>% group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>% 
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
-         Hours = mean(pol$Hours))
+         Hours = 0.75)
 ```
 
 Как и в прошлый раз, давайте получим предсказания при помощи операций с матрицами,  
@@ -1071,11 +1071,11 @@ NewData <- pol %>% group_by(Treatment)%>%
 ```{r}
 # Модельная матрица и коэффициенты
 X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
-b <- coef(M_nb)
+betas <- coef(M_nb)
 
 # Предсказанные значения и стандартные ошибки...
 # ...в масштабе функции связи (логарифм)
-NewData$fit_eta <- X %*% b       
+NewData$fit_eta <- X %*% betas       
 NewData$SE_eta <- sqrt(diag(X %*% vcov(M_nb) %*% t(X)))
 
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
