@@ -29,12 +29,11 @@
 # растительностью прилетит больше опылителей).
 # - `Flowers` --- число цветков _Leopoldia_ на площадке (чем больше, тем больше опылителей).
 # - `Hours` --- продолжительность наблюдений (чем дольше, тем больше насчитали).
-
 # Другие переменные:
 # - `Total_1` --- общая плотность цветков
 # - `Visits_NO_Apis` --- посещения опылителей без учета пчел
-# - `Fruit` --- число цветов с плодами через месяц
-# - `No_Fruit` --- число цветов без плодов через месяц
+# - `Fruit` --- число цветов с плодами через месяц после эксперимента
+# - `No_Fruit` --- число цветов без плодов через месяц после эксперимента
 
 
 # ## Открываем и знакомимся с данными
@@ -51,7 +50,8 @@ library(ggplot2)
 theme_set(theme_bw())
 
 dot_plot <- ggplot(pol, aes(y = 1:nrow(pol))) + geom_point()
-plot_grid(dot_plot + aes(x = DiversityD_1), dot_plot + aes(x = Flowers),
+plot_grid(dot_plot + aes(x = DiversityD_1),
+          dot_plot + aes(x = Flowers),
           dot_plot + aes(x = Hours), nrow = 1)
 
 # ## Каков объем выборки?
@@ -89,7 +89,8 @@ nrow = 1)
 
 # ## Если мы подберем GLM с нормальным распределением отклика
 
-M_norm <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol)
+M_norm <- glm(Visits ~ Treatment + DiversityD_1 +
+                Flowers + Hours, data = pol)
 coef(M_norm)
 sigma(M_norm)
 
@@ -100,15 +101,16 @@ NewData <- pol %>%
   group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
-         Hours = mean(pol$Hours))
+         Hours = 0.75)
 
 head(NewData)
 
 # Модельная матрица и коэффициенты
-X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
-b <- coef(M_norm)
+X <- model.matrix(~ Treatment + DiversityD_1 +
+                    Flowers + Hours, data = NewData)
+betas <- coef(M_norm)
 # Предсказания в масштабе функции связи (eta) совпадают с масштабом отклика (mu)
-NewData$mu <- X %*% b
+NewData$mu <- X %*% betas
 NewData$SE_mu <- sqrt(diag(X %*% vcov(M_norm) %*% t(X)))  # SE
 
 head(NewData, 3)
@@ -150,8 +152,9 @@ ggplot(data = , aes()) + geom_hline( = 0) +
 
 # ## GLM с Пуассоновским распределением отклика #############################
 
-M_pois <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol,
-                   family = "poisson")
+M_pois <- glm(Visits ~ Treatment + DiversityD_1 +
+                Flowers + Hours, data = pol,
+              family = "poisson")
 coef(M_pois)
 
 
@@ -167,18 +170,19 @@ NewData <- pol %>%
   group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
-         Hours = mean(pol$Hours))
+         Hours = 0.75)
 NewData
 
 # ## Предсказания модели при помощи операций с матрицами
 
 # Модельная матрица и коэффициенты
-X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
-b <- coef(M_pois)
+X <- model.matrix(~ Treatment + DiversityD_1 +
+                    Flowers + Hours, data = NewData)
+betas <- coef(M_pois)
 
 # Предсказанные значения и стандартные ошибки...
 # ...в масштабе функции связи (логарифм)
-NewData$fit_eta <- X %*% b
+NewData$fit_eta <- X %*% betas
 NewData$SE_eta <- sqrt(diag(X %*% vcov(M_pois) %*% t(X)))
 
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
@@ -241,7 +245,8 @@ overdisp_fun(M_pois)
 
 # ## Квази-пуассоновские модели
 
-M_quasi <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol,
+M_quasi <- glm(Visits ~ Treatment + DiversityD_1 +
+                 Flowers + Hours, data = pol,
                  family = "quasipoisson")
 
 coef(M_quasi)
@@ -255,7 +260,8 @@ drop1(M_quasi, test = "F")
 
 # ## GLM с отрицательным биномиальным распределением отклика
 library(MASS)
-M_nb <- glm.nb(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol,
+M_nb <- glm.nb(Visits ~ Treatment + DiversityD_1 +
+                 Flowers + Hours, data = pol,
                  link = "log")
 coef(M_nb)
 summary(M_nb)$theta
@@ -294,7 +300,7 @@ NewData <- pol %>%
   group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
-         Hours = mean(pol$Hours))
+         Hours = 0.75)
 NewData
 
 # Задание 3 -----------------------------------------------
@@ -302,12 +308,13 @@ NewData
 # Получите предсказания при помощи операций с матрицами,
 
 # Модельная матрица и коэффициенты
-X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
-b <- coef(M_nb)
+X <- model.matrix(~ Treatment + DiversityD_1 +
+                    Flowers + Hours, data = NewData)
+betas <- coef(M_nb)
 
 # Предсказанные значения и стандартные ошибки...
 # ...в масштабе функции связи (логарифм)
-NewData$fit_eta <- X %*% b
+NewData$fit_eta <- X %*% betas
 NewData$SE_eta <- sqrt(diag(X %*% vcov(M_nb) %*% t(X)))
 
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
