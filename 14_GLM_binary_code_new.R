@@ -219,6 +219,10 @@ Anova(M1)
 drop1(M1, test = "Chi")
 M2 <- update(M1, .~.-CRE)
 
+
+
+
+# Проверьте получится ли аналогичная модель, если воспользоваться автоматическим алгоритмом
 step(M1, direction = "backward")
 
 
@@ -267,4 +271,12 @@ MyData$Predicted <- predict(M16, newdata = MyData, type = "response" )
 
 
 ggplot(MyData[MyData$TYP == "Emergency", ], aes(x=SYS, y = Predicted)) + geom_line() + facet_grid(LOC + PH + PCO ~ CAN, labeller = label_both) + scale_color_gradient(low = "green",  high = "red") + labs(label = list(x = "Давление в момент реанимации (SYS)", y = "Вероятность гибели", title = "Предсказания модели")) + theme_bw()
+
+
+
+# Задание для самостоятельной работы
+# Зависит ливероятность встретить ящериц (PA) от степени изрезанности острова (PARATIO)
+liz <- read.csv("data/polis.csv")
+
+
 
