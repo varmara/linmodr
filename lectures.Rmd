@@ -192,16 +192,16 @@ install.packages("AER")
 
 ### 14 GLM для бинарных данных (=логистическая регрессия) (16 нояб., ВХ)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("ISwR", "cowplot")) -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("ISwR", "cowplot"))
+```
 
 <!-- - Презентация: [14_GLM_binary_new.pdf](14_GLM_binary_new.pdf) -->
-<!-- - Код: [14_GLM_binary_code_new.R](14_GLM_binary_code_new.R) -->
-<!-- - Данные: -->
-<!--     + [aster_mussel.csv](data/aster_mussel.csv) -->
-<!--     + [polis.csv](data/polis.csv) -->
-<!--     + [ICU.csv](data/ICU.csv) -->
+- Код: [14_GLM_binary_code_new.R](14_GLM_binary_code_new.R)
+- Данные:
+    + [aster_mussel.csv](data/aster_mussel.csv)
+    + [polis.csv](data/polis.csv)
+    + [ICU.csv](data/ICU.csv)
 
 
 ## Смешанные модели (GLMM)
