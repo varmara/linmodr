@@ -196,7 +196,7 @@ install.packages("AER")
 install.packages(c("ISwR", "cowplot"))
 ```
 
-<!-- - Презентация: [14_GLM_binary_new.pdf](14_GLM_binary_new.pdf) -->
+- Презентация: [14_GLM_binary_new.pdf](14_GLM_binary_new.pdf)
 - Код: [14_GLM_binary_code_new.R](14_GLM_binary_code_new.R)
 - Данные:
     + [aster_mussel.csv](data/aster_mussel.csv)
