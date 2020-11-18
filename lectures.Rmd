@@ -208,9 +208,9 @@ install.packages(c("ISwR", "cowplot"))
 
 ### 15 GLMM для нормально-распределенных данных (19 нояб., МВ)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("lme4", "pbkrtest")) -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("lme4", "pbkrtest"))
+```
 
 <!-- - Презентация: -->
 <!--     + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf) -->
