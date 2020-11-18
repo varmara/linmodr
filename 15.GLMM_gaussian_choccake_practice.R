@@ -37,6 +37,52 @@
 # Протестируйте значимость влияния предикторов.
 # Запишите уравнение модели
 
+
 library(faraway)
 data("choccake")
+
+library(lme4)
+library(car)
+library(ggplot2)
+library(cowplot)
+theme_set(theme_bw())
+
+# Знакомство с данными ###########################
+
+head(choccake)
+str(choccake)
+
+colSums(is.na(choccake))
+
+# Температура выпекания кексов
+unique(choccake$temp)
+
+# По каждому рецепту 15 замесов, из каждого замеса 6 кексов
+with(choccake, table(recipe, batch))
+# Вот они
+with(choccake, table(temp, batch, recipe))
+
+# ВНИМАНИЕ, это важно! --------------------------
+
+# Видно, что батчи называются одинаково для каждого рецепта.
+# Но мы знаем, что батч №1 по первому рецепту, это не то же самое что батч №1 по второму рецепту. Т.е. у нас не 15 батчей всего, а целых 45!
+# Поэтому нужно перекодировать batch. Сделать так, чтобы каждый конкретный батч имел свое собственное имя.
+choccake$batch_ID <- paste('R', choccake$recipe, 'B', choccake$batch, sep = '_')
+
+# Три рецепта, мы хотим получить групповые предсказания.
+# Линии для трех рецептов могут быть параллельны друг другу или непараллельны.
+ggplot(data = choccake, aes(x = temp, y = breakang)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE) +
+  facet_wrap(~ recipe)
+
+# Но мы должны учесть эффект замеса!
+
+# Вот как выглядят данные с учетом замеса.
+ggplot(data = choccake, aes(x = temp, y = breakang, colour = batch_ID)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = FALSE) +
+  facet_wrap(~ recipe)
+
+# Теперь ваша очередь...
 
