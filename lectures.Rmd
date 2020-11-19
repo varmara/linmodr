@@ -212,9 +212,9 @@ install.packages(c("ISwR", "cowplot"))
 install.packages(c("lme4", "pbkrtest"))
 ```
 
-<!-- - Презентация: -->
-<!--     + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf) -->
-<!--     + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf) -->
+- Презентация:
+    + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf)
+    + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf)
 
 - Код:
     + [15.1_GLMM_gaussian_random_intercept_slope_code.R](15.1_GLMM_gaussian_random_intercept_slope_code.R)
@@ -225,9 +225,9 @@ install.packages(c("lme4", "pbkrtest"))
     + Код: [15.GLMM_gaussian_choccake_practice.R](15.GLMM_gaussian_choccake_practice.R)
     + Данные: [choccake.csv](data/choccake.csv)
 
-<!--     + Решение (частичное): [15.GLMM_gaussian_choccake_solution.R](15.GLMM_gaussian_choccake_solution.R) -->
+    + Решение (частичное): [15.GLMM_gaussian_choccake_solution.R](15.GLMM_gaussian_choccake_solution.R)
 
-<!-- - Демонстрация LRT при помощи бутстрепа: [15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R](15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R) -->
+- Демонстрация LRT при помощи бутстрепа: [15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R](15.1_GLMM_gaussian_bootstrap_demo_sleepstudy.R)
 
 
 ### 16 Моделирование структуры дисперсии в смешаных моделях (23 нояб., ВХ)
