@@ -233,16 +233,16 @@ install.packages(c("lme4", "pbkrtest"))
 ### 16 Моделирование структуры дисперсии в смешаных моделях (23 нояб., ВХ)
 
 <!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
-<!-- - Код: [16_variance_structure_code.R](16_variance_structure_code.R) -->
-<!-- - Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R) -->
+- Код: [16_variance_structure_code.R](16_variance_structure_code.R)
+- Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R)
 
-<!-- - Данные: -->
-<!--     + [mussel_juv_ad.csv](data/mussel_juv_ad.csv) -->
+- Данные:
+    + [mussel_juv_ad.csv](data/mussel_juv_ad.csv)
 
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages("faraway") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages("faraway")
+```
 
 
 
