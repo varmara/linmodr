@@ -80,10 +80,10 @@ dotplot + aes(x = StartBushAct)
 dotplot + aes(x = StartDate)
 
 # Сразу много дот-плотов
-ants %>% mutate(Index = row_number()) %>%
+ants %>%
+  mutate(Index = row_number()) %>%
   gather(key = Variable, value = Value,
-         -c(Index, Site, Treatment, Branch, StartDate,
-            StartTime, PlacementDate, PlacementTime))  %>%
+         -c(Index, Site, Treatment, Branch))  %>%
   ggplot(., aes(x = Value, y = Index)) +
   geom_point() +
   facet_wrap(~ Variable, scales = "free_x")

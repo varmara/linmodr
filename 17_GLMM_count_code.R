@@ -72,13 +72,13 @@ ggplot(Owls) +
                fun.data = "mean_cl_boot", position = position_dodge(width = 0.2))
 
 
-
-# ## Задание 1 ---------------------------------------------
-# Постройте график, как на слайде
-
-
-
-
+# ## Когда орут птенцы?
+ggplot(Owls, aes(x = ArrivalTime, y = NCalls,
+                 colour = FoodTreatment, fill = FoodTreatment)) +
+  geom_bar(stat = "identity") +
+  facet_grid(FoodTreatment + SexParent ~ Nest) +
+  theme(legend.position = "bottom",
+        axis.text.x = element_text(angle = 90, hjust = 1))
 
 
 # ## Коллинеарность
@@ -107,7 +107,7 @@ M1 <- glmer(NCalls ~ SexParent * FoodTreatment +
 
 
 
-# ## Задание 2 ----------------------------------
+# ## Задание 1 ----------------------------------
 #
 # Проверьте модель M1 на избыточность дисперсии
 
@@ -152,7 +152,7 @@ th <- lme4:::est_theta(M1)
 M2 <- update(M1, family = negative.binomial(theta=th))
 
 
-# ## Задание 3 -----------------------------------------------------
+# ## Задание 2 -----------------------------------------------------
 #
 # Проверьте модель с отрицательным биномиальным распределением отклика
 #
@@ -165,7 +165,7 @@ M2 <- update(M1, family = negative.binomial(theta=th))
 # # Подбор оптимальной модели ####################################
 summary(M2)
 
-# ## Задание 4 -----------------------------------------------
+# ## Задание 3 -----------------------------------------------
 
 # Попробуйте упростить модель M2
 

@@ -53,19 +53,24 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 
 <small><a href="https://flic.kr/p/66jqtt">Young Barn Owls in Tree Nest</a> by Hunter Desportes on Flickr</small>
 
-Данные из Roulin & Bersier 2007, пример из кн. Zuur et al., 2007
-
--`SiblingNegotiation` - число звуков в течение 15 минут до прибытия родителя 
-- `FoodTreatment` - тритмент (сытые или голодные)  
-- `SexParent` - пол родителя  
-- `FoodTreatment x SexParent`  
-- `ArrivalTime` - время прибытия родителя  
-- `ArrivalTime х SexParent`  
-- `Nest` - гнездо  
+Данные из [Roulin & Bersier 2007](https://doc.rero.ch/record/8836/files/bersier_nbo.pdf), пример из кн. Zuur et al., 2007
 
 </div>
 
 <small>Roulin, A. and Bersier, L.F., 2007. Nestling barn owls beg more intensely in the presence of their mother than in the presence of their father. Animal Behaviour, 74(4), pp.1099-1106.</small>
+
+## От чего зависит призывный крик совят? {.smaller}
+
+![Схема эксперимента Roulin & Bersier (2007)](images/Owls_experimental_design.png)
+
+<div class="columns-2">
+
+- `SiblingNegotiation` --- число звуков в течение 15 минут до прибытия родителя  
+- `FoodTreatment` --- сытые или голодные
+- `SexParent` --- пол родителя  
+- `ArrivalTime` --- время прибытия родителя  
+- `Nest` --- гнездо  
+</div>
 
 ## Знакомство с данными
 
@@ -146,9 +151,9 @@ ggplot(Owls) +
 
 > - Похоже, что может быть взаимодействие, но не понятно значимое ли.
 
-## Задание: Постройте такой график
+## Когда орут птенцы?
 
-```{r owls-all, fig.height=5, fig.width=10, echo=FALSE, purl=FALSE}
+```{r owls-all, fig.height=5, fig.width=10, echo=FALSE}
 ggplot(Owls, aes(x = ArrivalTime, y = NCalls,
                    colour = FoodTreatment, fill = FoodTreatment)) +
   geom_bar(stat = "identity") + 
@@ -157,7 +162,7 @@ ggplot(Owls, aes(x = ArrivalTime, y = NCalls,
         axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-> - Птенцы больше орут, если голодали прошлой ночью. И, возможно, орут у самцов
+> - Птенцы больше орут, если голодали прошлой ночью. И, возможно, орут у самцов (?)
 
 ## Код для графика
 
@@ -382,10 +387,6 @@ gg_resid %+% aes(x = ArrivalTime) + geom_smooth(method = 'loess')
 
 > - Подозрительно. Возможно, нужен GAMM
 
-## Задание
-
-Проверьте остатки модели M2 на наличие нелинейных паттернов
-
 ## Проверяем, есть ли нелинейные паттерны {.smaller .columns-2}
 
 ```{r M2-resid-gam, fig.width=4.5, fig.height=4, fig.align='right', tidy.opts=list(width = 50), purl=FALSE}
@@ -512,7 +513,7 @@ abline(h = 0)
 
 - $NCalls_{ij} \sim NegBin(\mu_{ij}, k)$  --- отклик подчиняется отрицательному биномиальному распределению с параметрами $\mu$ и $k$
 - $E(NCalls_{ij}) = \mu_{ij}$, $var(NCalls_{ij}) = \mu_{ij} + \mu^2_{ij} / k$
-- $ln(\mu_{ij}) = \eta_{ij}$  --- функция связи --- логарифм
+- $ln(\mu_{ij}) = \eta_{ij}$  --- функция связи логарифм
 - $\begin{array}{l}\eta_{ij} = \beta_0 + \beta_{1}SexParentM_{ij} + \beta_{2}FoodTreatmentS_{ij} + \beta_{3}ArrivalTime_{ij} + \\ + log(BroodSize_{i}) + a_{i} \end{array}$
 
 - $a_{i}\sim N(0, \sigma^2_{Nest})$ --- случайный эффект гнезда (intercept)
@@ -549,9 +550,9 @@ NewData$lwr <- exp(NewData$fit_eta - 2 * NewData$SE_eta)
 NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
 ```
 
-## График предсказанных значений
+## График предсказанных значений  {.smaller}
 
-```{r owls-pred, echo=FALSE}
+```{r owls-pred}
 ggplot() + 
   geom_point(data = Owls, aes(x = ArrivalTime, y = NCalls), colour = "steelblue") + 
   geom_ribbon(data = NewData, aes(x = ArrivalTime,  ymax = upr,  ymin = lwr), alpha = 0.3) + 
@@ -559,12 +560,8 @@ ggplot() +
   facet_wrap(~ FoodTreatment)
 ```
 
-## Код для графика предсказанных значений {.smaller}
 
-```{r owls-pred, eval=FALSE, purl=FALSE}
-```
-
-## Take home messages
+## Take-home messages
 
 - В случае счетных зависимых перменных (неотрицательных целочисленных величин) применяются модели, основанные на распределении Пуассона или отрицаетльном биномиальном распределении.
 
