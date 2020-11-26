@@ -141,6 +141,20 @@ M1 <- glmer(Infestation ~ Treatment * Branch + StartBranchAct + BranchBerries + 
 
 M2 <- glmer(Infestation ~ Treatment * Branch + StartBranchAct_std + BranchBerries_std + (1|Site), data = ants, family = "poisson")
 
+# ## Проверка на сверхдисперсию
+# Функция для проверки наличия сверхдисперсии в модели (автор Ben Bolker)
+# http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html
+# Код модифицирован, чтобы учесть дополнительный параметр в NegBin GLMM, подобранных MASS::glm.nb()
+overdisp_fun <- function(model) {
+  rdf <- df.residual(model)  # Число степеней свободы N - p
+  if (any(class(model) == 'negbin')) rdf <- rdf - 1 ## учитываем k в NegBin GLMM
+  rp <- residuals(model,type='pearson') # Пирсоновские остатки
+  Pearson.chisq <- sum(rp^2) # Сумма квадратов остатков, подчиняется Хи-квадрат распределению
+  prat <- Pearson.chisq/rdf  # Отношение суммы квадратов остатков к числу степеней свободы
+  pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE) # Уровень значимости
+  c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)        # Вывод результатов
+}
+
 overdisp_fun(M2)
 # Сверхдисперсия. Почему?
 
@@ -150,27 +164,34 @@ M2_diag <- data.frame(ants,
                       .fitted = predict(M2, type = "response")
 )
 gg_resid <- ggplot(data = M2_diag, aes(y = .pearson_resid))
-gg_resid + geom_point(aes(x = .fitted))
+gg_resid + geom_point(aes(x = .fitted)) + geom_smooth(aes(x = .fitted))
 gg_resid + geom_boxplot(aes(x = Site)) # разные остатки в разных сайтах
-gg_resid + geom_boxplot(aes(x = Treatment))
-gg_resid + geom_point(aes(x = StartDate))  # нелинейная связь?
-gg_resid + geom_point(aes(x = StartTime))
-gg_resid + geom_point(aes(x = StartBushAct))
-gg_resid + geom_point(aes(x = StartBranchAct))  #?
-gg_resid + geom_point(aes(x = Bored))
-gg_resid + geom_point(aes(x = NonBored))
-gg_resid + geom_point(aes(x = BranchBerries))
-gg_resid + geom_point(aes(x = TotRemoved))
-gg_resid + geom_point(aes(x = ClusterBerries)) #?
-gg_resid + geom_point(aes(x = PlacementDate))  # нелинейная связь?
-gg_resid + geom_point(aes(x = PlacementTime)) # часть жуков выпустили в другое время
-gg_resid + geom_point(aes(x = PlacementBushAct)) #
-gg_resid + geom_point(aes(x = PlacementBranchAct)) ##?
-gg_resid + geom_point(aes(x = FinalBushAct))
-gg_resid + geom_point(aes(x = FinalBranchAct))
+# С чем это может быть связано? Разный угол наклона?
+# Или какое-то свойство, по которому сайты различаются?
+gg_resid + geom_boxplot(aes(x = Treatment)) # Oк
+
+gg_res_smooth <- ggplot(data = M2_diag, aes(y = .pearson_resid)) +
+  geom_point() + geom_smooth()
+gg_res_smooth %+% aes(x = StartDate) # нелинейная связь? Это время начала подготовки к эксп.
+gg_res_smooth %+% aes(x = StartTime) # Oк
+gg_res_smooth %+% aes(x = StartBushAct) # нелинейная связь? Связано со StartDate?
+gg_res_smooth %+% aes(x = StartBranchAct)  # нелинейная связь? Связано со StartDate?
+gg_res_smooth %+% aes(x = Bored) # нелинейная связь?
+gg_res_smooth %+% aes(x = NonBored) # Oк
+gg_res_smooth %+% aes(x = BranchBerries) # Oк
+gg_res_smooth %+% aes(x = TotRemoved) # Oк
+gg_res_smooth %+% aes(x = ClusterBerries) # Oк
+gg_res_smooth %+% aes(x = PlacementDate)  # нелинейная связь? Это время начала эксперимента!
+gg_res_smooth %+% aes(x = PlacementTime) # ~Oк
+gg_res_smooth %+% aes(x = PlacementBushAct) # нелинейная связь? Связано с PlacementDate и  StartDate?
+gg_res_smooth %+% aes(x = PlacementBranchAct) # нелинейная связь? Связано с PlacementDate и StartDate?
+gg_res_smooth %+% aes(x = FinalBushAct)
+ggplot(data = M2_diag, aes(x = FinalBranchAct, y = .pearson_resid)) +
+  geom_point() + geom_smooth()
 
 # Может быть, здесь нелинейный паттерн?
-# Самые подходящие кандидаты - это переменные, которые показывают время.
+# Самые подходящие кандидаты - это переменные, которые показывают время,
+# т.к., возможно, активность муравьев меняется в течение периода наблюдений.
 # В других случаях сложно придумать осмысленное объяснение появления нелинейности.
 library(mgcv)
 
@@ -199,27 +220,32 @@ summary(M2)
 # стоило бы включить нелинейный эффект PlacementDate.
 
 # Варианты борьбы со сверхдисперсией
-# (0) Неучтенные переменные (в основном нелинейный эффект,
-# который скорее всего связан с датой начала, но можно рискнуть добавить)
-# (1) Нелинейный паттерн в остатках - включить нелинейный эффект PlacementDate.
-# (2) Отр. биномиальное распределение.
-# (3) Случайный отрезок на уровне наблюдения (Observation-level random intercept)
-# Но нужно помнить, что это очень грубый способ.
+# (1) Неучтенные переменные --- это нелинейный эффект,
+# который скорее всего связан с датой начала.
+# Нужно включить нелинейный эффект PlacementDate и использовать GAMM.
+# (2) GLMM с отр. биномиальным распределением. Она может помочь
+# побороть сверхдисперсию. Но если нелинейный паттерн
+# от даты начала эксперимента сохранится,
+# то придется использовать либо (1) либо (3).
+# (3) Сверхдисперсию можно побороть, использовав модель
+# со случайным отрезком на уровне наблюдения
+# (Observation-level random intercept), но это очень грубый способ.
+# Кроме того, нелинейный паттерн от даты начала эксперимента может сохранится.
 
-# Рассмотрим два варианта борьбы со сверхдисперсией (2) и (3)
+# Ниже мы рассмотрим два варианта борьбы со сверхдисперсией --- (2) и (3).
 
 # (2) GLM с отр. биномиальным распределением ######
 
 NB1 <- glmer.nb(Infestation ~ Treatment * Branch + StartBranchAct_std + BranchBerries_std + (1 | Site), data = ants)
 # Warning messages:
 # 1: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
-# Model failed to converge with max|grad| = 0.00593457 (tol = 0.001, component 1)
+#   Model failed to converge with max|grad| = 0.00593457 (tol = 0.001, component 1)
 # 2: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
-# Model failed to converge with max|grad| = 0.0608566 (tol = 0.001, component 1)
+#   Model failed to converge with max|grad| = 0.0608566 (tol = 0.001, component 1)
 # 3: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
-# Model failed to converge with max|grad| = 0.338333 (tol = 0.001, component 1)
+#   Model failed to converge with max|grad| = 0.338333 (tol = 0.001, component 1)
 # 4: In checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv,  :
-# Model failed to converge with max|grad| = 0.0317026 (tol = 0.001, component 1)
+#   Model failed to converge with max|grad| = 0.0317026 (tol = 0.001, component 1)
 
 # Опять пытаемся заставить модель сойтись:
 # (a) Увеличиваем число итераций
@@ -230,11 +256,11 @@ NB1 <- glmer.nb(Infestation ~ Treatment * Branch + StartBranchAct_std + BranchBe
 ctrl.nb = glmerControl(optimizer = 'bobyqa',
                        optCtrl = list(maxfun = 200000))
 NB1 <- glmer.nb(Infestation ~ Treatment * Branch + StartBranchAct_std + BranchBerries_std + (1 | Site), data = ants, control = ctrl.nb)
-# singular fit
+# boundary (singular) fit: see ?isSingular
 
 # (б) Пытаемся подобрать более простую модель
 NB1 <- glmer.nb(Infestation ~ Treatment + Branch + StartBranchAct_std + BranchBerries_std + (1 | Site), data = ants, control = ctrl.nb)
-# singular fit
+# boundary (singular) fit: see ?isSingular
 
 # (в) Пробуем подсунуть в модель заранее оцененную тету
 # Оцениваем theta из исходной пуассоновской модели, которая сошлась
@@ -252,24 +278,30 @@ NB1_diag <- data.frame(ants,
                       .fitted = predict(NB1, type = "response")
 )
 gg_resid <- ggplot(data = NB1_diag, aes(y = .pearson_resid))
-gg_resid + geom_point(aes(x = .fitted))
+gg_resid + geom_point(aes(x = .fitted)) + geom_smooth(aes(x = .fitted))
 gg_resid + geom_boxplot(aes(x = Site)) # разные остатки в разных сайтах
-gg_resid + geom_boxplot(aes(x = Treatment))
-gg_resid + geom_point(aes(x = StartDate))  # нелинейная связь?
-gg_resid + geom_point(aes(x = StartTime))
-gg_resid + geom_point(aes(x = StartBushAct))
-gg_resid + geom_point(aes(x = StartBranchAct))  #?
-gg_resid + geom_point(aes(x = Bored))
-gg_resid + geom_point(aes(x = NonBored))
-gg_resid + geom_point(aes(x = BranchBerries))
-gg_resid + geom_point(aes(x = TotRemoved))
-gg_resid + geom_point(aes(x = ClusterBerries)) #?
-gg_resid + geom_point(aes(x = PlacementDate))  # нелинейная связь?
-gg_resid + geom_point(aes(x = PlacementTime)) # часть жуков выпустили в другое время
-gg_resid + geom_point(aes(x = PlacementBushAct)) #
-gg_resid + geom_point(aes(x = PlacementBranchAct)) ##?
-gg_resid + geom_point(aes(x = FinalBushAct))
-gg_resid + geom_point(aes(x = FinalBranchAct))
+# Но уже немного лучше. Возможные причины те же.
+gg_resid + geom_boxplot(aes(x = Treatment)) # Oк
+
+gg_res_smooth <- ggplot(data = NB1_diag, aes(y = .pearson_resid)) +
+  geom_point() + geom_smooth()
+gg_res_smooth %+% aes(x = StartDate) # нелинейная связь? Это время начала подготовки к эксп.
+gg_res_smooth %+% aes(x = StartTime) # Oк
+gg_res_smooth %+% aes(x = StartBushAct) # нелинейная связь? Связано со StartDate?
+gg_res_smooth %+% aes(x = StartBranchAct)  # нелинейная связь? Связано со StartDate?
+gg_res_smooth %+% aes(x = Bored) # нелинейная связь?
+gg_res_smooth %+% aes(x = NonBored) # Oк
+gg_res_smooth %+% aes(x = BranchBerries) # Oк
+gg_res_smooth %+% aes(x = TotRemoved) # Oк
+gg_res_smooth %+% aes(x = ClusterBerries) # Oк
+gg_res_smooth %+% aes(x = PlacementDate)  # нелинейная связь? Это время начала эксперимента!
+gg_res_smooth %+% aes(x = PlacementTime) # ~Oк
+gg_res_smooth %+% aes(x = PlacementBushAct) # нелинейная связь? Связано с PlacementDate и  StartDate?
+gg_res_smooth %+% aes(x = PlacementBranchAct) # нелинейная связь? Связано с PlacementDate и StartDate?
+gg_res_smooth %+% aes(x = FinalBushAct)
+ggplot(data = NB1_diag, aes(x = FinalBranchAct, y = .pearson_resid)) +
+  geom_point() + geom_smooth()
+
 
 # Может быть, здесь нелинейный паттерн?
 # StartDate
@@ -329,27 +361,32 @@ M_ori1_diag <- data.frame(ants,
                        .fitted = predict(M_ori1, type = "response")
 )
 gg_resid <- ggplot(data = M_ori1_diag, aes(y = .pearson_resid))
-gg_resid + geom_point(aes(x = .fitted))
+gg_resid + geom_point(aes(x = .fitted)) + geom_smooth(aes(x = .fitted)) # Ой!
 gg_resid + geom_boxplot(aes(x = Site)) # разные остатки в разных сайтах
-gg_resid + geom_boxplot(aes(x = Treatment))
-gg_resid + geom_point(aes(x = StartDate))  # нелинейная связь уже почти не читается
-gg_resid + geom_point(aes(x = StartTime))
-gg_resid + geom_point(aes(x = StartBushAct))
-gg_resid + geom_point(aes(x = StartBranchAct))  #?
-gg_resid + geom_point(aes(x = Bored))
-gg_resid + geom_point(aes(x = NonBored))
-gg_resid + geom_point(aes(x = BranchBerries))
-gg_resid + geom_point(aes(x = TotRemoved))
-gg_resid + geom_point(aes(x = ClusterBerries)) #?
-gg_resid + geom_point(aes(x = PlacementDate))  # нелинейная связь уже почти не читается
-gg_resid + geom_point(aes(x = PlacementTime)) # часть жуков выпустили в другое время
-gg_resid + geom_point(aes(x = PlacementBushAct)) #
-gg_resid + geom_point(aes(x = PlacementBranchAct)) ##?
-gg_resid + geom_point(aes(x = FinalBushAct))
-gg_resid + geom_point(aes(x = FinalBranchAct))
+# Возможные причины те же.
+gg_resid + geom_boxplot(aes(x = Treatment)) # Oк
 
-# Немного лучше
-# Может быть, здесь нелинейный паттерн?
+gg_res_smooth <- ggplot(data = M_ori1_diag, aes(y = .pearson_resid)) +
+  geom_point() + geom_smooth()
+gg_res_smooth %+% aes(x = StartDate) # нелинейная связь? Это время начала подготовки к эксп.
+gg_res_smooth %+% aes(x = StartTime) # Oк
+gg_res_smooth %+% aes(x = StartBushAct) # нелинейная связь? Связано со StartDate?
+gg_res_smooth %+% aes(x = StartBranchAct)  # нелинейная связь? Связано со StartDate?
+gg_res_smooth %+% aes(x = Bored) # нелинейная связь?
+gg_res_smooth %+% aes(x = NonBored) # Oк
+gg_res_smooth %+% aes(x = BranchBerries) # ~Oк
+gg_res_smooth %+% aes(x = TotRemoved) # Oк
+gg_res_smooth %+% aes(x = ClusterBerries) # Oк
+gg_res_smooth %+% aes(x = PlacementDate)  # нелинейная связь? Это время начала эксперимента!
+gg_res_smooth %+% aes(x = PlacementTime) # ~Oк
+gg_res_smooth %+% aes(x = PlacementBushAct) # нелинейная связь? Связано с PlacementDate и  StartDate?
+gg_res_smooth %+% aes(x = PlacementBranchAct) # нелинейная связь? Связано с PlacementDate и StartDate?
+gg_res_smooth %+% aes(x = FinalBushAct)
+ggplot(data = M_ori1_diag, aes(x = FinalBranchAct, y = .pearson_resid)) +
+  geom_point() + geom_smooth()
+
+
+# Проверим подозрительный нелинейный паттерн
 # StartDate
 nonlin5 <- gam(M_ori1_diag$.pearson_resid ~ s(as.numeric(ants$StartDate)))
 summary(nonlin5)
@@ -364,7 +401,9 @@ abline(h = 0)
 
 # РЕЗЮМЕ по M_ori1:
 # Мы побороли избыточность дисперсии, но...
+# Моделью M_ori1 пользоваться нельзя
 # Здесь есть нелинейные паттерны в остатках,
-# стоило бы включить нелинейный эффект PlacementDate.
+# стоило бы включить нелинейный эффект PlacementDate в виде сплайна,
+# т.е. подобрать GAMM.
 
 
