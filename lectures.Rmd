@@ -263,7 +263,7 @@ install.packages("faraway")
 
 ```{r eval=FALSE}
 install.packages(c("MASS", "glmmML", "lme4", "doBy"))
-install.packages("sjstats")
+install.packages("performance")
 ```
 
 <!-- - Презентация: [18_GLMM_binary.pdf](18_GLMM_binary.pdf) -->
