@@ -261,16 +261,16 @@ install.packages("faraway")
 
 ### 18 GLMM для бинарных данных (30 нояб., ВХ)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("MASS", "glmmML", "lme4", "doBy")) -->
-<!-- install.packages("sjstats") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("MASS", "glmmML", "lme4", "doBy"))
+install.packages("sjstats")
+```
 
 <!-- - Презентация: [18_GLMM_binary.pdf](18_GLMM_binary.pdf) -->
 
-<!-- - Код: [18_GLMM_binary_code.R](18_GLMM_binary_code.R) -->
-<!-- - Данные: -->
-<!--     + [aster_mussel_full.csv](data/aster_mussel_full.csv) -->
-<!--     + [aster_mussel.csv](data/aster_mussel.csv) -->
-<!--     + [myt_gen_morph.csv](data/myt_gen_morph.csv) -->
-<!--     + [Yakovis2.csv](data/Yakovis2.csv) -->
+- Код: [18_GLMM_binary_code.R](18_GLMM_binary_code.R)
+- Данные:
+    + [aster_mussel_full.csv](data/aster_mussel_full.csv)
+    + [aster_mussel.csv](data/aster_mussel.csv)
+    + [myt_gen_morph.csv](data/myt_gen_morph.csv)
+    + [Yakovis2.csv](data/Yakovis2.csv)
