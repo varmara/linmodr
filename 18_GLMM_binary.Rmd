@@ -123,7 +123,7 @@ ggplot(new_data, aes(x = X, y = fit))  + geom_ribbon(aes(ymin = fit - 2 * se, ym
 логиты линейно связаны с предиктором: $ln\Big(\cfrac{\pi}{1 - \pi}\Big) = \beta_0 + \beta_1 X$
 
 
-## Обобщенная лиенйная модель для бинарного отклика
+## Обобщенная линейная модель для бинарного отклика
 
 
 $y_i \sim Binomial(n = 1, \pi_i)$
@@ -503,7 +503,7 @@ AIC(model1_ri, model1_rsi_1, model1_rsi_2)
 
 ```{r}
 library(ggplot2)
-model1_diagn <- fortify(model1_ri)
+model1_diagn <- fortify.merMod(model1_ri)
 ggplot(model1_diagn, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smooth() 
 
 ```
@@ -516,9 +516,16 @@ ggplot(model1_diagn, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smoot
 
 
 ```{r}
-library(sjstats)
-overdisp(model1_ri)
+overdisp_fun <- function(model) {
+    rdf <- df.residual(model)
+    rp <- residuals(model,type="pearson")
+    Pearson.chisq <- sum(rp^2)
+    prat <- Pearson.chisq/rdf
+    pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE)
+    c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)
+}
 
+overdisp_fun(model1_ri)
 ```
 
 Избыточной дисперсии нет
@@ -596,7 +603,7 @@ summary(model6)$call
 ## Диагностика финальной модели: линейность связи
 
 ```{r}
-model6_diagn <- fortify(model6)
+model6_diagn <- fortify.merMod(model6)
 ggplot(model6_diagn, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smooth() 
 
 ```
@@ -607,7 +614,7 @@ ggplot(model6_diagn, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smoot
 ## Диагностика финальной модели: избыточность дисперсии
 
 ```{r}
-overdisp(model6)
+overdisp_fun(model6)
 ```
 
 Избыточной дисперсии нет

@@ -195,7 +195,7 @@ model6_unscaled <- glmer(Out ~ L + Sp +
 
 ########### Самостоятельная работа  ###########################
 
-# Вариант 1. От чего зависит судьба морских желудей?
+# Задание 1. От чего зависит судьба морских желудей?
 # Данные взяты из работы Yakovis, E., & Artemieva, A. (2015). Bored to death: community-wide effect of predation on a foundation Species in a low-Disturbance arctic subtidal system. PloS one, 10(7), e0132973.
 
 #Читаем данные
@@ -229,23 +229,11 @@ bal2 <- bal[bal$Status == "empty_test", ]
 
 
 
-##Подбираем модель с помощью функции `glmer()`
-
-library(lme4)
-
-summary(M1_glmer)
-
-
-# Вот модель, которая нужна!
-M <- glmer(Drill ~ BorN + ALength + Position + Site + (1 |Sample), data = bal2, family = binomial("logit"))
 
 
 
 
-
-
-
-#Вариат 2. Можно ли использовать морфологический маркер для идентификации криптических видов мидий
+#Задание 2. Можно ли использовать морфологический маркер для идентификации криптических видов мидий
 # Данные взяты из работы M.Katolikova, V.Khaitov, R.Väinölä, M.Gantsevich, P.Strelkov "Genetic, Ecological and Morphological Distinctness of the Blue Mussels Mytilus trossulus Gould and M. edulis L. in the White Sea" PLOS ONE DOI:10.1371/journal.pone.0152963
 
 myt <- read.table("data/myt_gen_morph.csv", header = TRUE, sep = ";")
@@ -262,33 +250,6 @@ myt$Sp[myt$structure >= 0.5] <- 1
 myt$Sp[myt$structure < 0.5] <- 0
 
 
-
-# Строим модели
-
-
-summary(Myt_M1)
-
-diagnost <- fortify(Myt_M1)
-
-
-diagnost<-cbind(diagnost, myt)
-head(diagnost)
-
-Pl1 <- ggplot(diagnost, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smooth(se=F)
-
-Pl2 <- ggplot(diagnost, aes(x = Z, y = .scresid)) + geom_point() + geom_smooth(method = "loess", se=F)
-
-Pl3 <- ggplot(diagnost, aes(x = L, y = .scresid)) + geom_point() + geom_smooth( se=F)
-
-
-
-
-grid.arrange(Pl1, Pl2, Pl3, ncol = 2)
-
-overdisp_fun(Myt_M1)
-
-
-# Как решить эту проблему?
 
 
 
