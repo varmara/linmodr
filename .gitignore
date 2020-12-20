@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+*.log
 *_cache
 *_files
