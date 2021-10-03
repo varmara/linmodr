@@ -25,20 +25,20 @@ install.packages("MASS")
 
 ### 03 Описательная статистика
 
-<!-- Часть 1 -->
+Часть 1
 
 <!-- - Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html) -->
-<!-- - Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R) -->
-<!-- - Данные [diatome_count.csv](data/diatome_count.csv) -->
+- Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R)
+- Данные [diatome_count.csv](data/diatome_count.csv)
 
-<!-- Часть 2 -->
+Часть 2
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages("car") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages("car")
+```
 
 <!-- - Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html) -->
-<!-- - Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R) -->
+- Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R)
 
 ### 04 Тестирование гипотез
 
@@ -84,10 +84,10 @@ install.packages("MASS")
 
 <!-- Часть 1. Множественная линейная регрессия -->
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages("gridExtra") -->
-<!-- install.packages("ISwR") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages("gridExtra")
+install.packages("ISwR")
+```
 
 <!-- - Презентация: [08.1_multiple_LM.html](08.1_multiple_LM.html) -->
 
@@ -134,9 +134,9 @@ install.packages("cowplot")
 
 ### 10 Однофакторный дисперсионный анализ
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("DAAG", "multcomp")) -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("DAAG", "multcomp"))
+```
 
 <!-- - Презентация: [10_anova.pdf](10_anova.pdf) -->
 <!-- - Код: -->
@@ -170,9 +170,9 @@ install.packages("cowplot")
 
 ### 13 GLM для счетных данных
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages("AER") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages("AER")
+```
 
 <!-- - Презентация: [13_GLM_count.pdf](13_GLM_count.pdf) -->
 <!-- - Код: [13_GLM_count_code.R](13_GLM_count_code.R) -->
@@ -183,9 +183,9 @@ install.packages("cowplot")
 
 ### 14 GLM для бинарных данных (=логистическая регрессия)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("ISwR", "cowplot")) -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("ISwR", "cowplot"))
+```
 
 <!-- - Презентация: [14_GLM_binary.pdf](14_GLM_binary.pdf) -->
 <!-- - Код: [14_GLM_binary_code.R](14_GLM_binary_code.R) -->
@@ -199,9 +199,9 @@ install.packages("cowplot")
 
 ### 15 GLMM для нормально-распределенных данных
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("lme4", "pbkrtest")) -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("lme4", "pbkrtest"))
+```
 
 <!-- - Презентация: -->
 <!--     + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf) -->
@@ -225,9 +225,9 @@ install.packages("cowplot")
 <!-- - Данные: -->
 <!--     + [mussel_juv_ad.csv](data/mussel_juv_ad.csv) -->
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages("faraway") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages("faraway")
+```
 
 ### 17 GLMM для счетных данных
 
@@ -244,10 +244,10 @@ install.packages("cowplot")
 
 ### 18 GLMM для бинарных данных
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("MASS", "glmmML", "lme4", "doBy")) -->
-<!-- install.packages("performance") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("MASS", "glmmML", "lme4", "doBy"))
+install.packages("performance")
+```
 
 <!-- - Презентация: [18_GLMM_binary.pdf](18_GLMM_binary.pdf) -->
 

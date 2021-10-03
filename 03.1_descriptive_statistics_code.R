@@ -60,7 +60,7 @@ apple_data <- data.frame(diameter = apples)
 head(apple_data)
 
 ggplot(data = apple_data) +
-  geom_boxplot(aes(x = 'Медиана \nи квантили', y = diameter))
+  geom_boxplot(aes(x = 'Медиана\nи квантили', y = diameter))
 
 
 

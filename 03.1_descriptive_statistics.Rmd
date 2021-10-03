@@ -546,17 +546,17 @@ y6 <- c(rnorm(250, mean = 1, sd = 0.1), rnorm(250, 19, 0.1))
 
 sd_compare <- data.frame(y1, y2, y3, y4, y5, y6)
 
-gy1 <- ggplot(sd_compare, aes(x = y1)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20)) + labs(x = "Distribution 1")
+gy1 <- ggplot(sd_compare, aes(x = y1)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size = 1.5) + scale_x_continuous(limits = c(0,20)) + labs(x = "Distribution 1")
 
-gy2 <- ggplot(sd_compare, aes(x = y2)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 2")
+gy2 <- ggplot(sd_compare, aes(x = y2)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size = 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 2")
 
-gy3 <- ggplot(sd_compare, aes(x = y3)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 3")
+gy3 <- ggplot(sd_compare, aes(x = y3)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size = 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 3")
 
-gy4 <- ggplot(sd_compare, aes(x = y4)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 4")
+gy4 <- ggplot(sd_compare, aes(x = y4)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size = 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 4")
 
-gy5 <- ggplot(sd_compare, aes(x = y5)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = mean(y5), color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 5")
+gy5 <- ggplot(sd_compare, aes(x = y5)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = mean(y5), color = "red", linetype = "dashed", size = 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 5")
 
-gy6 <- ggplot(sd_compare, aes(x = y6)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 6")
+gy6 <- ggplot(sd_compare, aes(x = y6)) + geom_histogram(fill = "steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size = 1.5) + scale_x_continuous(limits = c(0,20))  + labs(x = "Distribution 6")
 
 grid.arrange(arrangeGrob(gy1, gy2, gy3, ncol = 1), arrangeGrob(gy4, gy5, gy6, ncol = 1), ncol = 2)
 ```
@@ -565,24 +565,24 @@ grid.arrange(arrangeGrob(gy1, gy2, gy3, ncol = 1), arrangeGrob(gy4, gy5, gy6, nc
 
 ```{r sd_compare2, echo=FALSE, purl=FALSE, fig.width=9, fig.height = 6, warning=FALSE, message=FALSE}
 
-gy1a <- ggplot(sd_compare, aes(x = y1)) +geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20)) + labs(x = round(sd(y1),1))
+gy1a <- gy1 + labs(x = round(sd(y1), 1))
 
-gy2a <- ggplot(sd_compare, aes(x = y2)) +geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = round(sd(y2),1))
+gy2a <- gy2  + labs(x = round(sd(y2), 1))
 
-gy3a <- ggplot(sd_compare, aes(x = y3)) + geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = round(sd(y3),2))
+gy3a <- gy3  + labs(x = round(sd(y3), 2))
 
-gy4a <- ggplot(sd_compare, aes(x = y4)) + geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = round(sd(y4),1))
+gy4a <- gy4  + labs(x = round(sd(y4), 1))
 
-gy5a <- ggplot(sd_compare, aes(x = y5)) + geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = mean(y5), color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = round(sd(y5),1))
+gy5a <- gy5  + labs(x = round(sd(y5), 1))
 
-gy6a <- ggplot(sd_compare, aes(x = y6)) + geom_histogram(fill="steelblue", color = "grey20") +  geom_vline (xintercept = 10, color = "red", linetype = "dashed", size - 1.5) + scale_x_continuous(limits=c(0,20))  + labs(x = round(sd(y6),1))
+gy6a <- gy6  + labs(x = round(sd(y6), 1))
 
 grid.arrange(arrangeGrob(gy1a, gy2a, gy3a, ncol = 1), arrangeGrob(gy4a, gy5a, gy6a, ncol = 1), ncol = 2)
 ```
 
 ## Задание 2
 
-Из пяти положительных чисел создайте выборку со средним = 10 и медианой = 7
+Из 5 положительных чисел создайте выборку со средним = 10 и медианой = 7
 
 ## Решение
 

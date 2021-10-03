@@ -297,8 +297,10 @@ qqPlot(women$height, id = FALSE)
 ```{r}
 data("iris")
 str(iris)
+op <- par(mfrow = c(1, 2))
 qqPlot(iris$Sepal.Length, id = FALSE)
 hist(iris$Sepal.Length)
+par(op)
 ```
 
 ## Решение (3.3)
@@ -306,8 +308,10 @@ hist(iris$Sepal.Length)
 ```{r}
 data("lynx")
 str(lynx)
+op <- par(mfrow = c(1, 2))
 qqPlot(lynx, id = FALSE)
 hist(lynx)
+par(op)
 ```
 
 
