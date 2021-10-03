@@ -82,7 +82,7 @@ slide.title-slide h2 {
 }
 
 slide.title-slide p {
-  font-size: 1.2em;
+  font-size: 1.1em;
   color: #CC2904;
 }
 
@@ -117,7 +117,7 @@ slide:not(.segue):not(.prompt) h3{
 /* Format code and body */
 
 body, td {
-   font-size: 1.1em;
+   font-size: 0.9em;
 }
 
 code.r{
@@ -127,14 +127,14 @@ code.r{
 pre {
   font-size: 0.9em;
   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
-  line-height: 1.1em;
+  line-height: 1.0em;
   margin-bottom: 12px;
   text-align:left;
 }
 pre code {
   font-size: 0.9em;
   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
-  line-height: 1.1em;
+  line-height: 1.0em;
   margin-bottom: -18px;
   text-align: left;
   border: 1px solid #ccc;
@@ -142,7 +142,7 @@ pre code {
 code {
   font-size: 0.9em;
   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
-  line-height: 1.1em;
+  line-height: 1.0em;
   margin-bottom: -18px;
   text-align:left;
 }
@@ -156,7 +156,7 @@ strong {
 }
 
 small {
-  font-size: 0.8em;
+  font-size: 0.7em;
 }
 
 /*</style>*/
