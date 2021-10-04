@@ -27,7 +27,7 @@ install.packages("MASS")
 
 Часть 1
 
-<!-- - Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html) -->
+- Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html)
 - Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R)
 - Данные [diatome_count.csv](data/diatome_count.csv)
 
