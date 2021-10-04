@@ -37,7 +37,7 @@ install.packages("MASS")
 install.packages("car")
 ```
 
-<!-- - Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html) -->
+- Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html)
 - Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R)
 
 ### 04 Тестирование гипотез
