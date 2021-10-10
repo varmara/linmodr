@@ -51,12 +51,12 @@ install.packages("car")
 ### 05 Простая линейная регрессия
 
 <!-- - Презентация: [05_LM.html](05_LM.html) -->
-<!-- - Код: -->
-<!--     + [05_LM_code.R](05_LM_code.R) -->
-<!--     + [05_LM_task.R](05_LM_task.R) -->
-<!-- - Данные: -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!--     + [secher.xls](data/secher.xls) -->
+- Код:
+    + [05_LM_code.R](05_LM_code.R)
+    + [05_LM_task.R](05_LM_task.R)
+- Данные:
+    + [IQ_brain.csv](data/IQ_brain.csv)
+    + [secher.xls](data/secher.xls)
 
 ### 06 Основы линейной алгебры
 
