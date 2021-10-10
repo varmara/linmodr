@@ -1506,7 +1506,7 @@ ggplot(data = Cushings[Cushings$Type %in% c('a', 'b'), ],
 Прочитаем эти данные
 ```{r}
 rem <- read.csv(file = "data/aml.csv", header = TRUE)
-str(rem)
+head(rem)
 ```
 
 - В переменной `time` представлена продолжительность ремиссии в днях.
@@ -1514,31 +1514,71 @@ str(rem)
 
 Ваша задача сравнить эти группы с помощью t-теста.
 
-## Решение
+## Решение: Разведочный анализ
+
+```{r  purl=FALSE}
+str(rem)
+# Делаем group фактором
+rem$group <- factor(rem$group, labels = c("therapy", "control"))
+
+# Пропущенные значения?
+colSums(is.na(rem))
+
+# Объемы выборок?
+table(rem$group)
+```
+
+
+## Решение: Проверка условий применимости
+
+```{r  purl=FALSE, fig.height=4}
+# Выборки малы, поэтому проверяем на нормальность и отсутствие выбросов
+op <- par(mfrow = c(1, 2))
+qqPlot(rem$time[rem$group == "therapy"])
+qqPlot(rem$time[rem$group == "control"])
+par(op)
+```
+
+
+## Решение: Проверка условий применимости
+
+Есть отскакивающее значение в группе `therapy`, в этой группе оно 11 по порядку (видно на `qqPlot()`).
+
+```{r  purl=FALSE}
+rem$time[rem$group == "therapy"]
+rem$time[rem$group == "therapy"][11]
+```
+
+Пусть в этом случае это вполне реальное наблюдение, но это значение придется исключить, т.к. t-тест не устойчив к выбросам.
+
+## Решение: Двухвыборочный t-тест
 
 ```{r purl=FALSE}
-t.test(formula = time ~ group, data = rem)
+# удалено наблюдение со значением 161
+tt <- t.test(formula = time ~ group, data = rem,
+       subset = rem$time != 161)
 ```
 
-Или так:
+Или то же самое:
 
 ```{r purl=FALSE, results="hide"}
-t.test(x = rem$time[rem$group == 1],
-       y = rem$time[rem$group == 2])
+# удалено 11 наблюдение в группе `therapy`
+tt <- t.test(x = rem$time[rem$group == 'therapy'][-11],
+       y = rem$time[rem$group == 'control'])
 ```
 
-## График со средними и доверительными интервалами
+## Решение: Результаты двухвыборочного t-теста
 
+```{r purl=FALSE}
+tt
+```
+
+- `r ifelse(tt$p.value <= 0.05, 'Продолжительность ремиссии значимо различается', 'Не найдено значимых различий продолжительности ремиссии')` у пациентов после регулярной лучевой терапии и обычного лечения ($t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.01, digits = 3)`$).
+
+## Решение: График со средними и доверительными интервалами
 
 ```{r fig.width=4}
-ggplot(data = rem, aes(x = factor(group), y = time)) + 
-  stat_summary(fun.data = mean_cl_normal)
-```
-
-Другой вариант кода
-```{r eval=FALSE}
-rem$group <- factor(rem$group)
-ggplot(data = rem, aes(x = group, y = time)) + 
+ggplot(data = rem[rem$time != 161, ], aes(x = factor(group), y = time)) + 
   stat_summary(fun.data = mean_cl_normal)
 ```
 
