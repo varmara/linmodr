@@ -6,15 +6,15 @@
 #Создаем матрицу из вектора
 # Задание: постройте марицу 4х3 из чисел от 1 до 12
 
-matrix(data = 1:12,  )
-matrix(1:12, nrow = 3, ncol = 4)
+matrix(data =   )
+matrix(, nrow = , ncol = )
 
-matrix(1:12, nrow = 3, ncol = 4, byrow = TRUE )
+matrix( nrow = , ncol = , byrow =  )
 
 
 # Единичная матрица
 
-diag(1, nrow=4)
+
 
 
 
@@ -29,7 +29,7 @@ A + 4
 A + (A+4)
 
 A + t(A)
-
+ё
 
 B <- t(A)
 
@@ -168,7 +168,7 @@ pr <- c(10, 20, 30, 40)
 
 Nakr <- matrix(c(0.1, 0.15, 0.2, 0.15, 0.15, 0.05, 0.05, 0.09, 0.1, 0.05, 0.01, 0.1), ncol = 4)
 
-Nakr %*% pr
+ %*%
 
 
 
@@ -210,7 +210,7 @@ iris_subs <- iris[, c(1,2)]
 
 iris_subs_scaled <- scale(iris_subs)
 
-(t(iris_subs_scaled) %*% iris_subs_scaled / (nrow(iris_subs_scaled) - 1))[2, 1]
+ %*%  /
 
 
 
@@ -255,13 +255,13 @@ round(solve(X) %*% X)
 # Решение систем линейных уравнений с помощью матричной алгебры
 
 
-Coef <- matrix(c(1,2,3,4,5,6,7,8,10), nrow = 3, byrow = TRUE)
+Coef <- matrix(, nrow = , byrow = )
 
-det(Coef)
+det()
 
 Answer <- matrix(c(2,4,10), ncol = 1)
 
-XYZ <- solve(Coef) %*% Answer
+XYZ <- solve() %*%
 
 
 1*XYZ[1] + 2*XYZ[2] + 3*XYZ[3]
