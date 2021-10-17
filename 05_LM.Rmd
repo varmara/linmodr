@@ -41,7 +41,7 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 
 <div class="columns-2"> 
 
-![Scan_03_11](images/MRI-Scan_03_11-by_bucaorg(Paul_Burnett)_no_Flickr.jpg)
+![Scan_03_11](images/MRI-Scan_03_11-by_bucaorg_Paul_Burnett_no_Flickr.jpg)
 <small>[Scan_03_11](https://flic.kr/p/c45eZ3) by bucaorg(Paul_Burnett) on Flickr</small>  
 
 <br/>

@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Описание, проверка значимости и валидности линейных моделей</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Марина Варфоломеева, Вадим Хайтов" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <!-- https://github.com/fnaufel/xaringan-smartify-->
+    <script
+    			  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    			  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+    			  crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/fnaufel/xaringan-smartify/smartify.min.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: top, center, inverse, title-slide
+
+# Описание, проверка значимости и валидности линейных моделей
+### Марина Варфоломеева, Вадим Хайтов
+
+---
+
+
+&lt;style&gt;
+.remark-slide-content {
+  padding-top: 0px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+pre {
+    display: block;
+    font-family: monospace;
+    font-size: 20px;
+    white-space: pre;
+    margin: 0.5em 0px;
+    margin-top: 0em;
+    margin-right: 0px;
+    margin-bottom: 0em;
+    margin-left: 0px;
+}
+.remark-code, .remark-inline-code { font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace;
+                                    font-size: 80%;
+                                  }
+&lt;/style&gt;
+
+
+
+# Описание и проверка значимости линейных моделей
+
+## Вы сможете
+
+- Подобрать линейную модель зависимости переменной-отклика от одного предиктора
+- Протестировать значимость линейной модели в целом и значимость отдельных ее коэффициентов при помощи t и F критериев
+- Проверить условия применимости линейной регрессии при помощи графиков
+
+
+
+
+---
+
+class: middle, center, inverse
+
+# Вспомним пример из прошлой лекции
+
+---
+
+## Пример: IQ и размеры мозга
+
+Зависит ли уровень интеллекта от размера головного мозга? (Willerman et al. 1991)
+
+.pull-left[
+
+![Scan_03_11](images/MRI-Scan_03_11-by_bucaorg_Paul_Burnett_no_Flickr.jpg)
+
+&lt;small&gt;[Scan_03_11](https://flic.kr/p/c45eZ3) by bucaorg(Paul_Burnett) on Flickr&lt;/small&gt;  
+
+]
+
+.pull-right[
+
+Было исследовано 20 девушек и 20 молодых людей
+
+У каждого индивида измеряли:
+
+- вес
+- рост
+- размер головного мозга (количество пикселей на изображении ЯМР сканера)
+- Уровень интеллекта измеряли с помощью IQ тестов
+
+&lt;small&gt;Пример: Willerman, L., Schultz, R., Rutledge, J. N., and Bigler, E. (1991), "In Vivo Brain Size and Intelligence", Intelligence, 15, p.223--228.  
+Данные: ["The Data and Story Library"](http://lib.stat.cmu.edu/DASL)  
+Фото: [Scan\_03\_11](https://flic.kr/p/c45eZ3) by bucaorg (Paul Burnett) on Flickr
+&lt;/small&gt;
+
+]
+
+---
+
+## Вспомним, на чем мы остановились
+
+
+```
+## 
+## Call:
+## lm(formula = PIQ ~ MRINACount, data = brain)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+##  -39.6  -17.9   -1.6   17.0   42.3 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  1.7437570 42.3923825    0.04    0.967  
+## MRINACount   0.0001203  0.0000465    2.59    0.014 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 21 on 38 degrees of freedom
+## Multiple R-squared:  0.15,	Adjusted R-squared:  0.127 
+## F-statistic: 6.69 on 1 and 38 DF,  p-value: 0.0137
+```
+
+---
+
+## Уравнение и график зависимости
+
+`$$PIQ_i = 1.744 + 0.0001202 \cdot MRINACount_i$$`
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: middle, center, inverse
+
+# Тестирование гипотез о линейных моделях
+ 
+---
+ 
+## Способы проверки значимости модели и ее коэффициентов
+
+Два равноправных способа
+
+--
+
+### Значима ли модель целиком?
+
++ F критерий
+&lt;!-- : действительно ли объясненная моделью дисперсия `\(MS_{r}\)` больше, чем случайная (= остаточная) дисперсия `\(MS_{e}\)`? --&gt;
+
+--
+
+### Значима ли связь между предиктором и откликом?
+
++ t-критерий
+&lt;!-- : отличается ли от нуля коэффициент `\(b_k\)` при этом предикторе `\(x_k\)` --&gt;
++ F-критерий
+&lt;!-- : действительно ли объясненная предиктором дисперсия `\(MS_{x_{k}}\)` больше, чем случайная (= остаточная) дисперсия `\(MS_{e}\)`? --&gt;
+
+---
+
+class: middle, center, inverse
+
+# Тестирование гипотез с помощью t-критерия  
+
+---
+
+## Тестирование гипотез с помощью t-критерия  
+
+### Гипотезы
+
+Зависимость есть, если `\(\beta_k \ne 0\)`
+
+Нулевая гипотеза `\(H_0: \beta_k = 0\)`
+
+---
+
+## Тестирование гипотез с помощью t-критерия  
+
+### Гипотезы
+
+Зависимость есть, если `\(\beta_k \ne 0\)`
+
+Нулевая гипотеза `\(H_0: \beta_k = 0\)`
+
+### Тестовая статистика
+
+`$$t=\frac{b_k - \beta_k}{SE_{b_k}} = \frac{b_k - 0}{SE_{b_k}} = \frac{b_k}{SE_{b_k}}$$`
+
+Число степеней свободы: `\(df = n − p\)`, где `\(n\)` --- объем выборки, `\(p\)` --- число параметров модели, `\(k\)` --- конкретный коэффициент регрессии. 
+
+Для простой линейной регрессии с одним предиктором `\(df = n - 2\)`.
+
+---
+
+## Зависит ли IQ от размера головного мозга?
+
+`$$PIQ_i = 1.744 + 0.0001202 \cdot MRINACount_i$$`
+
+
+```r
+summary(brain_model)
+```
+
+```
+## 
+## Call:
+## lm(formula = PIQ ~ MRINACount, data = brain)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+##  -39.6  -17.9   -1.6   17.0   42.3 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  1.7437570 42.3923825    0.04    0.967  
+## MRINACount   0.0001203  0.0000465    2.59    0.014 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 21 on 38 degrees of freedom
+## Multiple R-squared:  0.15,	Adjusted R-squared:  0.127 
+## F-statistic: 6.69 on 1 and 38 DF,  p-value: 0.0137
+```
+
+
+
+Результаты теста на IQ статистически значимо связаны &lt;br/&gt; с размерами мозга на МРТ ( `\(t_{ 0.05, 38}\)` = 2.59, `\(p\)` = 0.01 ).
+
+---
+
+class: middle, center, inverse
+
+# Тестирование гипотез при помощи F-критерия
+
+
+
+---
+
+## Общая изменчивость
+
+Общая изменчивость `\(SS_{t}\)` --- это сумма квадратов отклонений наблюдаемых значений `\(y_i\)` от общего среднего `\(\bar y\)`
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-7-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Структура общей изменчивости
+
+`$$SS_t = SS_r + SS_e$$`
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-8-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+---
+
+## От изменчивостей к дисперсиям
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-9-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+
+
+| `\(MS_t\)`, полная дисперсия | `\(MS_r\)`, дисперсия, &lt;br /&gt; объясненная регрессией  | `\(MS_e\)`, остаточная дисперсия | 
+|-----|-----|-----|
+| `\(MS_{t} =\frac{SS_{t}}{df_{t}}\)` | `\(MS_{r} =\frac{SS_{r}}{df_{r}}\)` | `\(MS_{e} =\frac{SS_{e}}{df_{e}}\)` |
+| `\(SS_{t}=\sum{(\bar{y}-y_i)^2}\)` | `\(SS_{r}=\sum{(\hat{y}-\bar{y})^2}\)` | `\(SS_{e}=\sum{(\hat{y}-y_i)^2}\)` |
+| `\(df_{t} = n-1\)` | `\(df_{r} = 1\)` | `\(df_{e} = n-2\)`  |
+
+---
+
+## С помощью `\(MS_r\)` и `\(MS_e\)` можно тестировать значимость коэффициентов
+
+Если дисперсии остатков для всех значений x равны, то
+
+`\(E(MS_r) = \sigma^2 + \beta_1^2\sum(x_i - \bar x)^2\)` 
+--
+`\(= \sigma^2 + \sigma_{x}^2\)`
+
+`\(E(MS_e) =\sigma^2\)`
+
+&lt;br/&gt;
+
+--
+
+Если зависимости нет, то `\(\beta_1 = 0\)`, и тогда 
+--
+`\(MS_r \approx MS_e\)`
+
+--
+
+Значит, `\(MS_r \approx MS_e\)`
+
+&lt;br/&gt;
+
+--
+
+- `\(H_0: \beta_1 = 0\)`
+- `\(H_A: \beta_1 \ne 0\)`
+
+`$$F_{df_r, df_e}= \frac{MS _{r}}{MS_{e}}$$`
+
+---
+
+## Тестирование значимости коэффициентов регрессии при помощи F-критерия
+
+- `\(H_0: \beta_1 = 0\)`
+- `\(H_A: \beta_1 \ne 0\)`
+
+`$$F_{df_r, df_e}= \frac{MS _{r}}{MS_{e}}$$`
+
+Для простой линейной регрессии `\(df_{r} = 1\)` и `\(df_{e} = n - 2\)`
+
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-10-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Таблица результатов дисперсионного анализа
+
+| Источник изменчивости  | df | SS | MS | F  | 
+| ----- | ----- | ----- | ----- | ----- | 
+| Регрессия | `\(df _r = 1\)` | `\(SS _r = \sum{(\bar y - \hat y _i)^2}\)` | `\(MS _r = \frac{SS _r}{df _r}\)` | `\(F _{df _r, df _e} = \frac{MS _r}{MS _e}\)` | 
+| Остаточная|  `\(df _e = n - 2\)` | `\(SS _e = \sum{(y _i - \hat y _i)^2}\)` | `\(MS _e = \frac{SS _e}{df _e}\)` | 
+| Общая | `\(df _t = n - 1\)` | `\(SS _t = \sum {(\bar y - y _i)^2}\)` | 
+
+&lt;br/&gt;&lt;br/&gt;
+
+Минимальное упоминание результатов в тексте должно содержать `\(F _{df _r, df _e}\)` и `\(p\)`.
+
+---
+
+class: middle, center, inverse
+
+# Оценка качества подгонки модели
+
+---
+
+## В чем различие между этими двумя моделями?
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-11-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+--
+
+У этих моделей разный разброс остатков:
+
+- Модель слева объясняет практически всю изменчивость
+- Модель справа объясняет не очень много изменчивости
+
+---
+
+## Коэффициент детерминации --- мера качества подгонки модели
+
+### Коэффициент детерминации
+
+описывает какую долю дисперсии зависимой переменной объясняет модель
+
+`$$R^2 = \frac{SS_{r}}{SS_{t}}$$`
+
+- `\(0 &lt; R^2 &lt; 1\)`
+- `\(R^2 = r^2\)` --- для простой линейной регрессии коэффициент детерминации равен квадрату коэффициента Пирсоновской корреляции
+
+---
+
+## Если в модели много предикторов, нужно внести поправку
+
+###  Скорректированный коэффициет детерминации (adjusted R-squared)
+
+Применяется если необходимо сравнить две модели с разным количеством параметров  
+
+$$ R^2_{adj} = 1- (1-R^2)\frac{n-1}{n-p}$$
+
+`\(p\)` - количество параметров в модели   
+
+Вводится штраф за каждый новый параметр
+
+---
+
+## Еще раз смотрим на результаты регрессионного анализа зависимости IQ от размеров мозга
+
+
+```r
+summary(brain_model)
+```
+
+```
+## 
+## Call:
+## lm(formula = PIQ ~ MRINACount, data = brain)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+##  -39.6  -17.9   -1.6   17.0   42.3 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  1.7437570 42.3923825    0.04    0.967  
+## MRINACount   0.0001203  0.0000465    2.59    0.014 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 21 on 38 degrees of freedom
+## Multiple R-squared:  0.15,	Adjusted R-squared:  0.127 
+## F-statistic: 6.69 on 1 and 38 DF,  p-value: 0.0137
+```
+
+---
+
+## Как записываются результаты регрессионного анализа в тексте статьи?
+
+Мы показали, что связь между результатами теста на IQ и размером головного мозга на МРТ описывается моделью вида
+&lt;br/&gt;
+IQ = 1.74 + 0.00012 MRINACount ( `\(F_{1,38}\)` = 6.686, p = 0.0136, `\(R^2\)` = 0.149)
+&lt;br/&gt;
+&lt;br/&gt;
+
+--
+
+Неужели уже пора писать статью?
+
+---
+
+## Задание 1 &amp; 2
+
+Выполните задания 1 и 2 в одном из этих файлов:
+
+- 07_task_assumptions_catsM.R
+- 07_task_assumptions_GAG.R
+
+
+---
+
+class: middle, center, inverse
+
+# Зачем нужна диагностика линейных моделей
+
+---
+
+## Зачем нужна диагностика модели? Разве тестов было недостаточно?
+
+
+```r
+dat &lt;- read.table('data/orly_owl_Lin_4p_5_flat.txt')
+fit &lt;- lm(V1 ~ V2 + V3 + V4 + V5 - 1, data = dat)
+coef(summary(fit))
+```
+
+```
+##    Estimate Std. Error t value Pr(&gt;|t|)
+## V2    0.986     0.1280    7.70 1.99e-14
+## V3    0.971     0.1266    7.67 2.50e-14
+## V4    0.861     0.1196    7.20 8.30e-13
+## V5    0.927     0.0833   11.13 4.78e-28
+```
+
+Все значимо? Пишем статью?
+
+---
+
+## Задание 3
+
+Постройте график зависимости остатков от предсказанных значений при помощи этого кода
+
+
+```r
+library(car)
+residualPlot(fit, pch = ".")
+```
+
+---
+
+## Oh, really?
+
+
+```r
+library(car)
+residualPlot(fit, pch = ".")
+```
+
+&lt;img src="07_model_description_and_validation_files/figure-html/bird-1.png" width="360" style="display: block; margin: auto;" /&gt;
+
+[http://www4.stat.ncsu.edu/~stefanski/NSF_Supported/Hidden_Images/stat_res_plots.html](http://www4.stat.ncsu.edu/~stefanski/NSF_Supported/Hidden_Images/stat_res_plots.html)
+
+---
+
+## Анализ остатков линейных моделей
+
+### 1) Проверка на наличие влиятельных наблюдений
+
+### 2) Проверка условий применимости линейных моделей
+
+1. Линейная связь
+1. Независимость
+1. Нормальное распределение
+1. Гомогенность дисперсий
+1. Отсутствие коллинеарности предикторов (для множественной регрессии)
+
+---
+
+class: middle, center, inverse
+
+# Анализ остатков
+
+---
+
+## Какие бывают остатки?
+
+--
+
+### "Сырые" остатки
+`$$e_i = y_i - \hat{y_i}$$`
+
+--
+
+### Стандартизованные (стьюдентизированные) остатки
+
+`$$s_i = \frac{e_i}{\sqrt{MS_e(1-h_{ii})}}$$`
+
+- легко сравнивать (стандартизованы), учитывают силу влияния наблюдений
+
+
+&lt;hr /&gt;
+
+- `\(\sqrt{MS_e}\)` --- стандартное отклонение остатков
+- `\(h_{ii}\)` --- "сила воздействия" отдельных наблюдений (leverage, рычаг проекционной матрицы)
+
+---
+
+## Что такое проекционная матрица?
+
+По определению, остатки `\(\mathbf{e} = \mathbf{Y} - \hat{\mathbf{Y}}\)`.
+
+Тогда `\(\mathbf{e} = \mathbf{Y} - \hat{\mathbf{Y}} = \mathbf{Y} - \mathbf{X} \mathbf{b} = \mathbf{Y} - \mathbf{X}[\mathbf{X}'\mathbf{X}]^{-1}\mathbf{X}'\mathbf{Y}\)`.
+
+&lt;br/&gt;
+
+Обозначим  `\(\mathbf{H} \equiv  \mathbf{X}[\mathbf{X}'\mathbf{X}]^{-1}\mathbf{X}'\)`.
+
+Матрица `\(\mathbf{H}\)` --- называется __"хэт"-матрица__ (hat-matrix) или проекционная матрица, т.к. __она позволяет получить предсказанные значения из наблюдаемых__.
+
+`\(\hat{\mathbf{Y}} = \mathbf{H}\mathbf{Y}\)`
+
+&lt;br/&gt;
+
+Тогда остатки можно получить как `\(\mathbf{e} = \mathbf{Y} - \mathbf{H}\mathbf{Y} = (\mathbf{I} - \mathbf{H})\mathbf{Y}\)`.
+
+Диагональные элементы проекционной матрицы --- это мера воздействия точек на ход линии регрессии.
+
+---
+
+class: middle, center, inverse
+
+# Влиятельные наблюдения
+
+---
+
+## Влиятельные наблюдения
+
+Влиятельные наблюдения --- это наблюдения, которые вносят слишком большой вклад в оценку параметров (коэффициентов) модели.
+
+![](images/leverage.png)
+
+&lt;small&gt;Из кн. Quinn, Keugh, 2002&lt;/small&gt;
+
+Учет каких из этих точек повлияет на ход регрессии и почему?
+
+--
+
+- Точка 1 почти не повлияет, т.к. у нее маленький остаток, хоть и большой `\(X\)`
+- Точка 2 почти не повлияет, т.к. ее `\(X\)` близок к среднему, хоть и большой остаток
+- Точка 3 повлияет сильно, т.к. у нее не только большой остаток, но и большой `\(X\)`
+
+---
+
+## Воздействие точек `\(h_{ii}\)` (leverage)
+
+показывает силу влияния значений `\(x_i\)` на ход линии регрессии, то есть на `\(\hat{y_i}\)`
+
+.pull-left[
+
+![](images/leverage.png)
+
+&lt;small&gt;Из кн. Quinn, Keough, 2002&lt;/small&gt;
+
+]
+
+.pull-right[
+
+![](images/seasaw-Weighing-Machine-by-neys-fadzil-on-Flickr.jpg)
+
+&lt;small&gt;Weighing Machine by neys fadzil on Flickr&lt;/small&gt;
+
+]
+
+--
+
+Точки, располагающиеся дальше от `\(\bar{x}\)`, оказывают более сильное влияние на `\(\hat{y_i}\)`
+
+- `\(h_{ii}\)` варьирует в промежутке от `\(1/n\)` до 1  
+- Если  `\(h_{ii} &gt; 2(p/n)\)`, то надо внимательно посмотреть на данное значение ( `\(p\)` --- число параметров, `\(n\)` --- объем выборки)
+
+---
+
+## Расстояние Кука (Cook's distance)
+
+описывает, как повлияет на модель удаление данного наблюдения
+
+`$$D_i = \frac{\sum{(\hat y_j-\hat{y}_{j(i)})^2}}{p \; MS_e} = \frac{e_i^2}{p \; MS_e} \; \frac {h_{ii}} {(1 - h_{ii}) ^ 2}$$`
+
+- `\(\hat{y_j}\)` - значение предсказанное полной моделью
+- `\(\hat{y}_{j(i)}\)` - значение, предсказанное моделью, построенной без учета `\(i\)`-го значения предиктора
+- `\(p\)` - количество параметров в модели
+- `\(MSe\)` - среднеквадратичная ошибка модели ( `\(\hat\sigma^2\)` )
+- `\(h_{ii}\)` --- "сила воздействия" отдельных наблюдений (leverage)
+
+--
+
+&lt;hr /&gt;
+
+- Зависит одновременно от величины остатков и "силы воздействия" наблюдений.
+
+- Условное пороговое значение. Наблюдение является выбросом (outlier), если:
+    - `\(D_i &gt; 1\)` --- это "мягкий" порог
+    - `\(D_i &gt; 4/(n - p)\)` ( `\(n\)` --- объем выборки, `\(p\)` --- число параметров) --- это "жесткий" порог
+
+---
+
+## Что делать с наблюдениями-выбросами?
+
+--
+
+- Удалить?
+
+--
+
+__Осторожно!__ Только очевидные ошибки в наблюдениях можно удалять. Лучше найти причины.
+
+--
+
+- Трансформировать? Это не всегда поможет.
+- Иногда можно переформулировать модель.
+
+---
+
+## Некоторые виды трансформаций
+
+Трансформация  |  Формула  
+------------- | -------------   
+степень -2 | `\(1/x^2\)`
+степень -1 | `\(1/x\)`
+степень -0.5  | `\(1/\sqrt{x}\)`
+степень 0.5 | `\(\sqrt{x}\)`
+логарифмирование | `\(log(x)\)`  
+
+---
+
+## Данные для анализа остатков
+
+
+```r
+library(ggplot2)
+brain_diag &lt;- fortify(brain_model)
+head(brain_diag, 2)
+```
+
+```
+##   PIQ MRINACount   .hat .sigma  .cooksd .fitted .resid .stdresid
+## 1 124     816932 0.0664   20.9 0.049838     100  24.02    1.1840
+## 2 124    1001121 0.0669   21.3 0.000304     122   1.87    0.0921
+```
+
+- `.hat` --- "сила воздействия" данного наблюдения (leverage)
+- `.cooksd` --- расстояние Кука
+- `.fitted` --- предсказанные значения
+- `.resid` --- остатки
+- `.stdresid` --- стандартизованные остатки
+
+---
+
+## График расстояния Кука
+
+Проверяем наличие влиятельных наблюдений в `brain_model`.
+
+Значения на графике расстояния Кука приведены в том же порядке, что и в исходных данных.
+
+
+
+```r
+# График расстояния Кука
+ggplot(brain_diag, aes(x = 1:nrow(brain_diag), y = .cooksd)) + 
+  geom_bar(stat = "identity")
+```
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-16-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Есть одно влиятельное наблюдение, которое нужно проверить, но сила его влияния невелика (расстояние Кука `\(&lt; 1\)`, и только одно наблюдение больше `\(4/(n-p) = 0.11\)`)
+
+---
+
+## График остатков от предсказанных значений
+
+Большую часть того, что нужно знать про остатки вы увидите на этом графике. А сейчас давайте научимся читать такой график.
+
+
+```r
+gg_resid &lt;- ggplot(data = brain_diag, aes(x = .fitted, y = .stdresid)) + 
+  geom_point() + 
+  geom_hline(yintercept = 0)
+gg_resid
+```
+
+&lt;img src="07_model_description_and_validation_files/figure-html/gg-resid-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: middle, center, inverse
+
+# 1. Линейность связи
+
+---
+
+## Нелинейность связи видно на графиках остатков
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-17-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+### Проверка на линейность связи
+
+- График зависимости `\(y\)` от `\(x\)` (и от других переменных, не включенных в модель)
+- График остатков от предсказанных значений
+
+---
+
+## Что делать, если связь нелинейна?  
+
+- Добавить неучтенные переменные или взаимодействия
+- Применить линеаризующее преобразование (Осторожно!)
+- Применить обобщенную линейную модель с другой функцией связи (GLM)
+- Построить аддитивную модель (GAM), если достаточно наблюдений по `\(x\)`
+- Построить нелинейную модель, если известна форма зависимости
+
+---
+
+## Примеры линеаризующих преобразований   
+
+
+
+### Логарифмирование
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-19-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+### Возведение в степень
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+и т.д.
+
+---
+
+## При прочих равных не стоит трансформировать отклик  
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-21-1.png" width="504" style="display: block; margin: auto;" /&gt;
+
+__Осторожно!__ Вы рискуете изучить не то, что хотели:  
+
+1.При логарифмировании отклика вы будете изучать поведение мат.ожидания логарифма  
+`\(E(log(y_i)) = b_0 + b_1x_{1i} + ... + e_i\)`.  
+
+2.Трансформация отклика не только линеаризует зависимость, но и затронет величину остатков `\(e\)`.
+
+--
+
+&lt;br/&gt;
+Вместо трансформации отклика лучше использовать обобщенную линейную модель с подходящей функцией связи, например:
+
+`\(log(E(y_i)) =  b_0 + b_1x_{1i}+ ... + e_i\)`
+
+---
+
+class: middle, center, inverse
+
+# 2. Независимость
+
+---
+
+## Каждое значение `\(y_i\)` должно быть независимо от любого другого `\(y_j\)` 
+
+Это нужно контролировать на этапе планирования сбора материала 
+
+* Наиболее частые источники зависимостей: 
+    + псевдоповторности (повторно измеренные объекты)
+    + неучтенные переменные
+    + временные автокорреляции (если данные - временной ряд)
+    + пространственные автокорреляции (если пробы взяты в разных местах)
+    + и т.п.
+
+---
+
+## Диагностика нарушений независимости
+
+Взаимозависимости можно заметить на графиках остатков
+
+- остатки vs. предсказанные значения
+- остатки vs. переменные в модели
+- остатки vs. переменные не в модели
+
+---
+
+## Нарушение условия независимости: Неучтенная переменная
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-22-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Слева: Если в модели не учтена переменная `\(X2\)`, внешне все нормально, но величина остатков зависит от `\(X2\)`
+- Справа: Если `\(X2\)` учесть, то зависимость остатков от `\(X2\)` исчезает
+
+---
+
+## Нарушение условия независимости: Автокорреляция
+
+В данном случае, наблюдения --- это временной ряд. 
+
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-23-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+На графиках остатков четко видно, что остатки не являются независимыми.
+
+---
+
+## Проверка на автокорреляцию
+
+Проверка на автокорреляцию нужна если данные это временной ряд, или если известны координаты или время сбора проб.
+
+Способы проверки временной автокорреляции (годятся, если наблюдения в ряду расположены через равные интервалы):
+
+- График автокорреляционной функции остатков (ACF-plot) покажет корреляции с разными лагами.
+- Критерий Дарбина-Уотсона (значимость автокорреляции 1-го порядка).
+
+Для проверки пространственных автокорреляций
+
+- вариограмма
+- I Морана (Moran's I)
+
+---
+
+## Что делать, если у вас нарушено условие независимости значений?
+
+Выбор зависит от обстоятельств. Вот несколько возможных вариантов.
+
++ псевдоповторности
+    - избавляемся от псевдоповторностей, вычислив среднее
+    - подбираем модель со случайным фактором
++ неучтенные переменные
+    - включаем в модель (если возможно)
++ временные автокорреляции
+    - моделируем автокорреляцию
+    - подбираем модель со случайным фактором
++ пространственные автокорреляции
+    - моделируем пространственную автокорреляцию
+    - делим на пространственные блоки и подбираем модель со случайным фактором (= random effects model, mixed model)
+
+---
+
+## Проверка условия независимости
+
+### Графики зависимости остатков от предикторов в модели
+
+```r
+# Полный код
+ggplot(data = brain_diag, aes(x = MRINACount, y = .stdresid)) + 
+  geom_point() + 
+  geom_hline(yintercept = 0)
+```
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-24-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+
+```r
+# То же самое с использованием ранее созданного gg_resid
+gg_resid + aes(x =  MRINACount)
+```
+
+---
+
+### Графики зависимости остатков от предикторов не в модели
+
+В данном случае их нет
+
+---
+
+class: middle, center, inverse
+
+# 3. Нормальное распределение
+
+---
+
+## 3. Нормальное распределение `\(y\)` (для каждого уровня значений `\(x\)`) 
+
+&lt;img src="07_model_description_and_validation_files/figure-html/gg-norm-tunnel-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+Это условие невозможно проверить "в лоб", т.к. обычно каждому `\(x\)` соответствует лишь небольшое число `\(y\)` 
+---
+
+## Проверка нормальности распределения остатков
+
+Если `\(y\)` это нормально распределенная случайная величина
+
+`$$y_i \sim N(\mu_{y_i}, \sigma)$$`
+
+--
+
+и мы моделируем ее как 
+
+`$$y_i = b_0 + b_1x_{1i} + \cdots + e_i$$` 
+
+--
+
+то остатки от этой модели --- тоже нормально распределенная случайная величина 
+
+`$$e_i \sim N(0, \sigma)$$`
+
+--
+
+Т.е. выполнение этого условия можно оценить по поведению случайной части модели.
+
+---
+
+## Проверка нормальности распределения остатков
+
+Есть формальные тесты, но:
+
+- у формальных тестов тоже есть свои условия применимости
+- при больших выборках формальные тесты покажут, что значимы даже небольшие отклонения от нормального распределения
+- тесты, которые используются в линейной регрессии, устойчивы к небольшим отклонениям от нормального распределения
+
+--
+
+Лучший способ проверки --- квантильный график остатков.
+
+---
+
+## Квантильный график остатков
+
+По оси Х --- квантили теоретического распределения, по оси Y --- квантили остатков модели. Если наблюдаемое распределение соответствует теоретическому, то точки должны лечь вдоль прямой по диагонали графика.
+
+--
+
+Обычные остатки должны подчиняться нормальному распределению `\(e \sim N(0, \sigma)\)`.
+
+--
+
+Cтьюдентизированные остатки --- t-распределению.
+
+
+```r
+# library(car)
+qqPlot(brain_model, id = FALSE) # из пакета car
+```
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-26-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Что делать, если остатки распределены не нормально?
+
+Зависит от причины
+
+- Нелинейная связь?
+    - Построить аддитивную модель (если достаточно наблюдений по `\(x\)`)
+    - Построить нелинейную модель (если известна форма зависимости)
+- Неучтенные переменные?
+    - добавляем в модель
+- Зависимая переменная распределена по-другому?
+    - трансформируем данные (неудобно)
+    - подбираем модель с другим распределением остатков (обобщенную линейную модель)
+
+---
+
+class: middle, center, inverse
+
+# 4. Постоянство дисперсии
+
+---
+
+## 4. Постоянство дисперсии (= гомогенность дисперсии, гомоскедастичность)
+
+Это самое важное условие, поскольку многие тесты чувствительны к гетероскедастичности.
+
+&lt;img src="07_model_description_and_validation_files/figure-html/gg-norm-tunnel-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Проверка гомогенности дисперсий
+
+Есть формальные тесты (тест Бройша-Пагана, тест Кокрана), но:
+
+- у формальных тестов тоже есть свои условия применимости, и многие сами неустойчивы к гетероскедастичности
+- при больших выборках формальные тесты покажут, что значима даже небольшая гетероскедастичность
+
+Лучший способ проверки на гомогенность дисперсий --- график остатков.
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-27-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Проверка на гетероскедастичность
+
+Этот график у нас уже есть
+
+```r
+gg_resid
+```
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-28-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Гетерогенность дисперсий не выражена.
+
+---
+
+## Что делать если вы столкнулись с гетероскедастичностью?
+
+
+&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-29-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+Трансформация может помочь...
+
+---
+
+## Возможные причины гетероскедастичности
+
+Даже если трансформация может помочь, лучше поискать причину гетерогенности дисперсий
+
+- Неучтенные переменные
+    - добавляем в модель
+- Зависимая переменная распределена по-другому
+    - трансформируем данные (неудобно)
+    - подбираем модель с другим распределением остатков (обобщенную линейную модель)
+- Моделируем гетерогенность дисперсии.
+
+---
+
+class: middle, center, inverse
+
+# Тренинг по анализу остатков
+
+---
+
+## Некоторые частые паттерны на графиках остатков
+
+.pull-left[
+
+![](images/Residuals.png)
+
+&lt;small&gt;Из кн. Logan, 2010, стр. 174&lt;/small&gt;
+
+]
+
+--
+
+.pull-right[
+
+- Рис. a --- Условия применимости соблюдаются, модель хорошая
+- Рис. b --- Клиновидный паттерн. Есть гетероскедастичность. Модель плохая
+- Рис. c --- Остатки рассеяны равномерно, но нужны дополнительные предикторы
+- Рис. d --- Нелинейный паттерн. Линейная модель использована некорректно
+
+]
+
+---
+
+## Задание 4
+
+Выполните три блока кода
+
+Какие нарушения условий применимости линейных моделей здесь наблюдаются?
+
+Вам понадобятся
+
+1. График расстояния Кука
+2. График остатков от предсказанных значений
+3. Графики остатков от предикторов в модели и не в модели
+4. Квантильный график остатков
+
+---
+
+## Задание 4, блок 1
+
+
+```r
+set.seed(90829)
+x1 &lt;- seq(1, 100, 1)
+y1 &lt;-  diffinv(rnorm(99))  + rnorm(100, 0.2, 4)
+dat1 = data.frame(x1, y1)
+ggplot(dat1, aes(x = x1, y =  y1)) + geom_point()+ 
+  geom_smooth(method="lm", alpha = 0.7)
+```
+
+&lt;img src="07_model_description_and_validation_files/figure-html/block-1-task-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Решение, блок 1
+
+### Графики
+
+&lt;img src="07_model_description_and_validation_files/figure-html/block-1-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="07_model_description_and_validation_files/figure-html/block-1-q-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Выбросов нет, зависимость нелинейна
+- Небольшие отклонения от нормального распределения
+
+---
+
+## Решение, блок 1
+
+
+```r
+mod1 &lt;- lm(y1 ~ x1, data = dat1)
+
+# Данные для графиков остатков
+mod1_diag &lt;- fortify(mod1)
+
+# 1) График расстояния Кука
+ggplot(mod1_diag, aes(x = 1:nrow(mod1_diag), y = .cooksd)) + 
+  geom_bar(stat = "identity")
+
+# 2) График остатков от предсказанных значений
+gg_resid &lt;- ggplot(data = mod1_diag, aes(x = .fitted, y = .stdresid)) + 
+  geom_point() + geom_hline(yintercept = 0)
+gg_resid
+
+# 3) Графики остатков от предикторов в модели и не в модели
+gg_resid + aes(x = x1)
+
+# 4) Квантильный график остатков
+qqPlot(mod1, id = FALSE)       
+```
+
+---
+
+## Задание 4, блок 2
+
+
+```r
+  set.seed(7657674)
+  x2 &lt;- runif(1000, 1, 100)
+  b_0 &lt;- 100;  b_1 &lt;- -20
+  h &lt;- function(x) x^0.5
+  eps &lt;- rnorm(1000, 0, h(x2))
+  y2 &lt;- b_0 + b_1 * x2 + eps
+  dat2 &lt;- data.frame(x2, y2)
+  ggplot(dat2, aes(x = x2, y = y2)) + 
+    geom_point() + 
+    geom_smooth(method = "lm")
+```
+
+&lt;img src="07_model_description_and_validation_files/figure-html/block-2-task-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Решение, блок 2
+
+
+&lt;img src="07_model_description_and_validation_files/figure-html/block-2-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="07_model_description_and_validation_files/figure-html/block-2-q-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+--
+
+- Выбросов нет
+- Гетерогенность дисперсий, остатки не подчиняются нормальному распределению
+
+---
+
+## Решение, блок 2
+
+
+```r
+mod2 &lt;- lm(y2 ~ x2, data = dat2)
+
+# Данные для графиков остатков
+mod2_diag &lt;- fortify(mod2)
+
+# 1) График расстояния Кука
+ggplot(mod2_diag, aes(x = 1:nrow(mod2_diag), y = .cooksd)) + 
+  geom_bar(stat = "identity")
+
+# 2) График остатков от предсказанных значений
+gg_resid &lt;- ggplot(data = mod2_diag, aes(x = .fitted, y = .stdresid)) + 
+  geom_point() + geom_hline(yintercept = 0)
+gg_resid
+
+# 3) Графики остатков от предикторов в модели и не в модели
+gg_resid + aes(x = x2)
+
+# 4) Квантильный график остатков
+qqPlot(mod2, id = FALSE)       
+```
+
+---
+
+## Задание 4, блок 3
+
+
+```r
+set.seed(9283)
+x3 &lt;- rnorm(25, 50, 10)
+b_0 &lt;- 20; b_1 &lt;- 20; eps &lt;- rnorm(50, 0, 100)
+y3 &lt;- b_0 + b_1*x3 + eps
+y3[100] &lt;- 1000; x3[100] &lt;- 95; y3[99] &lt;- 1300; x3[99] &lt;- 90; y3[98] &lt;- 1500; x3[98] &lt;- 80
+dat3 &lt;- data.frame(x3, y3)
+ggplot(dat3, aes(x=x3, y=y3)) + geom_point() + geom_smooth(method="lm")
+```
+
+&lt;img src="07_model_description_and_validation_files/figure-html/block-3-task-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Решение, блок 3
+
+
+&lt;img src="07_model_description_and_validation_files/figure-html/block-3-1.png" width="720" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="07_model_description_and_validation_files/figure-html/block-3-q-1.png" width="216" style="display: block; margin: auto;" /&gt;
+
+--
+
+- 100-е наблюдение сильно влияет на ход регрессии
+- Зависимость нелинейна
+
+---
+
+## Решение, блок 3
+
+
+```r
+mod3 &lt;- lm(y3 ~ x3, data = dat3)
+
+# Данные для графиков остатков
+mod3_diag &lt;- fortify(mod3)
+
+# 1) График расстояния Кука
+ggplot(mod3_diag, aes(x = 1:nrow(mod3_diag), y = .cooksd)) + 
+  geom_bar(stat = "identity")
+
+# 2) График остатков от предсказанных значений
+gg_resid &lt;- ggplot(data = mod3_diag, aes(x = .fitted, y = .stdresid)) + 
+  geom_point() + geom_hline(yintercept = 0)
+gg_resid
+
+# 3) Графики остатков от предикторов в модели и не в модели
+gg_resid + aes(x = x3)
+
+# 4) Квантильный график остатков
+qqPlot(mod3, id = FALSE)       
+```
+
+---
+
+## Задание 5
+
+Выполните задание 3 в одном из этих файлов:
+- 07_task_assumptions_catsM.R
+- 07_task_assumptions_GAG.R
+
+
+---
+
+## Take-home messages
+
+- Гипотезы о наличии зависимости можно тестировать при помощи t- или F-теста.
+- Качество подгонки модели можно оценить при помощи коэффициента детерминации `\(R^2\)`.
+
+
+--
+
+- У линейных моделей есть условия применимости, поэтому не спешите описывать результаты --- сначала проверьте.
+
+--
+
+- Если условия применимости нарушены, то результатам тестов для этой модели нельзя верить (получаются заниженные доверительные вероятности, возрастает вероятность ошибок I рода).
+- Анализ остатков дает разностороннюю информацию о валидности моделей.
+
+---
+
+## Что почитать
+
++ Гланц, С., 1998. Медико-биологическая статистика. М., Практика
++ Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014
++ Diez, D.M., Barr, C.D. and Çetinkaya-Rundel, M., 2015. OpenIntro Statistics. OpenIntro.
++ Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data. Springer Science &amp; Business Media.
++ Quinn G.P., Keough M.J. 2002. Experimental design and data analysis for biologists
++ Logan M. 2010. Biostatistical Design and Analysis Using R. A Practical Guide
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<!-- https://github.com/fnaufel/xaringan-smartify-->
+<script type="text/javascript">
+  smartify();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
