@@ -314,7 +314,7 @@ class: middle, center, inverse
 Для простой линейной регрессии `\(df_{r} = 1\)` и `\(df_{e} = n - 2\)`
 
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-10-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/f-distr-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -340,7 +340,7 @@ class: middle, center, inverse
 
 ## В чем различие между этими двумя моделями?
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-11-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/residuals-scatter-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -562,7 +562,7 @@ class: middle, center, inverse
 
 ![](images/leverage.png)
 
-&lt;small&gt;Из кн. Quinn, Keugh, 2002&lt;/small&gt;
+&lt;small&gt;Из кн. Quinn, Keough, 2002&lt;/small&gt;
 
 Учет каких из этих точек повлияет на ход регрессии и почему?
 
@@ -693,7 +693,7 @@ ggplot(brain_diag, aes(x = 1:nrow(brain_diag), y = .cooksd)) +
   geom_bar(stat = "identity")
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-16-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/gg-cook-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -725,7 +725,7 @@ class: middle, center, inverse
 
 ## Нелинейность связи видно на графиках остатков
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-17-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/non-linear-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 ### Проверка на линейность связи
 
@@ -750,11 +750,11 @@ class: middle, center, inverse
 
 ### Логарифмирование
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-19-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/log-transform-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 ### Возведение в степень
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-20-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/power-transform-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 и т.д.
 
@@ -762,7 +762,7 @@ class: middle, center, inverse
 
 ## При прочих равных не стоит трансформировать отклик  
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-21-1.png" width="504" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/dep-var-transform-1.png" width="504" style="display: block; margin: auto;" /&gt;
 
 __Осторожно!__ Вы рискуете изучить не то, что хотели:  
 
@@ -811,7 +811,7 @@ class: middle, center, inverse
 
 ## Нарушение условия независимости: Неучтенная переменная
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-22-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/unaccounted-var-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -825,7 +825,7 @@ class: middle, center, inverse
 В данном случае, наблюдения --- это временной ряд. 
 
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-23-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/autocorr-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 
 На графиках остатков четко видно, что остатки не являются независимыми.
@@ -877,7 +877,7 @@ ggplot(data = brain_diag, aes(x = MRINACount, y = .stdresid)) +
   geom_hline(yintercept = 0)
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-24-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/resid-predict-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 
 ```r
@@ -962,7 +962,7 @@ Cтьюдентизированные остатки --- t-распределе�
 qqPlot(brain_model, id = FALSE) # из пакета car
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-26-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/qqplot-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1004,7 +1004,7 @@ class: middle, center, inverse
 
 Лучший способ проверки на гомогенность дисперсий --- график остатков.
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-27-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/homo-hetero-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1016,7 +1016,7 @@ class: middle, center, inverse
 gg_resid
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-28-1.png" width="648" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/resid-plot-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -1027,7 +1027,7 @@ gg_resid
 ## Что делать если вы столкнулись с гетероскедастичностью?
 
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-29-1.png" width="432" style="display: block; margin: auto;" /&gt;
+&lt;img src="07_model_description_and_validation_files/figure-html/hetero-log-transform-1.png" width="432" style="display: block; margin: auto;" /&gt;
 
 Трансформация может помочь...
 
