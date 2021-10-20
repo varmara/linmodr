@@ -142,7 +142,7 @@ fitpoints <- predict(fit)
 
 scatter3D(x = dfr$x1, y = dfr$x2, z = dfr$y2, 
           pch = 18, cex = 1.5,
-          theta = 60, phi = 16,
+          theta = 30, phi = 16,
           ticktype = "detailed",
           surf = list(x = x1.pred, y = x2.pred, z = y2.pred,
                       facets = NA, fit = fitpoints),
