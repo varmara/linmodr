@@ -42,10 +42,10 @@ table(eggs$sp)
 # изображены средние значения и их 95%
 # доверительные интервалы, а цвет должен
 # соответствовать виду птиц-хозяев.
-
+library()
 theme_set( )
 ggplot(data = , aes()) +
-  stat_summary(geom = "", fun.data = mean_cl_)
+  stat_summary(geom = , fun.data = )
 
 
 
@@ -187,7 +187,7 @@ MyData$upr <- MyData$ +  * MyData$
 # Дополните код, чтобы получить столбчатый график с предсказаниями линейной модели.
 # Заливкой покажите вид птиц-хозяев. Подпишите оси. Спрячьте легенду.
 gg_bars <- ggplot(data = , aes(x = , y = )) +
-  geom_bar(stat = "", aes(fill = ), width = 0.5) +
+  geom_bar(stat = "", aes(), width = 0.5) +
   geom_errorbar(aes(ymin = , ymax = ), width = 0.1) +
   labs( = "Вид хозяев",  = "Длина яиц кукушек, мм") +
   scale_fill_brewer(name = "Вид \nхозяев", palette = "Dark2") +
