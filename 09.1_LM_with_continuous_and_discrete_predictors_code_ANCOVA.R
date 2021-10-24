@@ -74,12 +74,15 @@ ggplot(new_data, aes(x = age_group, y = fit)) +
 
 ## Можно ли доверять полученным результатам?
 
-Mod_diag <- fortify(Mod) # Создаем датафрейм с диагностическими данными
-Mod_diag$height <- tlc$height # Переменная, не вошедшая в модель
+# Задание
+# Проведите диагностику полученной модели
 
-ggplot(Mod_diag, aes(x = height, y = .stdresid)) +
+Mod_diag <- fortify(Mod) # Создаем датафрейм с диагностическими данными
+Mod_diag$  <-  # Переменная, не вошедшая в модель
+
+ggplot(Mod_diag, aes(x = , y = )) +
   geom_point() + geom_hline(yintercept = 0) +
-  geom_smooth(method = 'lm')
+  geom_smooth(method = )
 
 
 
