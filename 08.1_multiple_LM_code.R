@@ -31,7 +31,7 @@ str(bird)
 colSums(is.na(bird))
 
 # ## Можно ли ответить на вопрос таким методом?
-cor(bird)
+round(cor(bird), 3)
 
 
 # ## Знакомство с данными #################################
@@ -55,8 +55,39 @@ bird$logLDIST <- log(bird$LDIST)
 
 pairs(bird[, c("ABUND", "logAREA", "YRISOL", "logDIST", "logLDIST", "GRAZE", "ALT")])
 
+library(ggplot2)
+
+bird2 <- bird
+
+bird2[,nrow(bird2)+1] <- bird2[, nrow(bird2)]+10
+
+
+bird2$ABUND[4] <- 150
+
+
+ggplot(bird2, aes(y = 1:nrow(bird), x = ABUND  )) + geom_point() +
+  labs(y = 'Порядковый номер \nв датасете', x = 'Значения переменной')
+
+
+gg_dot <- ggplot(bird, aes(y = 1:nrow(bird))) + geom_point() + ylab('index')
+Pl1 <- gg_dot + aes(x = ABUND)
+Pl2 <- gg_dot + aes(x = YRISOL)
+Pl3 <- gg_dot + aes(x = logAREA)
+Pl4 <- gg_dot + aes(x = logDIST)
+Pl5 <- gg_dot + aes(x = logLDIST)
+Pl6 <- gg_dot + aes(x = ALT)
+Pl7 <- gg_dot + aes(x = GRAZE)
+
+library(cowplot) # пакет для группировки графиков
+theme_set(theme_bw())
+plot_grid(Pl1, Pl2, Pl3, Pl4, Pl5, Pl6,
+          Pl7, ncol = 3, nrow = 3)
+
 
 # Условия применимости линейной регрессии #######################
+
+Mod <-
+
 
 
 # ### Проверка на мультиколлинеарность ###########################
@@ -75,13 +106,17 @@ pairs(bird[, c("ABUND", "logAREA", "YRISOL", "logDIST", "logLDIST", "GRAZE", "AL
 # коллинеарны ли предикторы.
 #
 # Дополните код:
+names(bird)
 
-mod1 <- lm(formula = , data = )
-vif()
-
-
+mod1 <- lm(formula = ABUND ~ logAREA + YRISOL + logDIST + logLDIST + GRAZE + ALT, data = bird)
 
 
+
+vif(mod1)
+
+mod2 <- update(mod1, .~. - GRAZE)
+
+vif(mod2)
 
 
 
@@ -99,30 +134,45 @@ vif()
 # Проверьте, выполняются ли условия применимости
 # для модели `mod2`. Дополните код:
 library()
-mod2_diag <- data.frame(fortify(), $GRAZE)
+mod2_diag <- data.frame(fortify(mod2), bird$GRAZE)
 # 1) График расстояния Кука
-ggplot(data = , aes(x = 1:, y = .cooksd)) + geom_bar(stat = "")
+
+
+ggplot(data = mod2_diag, aes(x = 1:nrow(mod2_diag), y = .cooksd)) + geom_bar(stat = "identity")
+
+ggplot(data = mod2_diag, aes(x = 1:nrow(mod2_diag), y = .cooksd)) + geom_col()
+
+
+
 # 2) График остатков от предсказанных значений
-gg_resid <- ggplot(data = , aes(x = , y = )) + geom_point() + geom_hline()
+gg_resid <- ggplot(data = mod2_diag, aes(x = .fitted, y = .stdresid)) + geom_point() + geom_hline(yintercept = 0) + geom_smooth(method = "loess")
 gg_resid
+
+names(bird)
+
 # 3) Графики остатков от предикторов в модели и нет
 res_1 <- gg_resid + aes(x = logAREA)
 res_1
-res_2 <- gg_resid
-res_3 <- gg_resid
-res_4 <- gg_resid
-res_5 <- gg_resid
-res_6 <- gg_resid
+res_2 <- gg_resid + aes(x = YRISOL)
+res_3 <- gg_resid + aes(x = logDIST)
+res_4 <- gg_resid + aes(x = logLDIST)
+res_5 <- gg_resid + aes(x = ALT)
+res_6 <- ggplot(data = mod2_diag, aes(x = bird.GRAZE, y = .stdresid)) + geom_point() + geom_hline(yintercept = 0) + geom_smooth(method = "loess")
+
 # все графики вместе
 library(gridExtra)
-grid.arrange(res_1, res_2, nrow = 2)
+grid.arrange(res_1, res_2, res_3, res_4, res_5, res_6, nrow = 2)
+
+
 # 4) Квантильный график остатков
 library(car)
-qq
+qqPlot(mod2)
 
 
 
 # # Сравнение силы влияния разных предикторов #################################
+summary(mod2)
+
 
 # ## Какой из предикторов оказывает наиболее сильное влияние?
 coef(summary(mod2))
@@ -130,7 +180,19 @@ coef(summary(mod2))
 # ## Какой из предикторов оказывает наиболее сильное влияние?
 mod2_scaled <- lm(ABUND ~ scale(logAREA) + scale(YRISOL) + scale(logDIST) +
                           scale(logLDIST) + scale(ALT), data = bird)
+
+summary(mod2_scaled)
+
 coef(summary(mod2_scaled))
+
+X <- model.matrix(mod2)
+
+betas <- coef(mod2)
+
+
+fit <- X %*% betas
+
+resid <- bird$ABUND - fit
 
 
 
