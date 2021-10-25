@@ -1,6 +1,36 @@
+
 .remark-slide-content {
-  padding-top: 20px;
+  padding-top: 0px;
   padding-left: 20px;
   padding-right: 20px;
   padding-bottom: 20px;
 }
+
+h1, h2, h3 {
+  margin-bottom: 0.2em;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+pre {
+  background: #F5F5F5;
+  display: block;
+  font-family: monospace;
+  font-size: 20px;
+  white-space: pre;
+  margin: 0.5em 0px;
+  margin-top: 0.5em;
+  margin-right: 0px;
+  margin-bottom: 0em;
+  margin-left: 0px;
+}
+
+.remark-code, .remark-inline-code {
+  background: #F5F5F5;
+  font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace;
+  line-height: 1.3em;
+  font-size: 90%;
+                                  }

@@ -95,21 +95,27 @@ library(car)
 
 
 #' ## График модели
+# Используем технику конвейерной обработки данных
+library(dplyr)
+new_data <- goat %>% group_by(Treatment)%>%
+  do(data.frame(Stw = seq(min(.$Stw), max(.$Stw), length.out = 10)))
 
-gg_g <- ggplot(data = goat, aes(y = Wt, x = Stw, colour = Treatment)) +
-  geom_point(size = 4) +
-  labs(x = "Начальный вес, кг",
-       y = "Привес, кг") +
-  scale_colour_discrete("Способ обработки",
-                        breaks = c("intensive", "standard"),
-                        labels = c("Интенсивный", "Стандартный"))
+new_data$fit = predict(Mod_goat_reduced, newdata = new_data)
+
+# Задание
+# Постройте график модели, используя приемы матричной алгебры
 
 
-MyData <- unique(goat[ , c("Stw", "Treatment")])
 
-MyData$Predict <- predict(Mod_goat_reduced, newdata = MyData)
 
-gg_g + geom_line(data = MyData, aes(x = Stw, y = Predict, color = Treatment))
+# Задание
+# Постройте доверительные области для линий регрессии, используя приемы матричной алгебры
+# При этом вычислите точные значения критических значений t для 95% доверительной области (At! значение 1.96, которое мы использовали в предыдущих случаях,было лишь приблизительным)
+
+
+
+
+
 
 
 

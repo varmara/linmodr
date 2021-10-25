@@ -521,19 +521,19 @@ div.tocify {
 </div>
 <div id="множественная-линейная-регрессия.-выбор-оптимальной-модели" class="section level3">
 <h3>08 Множественная линейная регрессия. Выбор оптимальной модели</h3>
-<!-- Часть 1. Множественная линейная регрессия -->
+<p>Часть 1. Множественная линейная регрессия</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;gridExtra&quot;</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ISwR&quot;</span>)</span></code></pre></div>
-<!-- - Презентация: [08.1_multiple_LM.html](08.1_multiple_LM.html) -->
 <ul>
-<li>Код: <a href="08.1_multiple_LM_code.R">08.1_multiple_LM_code.R</a></li>
-<li>Данные: <a href="data/loyn.csv">loyn.csv</a></li>
+<li><p>Презентация: <a href="08.1_multiple_LM.html">08.1_multiple_LM.html</a></p></li>
+<li><p>Код: <a href="08.1_multiple_LM_code.R">08.1_multiple_LM_code.R</a></p></li>
+<li><p>Данные: <a href="data/loyn.csv">loyn.csv</a></p></li>
 </ul>
 <p>Часть 2. Выбор оптимальной модели</p>
-<!-- - Презентация: [08.2_model_selection.html](08.2_model_selection.html) -->
 <ul>
-<li>Код: <a href="08.2_model_selection_code.R">08.2_model_selection_code.R</a></li>
-<li>Данные: <a href="data/loyn.csv">loyn.csv</a></li>
+<li><p>Презентация: <a href="08.2_model_selection.html">08.2_model_selection.html</a></p></li>
+<li><p>Код: <a href="08.2_model_selection_code.R">08.2_model_selection_code.R</a></p></li>
+<li><p>Данные: <a href="data/loyn.csv">loyn.csv</a></p></li>
 </ul>
 </div>
 </div>
@@ -542,24 +542,35 @@ div.tocify {
 <div id="модели-с-непрерывными-и-дискретными-предикторами-ancova" class="section level3">
 <h3>09 Модели с непрерывными и дискретными предикторами (ANCOVA)</h3>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</span></code></pre></div>
-<!-- Часть 1. Модели с разными значениями отрезка для групп -->
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;dplyr&quot;</span>)</span></code></pre></div>
+<p>Часть 1. Модели с разными значениями отрезка (intercept) для групп</p>
 <!-- - Презентация: [09.1_LM_with_continuous_and_discrete_predictors_2.html](09.1_LM_with_continuous_and_discrete_predictors_2.html) -->
-<!-- - Код: [09.1_LM_with_continuous_and_discrete_predictors_code.R](09.1_LM_with_continuous_and_discrete_predictors_code_2.R) -->
-<!-- - Код: [09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R](09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R) -->
-<!-- - Данные: -->
-<!--     + [goats.xlsx](data/goats.xlsx) -->
-<!--     + [tlc.csv](data/tlc.csv) -->
-<!--     + [Puromycin.xlsx](data/Puromycin.xlsx) -->
-<!--     + [birthwt.csv](data/birthwt.csv) -->
-<!-- Часть 2. Модели с разными значениями угла наклона для групп -->
+<ul>
+<li>Код: <a href="09.1_LM_with_continuous_and_discrete_predictors_code_2.R">09.1_LM_with_continuous_and_discrete_predictors_code.R</a></li>
+<li>Код: <a href="09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R">09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R</a></li>
+<li>Данные:
+<ul>
+<li><a href="data/goats.xlsx">goats.xlsx</a></li>
+<li><a href="data/tlc.csv">tlc.csv</a></li>
+<li><a href="data/Puromycin.xlsx">Puromycin.xlsx</a></li>
+<li><a href="data/birthwt.csv">birthwt.csv</a></li>
+</ul></li>
+</ul>
+<p>Часть 2. Модели с разными значениями угла наклона для групп</p>
 <!-- - Презентация: [09.2_LM_with_continuous_and_discrete_predictors_interactions.html](09.2_LM_with_continuous_and_discrete_predictors_interactions.html) -->
-<!-- - Код: -->
-<!--     + [09.2_LM_with_continuous_and_discrete_predictors_interactions.R](09.2_LM_with_continuous_and_discrete_predictors_interactions.R) -->
-<!--     + [09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R) -->
-<!-- - Данные: -->
-<!--     + [loyn.csv](data/loyn.csv) -->
-<!--     + [birthwt.csv](data/birthwt.csv) -->
+<ul>
+<li>Код:
+<ul>
+<li><a href="09.2_LM_with_continuous_and_discrete_predictors_interactions.R">09.2_LM_with_continuous_and_discrete_predictors_interactions.R</a></li>
+<li><a href="09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R">09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R</a></li>
+</ul></li>
+<li>Данные:
+<ul>
+<li><a href="data/loyn.csv">loyn.csv</a></li>
+<li><a href="data/birthwt.csv">birthwt.csv</a></li>
+</ul></li>
+</ul>
 </div>
 <div id="однофакторный-дисперсионный-анализ" class="section level3">
 <h3>10 Однофакторный дисперсионный анализ</h3>

@@ -83,6 +83,7 @@ ggplot(Mod_8_diag, aes(x = 1:nrow(Mod_8_diag), y = .cooksd)) + geom_bar(stat = "
 
 gg_resid <- ggplot(data = Mod_8_diag, aes(x = .fitted, y = .stdresid)) +  geom_point() + geom_hline(yintercept = 0)
 
+library(gridExtra)
 grid.arrange(gg_resid, gg_resid + geom_smooth(),
              gg_resid + geom_smooth(method = "lm"), nrow = 1)
 
@@ -106,7 +107,7 @@ qqPlot(Mod_8)
 
 summary(Mod_8)
 
-
+Anova(Mod_8)
 
 
 

@@ -4,3 +4,5 @@
 .Ruserdata
 *.log
 *_cache
+._files
+..html
