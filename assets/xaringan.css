@@ -1,4 +1,12 @@
 
+.large {
+  font-size: 120%;
+}
+
+.small {
+  font-size: 90%;
+}
+
 .remark-slide-content {
   padding-top: 0px;
   padding-left: 20px;

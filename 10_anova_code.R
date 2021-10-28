@@ -106,13 +106,59 @@ library(car)
 qqPlot(mod_treatment, id = FALSE)
 
 
+# График предсказаний модели #######################################
+
+# ## Данные для графика при помощи `predict()`
+MyData <- data.frame(sp = factor(levels(eggs$sp),
+                                 levels = levels(eggs$sp)))
+
+MyData <- data.frame(
+  MyData,
+  predict(mod_treatment, newdata = MyData, interval = "confidence"))
+
+MyData
+
+# Задание 2 ---------------------------------------------------
+# Создайте MyData вручную:
+# - предсказанные значения
+# - стандартные ошибки
+# - верхнюю и нижнюю границы доверительных интервалов
+
+MyData <- data.frame(sp = factor(levels(eggs$sp),
+                                 levels = levels(eggs$sp)))
+
+X <- model.matrix()
+betas <-
+  MyData$fit <-  %*%
+  MyData$se <- sqrt(diag(X %*% vcov(mod_treatment) %*% t(X)))
+t_crit <- qt(p = , df = nrow() - length(coef()))
+MyData$lwr <- MyData$ -  * MyData$
+  MyData$upr <- MyData$ +  * MyData$
+
+
+  # Задание 3 ------------------------------------------------------
+# Дополните код, чтобы получить столбчатый график с предсказаниями линейной модели.
+# Заливкой покажите вид птиц-хозяев. Подпишите оси. Спрячьте легенду.
+gg_bars <- ggplot(data = , aes(x = , y = )) +
+  geom_bar(stat = "", aes(), width = 0.5) +
+  geom_errorbar(aes(ymin = , ymax = ), width = 0.1) +
+  labs( = "Вид хозяев",  = "Длина яиц кукушек, мм") +
+  scale_fill_brewer(name = "Вид \nхозяев", palette = "Dark2") +
+  scale_x_discrete(labels = c("Крапивник", "Луговой\nконек", "Малиновка",
+                              "Белая\nтрясогузка", "Лесной\nконек", "Лесная\nзавирушка")) +
+  theme(  = "none")
+gg_bars
+
+
 
 # # Пост хок тесты ##################################################
+
 library(multcomp)
 # Пост хок тест Тьюки
 eggs_posthoc <- glht(mod_treatment, linfct = mcp(sp = "Tukey"))
 
 summary(eggs_posthoc)
+
 
 # Линейные контрасты (проверка избранного подмножества гипотез) ------
 # Факультативно. Для вашего личного любопытства.
@@ -152,49 +198,6 @@ contr <- rbind("БелТряс - ЛугКон" = c(0, -1, 0, 1, 0, 0),
 contr
 eggs_contrmat <- glht(mod_treatment, linfct = contr)
 summary(eggs_contrmat)
-
-# График предсказаний модели #######################################
-
-# ## Данные для графика при помощи `predict()`
-MyData <- data.frame(sp = factor(levels(eggs$sp),
-                                 levels = levels(eggs$sp)))
-
-MyData <- data.frame(
-  MyData,
-  predict(mod_treatment, newdata = MyData, interval = "confidence"))
-
-MyData
-
-# Задание 2 ---------------------------------------------------
-# Создайте MyData вручную:
-# - предсказанные значения
-# - стандартные ошибки
-# - верхнюю и нижнюю границы доверительных интервалов
-
-MyData <- data.frame(sp = factor(levels(eggs$sp),
-                                 levels = levels(eggs$sp)))
-
-X <- model.matrix()
-betas <-
-MyData$fit <-  %*%
-MyData$se <- sqrt(diag(X %*% vcov(mod_treatment) %*% t(X)))
-t_crit <- qt(p = , df = nrow() - length(coef()))
-MyData$lwr <- MyData$ -  * MyData$
-MyData$upr <- MyData$ +  * MyData$
-
-
-# Задание 3 ------------------------------------------------------
-# Дополните код, чтобы получить столбчатый график с предсказаниями линейной модели.
-# Заливкой покажите вид птиц-хозяев. Подпишите оси. Спрячьте легенду.
-gg_bars <- ggplot(data = , aes(x = , y = )) +
-  geom_bar(stat = "", aes(), width = 0.5) +
-  geom_errorbar(aes(ymin = , ymax = ), width = 0.1) +
-  labs( = "Вид хозяев",  = "Длина яиц кукушек, мм") +
-  scale_fill_brewer(name = "Вид \nхозяев", palette = "Dark2") +
-  scale_x_discrete(labels = c("Крапивник", "Луговой\nконек", "Малиновка",
-                            "Белая\nтрясогузка", "Лесной\nконек", "Лесная\nзавирушка")) +
-  theme(  = "none")
-gg_bars
 
 
 # Значимо различающиеся группы обозначим разными буквами
