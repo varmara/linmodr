@@ -24,9 +24,9 @@ fert <- read.csv(file="data/hall.csv")
 str(fert)
 # Для удобства названия переменных маленькими буквами
 colnames(fert) <- tolower(colnames(fert))
-# Время делаем фактором
+# Факторы делаем факторами
+fert$treat <- factor(fert$treat)
 fert$time <- factor(fert$time)
-levels(fert$time)
 
 # ## Пропущенные значения
 colSums(is.na(fert))

@@ -1,35 +1,33 @@
----
-title: "Дисперсионный анализ, часть 2"
-subtitle: ""
-author: "Марина Варфоломеева, Вадим Хайтов"
-output:
-  xaringan::moon_reader:
-    self-contained: true
-    lib_dir: libs
-    css: [default, tamu-fonts, "assets/xaringan.css"]
-    df_print: default
-    nature:
-      highlightStyle: vs
-      highlightLines: true
-      countIncrementalSlides: false
-      titleSlideClass: [top, center, inverse]
-    includes:
-      in_header: "assets/xaringan_in_header.html"
-      after_body: "assets/xaringan_after_body.html"
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Дисперсионный анализ, часть 2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Марина Варфоломеева, Вадим Хайтов" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/tamu-fonts.css" rel="stylesheet" />
+    <!-- https://github.com/fnaufel/xaringan-smartify-->
+    <script
+    			  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    			  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+    			  crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/fnaufel/xaringan-smartify/smartify.min.js"></script>
+    <link rel="stylesheet" href="assets/xaringan.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: top, center, inverse, title-slide
+
+# Дисперсионный анализ, часть 2
+### Марина Варфоломеева, Вадим Хайтов
+
 ---
 
 
-```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 80, scipen = 4, digits = 3)
-library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, 
-               fig.width = 9, fig.height = 3, fig.retina = 3,
-               warning = FALSE, message = FALSE)
-options(knitr.kable.NA = '')
-source("support_linmodr.R")
-```
+
+
 
 
 ## Многофакторный дисперсионный анализ
@@ -75,22 +73,39 @@ class: middle, center, inverse
 
 ## Знакомимся с данными
 
-```{r}
-fert <- read.csv(file='data/hall.csv')
+
+```r
+fert &lt;- read.csv(file='data/hall.csv')
 str(fert)
+```
+
+```
+## 'data.frame':	29 obs. of  3 variables:
+##  $ TREAT   : chr  "control" "control" "control" "control" ...
+##  $ TIME    : int  2 2 2 2 2 4 4 4 4 4 ...
+##  $ RICHNESS: int  5 7 5 7 5 20 18 20 18 17 ...
+```
+
+```r
 # Для удобства названия переменных маленькими буквами
-colnames(fert) <- tolower(colnames(fert))
+colnames(fert) &lt;- tolower(colnames(fert))
 # Факторы делаем факторами
-fert$treat <- factor(fert$treat)
-fert$time <- factor(fert$time)
+fert$treat &lt;- factor(fert$treat)
+fert$time &lt;- factor(fert$time)
 ```
 
 ---
 
 ## Пропущенные значения
 
-```{r}
+
+```r
 colSums(is.na(fert))
+```
+
+```
+##    treat     time richness 
+##        0        0        0
 ```
 
 --
@@ -101,8 +116,17 @@ colSums(is.na(fert))
 
 ## Объемы выборок в группах
 
-```{r}
+
+```r
 table(fert$time, fert$treat)
+```
+
+```
+##    
+##     control nutrient
+##   2       5        5
+##   4       5        5
+##   6       4        5
 ```
 
 --
@@ -113,13 +137,16 @@ table(fert$time, fert$treat)
 
 ##   Посмотрим на график
 
-```{r gg-mean-ci}
+
+```r
 library(ggplot2)
 theme_set(theme_bw(base_size = 14))
-gg_rich <- ggplot(data = fert, aes(x = time, y = richness, colour = treat)) + 
+gg_rich &lt;- ggplot(data = fert, aes(x = time, y = richness, colour = treat)) + 
   stat_summary(geom = 'pointrange', fun.data = mean_cl_normal)
 gg_rich
 ```
+
+&lt;img src="11_two-way_anova_and_interactions_files/figure-html/gg-mean-ci-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -137,8 +164,9 @@ gg_rich
 
 Давайте мы попробуем  преобразовать зависимую переменную, чтобы ее распределение стало больше походить на нормальное. Это может помочь, а может и нет.
 
-```{r}
-fert$log_rich <- log10(fert$richness + 1)
+
+```r
+fert$log_rich &lt;- log10(fert$richness + 1)
 ```
 
 ---
@@ -256,7 +284,7 @@ class: middle, center, inverse
 
 class: middle, center, inverse
 
-# Двухфакторный дисперсионный анализ <br/> в параметризации индикаторов
+# Двухфакторный дисперсионный анализ &lt;br/&gt; в параметризации индикаторов
 
 ---
 
@@ -267,16 +295,31 @@ class: middle, center, inverse
 --
 
 - `treat` --- 2 уровня (базовый `control`), для кодирования нужна одна переменная.
-```{r}
+
+```r
 contr.treatment(levels(fert$treat))
+```
+
+```
+##          nutrient
+## control         0
+## nutrient        1
 ```
 
 --
 
 -  `time` --- 3 уровня (базовый `2`), для кодирования нужно две переменных.
 
-```{r}
+
+```r
 contr.treatment(levels(fert$time))
+```
+
+```
+##   4 6
+## 2 0 0
+## 4 1 0
+## 6 0 1
 ```
 
 ---
@@ -285,7 +328,7 @@ contr.treatment(levels(fert$time))
 
 Дополнительные переменные понадобятся, чтобы учесть взаимодействие факторов.
 
-treat <br/>  | time <br/>  | treatnutrient <br/>  $x_1$  | time4 <br/> $x_2$ | time6 <br/> $x_3$| treatnutrient:time4 <br/> $x_4$ | treatnutrient:time6 <br/> $x_5$
+treat &lt;br/&gt;  | time &lt;br/&gt;  | treatnutrient &lt;br/&gt;  `\(x_1\)`  | time4 &lt;br/&gt; `\(x_2\)` | time6 &lt;br/&gt; `\(x_3\)`| treatnutrient:time4 &lt;br/&gt; `\(x_4\)` | treatnutrient:time6 &lt;br/&gt; `\(x_5\)`
 ---- | ---- | ---- | ---- | ---- | ---- | ---- 
 control   |  2   | 0 | 0 | 0 | 0 | 0          
 nutrient  |  2   | 1 | 0 | 0 | 0 | 0
@@ -298,29 +341,42 @@ nutrient  |  6   | 1 | 0 | 1 | 0 | 1
 
 ## Уравнение линейной модели в параметризации индикаторов
 
-$$y _{i} = b _0 + b _1 x _{1i} + b _2 x _{2i} + b _3 x _{3i} + b _4 x _{4i} + b _5 x _{5i}+ e _{i}$$
+`$$y _{i} = b _0 + b _1 x _{1i} + b _2 x _{2i} + b _3 x _{3i} + b _4 x _{4i} + b _5 x _{5i}+ e _{i}$$`
 
 
-- $b_0$ --- значение отклика для контроля через 2 месяца (на базовом уровне обоих факторов)
+- `\(b_0\)` --- значение отклика для контроля через 2 месяца (на базовом уровне обоих факторов)
 
 Отклонения относительно базового уровня обоих факторов:
 
-- $b_1$ --- для удобренных площадок
-- $b_2$ и $b_3$ --- для площадок с экспозицией 4 или 6 мес
-- $b_4$ и $b_5$ --- для удобренных площадок с экспозицией 4 или 6 мес
+- `\(b_1\)` --- для удобренных площадок
+- `\(b_2\)` и `\(b_3\)` --- для площадок с экспозицией 4 или 6 мес
+- `\(b_4\)` и `\(b_5\)` --- для удобренных площадок с экспозицией 4 или 6 мес
 
 ---
 
-## Подбираем линейную модель <br/> в параметризации индикаторов (contr.treatment)
+## Подбираем линейную модель &lt;br/&gt; в параметризации индикаторов (contr.treatment)
 
-```{r purl=FALSE}
-mod_treatment <- lm(log_rich ~ treat * time, data = fert)
+
+```r
+mod_treatment &lt;- lm(log_rich ~ treat * time, data = fert)
 mod_treatment
+```
+
+```
+## 
+## Call:
+## lm(formula = log_rich ~ treat * time, data = fert)
+## 
+## Coefficients:
+##         (Intercept)        treatnutrient                time4  
+##              0.8281               0.0504               0.4633  
+##               time6  treatnutrient:time4  treatnutrient:time6  
+##              0.6031               0.1381               0.0462
 ```
 
 Общее уравнение модели
 
-$$\begin{aligned}\widehat{log\_rich} _{i} = 0.828 + 0.05 treat_{nutrient\,i} + 0.463 time_{4\,i} + 0.603 time_{6\,i} + \\ + 0.138 treat_{nutrient}\ time_{4\,i} + 0.046 treat_{nutrient}\ time_{6\,i} \end{aligned}$$
+`$$\begin{aligned}\widehat{log\_rich} _{i} = 0.828 + 0.05 treat_{nutrient\,i} + 0.463 time_{4\,i} + 0.603 time_{6\,i} + \\ + 0.138 treat_{nutrient}\ time_{4\,i} + 0.046 treat_{nutrient}\ time_{6\,i} \end{aligned}$$`
 
 ---
 
@@ -337,16 +393,31 @@ class: middle, center, inverse
 --
 
 - `treat` --- 2 уровня (базовый `control`), для кодирования нужна одна переменная.
-```{r}
+
+```r
 contr.sum(levels(fert$treat))
+```
+
+```
+##          [,1]
+## control     1
+## nutrient   -1
 ```
 
 --
 
 -  `time` --- 3 уровня (базовый `2`), для кодирования нужно две переменных.
 
-```{r}
+
+```r
 contr.sum(levels(fert$time))
+```
+
+```
+##   [,1] [,2]
+## 2    1    0
+## 4    0    1
+## 6   -1   -1
 ```
 
 ---
@@ -355,7 +426,7 @@ contr.sum(levels(fert$time))
 
 Дополнительные переменные понадобятся, чтобы учесть взаимодействие факторов.
 
-treat | time | treat1 <br/> $x_1$ | time1 <br/> $x_2$ | time2 <br/> $x_3$ | treat1:time1 <br/> $x_4$ | treat1:time2 <br/> $x_5$
+treat | time | treat1 &lt;br/&gt; `\(x_1\)` | time1 &lt;br/&gt; `\(x_2\)` | time2 &lt;br/&gt; `\(x_3\)` | treat1:time1 &lt;br/&gt; `\(x_4\)` | treat1:time2 &lt;br/&gt; `\(x_5\)`
 ---- | ---- | ---- | ---- | ---- | ---- | ----
 control   |  2   |  1 |  1 |  0 |  1 |  0           
 nutrient  |  2   | -1 |  1 |  0 | -1 |  0 
@@ -368,29 +439,43 @@ nutrient  |  6   | -1 | -1 | -1 |  1 |  1
 
 ## Уравнение линейной модели в параметризации эффектов
 
-$$y _{i} = b _0 + b _1 x _{1i} + b _2 x _{2i} + b _3 x _{3i} + b _4 x _{4i} + b _5 x _{5i}+ e _{i}$$
+`$$y _{i} = b _0 + b _1 x _{1i} + b _2 x _{2i} + b _3 x _{3i} + b _4 x _{4i} + b _5 x _{5i}+ e _{i}$$`
 
-- $b_0$ --- среднее значение отклика по всем данным
+- `\(b_0\)` --- среднее значение отклика по всем данным
 
 Отклонения от общего среднего значений отклика:
 
-- $b_1$ --- в зависимости от тритмента (фактор `treat`)
-- $b_2$ и $b_3$ --- в зависимости от экспозиции (фактор `time`)
-- $b_4$ и $b_5$ --- для тритментов в зависимости от экспозиции  (взаимодействие)
+- `\(b_1\)` --- в зависимости от тритмента (фактор `treat`)
+- `\(b_2\)` и `\(b_3\)` --- в зависимости от экспозиции (фактор `time`)
+- `\(b_4\)` и `\(b_5\)` --- для тритментов в зависимости от экспозиции  (взаимодействие)
 
 ---
 
-## Подбираем линейную модель <br/> в параметризации эффектов (contr.sum)
+## Подбираем линейную модель &lt;br/&gt; в параметризации эффектов (contr.sum)
 
-```{r purl=FALSE}
-mod_sum <- lm(log_rich ~ treat * time, data = fert,
+
+```r
+mod_sum &lt;- lm(log_rich ~ treat * time, data = fert,
               contrasts = list(treat = 'contr.sum', time = 'contr.sum'))
 mod_sum
 ```
 
+```
+## 
+## Call:
+## lm(formula = log_rich ~ treat * time, data = fert, contrasts = list(treat = "contr.sum", 
+##     time = "contr.sum"))
+## 
+## Coefficients:
+##  (Intercept)        treat1         time1         time2  treat1:time1  
+##       1.2395       -0.0559       -0.3862        0.1462        0.0307  
+## treat1:time2  
+##      -0.0383
+```
+
 Общее уравнение модели
 
-$$\begin{aligned}\widehat{log\_rich}_i = 1.24 -0.056 treat_{1\,i} -0.386 time_{1\,i} + 0.146 time_{2\,i} + \\ + 0.031 treat_{1\,i}time_{1\,i} -0.038 treat_{1\,i}time_{2\,i} \end{aligned}$$
+`$$\begin{aligned}\widehat{log\_rich}_i = 1.24 -0.056 treat_{1\,i} -0.386 time_{1\,i} + 0.146 time_{2\,i} + \\ + 0.031 treat_{1\,i}time_{1\,i} -0.038 treat_{1\,i}time_{2\,i} \end{aligned}$$`
 
 ---
 
@@ -402,23 +487,36 @@ class: middle, center, inverse
 
 ## Диагностика линейной модели 
 
-Нужно проверить, выполняются ли условия применимости <br/> для модели в нужной параметризации
+Нужно проверить, выполняются ли условия применимости &lt;br/&gt; для модели в нужной параметризации
 
 Данные для анализа остатков
 
-```{r R.options=list(width = 60)}
-mod_treatment_diag <- fortify(mod_treatment) # функция из пакета ggplot2
+
+```r
+mod_treatment_diag &lt;- fortify(mod_treatment) # функция из пакета ggplot2
 head(mod_treatment_diag, 2)
+```
+
+```
+##   log_rich   treat time .hat .sigma .cooksd .fitted .resid
+## 1    0.778 control    2  0.2 0.0567  0.0405   0.828 -0.050
+## 2    0.903 control    2  0.2 0.0551  0.0911   0.828  0.075
+##   .stdresid
+## 1    -0.986
+## 2     1.479
 ```
 
 ---
 
 ## График расстояния Кука
 
-```{r cooksd}
+
+```r
 ggplot(mod_treatment_diag, aes(x = 1:nrow(mod_treatment_diag), y = .cooksd)) +
   geom_bar(stat = 'identity')
 ```
+
+&lt;img src="11_two-way_anova_and_interactions_files/figure-html/cooksd-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -429,11 +527,14 @@ ggplot(mod_treatment_diag, aes(x = 1:nrow(mod_treatment_diag), y = .cooksd)) +
 ## График остатков от предсказанных значений
 
 
-```{r resid-fitted}
-gg_resid <- ggplot(data = mod_treatment_diag, aes(x = .fitted, y = .stdresid)) +
+
+```r
+gg_resid &lt;- ggplot(data = mod_treatment_diag, aes(x = .fitted, y = .stdresid)) +
   geom_point() + geom_hline(yintercept = 0)
 gg_resid
 ```
+
+&lt;img src="11_two-way_anova_and_interactions_files/figure-html/resid-fitted-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -444,10 +545,13 @@ gg_resid
 ## График зависимости остатков от предикторов в модели
 
 
-```{r resid-predictors}
+
+```r
 ggplot(data = mod_treatment_diag, aes(x = treat, y = .stdresid, colour = time)) +
   geom_boxplot() + geom_hline(yintercept = 0)
 ```
+
+&lt;img src="11_two-way_anova_and_interactions_files/figure-html/resid-predictors-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 
 Удобнее смотреть на боксплот.
@@ -462,17 +566,13 @@ ggplot(data = mod_treatment_diag, aes(x = treat, y = .stdresid, colour = time)) 
 
 ## Квантильный график остатков
 
-```{r qq-plot, echo=TRUE, purl=TRUE, eval=FALSE}
+
+```r
 library(car)
 qqPlot(mod_treatment, id = FALSE) # функция из пакета car
 ```
 
-```{r qq-plot1, echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=3.5}
-library(car)
-op <- par(mar = c(3, 3, 0.5, 0.5))
-qqPlot(mod_treatment, id = FALSE)
-par(op)
-```
+&lt;img src="11_two-way_anova_and_interactions_files/figure-html/qq-plot1-1.png" width="396" style="display: block; margin: auto;" /&gt;
 
 --
 
@@ -519,16 +619,16 @@ class: middle, center, inverse
 
 - ANOVA менее устойчив к отклонениям от условий применимости (особенно от гомогенности дисперсий) при разных размерах групп (Quinn Keough 2002, section 8.3)
 
-- Проблемы с расчетом мощности. Если $\sigma _{\epsilon}^2 > 0$ и размеры выборок разные, то $MS _{x} \over MS _{e}$ не следует F-распределению (Searle et al. 1992).  
+- Проблемы с расчетом мощности. Если `\(\sigma _{\epsilon}^2 &gt; 0\)` и размеры выборок разные, то `\(MS _{x} \over MS _{e}\)` не следует F-распределению (Searle et al. 1992).  
 
 
-<br/>
+&lt;br/&gt;
 
 --
 
 Старайтесь _планировать_ группы равной численности!
 Но если не получилось - не страшно:
-- Для фикс. эффектов неравные размеры - проблема при нарушении условий применимости только, если значения доверительной вероятности _p_ близки к выбранному критическому уровню значимости $\alpha$
+- Для фикс. эффектов неравные размеры - проблема при нарушении условий применимости только, если значения доверительной вероятности _p_ близки к выбранному критическому уровню значимости `\(\alpha\)`
 
 ---
 
@@ -561,14 +661,14 @@ class: middle, center, inverse
 
 ---
 
-## Порядок тестирования значимости предикторов <br/> в дисперсионном анализе
+## Порядок тестирования значимости предикторов &lt;br/&gt; в дисперсионном анализе
 
 .small[
 
 "Типы сумм квадратов" | I тип | II тип | III тип
 ---- | ---- | ---- | ---- 
 Название | Последовательный | Без учета взаимодействий высоких порядков | Иерархический
-Порядок расчета SS | SS(A) <br/> SS(B&#124;A)  <br/> SS(AB&#124;B, A) | SS(A&#124;B) <br/> SS(B&#124;A) <br/> SS(AB&#124;B, A) | SS(A&#124;B, AB) <br/> SS(B&#124;A, AB) <br/> SS(AB&#124;B, A)
+Порядок расчета SS | SS(A) &lt;br/&gt; SS(B&amp;#124;A)  &lt;br/&gt; SS(AB&amp;#124;B, A) | SS(A&amp;#124;B) &lt;br/&gt; SS(B&amp;#124;A) &lt;br/&gt; SS(AB&amp;#124;B, A) | SS(A&amp;#124;B, AB) &lt;br/&gt; SS(B&amp;#124;A, AB) &lt;br/&gt; SS(AB&amp;#124;B, A)
 Величина эффекта зависит от выборки в группе | Да | Да | Нет
 Результат зависит от порядка включения факторов в модель | Да | Нет | Нет
 Параметризация | Любая | Любая | Только параметризация эффектов
@@ -582,8 +682,8 @@ __Осторожно!__ Тестируя предикторы в разном п
 
 ## Если несбалансированные данные, выберите подходящий порядок тестирования гипотез
 
-<!-- - SSe и SSab всегда рассчитываются одинаково, вне зависимости от порядка тестирования гипотез и от сбалансированности данных -->
-<!-- - SSa, SSb --- есть три способа расчета (суммы квадратов I, II и III типа, терминология пришла из SAS) в зависимости от порядка тестирования значимости факторов -->
+&lt;!-- - SSe и SSab всегда рассчитываются одинаково, вне зависимости от порядка тестирования гипотез и от сбалансированности данных --&gt;
+&lt;!-- - SSa, SSb --- есть три способа расчета (суммы квадратов I, II и III типа, терминология пришла из SAS) в зависимости от порядка тестирования значимости факторов --&gt;
 
 
 ### Если данные сбалансированы, то ...
@@ -594,9 +694,9 @@ __Осторожно!__ Тестируя предикторы в разном п
 
 - Результаты зависят от выбранного типа сумм квадратов (т.к. он определяет, какие гипотезы при этом тестируются).
 
-<br/>
+&lt;br/&gt;
 
-Для несбалансированных данных иногда рекомендуют __суммы квадратов III типа__ если есть взаимодействие факторов (Maxwell & Delaney 1990, Milliken, Johnson 1984, Searle 1993, Yandell 1997, Glantz, Slinker 2000). Но при этом __нарушается принцип маргинальности__, поэтому некоторые статистики не любят тех, кто так делает...
+Для несбалансированных данных иногда рекомендуют __суммы квадратов III типа__ если есть взаимодействие факторов (Maxwell &amp; Delaney 1990, Milliken, Johnson 1984, Searle 1993, Yandell 1997, Glantz, Slinker 2000). Но при этом __нарушается принцип маргинальности__, поэтому некоторые статистики не любят тех, кто так делает...
 
 ---
 
@@ -610,10 +710,24 @@ class: middle, center, inverse
 
 При таком способе, сначала тестируется взаимодействие, затем отдельные факторы в модели без взаимодействия.
 
-```{r}
-mod_treatment <- lm(log_rich ~ treat * time, data = fert)
+
+```r
+mod_treatment &lt;- lm(log_rich ~ treat * time, data = fert)
 library(car)
 Anova(mod_treatment, type = 'II')
+```
+
+```
+## Anova Table (Type II tests)
+## 
+## Response: log_rich
+##            Sum Sq Df F value   Pr(&gt;F)    
+## treat       0.091  1   28.42 0.000021 ***
+## time        2.216  2  344.88  &lt; 2e-16 ***
+## treat:time  0.025  2    3.84    0.036 *  
+## Residuals   0.074 23                     
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ---
@@ -635,10 +749,25 @@ __Внимание: при использовании III типа сумм кв
 
 --
 
-```{r tidy.opts=list(width.cutoff=40)}
-mod_sum <- lm(log_rich ~ treat * time, data = fert, 
+
+```r
+mod_sum &lt;- lm(log_rich ~ treat * time, data = fert, 
             contrasts = list(treat = contr.sum, time = contr.sum))
 Anova(mod_sum, type = 3)
+```
+
+```
+## Anova Table (Type III tests)
+## 
+## Response: log_rich
+##             Sum Sq Df  F value   Pr(&gt;F)    
+## (Intercept)   44.2  1 13776.11  &lt; 2e-16 ***
+## treat          0.1  1    28.04 0.000022 ***
+## time           2.2  2   344.75  &lt; 2e-16 ***
+## treat:time     0.0  2     3.84    0.036 *  
+## Residuals      0.1 23                      
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ---
@@ -651,16 +780,30 @@ Anova(mod_sum, type = 3)
 
 __В параметризации индикаторных переменных предикторы и взаимодействие коллинеарны__, т.е. суммы квадратов III типа будут рассчитаны неправильно.
 
-```{r}
+
+```r
 vif(mod_treatment)
+```
+
+```
+##       treatnutrient               time4               time6 treatnutrient:time4 
+##                2.90                2.62                2.79                3.31 
+## treatnutrient:time6 
+##                3.52
 ```
 
 --
 
 __В параметризации эффектов переменных предикторы и взаимодействие независимы__, значит получатся верные суммы квадратов III типа.
 
-```{r}
+
+```r
 vif(mod_sum)
+```
+
+```
+##       treat1        time1        time2 treat1:time1 treat1:time2 
+##         1.01         1.29         1.29         1.29         1.29
 ```
 
 ---
@@ -694,14 +837,15 @@ class: middle, center, inverse
 Дополните этот код, чтобы посчитать пост хок тест Тьюки по взаимодействию факторов
 
 
-```{r eval=FALSE, purl=TRUE}
+
+```r
 # Создаем переменную-взаимодействие
-fert$treat_time <- interaction(fert$treat, fert$time)
+fert$treat_time &lt;- interaction(fert$treat, fert$time)
 # Подбираем линейную модель от этой переменной без свободного члена
-fit_inter <- lm()
+fit_inter &lt;- lm()
 # Делаем пост хок тест для этой модели
 library(multcomp)
-dat_tukey <- glht(, linfct = mcp( = 'Tukey'))
+dat_tukey &lt;- glht(, linfct = mcp( = 'Tukey'))
 summary()
 ```
 
@@ -709,14 +853,15 @@ summary()
 
 ## Решение
 
-```{r phoc, eval=FALSE, purl=FALSE}
+
+```r
 # Создаем переменную-взаимодействие
-fert$treat_time <- interaction(fert$treat, fert$time)
+fert$treat_time &lt;- interaction(fert$treat, fert$time)
 # Подбираем линейную модель без свободного члена
-fit_inter <- lm(log_rich ~ treat_time - 1, data = fert)
+fit_inter &lt;- lm(log_rich ~ treat_time - 1, data = fert)
 # Делаем пост хок тест для этой модели
 library(multcomp)
-dat_tukey <- glht(fit_inter, linfct = mcp(treat_time = 'Tukey'))
+dat_tukey &lt;- glht(fit_inter, linfct = mcp(treat_time = 'Tukey'))
 summary(dat_tukey)
 ```
 
@@ -724,7 +869,36 @@ summary(dat_tukey)
 
 ## Результаты пост хок теста в виде таблицы почти нечитабельны
 
-```{r phoc, echo=FALSE, purl=FALSE}
+
+```
+## 
+## 	 Simultaneous Tests for General Linear Hypotheses
+## 
+## Multiple Comparisons of Means: Tukey Contrasts
+## 
+## 
+## Fit: lm(formula = log_rich ~ treat_time - 1, data = fert)
+## 
+## Linear Hypotheses:
+##                              Estimate Std. Error t value Pr(&gt;|t|)    
+## nutrient.2 - control.2 == 0    0.0504     0.0358    1.41    0.723    
+## control.4 - control.2 == 0     0.4633     0.0358   12.93   &lt;0.001 ***
+## nutrient.4 - control.2 == 0    0.6519     0.0358   18.19   &lt;0.001 ***
+## control.6 - control.2 == 0     0.6031     0.0380   15.86   &lt;0.001 ***
+## nutrient.6 - control.2 == 0    0.6997     0.0358   19.52   &lt;0.001 ***
+## control.4 - nutrient.2 == 0    0.4129     0.0358   11.52   &lt;0.001 ***
+## nutrient.4 - nutrient.2 == 0   0.6015     0.0358   16.78   &lt;0.001 ***
+## control.6 - nutrient.2 == 0    0.5527     0.0380   14.54   &lt;0.001 ***
+## nutrient.6 - nutrient.2 == 0   0.6493     0.0358   18.11   &lt;0.001 ***
+## nutrient.4 - control.4 == 0    0.1885     0.0358    5.26   &lt;0.001 ***
+## control.6 - control.4 == 0     0.1398     0.0380    3.68    0.014 *  
+## nutrient.6 - control.4 == 0    0.2364     0.0358    6.59   &lt;0.001 ***
+## control.6 - nutrient.4 == 0   -0.0488     0.0380   -1.28    0.791    
+## nutrient.6 - nutrient.4 == 0   0.0478     0.0358    1.33    0.763    
+## nutrient.6 - control.6 == 0    0.0966     0.0380    2.54    0.153    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## (Adjusted p values reported -- single-step method)
 ```
 
 ---
@@ -733,18 +907,29 @@ summary(dat_tukey)
 
 У нас два дискретных фактора, поэтому вначале используем `expand.grid()`
 
-```{r}
-MyData <- expand.grid(treat = levels(fert$treat),
+
+```r
+MyData &lt;- expand.grid(treat = levels(fert$treat),
                       time = levels(fert$time))
-MyData <- data.frame(
+MyData &lt;- data.frame(
   MyData,
   predict(mod_treatment, newdata = MyData, interval = 'confidence')
   )
 # Обратная трансформация (не забываем про единичку, которую прибавляли)
-MyData$richness <- 10^MyData$fit - 1
-MyData$LWR <- 10^MyData$lwr - 1
-MyData$UPR <- 10^MyData$upr - 1
+MyData$richness &lt;- 10^MyData$fit - 1
+MyData$LWR &lt;- 10^MyData$lwr - 1
+MyData$UPR &lt;- 10^MyData$upr - 1
 MyData
+```
+
+```
+##      treat time   fit   lwr   upr richness   LWR   UPR
+## 1  control    2 0.828 0.776 0.881     5.73  4.97  6.60
+## 2 nutrient    2 0.879 0.826 0.931     6.56  5.70  7.53
+## 3  control    4 1.291 1.239 1.344    18.56 16.34 21.07
+## 4 nutrient    4 1.480 1.428 1.532    29.20 25.76 33.07
+## 5  control    6 1.431 1.373 1.490    25.99 22.58 29.89
+## 6 nutrient    6 1.528 1.475 1.580    32.71 28.88 37.04
 ```
 
 ---
@@ -757,45 +942,65 @@ MyData
 - стандартные ошибки
 - верхнюю и нижнюю границы доверительных интервалов
 
-```{r eval=FALSE}
-MyData <- expand.grid(treat = levels(fert$treat),
+
+```r
+MyData &lt;- expand.grid(treat = levels(fert$treat),
                      time = levels())
-X <- model.matrix(~ , data = )
-betas <- coef()
-MyData$fit <- 
-MyData$se <-   (X %*% vcov(mod_treatment) %*% t(X))
-MyData$lwr <- MyData$ - 2 * 
-MyData$upr <- MyData$ + 2 * 
+X &lt;- model.matrix(~ , data = )
+betas &lt;- coef()
+MyData$fit &lt;- 
+MyData$se &lt;-   (X %*% vcov(mod_treatment) %*% t(X))
+MyData$lwr &lt;- MyData$ - 2 * 
+MyData$upr &lt;- MyData$ + 2 * 
 
 # Обратная трансформация
-MyData$richness <- 
-MyData$LWR <- 
-MyData$UPR <- 
+MyData$richness &lt;- 
+MyData$LWR &lt;- 
+MyData$UPR &lt;- 
 MyData
 ```
 
 
-```{r task-mydata, purl=FALSE, echo=FALSE}
-MyData <- expand.grid(treat = levels(fert$treat),
-                     time = levels(fert$time))
-X <- model.matrix(~ treat * time, data = MyData)
-betas <- coef(mod_treatment)
-MyData$fit <- X %*% betas
-MyData$se <- sqrt(diag(X %*% vcov(mod_treatment) %*% t(X)))
-MyData$lwr <- MyData$fit - 2 * MyData$se
-MyData$upr <- MyData$fit + 2 * MyData$se
-# Обратная трансформация
-MyData$richness <- 10^MyData$fit - 1
-MyData$LWR <- 10^MyData$lwr - 1
-MyData$UPR <- 10^MyData$upr - 1
-MyData
+
+```
+##      treat time   fit     se   lwr   upr richness   LWR   UPR
+## 1  control    2 0.828 0.0253 0.777 0.879     5.73  4.99  6.57
+## 2 nutrient    2 0.879 0.0253 0.828 0.929     6.56  5.73  7.50
+## 3  control    4 1.291 0.0253 1.241 1.342    18.56 16.41 20.99
+## 4 nutrient    4 1.480 0.0253 1.429 1.531    29.20 25.87 32.94
+## 5  control    6 1.431 0.0283 1.375 1.488    25.99 22.69 29.75
+## 6 nutrient    6 1.528 0.0253 1.477 1.578    32.71 29.00 36.89
 ```
 
 ---
 
 ## Решение:
 
-```{r task-mydata, purl=FALSE, echo=TRUE}
+
+```r
+MyData &lt;- expand.grid(treat = levels(fert$treat),
+                     time = levels(fert$time))
+X &lt;- model.matrix(~ treat * time, data = MyData)
+betas &lt;- coef(mod_treatment)
+MyData$fit &lt;- X %*% betas
+MyData$se &lt;- sqrt(diag(X %*% vcov(mod_treatment) %*% t(X)))
+MyData$lwr &lt;- MyData$fit - 2 * MyData$se
+MyData$upr &lt;- MyData$fit + 2 * MyData$se
+# Обратная трансформация
+MyData$richness &lt;- 10^MyData$fit - 1
+MyData$LWR &lt;- 10^MyData$lwr - 1
+MyData$UPR &lt;- 10^MyData$upr - 1
+MyData
+```
+
+```
+##      treat time   fit     se   lwr   upr richness   LWR   UPR
+## 1  control    2 0.828 0.0253 0.777 0.879     5.73  4.99  6.57
+## 2 nutrient    2 0.879 0.0253 0.828 0.929     6.56  5.73  7.50
+## 3  control    4 1.291 0.0253 1.241 1.342    18.56 16.41 20.99
+## 4 nutrient    4 1.480 0.0253 1.429 1.531    29.20 25.87 32.94
+## 5  control    6 1.431 0.0283 1.375 1.488    25.99 22.69 29.75
+## 6 nutrient    6 1.528 0.0253 1.477 1.578    32.71 29.00 36.89
 ```
 
 ---
@@ -805,18 +1010,26 @@ MyData
 Постройте график результатов, на котором будут изображены предсказанные средние значения видового богатства в зависимости от тритмента и времени экспозиции.
 
 
-```{r tidy.opts=list(width.cutoff=60), eval=FALSE, purl=TRUE}
-pos <- position_dodge(width = 0.2)
-gg_linep <- ggplot(data = , aes()) + 
+
+```r
+pos &lt;- position_dodge(width = 0.2)
+gg_linep &lt;- ggplot(data = , aes()) + 
   geom_  (position = pos) +
   geom_  (aes(group = ), position = pos) +
   geom_  (position = pos, width = 0.1) 
 gg_linep
 ```
 
-```{r gg-lineplot, tidy.opts=list(width.cutoff=60), eval=TRUE, purl=FALSE, echo=FALSE}
-pos <- position_dodge(width = 0.2)
-gg_linep <- ggplot(data = MyData, aes(x = time, y = richness, 
+&lt;img src="11_two-way_anova_and_interactions_files/figure-html/gg-lineplot-1.png" width="648" style="display: block; margin: auto;" /&gt;
+
+---
+
+## График результатов: Линии с точками
+
+
+```r
+pos &lt;- position_dodge(width = 0.2)
+gg_linep &lt;- ggplot(data = MyData, aes(x = time, y = richness, 
               ymin = LWR,  ymax = UPR, colour = treat)) + 
   geom_point(position = pos) +
   geom_line(aes(group = treat), position = pos) +
@@ -824,23 +1037,21 @@ gg_linep <- ggplot(data = MyData, aes(x = time, y = richness,
 gg_linep
 ```
 
----
-
-## График результатов: Линии с точками
-
-```{r gg-lineplot, tidy.opts=list(width.cutoff=60), eval=TRUE, purl=FALSE, echo=TRUE}
-```
+&lt;img src="11_two-way_anova_and_interactions_files/figure-html/gg-lineplot-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 ---
 
 ## Приводим график в приличный вид
 
-```{r tidy.opts=list(width.cutoff=60)}
-gg_final <- gg_linep + labs(x = 'Экспозиция',  y = 'Число видов') + 
+
+```r
+gg_final &lt;- gg_linep + labs(x = 'Экспозиция',  y = 'Число видов') + 
   scale_colour_brewer(name = '', palette = 'Dark2', 
     labels = c('Контроль', 'Эксперимент'))
 gg_final
 ```
+
+&lt;img src="11_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-20-1.png" width="648" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -864,3 +1075,130 @@ gg_final
 - Logan, 2010, pp. 313-359
 - Sokal, Rohlf, 1995, pp. 321-362
 - Zar, 2010, pp. 246-266
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "vs",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<!-- https://github.com/fnaufel/xaringan-smartify-->
+<script type="text/javascript">
+  smartify();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

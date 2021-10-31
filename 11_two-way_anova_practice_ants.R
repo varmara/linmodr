@@ -12,7 +12,7 @@
 
 library(Stat2Data)
 data(SandwichAnts)
-
+?SandwichAnts
 
 # Разведочный анализ #############################
 
