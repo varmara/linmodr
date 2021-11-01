@@ -151,8 +151,8 @@ X <- model.matrix(~ , data = )
 betas <- coef()
 MyData$fit <-
 MyData$se <-   (X %*% vcov(mod_treatment) %*% t(X))
-MyData$lwr <- MyData$ - 1.96 *
-MyData$upr <- MyData$ + 1.96 *
+MyData$lwr <- MyData$ - 2 *
+MyData$upr <- MyData$ + 2 *
 
 # Обратная трансформация
 MyData$richness <-

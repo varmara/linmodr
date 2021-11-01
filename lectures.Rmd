@@ -156,7 +156,7 @@ install.packages(c("DAAG", "multcomp"))
 
 ### 11 Многофакторный дисперсионный анализ
 
-<!-- - Презентация: [11_two-way_anova_and_interactions.html](11_two-way_anova_and_interactions.html) -->
+- Презентация: [11_two-way_anova_and_interactions.html](11_two-way_anova_and_interactions.html)
 - Код:
     + [11_two-way_anova_and_interactions_code.R](11_two-way_anova_and_interactions_code.R)
     + [11_two-way_anova_practice_ants.R](11_two-way_anova_practice_ants.R)
