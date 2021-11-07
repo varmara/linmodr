@@ -58,8 +58,6 @@ resid(mod, type = 'response')[1:5]
 # ### Пирсоновские остатки (Pearson's residuals)
 resid(mod, type = 'pearson')[1:5]
 
-# Для GLM с нормальным распределением отклика оба типа остатков одинаковы.
-
 
 # ## Проверка на коллинеарность
 library(car)
