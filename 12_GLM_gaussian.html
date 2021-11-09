@@ -1166,7 +1166,7 @@ head(New_Data)
 Predictions &lt;- predict(mod, newdata = New_Data, se.fit = TRUE)
 New_Data$fit &lt;- Predictions$fit  # Предсказанные значения
 New_Data$se &lt;- Predictions$se.fit # Стандартные ошибки
-t_crit &lt;- qt(0.975, df = nrow(FishEggs) - length(coef(mod))) # t для дов. инт.
+t_crit &lt;- qt(0.975, df = nrow(FishEggs) - length(coef(mod)) - 1) # t для дов. инт.
 New_Data$lwr &lt;- New_Data$fit - t_crit * New_Data$se
 New_Data$upr &lt;- New_Data$fit + t_crit * New_Data$se
 
@@ -1196,7 +1196,7 @@ X &lt;- model.matrix(~ Age * Month, data = New_Data) # Модельная мат
 betas &lt;- coef(mod) # Коэффициенты
 New_Data$fit &lt;- X %*% betas  # Предсказанные значения
 New_Data$se &lt;- sqrt(diag(X %*% vcov(mod) %*% t(X))) # Стандартные ошибки
-t_crit &lt;- qt(0.975, df = nrow(FishEggs) - length(coef(mod))) # t для дов. инт.
+t_crit &lt;- qt(0.975, df = nrow(FishEggs) - length(coef(mod)) - 1) # t для дов. инт.
 New_Data$lwr &lt;- New_Data$fit - t_crit * New_Data$se
 New_Data$upr &lt;- New_Data$fit + t_crit * New_Data$se
 
