@@ -3,27 +3,22 @@
 # subtitle: "Линейные модели..."
 # author: "Марина Варфоломеева, Вадим Хайтов"
 
-
-# ## Гадючий лук, копеечник и визиты опылителей
-# Гадючий лук (мускари, _Leopoldia comosa_) ---
-# представитель родной флоры острова Менорка. В
-# 18-19вв на остров завезли копеечник венечный
-# (_Hedysarum coronarium_), который быстро
-# натурализовался. Оба вида цветут одновременно и
-# нуждаются в опылении насекомыми.
+# ## Мускари, копеечник и визиты опылителей
+# Мускари (_Leopoldia comosa_) --- представитель родной флоры острова Менорка. В
+# 18-19вв на остров завезли копеечник венечный (_Hedysarum coronarium_), который
+# быстро натурализовался. Оба вида цветут одновременно и нуждаются в опылении
+# насекомыми.
 #
-# Как зависит число визитов опылителей на цветки
-# мускари от присутствия вселенца и разнообразия
-# флоры в ближайшей окрестности? (Данные
-# Montero-Castaño, Vilà, 2015)
+# Как зависит число визитов опылителей на цветки мускари от присутствия вселенца
+# и разнообразия флоры в ближайшей окрестности? (Данные Montero-Castaño, Vilà,
+# 2015)
 
 # ## Переменные
-#
 # - `Visits` --- число визитов всех опылителей на цветок _Leopoldia_
 # - `Treatment` --- тип площадки, тритмент (фактор с 3 уровнями):
 #     - `Invaded` --- _Leopoldia_ в смеси с видом-вселенцем;
 #     - `Removal` --- _Leopoldia_ в смеси с видом-вселенцем с удаленными цветками;
-#     - `Control` --- _Leopoldia_ без вида вселенца.
+#     - `Control` --- _Leopoldia_ без вида-вселенца.
 # - `DiversityD_1` --- Разнообразие флоры на площадке ($exp(H’)$,
 # где $H'$ --- индекс Шеннона-Уивера)  (на луг с более разнообразной
 # растительностью прилетит больше опылителей).
@@ -61,7 +56,6 @@ table(pol$Treatment)
 # Как распределены короткие периоды наблюдений по тритментам?
 table(pol$Hours, pol$Treatment)
 
-
 # ## Коллинеарны ли непрерывные и дискретные предикторы?
 box_plot <- ggplot(pol, aes(x = Treatment)) + geom_boxplot()
 
@@ -72,23 +66,13 @@ plot_grid(box_plot + aes(y = DiversityD_1),
 # ## Как распределена переменная-отклик?
 ggplot(data = pol, aes(x = Visits)) + geom_histogram()
 
-
 # Какова пропорция нулей?
 sum(pol$Visits == 0) / nrow(pol)
 mean(pol$Visits == 0)
 
+# GLM с нормальным распределением отклика --------
 
-# ## Линейна ли связь между предикторами и откликом?
-gg_shape <- ggplot(pol, aes(y = Visits/Hours, colour = Treatment)) +
-  theme(legend.position = 'bottom')
-plot_grid(
-  gg_shape + geom_point(aes(x = Flowers)),
-  gg_shape + geom_point(aes(x = DiversityD_1)),
-nrow = 1)
-
-
-# ## Если мы подберем GLM с нормальным распределением отклика
-
+# ## Что будет, если проигнорировать, что отклик --- численная переменная?
 M_norm <- glm(Visits ~ Treatment + DiversityD_1 +
                 Flowers + Hours, data = pol)
 coef(M_norm)
@@ -122,7 +106,7 @@ gg_norm <- ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
   geom_hline(yintercept = 0)
 gg_norm
 
-# ## Смотрим на результаты подбора модели
+# ## Результаты подбора модели
 summary(M_norm)
 
 # ## Анализ девиансы для модели с нормальным распределением отклика
@@ -158,7 +142,7 @@ M_pois <- glm(Visits ~ Treatment + DiversityD_1 +
 coef(M_pois)
 
 
-# ## Смотрим на результаты подбора модели
+# ## Результаты подбора модели
 summary(M_pois)
 
 # ## Анализ девиансы для модели с Пуассоновским распределением отклика
@@ -173,23 +157,24 @@ NewData <- pol %>%
          Hours = 0.75)
 NewData
 
-# ## Предсказания модели при помощи операций с матрицами
+## Задание 2 -------------------------------------------------------------------
+
+# Дополните код, чтобы получить предсказания модели при помощи операций с матрицами.
 
 # Модельная матрица и коэффициенты
-X <- model.matrix(~ Treatment + DiversityD_1 +
-                    Flowers + Hours, data = NewData)
-betas <- coef(M_pois)
-
+X <-
+betas <-
 # Предсказанные значения и стандартные ошибки...
 # ...в масштабе функции связи (логарифм)
-NewData$fit_eta <- X %*% betas
-NewData$SE_eta <- sqrt(diag(X %*% vcov(M_pois) %*% t(X)))
-
+NewData$fit_eta <-
+NewData$SE_eta <- sqrt(( %*% vcov(M_pois) %*% ))
 # ...в масштабе отклика (применяем функцию, обратную функции связи)
-NewData$fit_mu <- exp(NewData$fit_eta)
-# +- 2 SE
-NewData$lwr <- exp(NewData$fit_eta - 2 * NewData$SE_eta)
-NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
+NewData$fit_mu <-
+NewData$lwr <-
+NewData$upr <-
+
+
+
 head(NewData, 2)
 
 # ## График предсказаний в масштабе функции связи
@@ -209,7 +194,7 @@ gg_pois <- ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
   geom_hline(yintercept = 0)
 gg_pois
 
-# ## Условия применимости GLM с Пуассоновским распределением отклика
+# ## Условия применимости GLM с Пуассоновским распределением отклика ###########
 
 # - Случайность и независимость наблюдений внутри групп.
 # - Линейность связи (с учетом функции связи)
@@ -243,7 +228,7 @@ overdisp_fun(M_pois)
 
 
 
-# ## Квази-пуассоновские модели
+# ## Квази-пуассоновские модели ################################################
 
 M_quasi <- glm(Visits ~ Treatment + DiversityD_1 +
                  Flowers + Hours, data = pol,
@@ -252,13 +237,16 @@ M_quasi <- glm(Visits ~ Treatment + DiversityD_1 +
 coef(M_quasi)
 summary(M_quasi)$dispersion
 
-# ## Смотрим на результаты подбора модели
+# ## Результаты подбора модели
 summary(M_quasi)
 
 # ## Анализ девиансы для квази-пуассоновской модели
 drop1(M_quasi, test = "F")
 
-# ## GLM с отрицательным биномиальным распределением отклика
+
+
+# ## GLM с отрицательным биномиальным распределением отклика ###################
+
 library(MASS)
 M_nb <- glm.nb(Visits ~ Treatment + DiversityD_1 +
                  Flowers + Hours, data = pol,
@@ -266,29 +254,20 @@ M_nb <- glm.nb(Visits ~ Treatment + DiversityD_1 +
 coef(M_nb)
 summary(M_nb)$theta
 
-# ## Смотрим на результаты подбора модели
+# ## Результаты подбора модели
 summary(M_nb)
 
 # ## Анализ девиансы модели с отрицательным биномиальным распределением отклика
 drop1(M_nb, test = 'Chi')
 
 
-# ## Задание 2 ----------------------------------------------------------
+# ## Задание 3 ----------------------------------------------------------
 
 # Проведите диагностику модели `M_nb`.
 # Видите ли вы какие-нибудь нарушения условий применимости?
 
-M_nb_diag <- data.frame(
-  # .fitted = predict(M_nb, type = "response"),
-  .fitted = fitted(M_nb, type = "response"),
-  .resid_p = residuals(M_nb, type = "pearson"),
-  pol)
 
-gg_resid <- ggplot(M_nb_diag, aes(y = .resid_p)) +
-  geom_hline(yintercept = 0)
-gg_resid + geom_point(aes(x = .fitted))
 
-overdisp_fun(M_nb)
 
 
 
@@ -303,13 +282,10 @@ NewData <- pol %>%
          Hours = 0.75)
 NewData
 
-# Задание 3 -----------------------------------------------
-
-# Получите предсказания при помощи операций с матрицами,
+# Предсказания при помощи операций с матрицами,
 
 # Модельная матрица и коэффициенты
-X <- model.matrix(~ Treatment + DiversityD_1 +
-                    Flowers + Hours, data = NewData)
+X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
 betas <- coef(M_nb)
 
 # Предсказанные значения и стандартные ошибки...
@@ -343,7 +319,6 @@ gg_nb <- ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
 
 gg_nb
 
-library(cowplot)
 plot_grid(gg_norm + theme(legend.position = 'bottom'),
           gg_pois + theme(legend.position = 'bottom'),
           gg_nb + theme(legend.position = 'bottom'), nrow = 1)

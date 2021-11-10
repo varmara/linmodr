@@ -1,30 +1,32 @@
 ---
 title: "Обобщенные линейные модели с нормальным распределением остатков"
-subtitle: "Линейные модели..."
+subtitle: ""
 author: "Марина Варфоломеева, Вадим Хайтов"
-institute: "Кафедра Зоологии беспозвоночных, Биологический факультет, СПбГУ"
-fontsize: 10pt
-classoption: 't,xcolor=table'
-language: russian, english
 output:
-  beamer_presentation:
-    theme: default
-    toc: no
-    colortheme: beaver
-    latex_engine: xelatex
-    slide_level: 2
-    fig_crop: false
-    highlight: tango
+  xaringan::moon_reader:
+    self-contained: true
+    lib_dir: libs
+    css: [default, tamu-fonts, ninjutsu, "assets/xaringan.css"]
+    df_print: default
+    nature:
+      highlightStyle: vs
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: [top, center, inverse]
     includes:
-      in_header: ./includes/header.tex
+      in_header: "assets/xaringan_in_header.html"
+      after_body: "assets/xaringan_after_body.html"
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-options(width = 70, scipen = 4)
+# output options
+options(width = 80, scipen = 4, digits = 3)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7, R.options=list(width=70))
-# library("extrafont")
+opts_chunk$set(fig.align='center', tidy = FALSE, 
+               fig.width = 9, fig.height = 4, fig.retina = 3,
+               warning = FALSE, message = FALSE)
+options(knitr.kable.NA = '')
 source("support_linmodr.R")
 ```
 
@@ -39,14 +41,16 @@ source("support_linmodr.R")
 + Объяснить проблемы, связанные с избыточностью дисперсии в модели
 + Построить модель, основанную на отрицательном биномиальном распределении
 
+---
 
 ## Распределение Пуассона 
 
-\columnsbegin
-\column{0.48\textwidth}
+.pull-left[
 
-```{r echo=FALSE, purl=FALSE, fig.width=2.32*1.5, out.width='2.32in', fig.height=3.38, out.height='2.25in'}
+```{r poisson-distr, echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=6}
 library(ggplot2)
+theme_set(theme_bw(base_size = 14))
+
 mu1 <- 1
 mu2 <- 5
 mu3 <- 10
@@ -66,9 +70,9 @@ ggplot(pi, aes(x = y, y = pi)) +
   ylab("f(y)")
 ```
 
-\column{0.42\textwidth}
+]
 
-\vspace{-\baselineskip}
+.pull-right[
 
 $$f(y)= \frac{\mu^y \cdot e^{-\mu}}{y!}$$
 
@@ -77,7 +81,7 @@ $$f(y)= \frac{\mu^y \cdot e^{-\mu}}{y!}$$
 - $\mu$ -- задает среднее и дисперсию
 
 
-\vspace{\baselineskip}
+<br/>
 
 Свойства:
 
@@ -86,14 +90,15 @@ $$f(y)= \frac{\mu^y \cdot e^{-\mu}}{y!}$$
 - $0 \le y \le +\infty$, $y \in \mathbb{N}$ --- значения
 
 
-\columnsend
+]
+
+---
 
 ## Отрицательное биномиальное распределение
 
-\columnsbegin
-\column{0.48\textwidth}
+.pull-left[
 
-```{r echo=FALSE, purl=FALSE, fig.width=3.75, out.width='2.5in', fig.height=3.38, out.height='2.25in'}
+```{r neg-binomial-distr, echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=6}
 mu1 <- 1
 mu2 <- 5
 k1 <- 0.1
@@ -116,18 +121,18 @@ ggplot(pi, aes(x = y, y = pi)) +
   ylab("f(y)")
 ```
 
-\column{0.42\textwidth}
+]
 
-\vspace{-\baselineskip}
+.pull-right[
 
-$$f(y) = \frac{\Gamma(y + k)}{\Gamma(k) \cdot \Gamma(y+1)} \cdot (\frac{k}{\mu + k})^k \cdot (1 - \frac{k}{\mu + k})^y$$
+$f(y) = \frac{\Gamma(y + k)}{\Gamma(k) \cdot \Gamma(y+1)} \cdot (\frac{k}{\mu + k})^k \cdot (1 - \frac{k}{\mu + k})^y$
 
 Параметры: 
 
 - $\mu$ -- среднее  
 - $k$ -- определяет степень избыточности дисперсии
 
-\vspace{\baselineskip}
+<br/>
 
 Свойства:
 
@@ -135,10 +140,13 @@ $$f(y) = \frac{\Gamma(y + k)}{\Gamma(k) \cdot \Gamma(y+1)} \cdot (\frac{k}{\mu +
 - $var(y) = \mu + \frac {\mu^2}{k}$ -- дисперсия
 - $0 \le y \le +\infty$, $y \in \mathbb{N}$ -- значения
 
-\note{Это смесь Пуассоновского и Гамма распределений: $y$ подчиняется распределению Пуассона с Гамма-распределенным $\mu$. Приближается к распр. Пуассона при очень больших $k$.}
+]
 
-\columnsend
+???
 
+Это смесь Пуассоновского и Гамма распределений: $y$ подчиняется распределению Пуассона с Гамма-распределенным $\mu$. Приближается к распр. Пуассона при очень больших $k$.
+
+---
 
 ## GLM в "туннеле" из распределений
 
@@ -148,14 +156,13 @@ $$f(y) = \frac{\Gamma(y + k)}{\Gamma(k) \cdot \Gamma(y+1)} \cdot (\frac{k}{\mu +
 - Если нет, то справится ли отрицательное биномиальное распределениие, у которого есть параметр, для описания этой связи?
 
 
-```{r echo=FALSE, fig.height=2.5*1.5, out.height='2.5in'}
+```{r echo=FALSE}
 # A Graphical Look at Poisson Regression
 # https://bookdown.org/roback/bookdown-bysh/ch-poissonreg.html
 # https://github.com/broadenyourstatisticalhorizons/bysh_book/blob/1be2441d7dc0ac57e428218cac504ed3147fd8c6/04-Poisson-Regression.Rmd#L109
 
 library(dplyr)
 library(tidyr)
-library(ggplot2)    # enable ggplot
 library(gridExtra)  # enable multiple plotting
 library(MASS)
 
@@ -199,7 +206,6 @@ pois_assume <- ggplot(dat, aes(x, y)) +
             color='red', lwd=1.1) +
   # geom_path(data=dens[dens$type=="empirical",], aes(x, y, group=section),
   #           color="powderblue", lwd=1.1) +
-  theme_bw() +
   geom_vline(xintercept=breaks, lty=1, colour = 'grey80')
 # pois_assume
 
@@ -238,7 +244,6 @@ nb_assume <- ggplot(dat, aes(x, y)) +
             color='red', lwd=1.1) +
   # geom_path(data=dens[dens$type=="empirical",], aes(x, y, group=section),
             # color="powderblue", lwd=1.1) +
-  theme_bw() +
   geom_vline(xintercept=breaks, lty=1, colour = 'grey80')
 # nb_assume
 
@@ -253,45 +258,78 @@ grid.arrange(
 ```
 
 
-## Гадючий лук, копеечник и визиты опылителей
+---
 
-Гадючий лук (мускари, _Leopoldia comosa_) --- представитель родной флоры острова Менорка. В 18-19вв на остров завезли копеечник венечный (_Hedysarum coronarium_), который быстро натурализовался. Оба вида цветут одновременно и нуждаются в опылении насекомыми.
+background-image: url("images/Muscari_comosum_flowers.jpeg")
+background-position: center
+background-size: cover
+
+# Пример: визиты опылителей
+
+---
+
+class: split-two
+
+.row.bg-main1[.content[
+
+## Мускари, копеечник и визиты опылителей
+
+Мускари (_Leopoldia comosa_) --- представитель родной флоры острова Менорка. В 18-19вв на остров завезли копеечник венечный (_Hedysarum coronarium_), который быстро натурализовался. Оба вида цветут одновременно и опыляются насекомыми.
 
 Как зависит число визитов опылителей на цветки мускари от присутствия вселенца и разнообразия флоры в ближайшей окрестности? (Данные Montero-Castaño, Vilà, 2015)
+]]
 
-\columnsbegin
-\column{0.48\textwidth}
+.row.bg-main2[
+.split-three[
+.column[
 
-\includegraphics[height=1.7in,keepaspectratio]{images/Muscari_comosum.JPG}
+```{r echo=FALSE, out.width='200px'}
+knitr::include_graphics("images/Muscari_comosum.JPG")
+```
 
-\footnotesize
+.small[Muscari à toupet (Muscari comosum), Dordogne, France --- Père Igor]
 
-Muscari à toupet (Muscari comosum), Dordogne, France --- Père Igor
+]
 
-\column{0.48\textwidth}
+.column[
+```{r echo=FALSE, out.width='200px'}
+knitr::include_graphics("images/bee-positive.png")
+```
+]
 
-\includegraphics[clip, trim=0in 0in 0.65in 0in, height=1.7in,keepaspectratio]{images/Hedysarum-coronarium.jpg}
+.column[
 
-\footnotesize
+```{r echo=FALSE, out.width='200px'}
+knitr::include_graphics("images/Hedysarum-coronarium.jpg")
+```
 
-French-honeysuckle. Close to Santadi Basso, Sardinia, Italy --- Hans Hillewaert
+.small[French-honeysuckle. Close to Santadi Basso, Sardinia, Italy --- Hans Hillewaert]
 
-\note{\url{https://doi.org/10.1371/journal.pone.0128595}}
+]]]
 
-\columnsend
+???
+
+https://doi.org/10.1371/journal.pone.0128595
+
+---
 
 ## Дизайн исследования
 
-Подсчитывали число визитов опылителей на выбранное растение гадючьего лука \newline (в пунктирной рамке) на трех типах участков.
+Подсчитывали число визитов опылителей на выбранное растение мускари <br/> (в пунктирной рамке) на трех типах участков.
 
-\includegraphics[width=0.7\textwidth, height=0.7\textwidth, natwidth=997, natheight=636, keepaspectratio]{images/journal.pone.0128595.g002.PNG}
+```{r echo=FALSE, out.width='600px'}
+knitr::include_graphics("images/journal.pone.0128595.g002.PNG")
+```
 
-\footnotesize
+.left-column[
+```{r echo=FALSE, out.width='100px'}
+knitr::include_graphics("images/bee-positive.png")
+```
+]
 
-Fig.2 из Montero-Castaño, Vilà, 2015
+.right-column[.right[.small[Fig.2 из [Montero-Castaño, Vilà, 2015](https://doi.org/10.1371/journal.pone.0128595)]]]
 
-\url{https://doi.org/10.1371/journal.pone.0128595}
-
+---
 
 ## Переменные
 
@@ -300,9 +338,9 @@ Fig.2 из Montero-Castaño, Vilà, 2015
 - `Treatment` --- тип площадки, тритмент (фактор с 3 уровнями):
     - `Invaded` --- _Leopoldia_ в смеси с видом-вселенцем;
     - `Removal` --- _Leopoldia_ в смеси с видом-вселенцем с удаленными цветками; 
-    - `Control` --- _Leopoldia_ без вида вселенца.
+    - `Control` --- _Leopoldia_ без вида-вселенца.
 
-- `DiversityD_1` --- Разнообразие флоры на площадке ($exp(H’)$,  где $H'$ --- индекс Шеннона-Уивера) \newline (на луг с более разнообразной растительностью прилетит больше опылителей).
+- `DiversityD_1` --- Разнообразие флоры на площадке ( $exp(H’)$,  где $H'$ --- индекс Шеннона-Уинера) <br/> (на луг с более разнообразной растительностью прилетит больше опылителей).
 
 - `Flowers` --- число цветков _Leopoldia_ на площадке (чем больше, тем больше опылителей).
 
@@ -317,38 +355,48 @@ Fig.2 из Montero-Castaño, Vilà, 2015
 - `No_Fruit` --- число цветов без плодов через месяц
 
 
-## Открываем из знакомимся с данными
+---
 
-\small
+## Открываем из знакомимся с данными
 
 ```{r data, }
 library(readxl)
-pol <- read_excel("data/Pollinators_Montero-Castano, Vila, 2015.xlsx", sheet = 1)
+pol <- read_excel("data/Pollinators_Montero-Castano, Vila, 2015.xlsx", 
+                  sheet = 1)
 head(pol)
 ```
 
-Сколько пропущенных значений?
+--
 
 ```{r}
+# Сколько пропущенных значений?
 colSums(is.na(pol))
 ```
 
+---
 
 ## Есть ли выбросы?
 
-```{r}
-library(cowplot)
+```{r eval=FALSE}
 library(ggplot2)
 theme_set(theme_bw())
+```
+
+```{r dotplots}
+library(cowplot)
 
 dot_plot <- ggplot(pol, aes(y = 1:nrow(pol))) + geom_point()
-plot_grid(dot_plot + aes(x = DiversityD_1), dot_plot + aes(x = Flowers),
+plot_grid(dot_plot + aes(x = DiversityD_1), 
+          dot_plot + aes(x = Flowers),
           dot_plot + aes(x = Hours), nrow = 1)
 ```
 
-Выбросов нет.
+--
 
-Периоды наблюдений имеют разную продолжительность. Нужно это учесть в модели.
+- Выбросов нет.
+- Разную продолжительность периодов наблюдений нужно учесть в модели.
+
+---
 
 ## Каков объем выборки?
 
@@ -356,75 +404,80 @@ plot_grid(dot_plot + aes(x = DiversityD_1), dot_plot + aes(x = Flowers),
 table(pol$Treatment)
 ```
 
-Как распределены короткие периоды наблюдений по тритментам?
+--
+
+### Как распределены короткие периоды наблюдений по тритментам?
 
 ```{r}
 table(pol$Hours, pol$Treatment)
 ```
 
+---
+
 ## Коллинеарны ли непрерывные и дискретные предикторы?
 
-```{r}
+```{r colinearity}
 box_plot <- ggplot(pol, aes(x = Treatment)) + geom_boxplot()
 
 plot_grid(box_plot + aes(y = DiversityD_1),
           box_plot + aes(y = Flowers), nrow = 1)
 ```
 
-Возможно, есть коллинеарность.
+--
 
+- Возможно, есть коллинеарность.  
+Перед подбором модели проверим это при помощи `vif()`
+
+---
 
 ## Как распределена переменная-отклик?
 
 
-```{r fig.show='asis'}
+Число визитов насекомых -- счетная переменная. Для ее моделирования нужно использовать подходящее распределение.
+
+```{r response-distrib, fig.show='asis'}
 ggplot(pol, aes(x = Visits)) + geom_histogram()
 mean(pol$Visits == 0) # Какова пропорция нулей?
 ```
 
-Число визитов насекомых -- счетная переменная. Для ее моделирования нужно использовать подходящее распределение.
+- Примерно `r round(mean(pol$Visits == 0) * 100)`% наблюдений -- нули. Иногда из-за избытка нулей (Zero inflation) в модели может появиться избыточность дисперсии. Будем иметь это в виду.
 
-Примерно `r round(mean(pol$Visits == 0) * 100)` \% наблюдений -- нули. Иногда из-за избытка нулей (Zero inflation) в модели может появиться избыточность дисперсии. Будем иметь это в виду.
+---
 
+class: middle, center, inverse
 
-## Линейна ли связь между предикторами и откликом?
+# GLM с нормальным распределением отклика
 
-```{r}
-gg_shape <- ggplot(pol, aes(y = Visits/Hours, colour = Treatment)) +
-  theme(legend.position = 'bottom')
-plot_grid(
-  gg_shape + geom_point(aes(x = Flowers)),
-  gg_shape + geom_point(aes(x = DiversityD_1)),
-nrow = 1)
-```
+---
 
-Связь практически линейна.
+## Что будет, если проигнорировать, что отклик --- численная переменная?
 
-## Если мы (ошибочно) подберем \newline GLM с нормальным распределением отклика?
+$Visits_i \sim N(\mu_i, \sigma)$   
+$E(Visits_i) = \mu_i$, $var(Visits_i) = \sigma^2$  
+$\mu_i = \eta_i$ -- функция связи "идентичность"  
+$\eta_i = b_0 + b_1 Treatment_{Invaded\ i} + b_2 Treatment_{Removal\ i} + \\ + b_3 DiversityD1_{i} + b_4 Flowers_{i} + b_5 Hours_{i}$
 
-$Visits_i \sim N(\mu_i, \sigma)$ 
-
-$E(Visits_i) = \mu_i$, $var(Visits_i) = \sigma^2$
-
-$\mu_i = \eta_i$ -- функция связи "идентичность"
-
-$\eta_i = b_0 + b_1 Treatment_{Invaded\ i} + b_2 Treatment_{Removal\ i} + b_3 DiversityD1_{i} + b_4 Flowers_{i} + b_5 Hours_{i}$
-
-
-\vspace{\baselineskip}
-
-```{r }
+```{r R.options=list(width=60)}
 M_norm <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol)
 coef(M_norm)
 sigma(M_norm)
 ```
 
-## Данные для графика предсказаний простой линейной модели
+--
 
+$Visits_i \sim N(\mu_i, 4.17)$   
+$E(Visits_i) = \mu_i$, $var(Visits_i) = \sigma^2$  
+$\mu_i = \eta_i$
+$\eta_i =  -3.3 + 2.9 Treatment_{Invaded\ i} -1.1 Treatment_{Removal\ i} - \\ -1.2 DiversityD1_{i} + 0.1 Flowers_{i} + 6.7 Hours_{i}$
+
+---
+
+## Данные для графика предсказаний простой линейной модели
 
 ```{r}
 library(dplyr)
-NewData <- pol %>% group_by(Treatment)%>%
+NewData <- pol %>% 
+  group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>%
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
          Hours = 0.75)
@@ -432,30 +485,45 @@ NewData <- pol %>% group_by(Treatment)%>%
 # Модельная матрица и коэффициенты
 X <- model.matrix(~ Treatment + DiversityD_1 + Flowers + Hours, data = NewData)
 betas <- coef(M_norm)
-# Предсказания в масштабе функции связи (eta) совпадают с масштабом отклика (mu)
+# Предсказания в масштабе функции связи (eta) уже в масштабе отклика (mu)
 NewData$mu <- X %*% betas       
 NewData$SE_mu <- sqrt(diag(X %*% vcov(M_norm) %*% t(X)))  # SE
 
 head(NewData, 3)
 ```
 
+---
+
 ## График предсказаний
 
-```{r}
+```{r predict-pois, fig.height=5}
 ggplot(NewData, aes(x = Flowers, y = mu, fill = Treatment)) +
   geom_ribbon(aes(ymin = mu - 2 * SE_mu, ymax = mu + 2 * SE_mu), alpha=0.3)+
   geom_line(aes(colour = Treatment)) +
   geom_hline(yintercept = 0)
 ```
 
+--
 
-## Смотрим на результаты подбора модели
+.left-column[
+```{r echo=FALSE, out.width='100px'}
+knitr::include_graphics("images/bee-negative.png")
+```
+]
 
-\footnotesize
+.right-column[
+Отрицательные предсказания!
+]
+
+---
+
+## Результаты подбора модели
 
 ```{r}
-summary(M_norm)
+summary(M_norm) 
 ```
+
+---
 
 ## Анализ девиансы для модели с нормальным распределением отклика
 
@@ -464,18 +532,18 @@ summary(M_norm)
 drop1(M_norm, test = 'Chi')
 ```
 
-\vspace{\baselineskip}
+--
 
-Число визитов опылителей на цветки гадючьего лука:
+Число визитов опылителей на цветки мускари:
 
 - НЕ зависит от присутствия вселенца и его цветов,
 - НЕ зависит от разнообразия флоры на участке,
-- зависит от числа цветов самого гадючьего лука.
-    
-\vspace{\baselineskip}
+- зависит от числа цветов мускари.
 
 Можем ли мы доверять этим результатам? Пока не известно.
 
+
+---
 
 ## Нет ли коллинеарности предикторов
 
@@ -485,7 +553,11 @@ library(car)
 vif(M_norm)
 ```
 
-Коллинеарности нет.
+--
+
+- Коллинеарности нет.
+
+---
 
 ## Задание 1
 
@@ -493,7 +565,7 @@ vif(M_norm)
 
 Какие нарушения условий применимости вы на нем видите?
 
-\vspace{\baselineskip}
+<br/>
 
 Дополните код:
 
@@ -506,10 +578,12 @@ ggplot(data = , aes()) + geom_hline( = 0) +
 ```
 
 
+---
+
 ## График остатков от предсказанных значений
 
 
-```{r fig.height=2.4, purl=FALSE}
+```{r norm-resid, purl=FALSE}
 M_norm_diag <- data.frame(.fitted = fitted(M_norm, type = "response"),
                           .resid_p = residuals(M_norm, type = "pearson"))
 
@@ -517,13 +591,25 @@ ggplot(M_norm_diag, aes(y = .resid_p)) + geom_hline(yintercept = 0) +
   geom_point(aes(x = .fitted))
 ```
 
+--
 
-Гетерогенность дисперсий остатков.
+.left-column[
+```{r echo=FALSE, out.width='100px'}
+knitr::include_graphics("images/bee-negative.png")
+```
+]
 
-Отрицательные предсказания!
+.right-column[
+- Гетерогенность дисперсий остатков.
+- Отрицательные предсказания!
+]
 
 
-## Модель с нормальным распределением отклика не подходит
+
+
+---
+
+## Модель с нормальным распределением отклика <br/>не подходит
 
 Два способа решения проблем с моделью:
 
@@ -532,62 +618,48 @@ ggplot(M_norm_diag, aes(y = .resid_p)) + geom_hline(yintercept = 0) +
     - распределение Пуассона,
     - отрицательное биномиальное распределение.
 
+---
+
+class: middle, center, inverse
+
+# GLM с Пуассоновским распределением отклика
+
+---
 
 ## GLM с Пуассоновским распределением отклика
 
-$Visits_i \sim Poisson(\mu_i)$
-
-$E(Visits_i) = \mu_i$, $var(Visits_i) = \mu_i$
-
-$\text{ln}(\mu_i) = \eta_i$ --- функция связи логарифм
-
+$Visits_i \sim Poisson(\mu_i)$  
+$E(Visits_i) = \mu_i$, $var(Visits_i) = \mu_i$  
+$\text{ln}(\mu_i) = \eta_i$ --- функция связи логарифм  
 $\begin{aligned}\eta_i & =  b_0 + b_1 Treatment_{Invaded\ i} + b_2 Treatment_{Removal\ i} + \\ &+ b_3 DiversityD1_{i} + b_4 Flowers_{i} + b_5 Hours_{i}\end{aligned}$
 
-\vspace{\baselineskip}
+--
 
-```{r }
-M_pois <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol,
-                   family = "poisson")
-
-```
-
-## Уравнение модели с Пуассоновским распределением отклика
-
-$Visits_i \sim Poisson(\mu_i)$
-
-$E(Visits_i) = \mu_i$, $var(Visits_i) = \mu_i$
-
-$\text{ln}(\mu_i) = \eta_i$
-
-$\begin{aligned}\eta_i = &-2.66 + 0.71 Treatment_{Invaded\ i} - 0.22 Treatment_{Removal\ i} - \\ &- 0.46 DiversityD1_i + 0.04  Flowers_i + 4.69 Hours_i\end{aligned}$
-
-\vspace{\baselineskip}
-
-```{r R.options=list(width=60)}
+```{r  R.options=list(width=60)}
+M_pois <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, 
+              data = pol, family = "poisson")
 coef(M_pois)
 ```
 
-## Смотрим на результаты подбора модели
+--
 
-\vspace{-\baselineskip}
+$Visits_i \sim Poisson(\mu_i)$  
+$E(Visits_i) = \mu_i$, $var(Visits_i) = \mu_i$  
+$\text{ln}(\mu_i) = \eta_i$  
+$\begin{aligned}\eta_i = &-2.66 + 0.71 Treatment_{Invaded\ i} - 0.22 Treatment_{Removal\ i} - \\ &- 0.46 DiversityD1_i + 0.04  Flowers_i + 4.69 Hours_i\end{aligned}$
 
-\columnsbegin
-\column{0.7\textwidth}
+---
 
-\footnotesize
+## Смысл коэффициентов модели с Пуассоновским распределением отклика
+
+Угловые коэффициенты показывают, на сколько единиц меняется значение логарифма отклика, если соответствующий предиктор изменяется на единицу.  
+Значит, сам отклик изменяется в $e^{b_k}$ раз при изменении предиктора на единицу.
 
 ```{r}
 summary(M_pois)
 ```
 
-\column{0.3\textwidth}
-
-Угловые коэффициенты показывают, на сколько единиц меняется значение логарифма отклика, если соответствующий предиктор изменяется на единицу.
-
-Это значит, что сам отклик изменяется в $e^{b_k}$ раз при изменении предиктора на единицу.
-
-\columnsend
-
+---
 
 ## Анализ девиансы для модели с Пуассоновским распределением отклика
 
@@ -596,23 +668,24 @@ summary(M_pois)
 drop1(M_pois, test = 'Chi')
 ```
 
-\vspace{\baselineskip}
+--
 
-Число визитов опылителей на цветки гадючьего лука:
+Число визитов опылителей на цветки мускари:
 
-- зависит от присутствия вида вселенца и его цветов,
+- зависит от присутствия вида-вселенца и его цветов,
 - зависит от разнообразия флоры на данном участке,
-- зависит от числа цветов самого гадючьего лука.
-    
-\vspace{\baselineskip}
+- зависит от числа цветов самого мускари.
 
 Можем ли мы доверять этим результатам? Пока не известно.
 
 
+---
+
 ## Данные для предсказаний
 
 ```{r}
-NewData <- pol %>% group_by(Treatment)%>%
+NewData <- pol %>% 
+  group_by(Treatment)%>%
   do(data.frame(Flowers = seq(min(.$Flowers), max(.$Flowers), length.out=50))) %>% 
   mutate(DiversityD_1 = mean(pol$DiversityD_1),
          Hours = 0.75)
@@ -621,12 +694,38 @@ NewData <- pol %>% group_by(Treatment)%>%
 Давайте получим предсказания при помощи операций с матрицами,  
 чтобы своими глазами увидеть работу функции связи.
 
-Еще можно получить предсказания при помощи функции `predict()`. Но будьте осторожны, **predict() возвращает стандартные ошибки все время только в масштабе функции связи!**
+Еще можно получить предсказания при помощи функции `predict()`.  
+**`predict()` возвращает "правильные" `SE` только в масштабе функции связи!**
 
 ```{r eval=FALSE}
 ?predict.glm
 ```
 
+
+---
+
+## Задание 2
+
+Дополните код, чтобы получить предсказания модели при помощи операций с матрицами.
+
+```{r eval=FALSE}
+# Модельная матрица и коэффициенты
+X <- 
+betas <- 
+
+# Предсказанные значения и стандартные ошибки...
+# ...в масштабе функции связи (логарифм)
+NewData$fit_eta <- 
+NewData$SE_eta <- sqrt(( %*% vcov(M_pois) %*% ))
+
+# ...в масштабе отклика (применяем функцию, обратную функции связи)
+NewData$fit_mu <- 
+NewData$lwr <- 
+NewData$upr <- 
+```
+
+
+---
 
 ## Предсказания модели при помощи операций с матрицами
 
@@ -649,10 +748,12 @@ NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
 head(NewData, 2)
 ```
 
+---
+
 ## График предсказаний в масштабе функции связи
 
 
-```{r}
+```{r pois-predict-link}
 ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
   geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, 
                   ymax = fit_eta + 2 * SE_eta), 
@@ -665,10 +766,12 @@ ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
 В масштабе функции связи мы моделируем линейную зависимость логарифмов мат. ожидания отклика от предикторов.
 
 
+---
+
 ## График предсказаний в масштабе переменной-отклика
 
 
-```{r}
+```{r pois-predict-response}
 ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
   geom_ribbon(aes(ymin = lwr, 
                   ymax = upr), 
@@ -677,32 +780,56 @@ ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
   geom_hline(yintercept = 0)
 ```
 
+.left-column[
+```{r echo=FALSE, out.width='100px'}
+knitr::include_graphics("images/bee-positive.png")
+```
+]
 
+.right-column[
 GLM с Пуассоновским распределением отклика моделирует его нелинейную cвязь предикторами за счет функции связи $log()$.
 
+И никаких отрицательных предсказаний!
+]
 
 
-## Возможные проблемы GLM с Пуассоновским распределением отклика
+---
 
-GLM с Пуассоновским распределением отклика учитывает гетерогенность дисперсии ($var(y_i) = mu_i = E(y_i)$). Стандартные ошибки возрастают с увеличением предсказанного значения.
+## Возможные с Пуассоновской GLM
+
+GLM с Пуассоновским распределением отклика учитывает гетерогенность дисперсии, т.к. $var(y_i) = mu_i = E(y_i)$. Стандартные ошибки возрастают с увеличением предсказанного значения.
+
+```{r pois-predict-response2, echo=FALSE}
+ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
+  geom_ribbon(aes(ymin = lwr, 
+                  ymax = upr), 
+              alpha = 0.5) +
+  geom_line(aes(colour = Treatment)) + 
+  geom_hline(yintercept = 0)
+```
 
 Но достаточно ли этого для моделирования данных? Нет ли здесь сверхдисперсии?
 
-```{r echo=FALSE}
-ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = lwr, 
-                  ymax = upr), 
-              alpha = 0.5) +
-  geom_line(aes(colour = Treatment)) + 
-  geom_hline(yintercept = 0)
+```{r bees, echo=FALSE, fig.height=2}
+library(cowplot)
+plot_grid(
+  ggdraw() + draw_image("images/bee-positive.png"),
+  ggplot() + theme_void(),
+  ggdraw() + draw_image("images/bee-positive.png"),
+  ggplot() + theme_void(),
+  ggdraw() + draw_image("images/bee-positive.png"),
+  nrow = 1, rel_widths = c(1, 3, 2, 3, 4))
 ```
 
+---
 
 ## Условия применимости GLM с Пуассоновским распределением отклика
 
 - Случайность и независимость наблюдений внутри групп.
 - Отсутствие сверхдисперсии. (Дисперсия остатков равна мат.ожиданию при каждом уровне значений предикторов).
 - Отсутствие коллинеарности предикторов.
+
+---
 
 ## График остатков
 
@@ -715,6 +842,25 @@ ggplot(M_pois_diag, aes(x = .fitted, y = .resid_p)) +
 ```
 
 
+.left-column[
+```{r echo=FALSE, out.width='100px'}
+knitr::include_graphics("images/bee-positive.png")
+```
+]
+
+.right-column[
+Никаких отрицательных предсказаний!
+]
+
+
+---
+
+class: middle, center, inverse
+
+# Избыточность дисперсии (overdispersion)
+
+---
+
 ## Избыточность дисперсии (overdispersion)
 
 Если данные подчиняются распределению Пуассона, то дисперсия должна быть равна среднему значению.
@@ -725,29 +871,29 @@ ggplot(M_pois_diag, aes(x = .fitted, y = .resid_p)) +
 Если это не так, то мы не сможем доверять результатам. Это будет значить, что мы применяем модель, основанную на Пуассоновском распределении, к данным, которые не подчиняются этому распределению. 
 
 
-## Проверка на сверхдисперсию
+---
 
-Используем предложенную Беном Болкером функцию проверки на сверхдисперсию
+## Проверка на сверхдисперсию
 
 ```{r}
 # Функция для проверки наличия сверхдисперсии в модели (автор Ben Bolker)
 # http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html
-# Код модифицирован, чтобы учесть дополнительный параметр в NegBin GLMM, подобранных MASS::glm.nb()
+# Код модифицирован, чтобы учесть дополнительный параметр в NegBin GLMM, 
+# подобранных MASS::glm.nb()
 overdisp_fun <- function(model) {
-    rdf <- df.residual(model)  # Число степеней свободы N - p
-    if (any(class(model) == 'negbin')) rdf <- rdf - 1 ## учитываем k в NegBin GLMM
-    rp <- residuals(model,type='pearson') # Пирсоновские остатки
-    Pearson.chisq <- sum(rp^2) # Сумма квадратов остатков, подчиняется Хи-квадрат распределению 
-    prat <- Pearson.chisq/rdf  # Отношение суммы квадратов остатков к числу степеней свободы
-    pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE) # Уровень значимости
-    c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)        # Вывод результатов
+  rdf <- df.residual(model)  # Число степеней свободы N - p
+  if (any(class(model) == 'negbin')) rdf <- rdf - 1 ## учитываем k в NegBin GLMM
+  rp <- residuals(model,type='pearson') # Пирсоновские остатки
+  Pearson.chisq <- sum(rp^2) # Сумма квадратов остатков, подчиняется Хи-квадрат распределению 
+  prat <- Pearson.chisq/rdf  # Отношение суммы квадратов остатков к числу степеней свободы
+  pval <- pchisq(Pearson.chisq, df=rdf, lower.tail=FALSE) # Уровень значимости
+  c(chisq=Pearson.chisq,ratio=prat,rdf=rdf,p=pval)        # Вывод результатов
 }
 ```
 
-Ben Bolker's glmmFAQ  
-\url{http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html}
+Модифицировано по Ben Bolker's [glmmFAQ](http://bbolker.github.io/mixedmodels-misc/glmmFAQ.html)
 
-\vspace{\baselineskip}
+<br/>
 
 ```{r}
 overdisp_fun(M_pois)
@@ -755,43 +901,62 @@ overdisp_fun(M_pois)
 
 Избыточность дисперсии есть! Дисперсия в `r as.numeric(round(overdisp_fun(M_pois)[2], 1))` раза выше среднего.
 
+---
+
 ## Если есть избыточность дисперсии...
 
 Пуассоновские модели недооценивают (приуменьшают) "раздувшиеся" стандартные ошибки.
 
-Если данные подчиняются распределению Пуассона, то:
+__Если данные подчиняются распределению Пуассона__, то:
 
 $var(y_i) = \mu_i$
 
-\vspace{\baselineskip}
+--
+
+Т.е. дисперсии и стандартные ошибки, "нормальные" для распределения Пуассона:
 
 $var(E(y_i)) = {\mu_i} / n$
 
 $SE_{E(y_i)} = \sqrt {var(E(y_i))}$
 
-\vspace{\baselineskip}
+--
 
-Если данные не подчиняются распределению Пуассона, и дисперсия в $\varphi$ раз больше среднего ($\varphi > 1$), то:
+__Если данные НЕ подчиняются распределению Пуассона__, и дисперсия в $\varphi$ раз больше среднего ( $\varphi > 1$), то:
 
 $var^*(y_i) = \varphi\mu_i$
 
-Тогда дисперсии и стандартные ошибки "раздуты":
+--
+
+Тогда дисперсии должны быть больше в $\varphi$ раз, а стандартные ошибки --- в $\sqrt {\varphi}$ раз:
 
 $var(E(y_i)) = {\varphi\mu_i} / n$
 
 $SE_{E(y_i)} = \sqrt {\varphi~var(E(y_i))}$
 
+__В итоге, если при сверхдисперсии использовать обычное распределение Пуассона, то оценки стандартных ошибок окажутся занижены.__
 
-## Проблемы из-за неучтенной избыточности дисперсии
 
-Когда есть избыточность дисперсии, использование распределения Пуассона приведет к проблемам:
+???
 
-- Доверительная зона предсказаний модели будет заужена из-за того, что оценки стандартных ошибок занижены.
+Fox 2016, p.431-432
 
-- Тесты Вальда для коэффициентов модели дадут неправильные результаты из-за того, что оценки стандартных ошибок занижены. Уровень значимости будет занижен.
+В биномиальных моделях см. Dunn, Smyth, 2018, p.347
+
+В пуассоновских моделях см. Dunn, Smyth, 2018, p.397
+
+
+---
+
+## Проблемы из-за неучтенной избыточности дисперсии <br/>в Пуассоновских GLM
+
+- Из-за того, что оценки стандартных ошибок занижены:
+    + Доверительная зона предсказаний модели будет заужена,
+    + Уровень значимости в тестах Вальда для коэффициентов будет занижен.
 
 - Тесты, основанные на сравнении правдоподобий дадут смещённые результаты,   
 т.к. соотношение девианс уже не будет подчиняться $\chi^2$-распределению.
+
+---
 
 ## Причины избыточности дисперсии 
 
@@ -800,52 +965,65 @@ $SE_{E(y_i)} = \sqrt {\varphi~var(E(y_i))}$
 + Нарушена независимость выборок (есть внутригрупповые корреляции).
 + Нелинейная связь между ковариатами и зависимой переменной.
 + Выбрана неподходящая связывающая функция.
-+ Количество нулей больше, чем предсказывает выбранное \newline распределение отклика (Zero inflation) .
++ Количество нулей больше, чем предсказывает выбранное <br/> распределение отклика (Zero inflation) .
 + Выбрана неподходящая функция распределения для отклика.
 
-\pause
+--
 
 ### Как бороться с избыточностью дисперсии
 
 Взвесив все, что известно о данных, можно решить, как именно усовершенствовать модель.
 
-\vspace{\baselineskip}
+<br/>
 
 Для модели числа визитов опылителей мы попробуем два варианта действий:
 
 - Можно построить квази-пуассоновскую модель.
 - Можно построить модель, основанную на отрицательном биномиальном распределении.
 
+
+---
+
+class: middle, center, inverse
+
+# Квази-пуассоновские модели
+
+---
+
 ## Квази-пуассоновские модели
 
-\columnsbegin
-\column{0.7\textwidth}
-
-$Visits_i \sim Quasipoisson(\mu_i)$
-
-$E(Visits_i) = \mu_i$, $var(y_i) = \varphi\ \mu_i$
-
-$\text{ln}(\mu_i) = \eta_i$ --- функция связи логарифм
-
-$\begin{aligned}\eta_i & =  b_0 + b_1 Treatment_{Invaded\ i} + b_2 Treatment_{Removal\ i} + \\ &+ b_3 DiversityD1_{i} + b_4 Flowers_{i} + b_5 Hours_{i}\end{aligned}$
-
-\column{0.3\textwidth}
+.left-column[
 
 Помните, не бывает  
 "квази-пуассоновского  
-распределения"!  
+распределения"!
 
-\columnsend
+![](images/i-tak-soydet.jpg)
 
-В этих моделях используется распределение Пуассона, но вводится поправка на степень избыточности дисперсии $\varphi$.
+]
 
-Величина $\varphi$ показывает, во сколько раз дисперсия превышает среднее. 
+.right-column[
 
-$\varphi$ оценивается по данным.
+$Visits_i \sim Quasipoisson(\mu_i)$  
+$E(Visits_i) = \mu_i$, $var(y_i) = \varphi\ \mu_i$  
+$\text{ln}(\mu_i) = \eta_i$ --- функция связи логарифм  
+$\begin{aligned}\eta_i & =  b_0 + b_1 Treatment_{Invaded\ i} + b_2 Treatment_{Removal\ i} + \\ &+ b_3 DiversityD1_{i} + b_4 Flowers_{i} + b_5 Hours_{i}\end{aligned}$
 
-<!-- Вот такой вариант оценки используется в R (рекомендован McCullagh, Nelder, 1989): -->
+<br/>
 
-<!-- $$\varphi =  \frac{var(E(y_i))}{\mu_i}=\frac {\frac{\sum{(e_{p~i})^2}}{n - p}}  {\mu_i} =  \frac{\sum{(e_{p~i})^2}}{n - p}$$ -->
+Квазипуассоновские модели используют распределение Пуассона, но при этом вносится поправка на степень избыточности дисперсии $\varphi$.
+
+$\varphi$ оценивается по данным и показывает, во сколько раз дисперсия больше среднего. 
+
+]
+
+???
+
+Вот такой вариант оценки используется в R (рекомендован McCullagh, Nelder, 1989):
+
+$$\varphi =  \frac{var(E(y_i))}{\mu_i}=\frac {\frac{\sum{(e_{p~i})^2}}{n - p}}  {\mu_i} =  \frac{\sum{(e_{p~i})^2}}{n - p}$$
+
+---
 
 ## Особенности квази-пуассоновской GLM
 
@@ -854,60 +1032,58 @@ $\varphi$ оценивается по данным.
 - Доверительные интервалы к оценкам коэффициентов домножены на $\sqrt{\varphi}$.
 - Логарифмы правдоподобий уменьшаются в $\varphi$ раз.
 
-\note{(см. Højsgaard and Halekoh 2005)}
+--
 
-\pause
-
-### Особенности работы с квази-моделями
+### Работа с квази-моделями
 
 1. В тестах параметров используются $t$-тесты (и $t$-распределение) вместо $z$-тестов Вальда (и стандартного нормального распределения).
-
 2. Для анализа девиансы используются $F$-тесты.
-
 3. Для квази-пуассоновских моделей не определена функция максимального правдоподобия, поэтому нельзя вычислить AIC (но иногда считают квази-AIC = QAIC).
 
 
-## Подбираем квази-пуассоновскую модель {.smaller}
+???
 
-$Visits_i \sim Quasipoisson(\mu_i)$
+См. Højsgaard and Halekoh 2005. Overdispersion Søren Højsgaard and Ulrich Halekoh; Biometry
+Research Unit Danish Institute of Agricultural Sciences; June 1, 2005 Printed: June 1,
+2005 File: overdispersion
 
-$E(Visits_i) = \mu_i$, $var(Visits_i) = \varphi\ \mu_i$
+http://genetics.agrsci.dk/statistics/courses/phd05/material/src/overdispersion
 
-$\text{ln}(\mu_i) = \eta_i$ --- функция связи логарифм
+---
 
+## Квази-пуассоновская модель
+
+$Visits_i \sim Quasipoisson(\mu_i)$  
+$E(Visits_i) = \mu_i$, $var(Visits_i) = \varphi\ \mu_i$  
+$\text{ln}(\mu_i) = \eta_i$ --- функция связи логарифм  
 $\begin{aligned}\eta_i & =  b_0 + b_1 Treatment_{Invaded\ i} + b_2 Treatment_{Removal\ i} + \\ &+ b_3 DiversityD1_{i} + b_4 Flowers_{i} + b_5 Hours_{i}\end{aligned}$
 
-\vspace{\baselineskip}
+--
 
 ```{r}
 M_quasi <- glm(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol, 
                  family = "quasipoisson")
-```
-
-## Уравнение квази-пуассоновской модели
-
-$Visits_i \sim Quasipoisson(\mu_i)$
-
-$E(Visits_i) = \mu_i$, $var(Visits_i) = 3.016\ \mu_i$
-
-$\text{ln}(\mu_i) = \eta_i$
-
-$\begin{aligned}\eta_i = &-2.66 + 0.71 Treatment_{Invaded\ i} - 0.22 Treatment_{Removal\ i} - \\ &- 0.46 DiversityD1_i + 0.04  Flowers_i + 4.69 Hours_i\end{aligned}$
-
-\vspace{\baselineskip}
-
-```{r }
 coef(M_quasi)
 summary(M_quasi)$dispersion
 ```
 
-## Смотрим на результаты подбора модели
+--
 
-\footnotesize
+$Visits_i \sim Quasipoisson(\mu_i)$  
+$E(Visits_i) = \mu_i$, $var(Visits_i) = 3.016\ \mu_i$  
+$\text{ln}(\mu_i) = \eta_i$  
+$\begin{aligned}\eta_i = &-2.66 + 0.71 Treatment_{Invaded\ i} - 0.22 Treatment_{Removal\ i} - \\ &- 0.46 DiversityD1_i + 0.04  Flowers_i + 4.69 Hours_i\end{aligned}$
+
+
+---
+
+## Результаты подбора модели
 
 ```{r}
 summary(M_quasi)
 ```
+
+---
 
 ## Анализ девиансы для квази-пуассоновской модели
 
@@ -916,77 +1092,63 @@ summary(M_quasi)
 drop1(M_quasi, test = "F")
 ```
 
-\vspace{\baselineskip}
+--
 
-Число визитов опылителей на цветки гадючьего лука:
+Число визитов опылителей на цветки мускари:
 
-- зависит от присутствия вида вселенца и его цветов,
+- зависит от присутствия вида-вселенца и его цветов,
 - зависит от разнообразия флоры на данном участке,
-- зависит от числа цветов самого гадючьего лука.
+- зависит от числа цветов самого мускари.
 
-\vspace{\baselineskip}
+Можем ли мы доверять этим результатам?  
+Это приблизительные результаты. Не стоит доверять $p$ близким к $\alpha = 0.05$.
 
-Можем ли мы доверять этим результатам?  Это приблизительные результаты.  Не\ стоит доверять $p$ близким к $\alpha = 0.05$.
+---
 
+class: middle, center, inverse
 
-## GLM с отрицательным биномиальным распределением отклика
+# GLM с отрицательным биномиальным распределением отклика
 
-$Visits_i \sim NB(\mu_i, k)$
+---
 
-$E(Visits_i) = \mu_i$, $var(Visits_i) = \mu_i + \frac{\mu_i^2}{k}$
+## GLM с отрицательным биномиальным распределением
 
-$\text{ln}(\mu_i) = \eta_i$ -- функция связи логарифм
+$Visits_i \sim NB(\mu_i, k)$   
+$E(Visits_i) = \mu_i$, $var(Visits_i) = \mu_i + \frac{\mu_i^2}{k}$  
+$\text{ln}(\mu_i) = \eta_i$ --- функция связи логарифм  
+$\eta = b_0 + b_1 Treatment_{Invaded\ i} + b_2 Treatment_{Removal\ i} + \\ + b_3 DiversityD1_{i} + b_4 Flowers_{i} + b_5 Hours_{i}$
 
-$\eta = b_0 + b_1 Treatment_{Invaded\ i} + b_2 Treatment_{Removal\ i} +$  
-$+ b_3 DiversityD1_{i} + b_4 Flowers_{i} + b_5 Hours_{i}$
+--
 
-\vspace{\baselineskip}
-
-```{r}
+```{r R.options=list(width=60)}
 library(MASS)
-M_nb <- glm.nb(Visits ~ Treatment + DiversityD_1 + Flowers + Hours, data = pol, 
-                 link = "log")
-```
-
-## Уравнение модели с отрицательным биномиальным распределением отклика
-
-$Visits_i \sim NB(\mu_i, 1.936)$
-
-$E(Visits_i) = \mu_i$, $var(Visits_i) = \mu_i + \frac{\mu_i^2}{1.936}$
-
-$\text{ln}(\mu_i) = \eta_i$
-
-$\eta_i = -1.97 + 0.57 Treatment_{Invaded\ i} - 0.11 Treatment_{Removal\ i} -$  
-$- 0.49 DiversityD1_{i} + 0.03 Flowers_{i} + 4.10 Hours_{i}$
-
-\vspace{\baselineskip}
-
-```{r }
+M_nb <- glm.nb(Visits ~ Treatment + DiversityD_1 + Flowers + Hours,  
+               data = pol, link = "log")
 coef(M_nb)
 summary(M_nb)$theta
 ```
 
-## Смотрим на результаты подбора модели
+--
 
-\vspace{-0.7\baselineskip}
+$Visits_i \sim NB(\mu_i, 1.936)$  
+$E(Visits_i) = \mu_i$, $var(Visits_i) = \mu_i + \frac{\mu_i^2}{1.936}$  
+$\text{ln}(\mu_i) = \eta_i$  
+$\eta_i = -1.97 + 0.57 Treatment_{Invaded\ i} - 0.11 Treatment_{Removal\ i} -\\ -0.49 DiversityD1_{i} + 0.03 Flowers_{i} + 4.10 Hours_{i}$
 
-\columnsbegin
-\column{0.7\textwidth}
+---
 
-\footnotesize
+## Результаты подбора модели
+
+
+Угловые коэффициенты показывают, на сколько единиц меняется значение логарифма отклика, если соответствующий предиктор изменяется на единицу.
+
+Значит, сам отклик изменяется в $e^{b_k}$ раз при изменении предиктора на единицу.
 
 ```{r}
 summary(M_nb)
 ```
 
-\column{0.3\textwidth}
-
-Угловые коэффициенты показывают, на сколько единиц меняется значение логарифма отклика, если соответствующий предиктор изменяется на единицу.
-
-Это значит, что сам отклик изменяется в $e^{b_k}$ раз при изменении предиктора на единицу.
-
-\columnsend
-
+---
 
 ## Анализ девиансы модели с отрицательным биномиальным распределением отклика
 
@@ -995,33 +1157,37 @@ summary(M_nb)
 drop1(M_nb, test = 'Chi')
 ```
 
-\vspace{\baselineskip}
+--
 
-Число визитов опылителей на цветки гадючьего лука:
+Число визитов опылителей на цветки мускари:
 
-- не зависит от присутствия вида вселенца и его цветов,
+- не зависит от присутствия вида-вселенца и его цветов,
 - зависит от разнообразия флоры на данном участке,
-- зависит от числа цветов самого гадючьего лука.
-
-\vspace{\baselineskip}
+- зависит от числа цветов самого мускари.
 
 Можем ли мы доверять этим результатам? Это нужно еще проверить.
 
-## Задание 2
+---
+
+## Задание 3
 
 Проведите диагностику модели `M_nb`.
 
 Видите ли вы какие-нибудь нарушения условий применимости?
 
+---
+
 ## График остатков
 
-```{r}
+```{r nb-resid}
 M_nb_diag <- data.frame(.fitted = fitted(M_nb, type = "response"),
                           .resid_p = residuals(M_nb, type = "pearson"),
                           pol)
 gg_resid <- ggplot(M_nb_diag, aes(y = .resid_p)) + geom_hline(yintercept = 0)
 gg_resid + geom_point(aes(x = .fitted))
 ```
+
+---
 
 ## Проверка на сверхдисперсию
 
@@ -1031,11 +1197,15 @@ gg_resid + geom_point(aes(x = .fitted))
 overdisp_fun(M_nb)
 ```
 
+--
+
 Избыточности дисперсии нет
+
+---
 
 ## Графики остатков от переменных, которые есть в модели
 
-```{r}
+```{r nb-resid-in, fig.height=5}
 plot_grid(gg_resid + geom_boxplot(aes(x = Treatment)),
           gg_resid + geom_boxplot(aes(x = as.factor(Hours))),
           gg_resid + geom_point(aes(x = DiversityD_1)),
@@ -1043,12 +1213,16 @@ plot_grid(gg_resid + geom_boxplot(aes(x = Treatment)),
           nrow = 2)
 ```
 
+---
+
 ## Графики остатков от переменных, которых нет в модели
 
-```{r}
+```{r nb-resid-out}
 gg_resid + geom_point(aes(x = Total_1))
 ```
 
+
+---
 
 ## Данные для предсказаний
 
@@ -1062,8 +1236,10 @@ NewData <- pol %>% group_by(Treatment)%>%
 Как и в прошлый раз, давайте получим предсказания при помощи операций с матрицами,  
 чтобы своими глазами увидеть работу функции связи.
 
-Еще можно получить предсказания при помощи функции `predict()`. Но будьте осторожны, **predict() возвращает стандартные ошибки все время только в масштабе функции связи!**
+Еще можно получить предсказания при помощи функции `predict()`.  
+**`predict()` возвращает "правильные" `SE` только в масштабе функции связи!**
 
+---
 
 ## Предсказания модели при помощи операций с матрицами
 
@@ -1086,10 +1262,12 @@ NewData$upr <- exp(NewData$fit_eta + 2 * NewData$SE_eta)
 head(NewData, 2)
 ```
 
+---
+
 ## График предсказаний в масштабе функции связи
 
 
-```{r}
+```{r nb-predict-link}
 ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
   geom_ribbon(aes(ymin = fit_eta - 2 * SE_eta, 
                   ymax = fit_eta + 2 * SE_eta), 
@@ -1101,9 +1279,11 @@ ggplot(NewData, aes(x = Flowers, y = fit_eta, fill = Treatment)) +
 В масштабе функции связи мы моделируем линейную зависимость логарифмов мат. ожидания отклика от предикторов.
 
 
+---
+
 ## График предсказаний в масштабе переменной-отклика
 
-```{r}
+```{r nb-predict-response}
 ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
   geom_ribbon(aes(ymin = lwr, 
                   ymax = upr), 
@@ -1115,54 +1295,54 @@ ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
 
 GLM с отрицательным биномиальным распределением отклика моделирует его нелинейную связь предикторами за счет функции связи $log()$.
 
+---
 
 ## GLM с отрицательным биномиальным распределением отклика
 
-GLM с отрицательным биномиальным распределением отклика учитывает гетерогенность дисперсии ($E(y_i) = \mu_i$, $var(y_i) = \mu_i + \frac{\mu_i^2}{k}$). Стандартные ошибки возрастают с увеличением предсказанного значения даже сильнее, чем это было у Пуассоновской модели.
+GLM с отрицательным биномиальным распределением отклика учитывает гетерогенность дисперсии ( $E(y_i) = \mu_i$, $var(y_i) = \mu_i + \frac{\mu_i^2}{k}$). Стандартные ошибки возрастают с увеличением предсказанного значения даже сильнее, чем это было у Пуассоновской модели.
 
 Этого оказалось вполне достаточно для моделирования данных (сверхдисперсии здесь нет).
 
 
-```{r echo=FALSE}
-ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
-  geom_ribbon(aes(ymin = lwr, 
-                  ymax = upr), 
-              alpha = 0.3) +
-  geom_line(aes(colour = Treatment)) + 
-  geom_hline(yintercept = 0) + ylab('Visits')
-```
-
-
-## Выводы
-
-Число визитов опылителей на цветки гадючьего лука зависит не от присутствия вида вселенца или его цветов, а от разнообразия флоры на данном участке (тест отношения правдоподобий, $p = 0.02$).
-
-При этом, чем больше цветов самого гадючьего лука, тем больше прилетает опылителей (тест отношения правдоподобий, $p = 0.01$).
-
-```{r echo=FALSE}
+```{r nb-predict-final, echo=FALSE}
 ggplot(NewData, aes(x = Flowers, y = fit_mu, fill = Treatment)) +
   geom_ribbon(aes(ymin = lwr, 
                   ymax = upr), 
               alpha = 0.3) +
   geom_line(aes(colour = Treatment)) + 
   geom_hline(yintercept = 0) + 
-  labs(y = 'Visits')
+  ylab('Visits')
 ```
 
 
+---
+
+## Выводы
+
+Число визитов опылителей на цветки мускари значимо зависит от разнообразия флоры на данном участке (тест отношения правдоподобий, $p = 0.02$).
+
+При этом, чем больше цветов самого мускари, тем больше прилетает опылителей (тест отношения правдоподобий, $p = 0.01$).
+
+Влияние присутствия вида-вселенца или его цветов не было выявлено.
+
+```{r nb-predict-final, echo=FALSE}
+```
+
+---
+
 ## Take-home messages
 
-Очень важно правильно формулировать модель для данных.
+- Важно формулировать модель с учетом распределения зависимой переменной.   При моделировании счетных данных используются:
+    + распределение Пуассона,
+    + отрицательное биномиальное распределение.
+    
+--
 
-Для моделирования счетных зависимых переменных применяются модели, основанные на распределении Пуассона или отрицательном биномиальном распределении.
+- В моделях для счетных данных не должно быть избыточности дисперсии. Она может возникать по многим причинам, поэтому нет единого рецепта борьбы с ней:
+    - В квази-пуассоновских GLM используются поправки для стандартных ошибок оценок коэффициентов модели.
+    - В моделях, основанных на отрицательном биномиальном распределении, специальный параметр этого распределения "описывает" сверхдисперсию.
 
-Одно из условий применимости этих моделей --- отсутствие избыточности дисперсии.
-
-Избыточность дисперсий может возникать в силу разных причин, поэтому единого рецепта борьбы с ней нет.
-
-Квази-пуассоновские модели решают проблему сверхдисперсии в Пуассоновской GLM внося поправки для стандартных ошибок оценок коэффициентов модели.
-
-Модели, основанные на отрицательном биномиальном распределении, учитывают избыточность дисперсии при помощи отдельного параметра.
+---
 
 ## Что почитать
 

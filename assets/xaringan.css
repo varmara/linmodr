@@ -4,7 +4,7 @@
 }
 
 .small {
-  font-size: 90%;
+  font-size: 80%;
 }
 
 .red { color: red; }
@@ -29,10 +29,10 @@ pre {
   background: #F5F5F5;
   display: block;
   font-family: monospace;
-  font-size: 20px;
+  font-size: 18px;
   white-space: pre;
-  margin: 0.5em 0px;
-  margin-top: 0.5em;
+  margin: 0.4em 0px;
+  margin-top: 0.4em;
   margin-right: 0px;
   margin-bottom: 0em;
   margin-left: 0px;
@@ -41,6 +41,6 @@ pre {
 .remark-code, .remark-inline-code {
   background: #F5F5F5;
   font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace;
-  line-height: 1.3em;
+  line-height: 1.2em;
   font-size: 90%;
                                   }
