@@ -40,9 +40,10 @@ head(pol)
 colSums(is.na(pol))
 
 # ## Есть ли выбросы?
-library(cowplot)
 library(ggplot2)
 theme_set(theme_bw())
+
+library(cowplot)
 
 dot_plot <- ggplot(pol, aes(y = 1:nrow(pol))) + geom_point()
 plot_grid(dot_plot + aes(x = DiversityD_1),
