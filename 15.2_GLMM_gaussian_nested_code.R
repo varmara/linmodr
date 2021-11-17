@@ -27,7 +27,9 @@
 # - **plotID** - уникальный идентификатор участка
 #
 # Данные:
-# Gennet, S., Spotswood, E., Hammond, M. and Bartolome, J.W., 2017. Livestock grazing supports native plants and songbirds in a California annual grassland. PloS one, 12(6), p.e0176367.
+# Gennet, S., Spotswood, E., Hammond, M. and Bartolome, J.W., 2017. Livestock
+# grazing supports native plants and songbirds in a California annual grassland.
+# PloS one, 12(6), p.e0176367.
 #
 # ## Открываем данные
 #
@@ -66,8 +68,7 @@ graz$nativecov_sq <- sqrt(graz$nativecov)
 # ## Модель
 
 library(lme4)
-ML1 <- lmer(height ~ graze_f*AspectCat + year_f + nativecov_sq + slope + (1|Park/plotID),
-          data = graz, REML = FALSE)
+ML1 <- lmer(height ~ graze_f*AspectCat + year_f + nativecov_sq + slope + (1|Park/plotID), data = graz, REML = FALSE)
 
 # ## Анализ остатков
 ML1_diag <- data.frame(
@@ -144,3 +145,4 @@ ggplot(data = NewData_REML1, aes(x = year_f, y = fit, colour = graze_f)) +
 # Оптимизируйте модель с предыдущего шага
 # Сделайте анализ остатков
 # Опишите и визуализируйте финальную модель
+
