@@ -51,6 +51,49 @@ M1_diagn <- fortify(M1)
 ggplot(M1_diagn, aes(x = .fitted, y = .stdresid)) + geom_point() + geom_hline(yintercept = 0)
 
 
+##########################################################################
+# Почему Нельзя доверять результатам если выявлена гетероскедастичность? #
+##########################################################################
+
+
+set.seed(568)  # this makes the example exactly reproducible
+
+N_trial <- 1000 # RКоличество повторных оценок значений параметров модели
+
+b1_val <- rep(NA, N_trial) #Создаем вектор "заготовок" для значений оценок коэффициента b1 в модели y ~ b0 +b1*x
+
+p_val <- rep(NA, N_trial) #Создаем вектор "заготовок" для значений p_values для оценок коэффициента b1 в модели y ~ b0 +b1*x
+
+pb = txtProgressBar(min = 0, max = N_trial, initial = 0) # а programming tricks - создает прогресс-бар
+
+for(i in 1:N_trial){
+  x      = rep(1:100,3) #Значения предиктора
+  b0      = 10 #Intercept
+  b1      = 0 #Slope
+  sigma2 = x^4 #Дисперсия связана с предиктором
+  eps    = rnorm(x,mean=0,sd=sqrt(sigma2)) #Задаем случайную часть модели
+  y      = b0+b1*x + eps #Задаем выборочные значения переменной отклика
+  mod    = lm(y ~ x) #Модель
+  b1_val[i] <- summary(mod)$coefficients[2,1] #Извлекаем оценки b1 из результатов
+  p_val[i] <- summary(mod)$coefficients[2,4] #Извлекаем p_values из результатов
+
+  setTxtProgressBar(pb,i) #Рисует прогресс-бар
+}
+
+
+mean(p_val < 0.05) #Доля статистически значимых результатов
+
+hist(b1_val) #Распределение оценок коэффициента b1
+
+
+############################################################
+
+
+
+
+
+
+
 library(nlme)
 M1_gls <- gls(mod_formula, data = fruitfly)
 
@@ -60,6 +103,9 @@ M1_gls <- gls(mod_formula, data = fruitfly)
 Pl_resid_M1_gls <- qplot(x = fitted(M1_gls), y = residuals(M1_gls, type = "pearson")) + geom_hline(yintercept = 0)
 
 Pl_resid_M1_gls
+
+
+# Моделирование структуры дисперсии
 
 
 ##  Фиксированная структура дисперсии: varFixed()
@@ -256,39 +302,6 @@ ggplot(MyData, aes(x = Time, y = Predicted,  color = Diet)) +
   geom_line( size = 1.5) +
   geom_point(data = bw, aes(x = Time, y = weight),
              position = position_jitter())
-
-
-
-
-
-
-
-
-
-############## Самостоятельная работа################
-
-# Вариант1
-# Пользуясь данными из встроенного датасета Spruce (пакет nlme) постройте модель роста деревьев взависимости от времени
-
-
-data("Spruce")
-
-head(Spruce)
-
-
-
-
-
-
-# Вариант2
-# Пользуясь данными из встроенного датасета RatPupWeight (пакет nlme) выясните зависит ли вес новорожденных крысят от пола и количества детенышей в помете.
-
-
-data(RatPupWeight)
-
-head(RatPupWeight)
-
-
 
 
 
