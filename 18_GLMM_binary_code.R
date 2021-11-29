@@ -195,15 +195,8 @@ model6_unscaled <- glmer(Out ~ L + Sp +
 library(partR2)
 data("Grasshoppers")
 
-library(lme4)
 
-Grasshoppers$OLRE <- 1:nrow(Grasshoppers)
-mod <- glmer(cbind(nGreen, nBrown) ~ Sex +
-               (1|SiteID) + (1|OLRE), data=Grasshoppers, family="binomial")
 
-summary(mod)
-
-overdisp(mod)
 
 
 ########### Самостоятельная работа  ###########################
