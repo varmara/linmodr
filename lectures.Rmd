@@ -266,7 +266,7 @@ install.packages(c("MASS", "glmmML", "lme4", "doBy"))
 install.packages("performance")
 ```
 
-<!-- - Презентация: [18_GLMM_binary.pdf](18_GLMM_binary.pdf) -->
+- Презентация: [18_GLMM_binary.pdf](18_GLMM_binary.pdf)
 
 - Код: [18_GLMM_binary_code.R](18_GLMM_binary_code.R)
 - Данные:
