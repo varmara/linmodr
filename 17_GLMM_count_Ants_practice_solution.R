@@ -44,7 +44,6 @@ library(car)
 library(dplyr)
 library(tidyr)
 library(lme4)
-library(sjstats)
 
 stand <- function(x) {
   (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
