@@ -1,20 +1,30 @@
 ---
 title: Ресурсы по R и статистике
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: simplex
+    highlight: haddock
+    include:
+      after_body: _footer.html
+    css: my_styles.css
 ---
 
 ## R --- базовые знания
 
-- [Cheat-sheet по RStudio](https://www.rstudio.com/wp-content/uploads/2016/01/rstudio-IDE-cheatsheet.pdf) от [RStudio](https://www.rstudio.com)
-- Очень краткая шпаргалка по R [Cheat-sheet по базовому R](http://www.rstudio.com/wp-content/uploads/2016/06/r-cheat-sheet.pdf) от [Mhairi McNeill](http://mhairihmcneill.com/)
+- [Cheat-sheet по RStudio](https://raw.githubusercontent.com/rstudio/cheatsheets/main/rstudio-ide.pdf) от [RStudio](https://www.rstudio.com)
+- Очень краткая шпаргалка по R [Cheat-sheet по базовому R](http://github.com/rstudio/cheatsheets/blob/main/base-r.pdf) от [Mhairi McNeill](http://mhairihmcneill.com/)
 - Более подробная шпаргалка [R reference card](https://cran.r-project.org/doc/contrib/Short-refcard.pdf) от Tom Short
-- [Data import cheat-sheet](https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/data-import-cheatsheet.pdf)
+- [Data import cheat-sheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf)
 
 
 ## R-графика
 
 - [Cookbook for R](http://www.cookbook-r.com/) --- сайт [книги Winston Chang](http://www.amazon.com/gp/product/0596809158/ref=as_li_tf_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0596809158&linkCode=as2&tag=cooforr09-20)
 - [Руководство по ggplot2](http://ggplot2.tidyverse.org/reference/)
-- [Cheat-sheet по ggplot2](https://github.com/rstudio/cheatsheets/raw/master/old/pdfs/ggplot2-cheatsheet-2.1.pdf)
+- [Cheat-sheet по ggplot2](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-visualization.pdf)
  от [RStudio](https://www.rstudio.com)
 - [ggplot2 Quick Reference: colour and fill](http://sape.inf.usi.ch/quick-reference/ggplot2/colour)
 - [ggplot2 Quick reference: shape](http://sape.inf.usi.ch/quick-reference/ggplot2/shape)

@@ -12,6 +12,7 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       titleSlideClass: [top, center, inverse]
+      beforeInit: "assets/macros.js"
     includes:
       in_header: "assets/xaringan_in_header.html"
       after_body: "assets/xaringan_after_body.html"

@@ -782,15 +782,28 @@ SlideDeck.prototype.loadAnalytics_ = function() {
 };
 
 
-// Polyfill missing APIs (if we need to), then create the slide deck.
-// iOS < 5 needs classList, dataset, and window.matchMedia. Modernizr contains
-// the last one.
-(function() {
+var loadDeck = function(event) {
+  // Polyfill missing APIs (if we need to), then create the slide deck.
+  // iOS < 5 needs classList, dataset, and window.matchMedia. Modernizr contains
+  // the last one.
   Modernizr.load({
-    test: !!document.body.classList && !!document.body.dataset,
-    nope: ['js/polyfills/classList.min.js', 'js/polyfills/dataset.min.js'],
     complete: function() {
       window.slidedeck = new SlideDeck();
     }
   });
-})();
+};
+
+if (document.readyState !== "loading" &&
+    document.querySelector('slides') === null) { 
+  // if the document is done loading but our element hasn't yet appeared, defer
+  // loading of the deck
+  window.setTimeout(function() {
+    loadDeck(null);
+  }, 0);
+} else {
+  // still loading the DOM, so wait until it's finished
+  document.addEventListener("DOMContentLoaded", loadDeck);
+}
+
+
+

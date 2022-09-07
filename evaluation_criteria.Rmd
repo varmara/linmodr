@@ -1,5 +1,15 @@
 ---
 title: Критерии оценки домашних заданий
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: simplex
+    highlight: haddock
+    include:
+      after_body: _footer.html
+    css: my_styles.css
 ---
 
 [Пример решения домашнего задания](example-report.zip)

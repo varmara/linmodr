@@ -13,8 +13,8 @@
 
 <title>Линейные модели, дисперсионный и регрессионный анализ с использованием R</title>
 
-<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/simplex.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -48,6 +48,7 @@
 
 
 
+
 <link rel="stylesheet" href="my_styles.css" type="text/css" />
 
 
@@ -72,6 +73,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -129,11 +133,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -332,38 +340,58 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Линейные модели, дисперсионный и регрессионный анализ с использованием R</h1>
+<h1 class="title toc-ignore">Линейные модели, дисперсионный и
+регрессионный анализ с использованием R</h1>
 
 </div>
 
 
 <div id="о-курсе" class="section level2">
 <h2>О курсе</h2>
-<div id="цель-и-задачи-курса" class="section level3">
-<h3>Цель и задачи курса</h3>
-<p>Курс знакомит с применением различных вариантов линейных моделей в биологии (регрессионный анализ, анализ ковариаций, дисперсионный анализ, логистическая регрессия, смешанные линейные модели). В итоге, вы сможете критически оценивать корректность применения методов статистики в научных статьях, самостоятельно анализировать данные с использованием скриптов на языке статистического программирования R, представлять в наглядном виде результаты анализов, интерпретировать их и представлять в виде научного отчета.</p>
+<div id="цель-и-задачи" class="section level3">
+<h3>Цель и задачи</h3>
+<p>Курс знакомит с применением различных вариантов линейных моделей в
+биологии (регрессионный анализ, анализ ковариаций, дисперсионный анализ,
+логистическая регрессия, смешанные линейные модели). В итоге, вы сможете
+критически оценивать корректность применения методов статистики в
+научных статьях, самостоятельно анализировать данные с использованием
+скриптов на языке статистического программирования R, представлять в
+наглядном виде результаты анализов, интерпретировать их и представлять в
+виде научного отчета.</p>
 </div>
 <div id="расписание-и-контакты" class="section level3">
 <h3>Расписание и контакты</h3>
-<p>Осенью 2021г. курс проходит очно.</p>
-<!-- - 1 часть на Coursera по приглашению - приватная версия курса __"Знакомство с R и базовая статистика"__, с 10.09 по 11.10. -->
-<!-- - 2 часть онлайн (в Zoom) c 12 октября 1--2 парой в понедельник и четверг.  -->
-<p>Тесты будут на Stepik в курсе <strong>Linmodr (2021)</strong>.</p>
+<p>Осенью 2022г. курс проходит очно.</p>
 <p>Инструкторы:</p>
 <ul>
-<li>Варфоломеева Марина Александровна — marina.nikolaeva[]gmail.com, <code>varmara</code> в Телеграм</li>
-<li>Хайтов Вадим Михайлович — polydora[]rambler.ru, <code>polydora</code> в Телеграм</li>
+<li>Варфоломеева Марина Александровна — marina.nikolaeva[]gmail.com,
+<code>varmara</code> в Телеграм</li>
+<li>Хайтов Вадим Михайлович — polydora[]rambler.ru,
+<code>polydora</code> в Телеграм</li>
 </ul>
 </div>
 <div id="задания-дедлайны-и-оценки" class="section level3">
 <h3>Задания, дедлайны и оценки</h3>
 <ol style="list-style-type: decimal">
-<li><p>Тесты по каждой теме (166 баллов) будут размещены на платформе Stepik в курсе <strong>Linmodr (2021)</strong>. Первые несколько модулей дублируют темы в курсе на Coursera — сделайте эти задания тоже.</p></li>
-<li><p>В конце курса будет финальный тест (160 баллов) на Stepik.</p></li>
+<li><p>Тесты по каждой теме (166 баллов) будут размещены на платформе
+Stepik в курсе <strong>Linmodr (2022)</strong>. Первые несколько модулей
+на Stepik дублируют темы в курсе <a
+href="https://openedu.ru/course/spbu/STATIK/?session=summer_2022">“Знакомство
+с R и базовая статистика” на openedu.ru</a> — материалы оттуда можно
+использовать для повторения.</p></li>
+<li><p>В конце курса будет финальный тест (160 баллов) на
+Stepik.</p></li>
 </ol>
-<p>На всякий случай у нас есть модуль с пересдачей (160 баллов). Он тоже включен в курс на Stepik, но его баллы не нужно учитывать при расчете итоговой оценки. Таким образом, 326 баллов на Stepik будем считать за 100%.</p>
-<p>Итоговая оценка будет выставлена по результатам <strong>Linmodr (2021) на Stepik</strong>. Проценты будут пересчитаны в баллы по ECTS: 50–60% — E, 61–69% — D, 70–79% — C, 80–89% — B, и наконец 90–100% — это A по ECTS.</p>
-<p><strong>NB</strong>: Возможно, точное общее количество баллов будет скорректировано, если вдруг мы добавим несколько заданий.</p>
+<p>На всякий случай у нас есть модуль с пересдачей (160 баллов). Он тоже
+включен в курс на Stepik, но его баллы не нужно учитывать при расчете
+итоговой оценки. Таким образом, 326 баллов на Stepik будем считать за
+100%.</p>
+<p>Итоговая оценка будет выставлена по результатам <strong>Linmodr
+(2022) на Stepik</strong>. Проценты будут пересчитаны в баллы по ECTS:
+50–60% — E, 61–69% — D, 70–79% — C, 80–89% — B, и наконец 90–100% — это
+A по ECTS.</p>
+<p><strong>NB</strong>: Возможно, точное общее количество баллов будет
+скорректировано, если вдруг мы добавим несколько заданий.</p>
 </div>
 </div>
 

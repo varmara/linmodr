@@ -1,5 +1,15 @@
 ---
 title: Дополнительные темы
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: simplex
+    highlight: haddock
+    include:
+      after_body: _footer.html
+    css: my_styles.css
 ---
 
 ## Анализ мощности (на примере t-критерия)
