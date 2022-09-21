@@ -17,7 +17,7 @@ output:
 ### 01 Знакомство с R
 
 <!-- - Презентация: [Знакомство с R](01_intro_to_r.html) -->
-<!-- - Код: [01_intro_to_r_code.R](01_intro_to_r_code.R) -->
+- Код: [01_intro_to_r_code.R](01_intro_to_r_code.R)
 
 ### 02 Основы ggplot2
 
