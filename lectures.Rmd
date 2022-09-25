@@ -29,9 +29,12 @@ install.packages("MASS")
 ```
 
 <!-- - Презентация: [Основы ggplot2](02_intro_ggplot.html) -->
-<!-- - Код: [02_intro_ggplot.R](02_intro_ggplot.R) -->
-<!-- - Данные: [Titanic.csv](data/Titanic.csv) -->
-<!-- - Данные: [fev.xls](data/fev.xls) -->
+- Код: [02_intro_ggplot.R](02_intro_ggplot.R)
+- Данные: [Titanic.csv](data/Titanic.csv)
+- Данные: [fev.xls](data/fev.xls)
+- Тренировка: [02_intro_ggplot_training.html](02_intro_ggplot_training.html)
+
+
 
 ### 03 Описательная статистика
 

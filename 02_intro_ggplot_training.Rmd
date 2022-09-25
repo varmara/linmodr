@@ -1,0 +1,84 @@
+---
+title: "Задания для самостоятельной работы с пакетом ggplot2"
+author: ""
+subtitle: ""
+output: html_document
+---
+
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, echo =FALSE, message = FALSE)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+<br> <br> <br>
+
+## Задание 1
+
+::: columns
+::: {.column width="40%"}
+Нарисуйте график, соответствующий следующей функции
+
+$$
+y = 2 \cdot x^2 + 4 \cdot x + 50
+$$
+:::
+
+::: {.column width="60%"}
+```{r}
+df <- data.frame(x = c(-10:10, seq(0, 1, 0.001)))
+
+df <- df %>% mutate(y = 2*x^2 + 4*x + 50) %>% mutate(Marker = ifelse(x<=0, "negative", "positive"))
+
+ggplot(df, aes(x = x, y = y)) + 
+  geom_line(aes(color = Marker, linetype = Marker), size = 2) + 
+  ylim(0, max(df$y)) + 
+  scale_color_manual(values = c("blue", "red")) +
+  theme_bw() +
+  guides(color="none", linetype = "none")
+  
+
+
+
+```
+:::
+:::
+
+<br> <br>
+
+## Задание 2
+
+::: columns
+::: {.column width="40%"}
+Выполните следующий код, который симулирует выборку из генеральной совокупности с двумерным нормальным распределением
+
+```{r, echo=TRUE}
+set.seed(12345)
+
+df <- data.frame(X = rnorm(1000, 1, 5), Y = rnorm(1000, 2, 5)) 
+
+```
+
+Визуализируйте двумерное нормальное распределение
+:::
+
+::: {.column width="60%"}
+```{r}
+ggplot(df, aes(X, Y))  + 
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon") + 
+  geom_point(size = 0.1) +
+  scale_fill_gradient(low = "yellow", high = "red") +
+  theme_bw() +
+  xlim(-20, max(df$X)) + 
+  theme(legend.position = c(0.1, 0.7))
+
+```
+:::
+:::
