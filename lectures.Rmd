@@ -28,7 +28,7 @@ install.packages("tidyr")
 install.packages("MASS")
 ```
 
-<!-- - Презентация: [Основы ggplot2](02_intro_ggplot.html) -->
+- Презентация: [Основы ggplot2](02_intro_ggplot.html)
 - Код: [02_intro_ggplot.R](02_intro_ggplot.R)
 - Данные: [Titanic.csv](data/Titanic.csv)
 - Данные: [fev.xls](data/fev.xls)
