@@ -1,29 +1,52 @@
 ---
 title: "Тестирование статистических гипотез"
+subtitle: "Линейные модели..."
 author: "Марина Варфоломеева, Юта Тамберг, Вадим Хайтов"
-subtitle: ""
+date: "Осень `r format(Sys.Date(), '%Y')`"
 output:
-  ioslides_presentation:
-    css: assets/my_styles.css
-    widescreen: yes
+  xaringan::moon_reader:
+    self_contained: true
+    lib_dir: libs
+    css: [ninjutsu, "assets/xaringan-themer.css", "assets/xaringan.css"]
+    df_print: default
+    nature:
+      highlightStyle: googlecode
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: [middle, left, inverse]
+      beforeInit: "assets/macros.js"
+    includes:
+      in_header: "assets/xaringan_in_header.html"
+      after_body: "assets/xaringan_after_body.html"
 ---
 
-```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 70)
-library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, message = FALSE)
-library(scales)
-library(grid)
-ar <- arrow(type = 'closed', length = unit(0.15,'cm'))
-arb <- arrow(type = 'closed', length = unit(0.15,'cm'), ends = 'both')
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE, fig.showtext = TRUE}
+source("assets/xaringan_setup.R")
+library(xaringanExtra)
+use_tile_view()
+use_scribble()
+use_search(show_icon = FALSE)
+use_progress_bar(color = "#6d2b5e", location = "bottom", height = "10px")
+use_freezeframe()
+# use_webcam()
+# use_panelset()
+# use_extra_styles(hover_code_line = TRUE)
+
+# http://tachyons.io/docs/
+# https://roperzh.github.io/tachyons-cheatsheet/
+use_tachyons()
 ```
 
 ```{r libs-funs, include = FALSE, cache = FALSE, purl = FALSE}
-library(cowplot)
-library(ggplot2)
-library(gridExtra)
+library("tidyverse")
+library("cowplot")
+library("ggplot2")
+theme_set(theme_bw(base_size = 20))
+library("scales")
+library("grid")
+ar <- arrow(type = 'closed', length = unit(0.15,'cm'))
+arb <- arrow(type = 'closed', length = unit(0.15,'cm'), ends = 'both')
+
 dt_limit <- function(x, alph = 0.05, df = 18, sides = 2, ncp = 0, what = "alpha") {
   #' Function to generate data for plotting with ggplot
   #' (non)central t distribution
@@ -89,10 +112,17 @@ dnorm_limit <- function(x, alph = 0.05, mu = 0, sig = 1, sides = 2, what = "alph
 - Применение t-теста
 - Статистическая значимость
 
+---
+
+class: middle, center, inverse
 
 # Выборочная оценка среднего
 
-<!-- Что мы можем сказать о среднем значении в генеральной совокупности, если у нас есть всего одна выборка? Центральная предельная теорема говорит, что если мы возьмем достаточно большую выборку из генеральной совокупности, то среднее значение будет нормально распределено. Особенно важно, что это правда даже если признак в совокупности имеет другое распределение. Повторные выборки. Зависимость точности оценки от объема выборки. Ошибка среднего SE (это иллюстрация теоремы центрального предела) -->
+???
+
+Что мы можем сказать о среднем значении в генеральной совокупности, если у нас есть всего одна выборка? Центральная предельная теорема говорит, что если мы возьмем достаточно большую выборку из генеральной совокупности, то среднее значение будет нормально распределено. Особенно важно, что это правда даже если признак в совокупности имеет другое распределение. Повторные выборки. Зависимость точности оценки от объема выборки. Ошибка среднего SE (это иллюстрация теоремы центрального предела).
+
+---
 
 ## Как можно судить о свойствах генеральной совокупности по выборке?
 
@@ -104,54 +134,53 @@ $$\bar X \sim N (\mu_{\bar x}, \sigma_{\bar x})$$
 
 <br/>
 
-Но самое важное, что при больших объемах выборки ($N > 30$, или даже $N > 100$) это так, даже если $x$ в генеральной совокупности не подчиняется нормальному распределению.
+__Важно__: это так при больших объемах выборки ( $N > 30$, или даже $N > 100$), даже если $x$ в генеральной совокупности не подчиняется нормальному распределению.
 
-<br/><br/>
+<br/>
 
 Давайте проверим на опыте, так ли это.
 
+---
 
 ## Цена алмазов
 
-Представим, что данные об алмазах из датасета `diamonds` (пакет `gplot2`) --- это генеральная совокупность.
+Представим, что данные об алмазах из датасета `diamonds` (пакет `gplot2`) — это генеральная совокупность.
 
 Перед вами распределение цены алмазов. Давайте будем брать из этого распределения выборки и оценивать по ним среднее значение.
 
-<div class="columns-2">
+.pull-left[
 
-```{r echo=FALSE, purl=FALSE, fig.width=5}
-library(ggplot2)
+```{r echo=FALSE, purl=FALSE}
 data("diamonds")
 
 X <- na.omit(diamonds$price)
 sig <- sd(X)
 mu <- mean(X)
 
-lab <- paste('bar(x) ==', format(mu, nsmall = 0, digits = 0), '~~~sd ==', format(sig, nsmall = 0, digits = 0))
+lab <- paste('bar(x) ==', format(mu, nsmall = 0, digits = 1), '~~~sd ==', format(sig, nsmall = 0, digits = 1))
 
 gg_population <- ggplot(data = data.frame(x = X), aes(x = x)) + 
   geom_histogram(fill = 'lightskyblue1', colour = 'black') + 
   geom_vline(xintercept = mu, colour = 'red', size = 2) +
   annotate('text', x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, 
-             label = lab, parse = T, size = 3.5) +
-  labs(x = 'price')
+             label = lab, parse = T, size = 5) +
+  labs(x = 'price', y = "count")
 gg_population
 ```
 
-![](images/Diamond-age-bySteve-Jurvetson-on-Flickr.jpg)
+]
+.pull-right[
+![:scale 75%](images/Diamond-age-bySteve-Jurvetson-on-Flickr.jpg)
 
-<small>Diamond Age by Steve Jurvetson on Flickr</small>
-<!-- https://flic.kr/p/eRNcR -->
+.tiny[Diamond Age by Steve Jurvetson on Flickr
+<!-- https://flic.kr/p/eRNcR -->]
+]
 
-<br/>
+---
 
-</div>
+.pull-left[
 
-## Средние в выборках
-
-<div class="columns-2">
-
-```{r gg-sample, echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=5.5}
+```{r gg-sample, echo=FALSE, purl=FALSE, fig.height = 10}
 set.seed(83314197)
 gg_sample_hist <- function(x, size) {
   id <- sample(x = length(x), size = size)
@@ -162,10 +191,10 @@ gg_sample_hist <- function(x, size) {
     geom_vline(xintercept = my_mean, colour = 'yellow3', size = 2) + 
     annotate('text', x = Inf, y = Inf, hjust = 3.1, vjust = 1.5, 
              label = paste('n ==', size), 
-             parse = T, size = 3.5) +
+             parse = T, size = 5) +
         annotate('text', x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, 
              label = paste('bar(x) ==', format(my_mean, nsmall = 2, digits = 2)), 
-             parse = T, size = 3.5)
+             parse = T, size = 5) + labs(y = "count")
 }
 
 gg_void <- ggplot() + theme_void()
@@ -178,9 +207,13 @@ plot_grid(gg_population + coord_cartesian(xlim = c(-1, max(X))) + theme(axis.tit
           gg_sample_hist(X, n) + coord_cartesian(xlim = c(-1, max(X))) + theme(axis.title.x = element_blank()), 
           gg_sample_hist(X, n) + coord_cartesian(xlim = c(-1, max(X))) + theme(axis.title.x = element_blank()), 
           gg_sample_hist(X, n) + coord_cartesian(xlim = c(-1, max(X))) + labs(x = 'price'), 
-          ncol = 1, align = 'v')
+          ncol = 1, align = 'v', rel_heights = c(1, 1, 1, 1, 1, 1.2))
 ```
 
+]
+.pull-right[
+
+## Средние в выборках
 
 Средние в выборках отличаются от среднего в генеральной совокупности.
 
@@ -188,15 +221,16 @@ plot_grid(gg_population + coord_cartesian(xlim = c(-1, max(X))) + theme(axis.tit
 
 <br/>
 
-Давайте посмотрим, как меняется форма распределения выборочных средних при изменении объема выборки.
+Как изменится форма распределения выборочных средних при изменении объема выборки?
+]
 
-</div>
+---
 
-## Распределение выборочных средних
 
-<div class="columns-2">
 
-```{r gg-many-sampling-distr, echo=FALSE, purl=FALSE, fig.width=5, fig.height=5.5}
+.pull-left[
+
+```{r gg-many-sampling-distr, echo=FALSE, purl=FALSE, fig.height=10}
 # Функция, которая берет выборку объемом sample_size из вектора x и возвращает ее среднее значение
 sample_mean <- function(x, size){
   id <- sample(x = length(x), size)
@@ -215,10 +249,11 @@ gg_sample_means <- function(x, n_samples, size){
     geom_vline(xintercept = mean_of_means, colour = 'gold1', size = 1.5) + 
     annotate('text', x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, 
              label = paste('n ==', size), 
-             parse = T, size = 3.5) +
+             parse = T, size = 5) +
         annotate('text', x = Inf, y = Inf, hjust = 1.1, vjust = 1.5, 
              label = paste('bar(x) ==', format(mean_of_means, nsmall = 2, digits = 2), '~~~sd ==', format(sd_of_means, nsmall = 2, digits = 2)), 
-             parse = T, size = 3.5)
+             parse = T, size = 5) +
+    labs(y = "count")
 }
 n_samples <- 500
 plot_grid(gg_population + coord_cartesian(xlim = c(0, 20000)), 
@@ -230,29 +265,38 @@ plot_grid(gg_population + coord_cartesian(xlim = c(0, 20000)),
             coord_cartesian(xlim = c(0, 20000)) + theme(axis.title.x = element_blank()), 
           gg_sample_means(x = X, n_samples = n_samples, size = 30) + 
             coord_cartesian(xlim = c(0, 20000)) + labs(x = 'sample mean'), 
-          ncol = 1, align = 'v')
+          ncol = 1, align = 'v', rel_heights = c(1, 1, 1, 1, 1.2))
 ```
 
+
+]
+.pull-right[
+
+## Распределение выборочных средних
 
 $$\bar X \sim N (\mu_{\bar x}, \sigma_{\bar x})$$
 
-$\mu_{\bar x} = \mu$ --- среднее значение выборочных средних стремится к среднему в генеральной совокупности.
+$\mu_{\bar x} = \mu$ — среднее значение выборочных средних стремится к среднему в генеральной совокупности.
 
-$\sigma_{\bar x} =  \sigma / \sqrt{n}$ --- стандартное отклонение в $\sqrt{n}$ раз меньше стандартного отклонения в генеральной совокупности.
+$\sigma_{\bar x} =  \sigma / \sqrt{n}$ — стандартное отклонение в $\sqrt{n}$ раз меньше стандартного отклонения в генеральной совокупности.
 
 $\sigma_{\bar x}$ называют стандартной ошибкой среднего и обозначают $SE _{\bar{x}}$.
 
-</div>
 
+]
+
+---
 
 ## Центральная предельная теорема очень важна в статистике
 
-<div class="columns-2">
+.pull-left[
 
-```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=3.38}
+```{r echo=FALSE, purl=FALSE}
 gg_sample_means(x = X, n_samples = n_samples, size = 100) + labs(x = 'sample means')
 ```
 
+]
+.pull-right[
 
 $$\bar X \sim N (\mu, \sigma / \sqrt{n})$$
 
@@ -261,26 +305,36 @@ $$\bar X \sim N (\mu, \sigma / \sqrt{n})$$
 - строить доверительные интервалы
 - тестировать гипотезы
 
-</div>
+]
+
+---
+
+class: middle, center, inverse
 
 # Доверительный интервал
 
-## Если выполняется центральная предельная теорема, то
+---
 
-<div class="columns-2">
+## Если выполняется центральная предельная теорема... <br/><br/>
 
-```{r echo=FALSE, purl=FALSE, fig.width=5, fig.height=3.38}
+.pull-left-60[
+
+```{r echo=FALSE, purl=FALSE, opts.label='fig.wider.taller'}
 labs_x <- c(expression(-3*sigma / sqrt(n)), expression(-2*sigma / sqrt(n)), expression(-sigma / sqrt(n)), expression(bar(x)), expression(sigma / sqrt(n)), expression(2*sigma / sqrt(n)), expression(3*sigma / sqrt(n)))
 
 gg_conf_0 <- ggplot(data = data.frame(z = -4:4), aes(x = z)) +
   stat_function(fun = dnorm, colour = 'steelblue', size = 1) + 
-  scale_x_continuous(breaks = -3:3, sec.axis = sec_axis(~., breaks = -3:3, labels = labs_x, name = 'Выборочное распределение средних')) +
+  scale_x_continuous(breaks = -3:3, sec.axis = sec_axis(~., breaks = -3:3, labels = labs_x, name = 'Распределение\nвыборочных средних')) +
   scale_y_continuous('Плотность вероятности') +
   coord_cartesian(ylim = c(0, 0.47), xlim = c(-3.6, 3.6))
 
 gg_conf_0
 ```
 
+]
+.pull-right-40[
+
+Было 
 
 $$\bar X \sim N(\mu, \sigma/ \sqrt{n})$$
 
@@ -288,26 +342,29 @@ $$\bar X \sim N(\mu, \sigma/ \sqrt{n})$$
 
 $$\frac{\bar X - \mu}{\sigma / \sqrt{n}} \sim N(0, 1)$$
 
-Стандартизованное распределение выборочных средних будет подчинятся стандартному нормальному распределению.
+Стандартизованное распределение выборочных средних — это стандартное нормальное распределение.
 
-</div>
+]
 
+---
 
-##  Доверительный интервал из нормального распределения
+##  Доверительный интервал <br/>из нормального распределения
 
-<div class="columns-2">
-
-```{r echo=FALSE, purl=FALSE, fig.width=5, fig.height=3.38}
+.pull-left-60[
+```{r echo=FALSE, purl=FALSE, opts.label='fig.wider.taller'}
 gg_conf_1 <- gg_conf_0 +
   stat_function(geom = 'area', fun = dnorm, xlim = c(-1.96, 1.96),
                 fill = 'steelblue', alpha = 0.5) +
   annotate('text', label = 'P == 0.95', parse = T,
-           x = 0, y = 0.1) +
-  annotate('text', label = '0.025', parse = T, size = 3,
+           x = 0, y = 0.1, size = 5) +
+  annotate('text', label = '0.025', parse = T, size = 5,
            x = c(-2.2, 2.2), y = 0.01)
 gg_conf_1
 ```
 
+
+]
+.pull-right-40[
 
 --- это интервал, в который попадает заданный процент выборочных средних.
 
@@ -317,21 +374,25 @@ gg_conf_1
 
 Как найти этот интервал?
 
-</div>
+]
 
-##  Доверительный интервал из нормального распределения
+---
 
-<div class="columns-2">
+##  Доверительный интервал <br/>из нормального распределения
 
-```{r echo=FALSE, purl=FALSE, fig.width=5, fig.height=3.38}
+.pull-left-60[
+
+```{r echo=FALSE, purl=FALSE, opts.label='fig.wider.taller'}
 gg_conf_2 <- gg_conf_1 + 
   geom_vline(xintercept = c(-1.96, 1.96), linetype = 'dashed') +
   annotate(geom = 'text', label = c('-z[0.05]==-1.96', 'z[0.05]==1.96'), hjust = c(1.03, -0.03),
-           x = c(-1.96, 1.96), y = 0.1, parse = TRUE)
+           x = c(-1.96, 1.96), y = 0.1, parse = TRUE, size = 5)
 
 gg_conf_2
 ```
 
+]
+.pull-right-40[
 
 $$\bar {x} \pm z_{\alpha} \cdot \sigma / \sqrt{n}$$
 
@@ -346,7 +407,9 @@ $z_{0.05} = 1.96$
 
 95% выборочных средних в повторных выборках будут лежать в пределах $\pm 1.96$ стандартных ошибок вокруг среднего значения.
 
-</div>
+]
+
+---
 
 ## Условия применимости нормального распределения для доверительного интервала
 
@@ -357,6 +420,8 @@ $z_{0.05} = 1.96$
 - Наблюдения в выборке должны быть независимы друг от друга.
 
 - Большой объем выборки **или** нормальное распределение $x$
+
+---
 
 ## Если $\pmb \sigma$ не известна
 
@@ -371,48 +436,50 @@ $$\frac{\bar X - \mu}{SE_{\bar x}} = \frac{\bar X - \mu}{s / \sqrt{n}} \sim t_{d
 
 стандартизованное распределение выборочных средних подчиняется $t$-распределению с числом степеней свободы $df = n - 1$
 
+---
 
-## $t$-распределение
+## _t_-распределение
 
-<div class="columns-2">
+.pull-left-55[
 
-
-```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=2.62}
+```{r echo=FALSE, purl=FALSE, opts.label='fig.wider.taller'}
 ggplot(data = data.frame(t = -4 : 4), aes(x = t)) +
   stat_function(aes(color = 't, df = 3', linetype = 't, df = 3'), 
-                fun = dt, args = list(df = 3), size = 1) +
+                fun = dt, args = list(df = 3), size = 1.5) +
   stat_function(aes(color = 't, df = 10', linetype = 't, df = 10'), 
-                fun = dt, args = list(df = 10), size = 1) +
-  stat_function(aes(color = 'Z', linetype = 'Z'), 
+                fun = dt, args = list(df = 10), size = 1.5) +
+  stat_function(aes(color = 'Z', linetype = 'Z'), size = 1.5,
                 fun = dnorm) +
   scale_color_manual(
     'Распределение',
-    values = c('t, df = 3' = 'red' , 
-               'Z' = 'steelblue', 
-               't, df = 10' = 'orange')) + 
+    values = c('Z' = 'steelblue', 
+               't, df = 10' = 'orange',
+               't, df = 3' = 'red')) + 
   scale_linetype_manual(
     'Распределение', 
-    values = c('t, df = 3' = 1, 'Z' = 2, 't, df = 10' = 1)) + 
+    values = c('Z' = 2, 't, df = 10' = 1, 't, df = 3' = 1)) + 
   labs(y = 'Плотность вероятности') +
   theme(legend.position = c(0.8, 0.75), 
         legend.box.background = element_blank(),
         legend.background = element_blank())
 ```
 
+]
+.pull-right-45[
 
 - Симметричное колоколообразное распределение с толстыми хвостами. 
-- Единственный параметр --- число степеней свободы (для доверительного интервала $df = n - 1$).
+- Единственный параметр — число степеней свободы (для доверительного интервала $df = n - 1$).
 - При увеличении объема выборки $t$-распределение приближается к нормальному.
 
+]
 
-</div>
+---
 
+## Доверительный интервал из _t_-распределения
 
-## Доверительный интервал из $t$-распределения
+.pull-left-55[
 
-<div class="columns-2">
-
-```{r echo=FALSE, purl=FALSE, fig.width=5.25, fig.height=3.38}
+```{r echo=FALSE, purl=FALSE, opts.label='fig.wider.taller'}
 n <- 10
 lims <- qt(p = c(0.025, 0.975), df = n - 1)
 labs <- format(lims, digits = 2, nsmall = 2)
@@ -427,17 +494,20 @@ gg_conf_1 <- gg_conf_0 +
   stat_function(geom = 'area', fun = dt, args = list(df = n - 1), xlim = lims,
                 fill = 'red', alpha = 0.5) +
   annotate('text', label = 'P == 0.95', parse = T,
-           x = 0, y = 0.1) +
-  annotate('text', label = '0.025', parse = T, size = 3,
+           x = 0, y = 0.1, size = 5) +
+  annotate('text', label = '0.025', parse = T, size = 5,
            x = lims, y = 0.01, hjust = c(1.03, -0.03))
 gg_conf_2 <- gg_conf_1 +
   geom_vline(xintercept = lims, linetype = 'dashed') +
   annotate(geom = 'text', label = c(paste('-t[0.05, 9]==', labs[1]), paste('t[0.05, 0]==', labs[2])), hjust = c(1.03, -0.03),
-           x = lims, y = 0.1, parse = TRUE)
+           x = lims, y = 0.1, parse = TRUE, size = 5)
 gg_conf_2 +
   annotate('path', x = lims, y = rep(0.42, 2), arrow = arb) +
-  annotate('text', label = paste('Для~n==10~~~~~~~bar(x)%+-%', labs[2], '*~sigma / sqrt(n)'), vjust = -0.5, x = 0, y = 0.42, parse = TRUE)
+  annotate('text', label = paste('Для~n==10~~~~~~~bar(x)%+-%', labs[2], '*~sigma / sqrt(n)'), vjust = -0.5, x = 0, y = 0.42, parse = TRUE, size = 5)
 ```
+
+]
+.pull-right-45[
 
 Обязательно используется, если:
 
@@ -448,7 +518,8 @@ $$\bar {x} \pm t_{\alpha, df} \cdot s / \sqrt{n}$$
 
 $df = n - 1$
 
-</div>
+<br/><br/><br/><br/><br/><br/>
+]
 
 Условия применимости
 
@@ -457,13 +528,13 @@ $df = n - 1$
 - Наблюдения в выборке независимы друг от друга.
 - Большой объем выборки и нет "выбросов" **или** нормальное распределение $x$
 
+---
 
-## Смысл 95% доверительного интервала.
+## Смысл 95% доверительного интервала
 
-<div class="columns-2">
+.pull-left[
 
-
-```{r gg-many-lims, echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=5.5}
+```{r gg-many-lims, echo=FALSE, purl=FALSE, opts.label='fig.medium.tall'}
 library(dplyr)
 set.seed(14934)
 # Генеральная совокупность для симуляции
@@ -500,18 +571,22 @@ gg_many_lims <- ggplot(data = dfr_means) +
 gg_many_lims
 ```
 
-Среднее в генеральной совокупности --- это фиксированная величина (она либо попала в интервал, либо нет.
+]
+.pull-right[
 
-Доверительный интервал --- случайная величина.
+Среднее в генеральной совокупности — это фиксированная величина (она либо попала в интервал, либо нет.
+
+Доверительный интервал — случайная величина.
 
 В повторных выборках такого же размера $\approx 95\%$ всех доверительных интервалов "накроют" истинное среднее значение.
 
-</div>
+]
 
+---
 
 ## Расчет и изображение доверительного интервала в R
 
-```{r}
+```{r echo=TRUE, eval=-1}
 library(ggplot2)
 data("diamonds")
 
@@ -523,6 +598,7 @@ good <- diamonds$price[diamonds$cut == "Good"]
 SE <- sd(good)/ sqrt(.n)             # стандартная ошибка
 t_crit <- qt(p = 0.975, df = .n - 1) # критич. зн. t для данного n и p = 0.95
 err <- t_crit * SE                   # предел погрешности
+err
 # Границы доверительного интервала
 .mean - err
 .mean + err
@@ -531,65 +607,106 @@ err <- t_crit * SE                   # предел погрешности
 Можем записать среднюю цену бриллиантов хорошей огранки и ее доверительный интервал:
 $`r round(.mean, 1)` \pm `r round(err, 1)`$ 
 
+---
 
 ## Строим доверительные интервалы в ggplot
 
-```{r}
+```{r echo=TRUE, eval=-1, opts.label='fig.wider'}
 theme_set(theme_bw())
 ggplot(data = diamonds, aes(x = cut, y = price)) +
   stat_summary(geom = 'pointrange', fun.data = mean_cl_normal)
 ```
 
+---
+
 ## Задание 1
 
-Посчитайте среднюю цену и доверительный интервал для бриллиантов с такими свойствами:
+Посчитайте среднюю цену и доверительный интервал для бриллиантов с такими свойствами (одновременно):
 
 - качество огранки (`cut`) идеальное (`Ideal`)
 - прозрачность (`clarity`) наивысшая (`IF`)
 
 Постройте график средней цены с доверительными интервалами для бриллиантов разного качества огранки и прозрачности.
 
+---
+
 ## Решение
 
 Вычислим границы доверительного интервала
 
-```{r purl=FALSE}
+```{r purl=FALSE, echo=TRUE}
 ideal <- diamonds$price[diamonds$cut == 'Ideal' & diamonds$clarity == 'IF'] 
 
 .mean <- mean(ideal)                  # выборочное среднее
-.n <- length(ideal)                   # объем выборки
+.n <- length(ideal)                   # объем выборки, если нет NA
 SE <- sd(ideal)/ sqrt(.n)             # стандартная ошибка
 t_crit <- qt(p = 0.975, df = .n - 1) # критич. зн. t для данного n и p = 0.95
 err <- t_crit * SE                   # предел погрешности
+err
 # Границы доверительного интервала
 .mean - err
 .mean + err
 ```
 
-## Решение
+---
+
+## Решение: cпособ 1 (некрасивый, требует доработки)
 
 Теперь можно построить график средней цены с доверительными интервалами для бриллиантов разного качества огранки и прозрачности. Для этого нужно к предыдущему графику добавить информацию о прозрачности.
 
-Способ 1 (некрасивый, требует доработки):
-
-```{r purl=FALSE}
+```{r purl=FALSE, echo=TRUE, opts.label='fig.wider'}
 ggplot(data = diamonds, aes(x = cut, y = price, colour = clarity)) +
   stat_summary(geom = 'pointrange', fun.data = mean_cl_normal)
 ```
 
-## Решение
+---
 
-Способ 2 (удовлетворительный):
+## Решение: cпособ 2 (удовлетворительный)
 
-```{r purl=FALSE}
+```{r purl=FALSE, echo=TRUE, opts.label='fig.wider', fig.height=5.6}
 ggplot(data = diamonds, aes(x = cut, y = price, colour = clarity)) +
   stat_summary(geom = 'pointrange', fun.data = mean_cl_normal) +
-  facet_wrap(~ clarity)
+  facet_wrap(~ clarity) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+Что странного в этой картинке?
+
+--
 
 Осторожно! Группы могут быть неоднородны. Здесь не учтен размер и т.п.
 
+---
+
+## Статистика по группам при помощи пакета `dplyr`
+
+На примере доверительных интервалов:
+
+```{r }
+library(dplyr)
+
+smr_diamonds <- diamonds %>%             # данные
+  group_by(cut, clarity) %>%             # группируем
+  summarize(
+    .mean = mean(price),                 # выборочное среднее
+    .n = n(),                            # объем выборки
+    SE = sd(price) / sqrt(.n),           # стандартная ошибка
+    t_crit = qt(p = 0.975, df = .n - 1), # критич. зн. t
+    err = t_crit * SE,                   # предел погрешности
+    lower = .mean - err,  #  нижняя граница доверительного интервала
+    upper = .mean + err   # верхняя граница доверительного интервала
+  )
+
+head(smr_diamonds)
+```
+
+---
+
+class: middle, center, inverse
+
 # Как устроено тестирование гипотез
+
+---
 
 ## Сравнение выборок
 
@@ -598,103 +715,140 @@ ggplot(data = diamonds, aes(x = cut, y = price, colour = clarity)) +
 ![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
 ![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
 
-<small>tres caracoles by Alberto Villen on Freeimages.com</small>
+.tiny[tres caracoles by Alberto Villen on Freeimages.com]
 
-
+---
 
 ## Нулевая и альтернативная гипотезы
 
 Это первый шаг
 
 ![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
-
 ![](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
 
-<small>tres caracoles by Alberto Villen on Freeimages.com</small>
+.tiny[tres caracoles by Alberto Villen on Freeimages.com]
 
->- Нулевая гипотеза $H_0$ чаще всего формулируется как **отсутствие различий** между сравниваемыми объектами. Например: Улитки из обеих популяций одинакового размера
+--
 
->- Альтернативная гипотеза $H_A$ формулируется как **присутствие различий**, она обратна нулевой гипотезе, т.е. включает все остальные случаи. Например: Улитки из обеих популяций разного размера.
+- Нулевая гипотеза $H_0$ чаще всего формулируется как **отсутствие различий** между сравниваемыми объектами. Например: Улитки из обеих популяций одинакового размера
 
-## Нулевая и альтернативная гипотезы --- это "два мира"
+- Альтернативная гипотеза $H_A$ формулируется как **присутствие различий**, она обратна нулевой гипотезе, т.е. включает все остальные случаи. Например: Улитки из обеих популяций разного размера.
+
+---
+
+## Нулевая и альтернативная гипотезы — это "два мира"
 
 Вне зависимости от нас, реальность может находиться в одном из двух состояний:
 
+.pull-left[
 - $H_0$ верна, улитки одинаковы
+
+![:scale 45%](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
+![:scale 45%](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
+]
+.pull-right[
 - $H_0$ неверна, улитки различаются 
 
-|$H_0$ верна |	$H_0$ неверна |
-|:-----:|:-----:|
+![:scale 45%](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
+![:scale 30%](images/tres-caracoles-by-Alberto-Villen-on-freeimages.com.jpg)
+]
 
-<br />После статистического теста мы принимаем решение о том, принять или отвергнуть $H_0$. Но это решение не обязательно окажется верным. Возможно четыре исхода:
+<br />
 
-В мире где улитки одинаковы ($H_0$ верна) мы можем:  
+--
+
+После статистического теста мы принимаем решение о том, принять или отвергнуть $H_0$. Но это решение не обязательно окажется верным. Возможно четыре исхода:
+
+.pull-left[
+В мире где улитки одинаковы <br/>( $H_0$ верна) мы можем:  
 - принять $H_0$ (верное решение),  
 - отвергнуть $H_0$ (ошибка).
-
-Аналогично, в мире где улитки различаются ($H_A$ верна), мы можем:  
+]
+.pull-right[
+В мире где улитки различаются <br/>( $H_A$ верна), мы можем:  
 - принять $H_0$ (ошибка),  
 - либо отвергнуть $H_0$ (верное решение).
+]
+
+---
 
 ## Верные и неверные решения
 
-<div class="columns-2">
-
+.pull-left[
 **Ошибка I рода: нашли то, чего нет**
-
+]
+.pull-right[
 **Ошибка II рода: не нашли то, что было**
+]
 
-</div>
-
-| 	|$H_0$ верна |	$H_0$ неверна |
+| 	| $H_0$ верна |	$H_0$ неверна |
 |:-----:|:-----:|:-----:|
 | Отклонить H0 | Ошибка I рода с вероятностью <span class="orange">&alpha;</span></br>Ложно-положительный результат | 	Верно |
 | Сохранить H0 | Верно | Ошибка II рода с вероятностью <span class= "blue">&beta;</span> </br> Ложно-отрицательный результат |
 
+---
 
 ## Тестирование гипотез: Тестовые статистики
 
-### 1. Формулируем нулевую и альтернативную гипотезы.
+--
+
+#### 1. Формулируем нулевую и альтернативную гипотезы.
 
 Гипотезы выражаются математически в виде тестовых статистик. На этом этапе мы делаем определенные допущения.
 
-### 2. Проверяем __условия применимости__ тестовой статистики.
+--
 
-### 3. По реальным данным вычисляем __эмпирическое значение тестовой статистики__.
+#### 2. Проверяем __условия применимости__ тестовой статистики.
+
+--
+
+#### 3. По реальным данным вычисляем __эмпирическое значение тестовой статистики__.
+
+--
 
 Дальше мы должны ответить на вопрос:
 
 **Насколько вероятно получить _такое или более экстремальное_ эмпирическое значение, если верна нулевая гипотеза  $H_0$?**
 
-### 4. Строим теоретическое распределение тестовой статистики для случая, когда верна $H_0$, и оцениваем по нему уровень значимости.
+#### 4. Строим теоретическое распределение тестовой статистики для случая, когда верна $H_0$, и оцениваем по нему уровень значимости.
 
-### 5. Решаем сохранить или отвергнуть $H_0$.
+--
+
+#### 5. Решаем сохранить или отвергнуть $H_0$.
 
 Увы, мы не сможем узнать, какая гипотеза верна, но поймем, насколько с ней согласуются исходные данные.
 
+---
+
+class: middle, center, inverse
 
 # Одновыборочный $t$-тест
+
+---
 
 ## Размер кладки черепах
 
 Разберемся с одновыборочным $t$-тестом на вымышленном примере.
 
 ```{r echo=FALSE, purl=FALSE}
-n <- 33
-set.seed(1814)
-X <- rnorm(n, mean = 8.5, sd = 3.2)
-x <- round(mean(X), 1)
-s <- round(sd(X), 1)
-mu <- 7
+n <- 35
+# set.seed(181257)
+# X <- round(rnorm(n, mean = 9.2, sd = 2.5))
+X <- c(10, 11, 10, 7, 8, 7, 9, 8, 11, 11, 12, 8, 6, 7, 10, 11, 9, 
+10, 7, 11, 11, 12, 11, 9, 4, 12, 9, 6, 9, 6, 9, 7, 8, 10, 9)
+x <- mean(X)
+s <- sd(X)
+mu <- 8
 ```
 
-Представьте, что в одной статье сказано, что средняя плодовитость черепах определенного вида --- `r mu` яиц в кладке.
+Представьте, что в [одной статье](https://edis.ifas.ufl.edu/publication/UW441#:~:text=Reproductive%20rate%3A%20Clutch%20sizes%20range,to%20100%20years%20in%20captivity.) сказано, что средняя плодовитость черепах определенного вида — `r mu` яиц в кладке.
 
-В вашей выборке из $`r n`$ черепах --- $\bar x = `r x`$, $s = `r s`$.
+В вашей выборке из $`r n`$ черепах — $\bar x = `r x`$, $s = `r s`$.
 
 ```{r echo=FALSE, eval=FALSE}
-mu <- 7
-X <- c(5.7, 11.6, 5.7, 9.89, 9.01, 10.1, 12.4, 2.37, 7.21, 6.86, 9.77, 10.6, 3.82, 13.7, 6.01, 10.2, 7.36, 14.8, 10.1, 8.44, 10.5, 8.85, 4.18, 9.12, 12.3, 7.83, 9.51, 4.01, 9.75, 7.59, 0.769, 8.5, 10.8)
+mu <- 8
+X <- c(10, 11, 10, 7, 8, 7, 9, 8, 11, 11, 12, 8, 6, 7, 10, 11, 9, 
+10, 7, 11, 11, 12, 11, 9, 4, 12, 9, 6, 9, 6, 9, 7, 8, 10, 9)
 (n <- length(X))
 (x <- mean(X))
 (s <- sd(X))
@@ -709,12 +863,14 @@ X <- c(5.7, 11.6, 5.7, 9.89, 9.01, 10.1, 12.4, 2.37, 7.21, 6.86, 9.77, 10.6, 3.8
 <!-- https://flic.kr/p/Q2ZozS -->
 
 
+---
+
 ## Одновыборочный t-тест
 
-- $H_0: \mu = \mu_0$ --- Реальная средняя плодовитость черепах такая, как в статье.
-- $H_A: \mu \ne \mu_0$ --- Средняя плодовитость отличается от того, что написано в статье.
+- $H_0: \mu = \mu_0$ — Реальная средняя плодовитость черепах такая, как в статье.
+- $H_A: \mu \ne \mu_0$ — Средняя плодовитость отличается от того, что написано в статье.
 
-$\mu_0$ --- это какое-то конкретное значение. В нашей задаче это --- `r mu` яиц в кладке.
+$\mu_0$ — это какое-то конкретное значение. В нашей задаче это — `r mu` яиц в кладке.
 
 <br/>
 
@@ -732,12 +888,16 @@ $$t = \cfrac{\bar x - \mu}{ s / \sqrt{n} }$$
 
 Проверьте условия применимости t-теста. Вычислите t и p.
 
+---
+
 ## Проверяем, нормально ли распределение
 
-```{r echo=FALSE, purl=FALSE, fig.width=5.8, fig.height=5}
+```{r echo=FALSE, purl=FALSE}
 library(car)
 qqPlot(X, id = FALSE)
 ```
+
+---
 
 ## Вычислим наблюдаемое значение $t$-статистики
 
@@ -747,19 +907,21 @@ $$t = \cfrac{\bar x - \mu}{ s / \sqrt{n} }$$
 
 
 ```{r echo=FALSE}
-t_val <- round((x - mu) / (s / sqrt(n)), 1)
+t_val <- round((x - mu) / (s / sqrt(n)), 2)
 p_val <- format(2*pt(-t_val, df = n - 1), digits = 1, nsmall = 3)
 ```
 
 
 $$t = \cfrac{`r x` - `r mu`}{ `r s` / \sqrt{`r n`} } = `r t_val`$$
 
+---
+
 ## Насколько это значение согласуется с $H_0$?
 
-```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
-library(ggplot2)
-theme_set(theme_bw())
-cols <- c('orange', 'red')
+.pull-left[
+
+```{r echo=FALSE, purl=FALSE, opts.label='fig.medium.taller'}
+cols <- c('yellow2', 'red')
 labs <- c(paste('p =', p_val), expression(alpha ==0.05))
 mappings <- factor(c('p', 'alpha'), levels = c('p', 'alpha'), labels = labs)
 names(cols) <- labs
@@ -785,7 +947,7 @@ gg_test_t <- gg_test_0 +
   annotate(geom = 'text', label = c(paste('-t =', -t_val), paste('t =', t_val)),
            x = c(-t_val, t_val), 
            y = dt(c(-t_val, t_val), df = n - 1) + 0.15,
-           vjust = -0.3)
+           vjust = -0.3, size = 5)
 
 gg_test_p <- gg_test_t +
     # Площадь под кривой
@@ -793,19 +955,21 @@ gg_test_p <- gg_test_t +
                 aes(fill = mappings[1]), xlim = c(-4, -t_val), alpha = 0.7) +
   stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
                aes(fill = mappings[1]), xlim = c(t_val, 4), alpha = 0.7) +
-  scale_fill_manual('', values = cols) +
-  theme(legend.position = c(0.14, 0.96), legend.background = element_blank())
+  scale_fill_manual('', values = cols[1], labels = labs[1]) +
+  theme(legend.position = c(0, 1), legend.background = element_blank(), legend.justification = c(0, 1))
+# gg_test_p
 
 gg_test_alpha <- gg_test_0 + 
-  # geom_vline(xintercept = qt(c(0.025, 0.975), df = n - 1), linetype = 2) +
+  geom_vline(xintercept = qt(c(0.025, 0.975), df = n - 1), linetype = 2) +
         # Уровень значимости
   stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
                 aes(fill = mappings[2]), xlim = c(-4, qt(0.025, df = n - 1)), alpha = 0.3) +
   stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
                 aes(fill = mappings[2]), xlim = c(qt(0.975, df = n - 1), 4), alpha = 0.3) +
-   scale_fill_manual('', values = cols, labels = labs[2])+
+   scale_fill_manual('', values = cols[2], labels = labs[2])+
   guides(fill = guide_legend(override.aes = list(alpha = 0.4))) +
-  theme(legend.position = c(0.13, 0.96), legend.background = element_blank())
+  theme(legend.position = c(0, 1), legend.background = element_blank(), legend.justification = c(0, 1))
+# gg_test_alpha
 
 gg_test_alpha_p <- gg_test_t + 
   # Критический уровень значимости
@@ -815,12 +979,12 @@ gg_test_alpha_p <- gg_test_t +
                 aes(fill = mappings[2]), xlim = c(qt(0.975, df = n - 1), 4), alpha = 0.3) +
   # Значение p, уровень значимости
   stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
-                aes(fill = mappings[1]), xlim = c(-4, -t_val), alpha = 0.8) +
+                aes(fill = mappings[1]), xlim = c(-4, -t_val), alpha = 0.9) +
   stat_function(geom = 'area', fun = dt, args = list(df = n - 1), 
-                aes(fill = mappings[1]), xlim = c(t_val, 4), alpha = 0.8) +
-  scale_fill_manual('', values = cols, labels = rev(labs)) +
+                aes(fill = mappings[1]), xlim = c(t_val, 4), alpha = 0.9) +
+  scale_fill_manual('', values = cols, labels = labs) +
   guides(fill = guide_legend(override.aes = list(alpha = 0.25)))+
-  theme(legend.position = c(0.14, 0.92), legend.background = element_blank())
+  theme(legend.position = c(0, 1), legend.background = element_blank(), legend.justification = c(0, 1))
 
 gg_test_t # реальное t
 # gg_test_p # уровень значимости
@@ -828,32 +992,46 @@ gg_test_t # реальное t
 # gg_test_alpha_p # сравнение с уровнем значимости
 ```
 
+]
+.pull-right[
 
 При $H_0$ значение $t$ будет близко к нулю.
 
 Насколько необычны значения t меньше или больше $\pm `r t_val`$?
 
+]
 
-## Уровень значимости ($p$-value)
+---
 
-```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
+## Уровень значимости (_p_-value)
+
+.pull-left[
+
+```{r echo=FALSE, purl=FALSE, opts.label='fig.medium.taller'}
 gg_test_p # Значение p
 ```
 
+]
+.pull-right[
 
-__Уровень значимости__ --- это вероятность получить значение $t$ меньше или больше данного, если бы $H_0$ была справедлива.
+__Уровень значимости__ — это вероятность получить значение $t$ меньше или больше данного, если бы $H_0$ была справедлива.
+
+]
 
 
-## Уровень значимости ($p$-value)
 
-\columnsbegin
-\column{0.49\textwidth}
+---
 
-```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
+## Уровень значимости (_p_-value)
+
+.pull-left[
+
+```{r echo=FALSE, purl=FALSE, opts.label='fig.medium.taller'}
 gg_test_p # Значение p
 ```
 
-\column{0.49\textwidth}
+]
+.pull-right[
 
 Можно вычислить значение $p$
 
@@ -863,68 +1041,91 @@ gg_test_p # Значение p
 
 Если бы плодовитость не отличалось от указанной в статье, получить $t$ меньше или больше $`r t_val`$ можно было бы с вероятностью $p = `r p_val`$. 
 
-\columnsend
+]
 
+---
 
 ## Критический уровень значимости
 
+.pull-left[
 
-```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
+```{r echo=FALSE, purl=FALSE, opts.label='fig.medium.taller'}
 gg_test_alpha +  geom_vline(xintercept = qt(c(0.025, 0.975), df = n - 1), linetype = 2)
 ```
 
+]
+.pull-right[
 
-Критический уровень значимости $\alpha$ --- это порог для принятия решений.
+Критический уровень значимости $\alpha$ — это порог для принятия решений.
 
 Обычно используют $\alpha = 0.05$.
 
-Если $p \le \alpha$ --- отвергаем $H_0$  и принимаем $H_A$.
+Если $p \le \alpha$ — отвергаем $H_0$  и принимаем $H_A$.
 
-Если $p > \alpha$ --- сохраняем $H_0$,  не можем ее отвергнуть.
+Если $p > \alpha$ — сохраняем $H_0$,  не можем ее отвергнуть.
 
+]
 
+---
 
 ## Принимаем решение
 
+.pull-left[
 
-```{r echo=FALSE, purl=FALSE, fig.width=3.75, fig.height=3.38}
+```{r echo=FALSE, purl=FALSE, opts.label='fig.medium.taller'}
 gg_test_alpha_p
 ```
 
+]
+.pull-right[
 
 Мы получили $p < \alpha$, поэтому отвергаем $H_0$ и принимаем $H_A$.
 
 Фактическая плодовитость статистически значимо отличается от указанной в статье.
 
+]
 
-## Заблуждения о $p$-values
+---
 
->- Правда ли, что $p$ --- вероятность того, что верна сама $H_0$?  
->- Нет! Значение $p$ всегда считается __при условии, что $H_0$ верна__. Но $H_0$ может быть неверна.
+## Заблуждения о _p_-values
+
+--
+
+> Правда ли, что $p$ — вероятность того, что верна сама $H_0$?  
+> - Нет! Значение $p$ всегда считается __при условии, что $H_0$ верна__. Но $H_0$ может быть неверна.
 
 <br/>
 
->- Правда ли, что $p$ --- это вероятность получить такое значение статистики при справедливой $H_0$?
->- Нет! Вероятность вычисляется как площадь под участком кривой.  Конкретное значение статистики --- это точка и под ней нет площади.
+--
+
+> Правда ли, что $p$ — это вероятность получить такое значение статистики при справедливой $H_0$?
+> - Нет! Вероятность вычисляется как площадь под участком кривой.  Конкретное значение статистики — это точка и под ней нет площади.
 
 <br/>
 
->- Правда ли, что если $p > 0.05$, то различий между группами на самом деле нет?  
->- Нет! Это значит, что наблюдаемый эффект согласуется с нулевой гипотезой. Различия могут быть.
+--
+
+> Правда ли, что если $p > 0.05$, то различий между группами на самом деле нет?  
+> - Нет! Это значит, что наблюдаемый эффект согласуется с нулевой гипотезой. Различия могут быть.
+
+---
+
+class: middle, center, inverse
 
 # Статистические ошибки при проверке гипотез
 
+---
+
 ## Статистические ошибки при проверке гипотез
 
-<div class="columns-2">
-
+.pull-left[
 **Ошибка I рода: нашли то, чего нет**
-
+]
+.pull-right[
 **Ошибка II рода: не нашли то, что было**
+]
 
-</div>
-
-| 	|$H_0$ верна |	$H_0$ неверна |
+| 	| $H_0$ верна |	$H_0$ неверна |
 |:-----:|:-----:|:-----:|
 | Отклонить H0 | Ошибка I рода с вероятностью <span class="orange">&alpha;</span></br>Ложно-положительный результат | 	Верно |
 | Сохранить H0 | Верно | Ошибка II рода с вероятностью <span class= "blue">&beta;</span> </br> Ложно-отрицательный результат |
@@ -934,7 +1135,7 @@ gg_test_alpha_p
 Как эти ошибки выглядят на графике? Как они взаимосвязаны?
 
 
-```{r power_alpha, echo = FALSE, purl = FALSE, fig.width=4.05}
+```{r power_alpha, echo = FALSE, purl = FALSE}
 cols <- c('red', 'steelblue', 'green')
 br <- c('alpha', 'beta', '1 - beta')
 labs <- list(bquote(alpha), bquote(beta), bquote(1 - beta))
@@ -1094,59 +1295,67 @@ gg_sm <- gg_H0 +
 # gg_sm
 ```
 
+---
 
-## Можно построить распределения при $H_0$ и $H_A$
+## Можно построить теоретические распределения <br/>при $H_0$ и $H_A$
 
-```{r echo = FALSE, purl = FALSE, fig.width=4.05}
+```{r echo = FALSE, purl = FALSE, opts.label='fig.wide'}
 gg_H0A
 ```
 
-Распределение статистики, когда справедлива $H_0$, нам уже знакомо --- его мы используем в тестах.
+Распределение статистики, когда справедлива $H_0$, нам уже знакомо — его мы используем в тестах.
 
 Но может быть справедлива $H_A$ и ее тоже можно описать своим распределением.
 
 При помощи этих распределений можно определить вероятность ошибок различных типов.
 
-## Ошибка I рода --- найти различия там, где их нет
+---
 
-```{r echo = FALSE, purl = FALSE, fig.width=4.05}
+## Ошибка I рода — <br/>найти различия там, где их нет
+
+```{r echo = FALSE, purl = FALSE, opts.label='fig.wide'}
 gg_nc
 ```
 
-$\alpha$ (критический уровень значимости) --- это вероятность ошибки I рода.
+$\alpha$ (критический уровень значимости) — это вероятность ошибки I рода.
 
 Если $H_0$ справедлива, то при $\alpha = 0.05$ мы отвергаем ее с 5% вероятностью.
 
 Чтобы снизить вероятность таких ошибок, можно уменьшить $\alpha$.
 
+---
 
-## Ошибка II рода --- не найти различий, где они есть
+## Ошибка II рода — <br/>не найти различий, где они есть
 
-```{r echo = FALSE, purl = FALSE, fig.width=8}
+```{r echo = FALSE, purl = FALSE, opts.label='fig.wide'}
 plot_grid(gg_beta, gg_beta_1, ncol = 2)
 ```
 
-$\beta$ --- вероятность ошибки II рода.
+$\beta$ — вероятность ошибки II рода.
 
 Считается, что допустимо $\beta \le 0.2$, но часто про нее забывают.
 
 Если мы уменьшаем $\alpha$ (график справа), то возрастает $\beta$.
 
-## Мощность теста --- вероятность найти различия, если они есть
+---
 
-```{r echo = FALSE, purl = FALSE, fig.width=8}
+## Мощность теста — <br/>вероятность найти различия, если они есть
+
+```{r echo = FALSE, purl = FALSE, opts.label='fig.wide'}
 plot_grid(gg_power, gg_power_1, ncol = 2)
 ```
 
-$Power = 1 - \beta$ --- мощность теста.
+$Power = 1 - \beta$ — мощность теста.
 
 Хорошо, когда мощность не меньше $0.8$.
 
 Мощность теста зависит от величины наблюдаемого эффекта (от величины различий).
 
-## С увеличением объема выборки растет мощность теста
+---
 
-```{r echo=FALSE, purl=FALSE, fig.width=8.25, fig.height=2.62}
+## С увеличением объема выборки <br/>растет мощность теста
+
+```{r echo=FALSE, purl=FALSE, opts.label='fig.wide.taller'}
 # Plots of power vs. sample size etc.
 # Modified after http://imdevsoftware.wordpress.com/2013/01/17/255/
 
@@ -1222,15 +1431,21 @@ pwr_size_alpha_d <- ggplot(data = dat, aes(x = size, y = value, color = sig.leve
 pwr_size_alpha_d
 ```
 
+---
+
+class: middle, center, inverse
+
 # Двухвыборочный t-тест
+
+---
 
 ## Гипотезы в двухвыборочном $t$-тесте и тестовая статистика
 
-$H_0: \mu_1 - \mu_2 = 0$ --- средние значения не различаются в двух группах
+$H_0: \mu_1 - \mu_2 = 0$ — средние значения не различаются в двух группах
 
-$H_A: \mu_1 - \mu_2 \ne 0$ --- средние значения различаются
+$H_A: \mu_1 - \mu_2 \ne 0$ — средние значения различаются
 
-\vspace{1\baselineskip}
+<br/>
 
 Т.е. нас интересует __разность выборочных средних__.
 
@@ -1240,6 +1455,7 @@ $H_A: \mu_1 - \mu_2 \ne 0$ --- средние значения различаю�
 t-тест в общем виде выглядит так
 
 $$t=\frac{\text{Наблюдаемая величина - Ожидаемое значение}}{\text{Стандартная ошибка}}$$
+---
 
 ## t-тест и его разновидности
 
@@ -1247,42 +1463,48 @@ $$t=\frac{\text{Наблюдаемая величина - Ожидаемое з�
 
 $$t=\frac{(\bar{x}_1 - \bar{x}_2) - (\mu_1 - \mu_2)}{SE_{\bar{x}_1 - \bar{x}_2}} \; = \; \frac{\bar{x}_1 - \bar{x}_2}{SE_{\bar{x}_1 - \bar{x}_2}}$$
 
-\pause
+--
 
-$SE_{\bar{x}_1 - \bar{x}_2}$ --- стандартная ошибка разности двух средних, может рассчитываться по-разному
+$SE_{\bar{x}_1 - \bar{x}_2}$ — стандартная ошибка разности двух средних, может рассчитываться по-разному
 
-- t-тест Стьюдента --- если считать, что дисперсии в группах равны
-- t-тест Уэлча --- если считать, что дисперсии могут быть разными
+- t-тест Стьюдента — если считать, что дисперсии в группах равны
+- t-тест Уэлча — если считать, что дисперсии могут быть разными
+
+---
 
 ## Стандартная ошибка разности средних в t-тесте Стьюдента
 
-\note{Student 1908}
+Student 1908
 
 Если группы независимы и дисперсии в них равны, то по центральной предельной теореме
 
 $$SE_{\bar{x}_1 - \bar{x}_2} = \sqrt{ \frac{\sigma^2}{n_{1}} + \frac{\sigma^2}{n_{2}}} \approx \sqrt{ \frac{s^2}{n_{1}} + \frac{s^2}{n_{2}}}$$
 
-$s^2 = \cfrac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2}{n_1 + n_2 - 2}$ --- это __обобщенная дисперсия__ по двум выборкам.
+$s^2 = \cfrac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2}{n_1 + n_2 - 2}$ — это __обобщенная дисперсия__ по двум выборкам.
 
 Результирующая $t$-статистика подчиняется $t$-распределению с  $df = n_1 + n_2 - 2$.
 
-\pause
+--
 
-Осторожно, равенство дисперсий в группах ---  
+Осторожно, равенство дисперсий в группах —  
 это часто нереалистичное предположение!
 
+---
 
 ## Cтандартная ошибка разности средних в t-тесте Уэлча
 
 Если группы независимы и дисперсии в них неизвестны, то получается
 
 $$SE_{\bar{x}_1 - \bar{x}_2} = \sqrt{ \frac{\sigma^2_{1}}{n_{1}} + \frac{\sigma^2_{2}}{n_{2}}} \approx \sqrt{ \frac{s^2_{1}}{n_{1}} + \frac{s^2_{2}}{n_{2}}}$$
-\pause
+
+--
 
 Проблема в том, что эта величина __лишь приблизительно следует t-распределению__, если считать его степени свободы как обычно для двух групп $df = n_1 + n_2 - 2$.
 
 Это из-за того, что мы оцениваем __две__ дисперсии  
 при помощи их стандартных отклонений. 
+
+---
 
 ## Приблизительное число степеней свободы
 
@@ -1296,6 +1518,8 @@ t-тестом Уэлча можно пользоваться, даже если
 
 Он немного консервативнее, чем тест Стьюдента.
 
+---
+
 ## Условия применимости двухвыборочного t-теста
 
 Почти такие же, как условия справедливости ЦПТ
@@ -1304,23 +1528,31 @@ t-тестом Уэлча можно пользоваться, даже если
 - Выборки независимы друг от друга (новое условие).
 - Объем выборки достаточно велик или величины нормально распределены.
 
+---
+
+class: middle, center, inverse
+
 # Двухвыборочный t-тест в R
+
+---
 
 ## Пример: Гормоны и артериальная гипертензия
 
-Синдром Кушинга --- это нарушения уровня артериального давления, вызванные гиперсекрецией кортизола надпочечниками.
+Синдром Кушинга — это нарушения уровня артериального давления, вызванные гиперсекрецией кортизола надпочечниками.
 
 В датасете `Cushings` (пакет `MASS`) записаны данные о секреции двух метаболитов при разных типах синдрома (данные из кн. Aitchison, Dunsmore, 1975).
 
-- `Tetrahydrocortisone` --- секреция тетрагидрокортизона с мочой (мг/сут.)
-- `Pregnanetriol` --- секреция прегнантриола с мочой (мг/сут.)
-- `Type` --- тип синдрома:
-    - `a` --- аденома
-    - `b` --- двусторонняя гиперплазия
-    - `c` --- карцинома
-    - `u` --- не известно
+- `Tetrahydrocortisone` — секреция тетрагидрокортизона с мочой (мг/сут.)
+- `Pregnanetriol` — секреция прегнантриола с мочой (мг/сут.)
+- `Type` — тип синдрома:
+    - `a` — аденома
+    - `b` — двусторонняя гиперплазия
+    - `c` — карцинома
+    - `u` — не известно
 
 Давайте сравним секрецию тетрагидрокортизона при аденома и двусторонней гиперплазии надпочечников. Различается ли она?
+
+---
 
 ## Открываем данные
 
@@ -1335,6 +1567,8 @@ data("Cushings")
 head(Cushings)
 str(Cushings)
 ```
+
+---
 
 ## Знакомимся с данными
 
@@ -1353,6 +1587,8 @@ table(Cushings$Type)
 ```
 
 Обратите внимание, объемы выборок **маленькие**.
+
+---
 
 ## Проверяем условия применимости...
 
@@ -1378,6 +1614,8 @@ table(Cushings$Type)
 
 Нужно проверить форму распределения в обеих группах.
 
+---
+
 ## Нормально ли распределены концентрации тетрагидрокортизона в группах?
 
 ```{r eval=FALSE}
@@ -1386,7 +1624,7 @@ qqPlot(Cushings$Tetrahydrocortisone[Cushings$Type == 'a'])
 qqPlot(Cushings$Tetrahydrocortisone[Cushings$Type == 'b'])
 ```
 
-```{r echo=FALSE, fig.height=4}
+```{r echo=FALSE, opts.label='fig.wide'}
 library(car)
 par(mfrow = c(1, 2))
 qqPlot(Cushings$Tetrahydrocortisone[Cushings$Type == 'a'], id = FALSE)
@@ -1397,6 +1635,8 @@ par(mfrow = c(1, 1))
 Удовлетворительно. При таких малых объемах выборки сложно ожидать лучшего. 
 
 <!-- Будем считать, что можно аппроксимировать концентрацию тетрагидрокортизона нормальным распределением. -->
+
+---
 
 ## Двухвыборочный t-тест в R: способ 1.
 
@@ -1413,6 +1653,7 @@ tt <- t.test(x = Cushings$Tetrahydrocortisone[Cushings$Type == 'a'],
 tt
 ```
 
+---
 
 ## Опишем результаты
 
@@ -1420,17 +1661,17 @@ tt
 tt
 ```
 
-- Секреция тетрагидрокортизона значимо различается у пациентов с аденомой и двусторонней гиперплазией надпочечников ($t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.05)`$)
+- Секреция тетрагидрокортизона значимо различается у пациентов с аденомой и двусторонней гиперплазией надпочечников ( $t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.05)`$)
 
 
 <br/>
 
 Можно указать в скобках не сравнение с $\alpha$, а само значение $p$:  
-($t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, digits = 2, eps = 0.001)`$).
+( $t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, digits = 2, eps = 0.001)`$).
 
 Только не надо безумствовать и указывать слишком много знаков...
 
-
+---
 
 ## Задание 3: Двухвыборочный t-тест в R, способ 2.
 
@@ -1444,6 +1685,8 @@ tt
 t.test(formula = что_зависит ~ группы, data = данные,
        subset = логический_вектор)
 ```
+
+---
 
 ## Решение: Двухвыборочный t-тест в R, способ 2.
 
@@ -1463,6 +1706,8 @@ t.test(formula = Tetrahydrocortisone ~ Type, data = Cushings,
 
 Результаты точно такие же, естественно.
 
+---
+
 ## Задание 4 
 
 Посмотрите структуру результатов (`tt`) при помощи
@@ -1472,6 +1717,8 @@ t.test(formula = Tetrahydrocortisone ~ Type, data = Cushings,
 - уровень значимости
 - значение t-критерия
 
+---
+
 ## Решение: Что спрятано в результатах?
 
 Как называются отдельные элементы результатов можно узнать посмотрев их структуру при помощи функции `str()`
@@ -1479,6 +1726,8 @@ t.test(formula = Tetrahydrocortisone ~ Type, data = Cushings,
 ```{r}
 str(tt)
 ```
+
+---
 
 ## Решение: Можно получить элементы результатов в виде отдельных чисел
 
@@ -1488,6 +1737,8 @@ tt$p.value # уровень значимости
 tt$statistic # значение t-критерия
 ```
 
+---
+
 ## График со средними и доверительными интервалами
 
 ```{r}
@@ -1496,8 +1747,13 @@ ggplot(data = Cushings[Cushings$Type %in% c('a', 'b'), ],
   stat_summary(fun.data = mean_cl_normal)
 ```
 
+---
+
+class: middle, center, inverse
 
 # Двухвыборочный t-тест (самостоятельная работа)
+
+---
 
 ## Задание 5
 
@@ -1514,6 +1770,8 @@ head(rem)
 
 Ваша задача сравнить эти группы с помощью t-теста.
 
+---
+
 ## Решение: Разведочный анализ
 
 ```{r  purl=FALSE}
@@ -1528,10 +1786,11 @@ colSums(is.na(rem))
 table(rem$group)
 ```
 
+---
 
 ## Решение: Проверка условий применимости
 
-```{r  purl=FALSE, fig.height=4}
+```{r  purl=FALSE}
 # Выборки малы, поэтому проверяем на нормальность и отсутствие выбросов
 op <- par(mfrow = c(1, 2))
 qqPlot(rem$time[rem$group == "therapy"])
@@ -1539,6 +1798,7 @@ qqPlot(rem$time[rem$group == "control"])
 par(op)
 ```
 
+---
 
 ## Решение: Проверка условий применимости
 
@@ -1550,6 +1810,8 @@ rem$time[rem$group == "therapy"][11]
 ```
 
 Пусть в этом случае это вполне реальное наблюдение, но это значение придется исключить, т.к. t-тест не устойчив к выбросам.
+
+---
 
 ## Решение: Двухвыборочный t-тест
 
@@ -1567,22 +1829,32 @@ tt <- t.test(x = rem$time[rem$group == 'therapy'][-11],
        y = rem$time[rem$group == 'control'])
 ```
 
+---
+
 ## Решение: Результаты двухвыборочного t-теста
 
 ```{r purl=FALSE}
 tt
 ```
 
-- `r ifelse(tt$p.value <= 0.05, 'Продолжительность ремиссии значимо различается', 'Не найдено значимых различий продолжительности ремиссии')` у пациентов после регулярной лучевой терапии и обычного лечения ($t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.01, digits = 3)`$).
+- `r ifelse(tt$p.value <= 0.05, 'Продолжительность ремиссии значимо различается', 'Не найдено значимых различий продолжительности ремиссии')` у пациентов после регулярной лучевой терапии и обычного лечения ( $t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.01, digits = 3)`$).
+
+---
 
 ## Решение: График со средними и доверительными интервалами
 
-```{r fig.width=4}
+```{r }
 ggplot(data = rem[rem$time != 161, ], aes(x = factor(group), y = time)) + 
   stat_summary(fun.data = mean_cl_normal)
 ```
 
+---
+
+class: middle, center, inverse
+
 # Парный t-тест (факультативно)
+
+---
 
 ## Пример: Снотворное
 
@@ -1596,6 +1868,7 @@ head(sleep)
 # str(sleep)
 ```
 
+---
 
 ## Проверяем условия применимости...
 
@@ -1620,6 +1893,8 @@ table(sleep$group)
 
 Нужно проверить форму распределения в обеих группах.
 
+---
+
 ## Нормально ли распределена зависимая переменная в группах?
 
 ```{r eval=FALSE}
@@ -1627,7 +1902,7 @@ qqPlot(sleep$extra[sleep$group == 1])
 qqPlot(sleep$extra[sleep$group == 2])
 ```
 
-```{r echo=FALSE, fig.height=4}
+```{r echo=FALSE}
 par(mfrow = c(1, 2))
 qqPlot(sleep$extra[sleep$group == 1], id = FALSE)
 qqPlot(sleep$extra[sleep$group == 2], id = FALSE)
@@ -1635,6 +1910,8 @@ par(mfrow = c(1, 1))
 ```
 
 Хорошо. Можно аппроксимировать нормальным распределением 
+
+---
 
 ## Парный t-тест в R
 
@@ -1644,6 +1921,8 @@ par(mfrow = c(1, 1))
 t.test(formula = extra ~ group, data = sleep, paired = TRUE)
 ```
 
+---
+
 ## Опишем результаты
 
 ```{r echo=FALSE}
@@ -1651,7 +1930,7 @@ tt <- t.test(formula = extra ~ group, data = sleep, paired = TRUE)
 tt
 ```
 
-- Различия изменения продолжительности сна при применении двух препаратов были достоверны ($t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.01)`$)
+- Различия изменения продолжительности сна при применении двух препаратов были достоверны ( $t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.01)`$)
 
 **Кстати, если бы мы не учли зависимость между группами, мы пришли бы к неверному выводу.**  В этом можно убедиться, выполнив этот код:
 
@@ -1659,12 +1938,16 @@ tt
 t.test(formula = extra ~ group, data = sleep)
 ```
 
+---
+
 ## График со средними и доверительными интервалами
 
-```{r fig.width=4}
+```{r }
 ggplot(data = sleep, aes(x = factor(group), y = extra)) + 
   stat_summary(fun.data = mean_cl_normal)
 ```
+
+---
 
 ## Take-home messages
 
@@ -1673,7 +1956,9 @@ ggplot(data = sleep, aes(x = factor(group), y = extra)) +
 - При тестировании нулевой гипотезы оценивают вероятность получения данного или более экстремального значения тестовой статистики при условии, что $H_0$ справедлива. Если эта вероятность меньше выбранного критического уровня значимости, то нулевую гипотезу отвергают.
 - Для сравнения выборочных средних лучше использовать t-критерий в модификации Уэлча, который учитывает, что дисперсии в группах могут быть разными.
 - Средние в независимых выборках нужно сравнивать двухвыборочным t-тестом.
-- Если выборки зависимы --- нужно это учесть, поэтому для сравнения средних используется парный t-тест.
+- Если выборки зависимы — нужно это учесть, поэтому для сравнения средних используется парный t-тест.
+
+---
 
 ## Дополнительные ресурсы
 

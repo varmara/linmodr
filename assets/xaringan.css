@@ -3,22 +3,28 @@
  ***********/
 
  .remark-slide-content {
-  padding-top: 0px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 20px;
+  padding-top: 2px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
 }
 
 /***********
  Headers
  ***********/
 h1, h2, h3 {
-  margin-bottom: 0.2em;
+  margin-bottom: 0.1em;
+  margin-bottom: 0.1em;
+  text-shadow: 0 0 1px #f6f6f6;
 }
 
 p {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
+}
+
+.inverse {
+  text-shadow: 0 0 20px #333;
 }
 
 /***********
@@ -32,8 +38,17 @@ p {
   font-size: 80%;
 }
 
-.red { color: red; }
+.tiny {
+  font-size: 50%;
+}
 
+.red { color: #9B3C17; }
+.green { color: #649015; }
+.blue { color: #132F67; }
+
+.blurred-background {
+  backdrop-filter: blur(10px) saturate(70%);
+}
 
 /***********
  Code blocks
@@ -48,7 +63,7 @@ pre {
   margin-top: 0.4em;
   margin-right: 0px;
   margin-bottom: 0em;
-  margin-left: 0px;
+  margin-left: 0.4em;
 }
 
 .remark-code, .remark-inline-code {
@@ -56,4 +71,234 @@ pre {
   font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace;
   line-height: 1.2em;
   font-size: 90%;
-                                  }
+}
+
+code.hljs {
+  border-left: 4px solid #9B3C17;
+}
+
+.hljs-googlecode .hljs {
+  background: #ededed;
+}
+
+/******************
+ * Slide scrolling
+ * (non-functional)
+ * not sure if it is a good idea anyway
+slides > slide {
+  overflow: scroll;
+ padding: 5px 40px;
+}
+.scrollable-slide .remark-slide {
+  height: 400px;
+  overflow: scroll !important;
+}
+ ******************/
+
+.scroll-box-8 {
+  height:8em;
+  overflow-y: scroll;
+}
+.scroll-box-10 {
+  height:10em;
+  overflow-y: scroll;
+}
+.scroll-box-12 {
+  height:12em;
+  overflow-y: scroll;
+}
+.scroll-box-14 {
+  height:14em;
+  overflow-y: scroll;
+}
+.scroll-box-16 {
+  height:16em;
+  overflow-y: scroll;
+}
+.scroll-box-18 {
+  height:18em;
+  overflow-y: scroll;
+}
+.scroll-box-20 {
+  height:20em;
+  overflow-y: scroll;
+}
+.scroll-box-22 {
+  height:22em;
+  overflow-y: scroll;
+}
+.scroll-box-24 {
+  height:24em;
+  overflow-y: scroll;
+}
+.scroll-box-26 {
+  height:26em;
+  overflow-y: scroll;
+}
+.scroll-box-28 {
+  height:28em;
+  overflow-y: scroll;
+}
+.scroll-box-30 {
+  height:30em;
+  overflow-y: scroll;
+}
+.scroll-output {
+  height: 90%;
+  overflow-y: scroll;
+}
+
+/******************
+ * Coloured content boxes
+ ****************/
+.content-box {
+    box-sizing: border-box;
+    background-color: #e2e2e2;
+}
+.content-box-blue,
+.content-box-gray,
+.content-box-grey,
+.content-box-army,
+.content-box-green,
+.content-box-purple,
+.content-box-red,
+.content-box-yellow {
+  box-sizing: border-box;
+  border-radius: 15px;
+  margin: 0 0 15px;
+  overflow: hidden;
+  padding: 0px 20px 0px 20px;
+  width: 100%;
+}
+.content-box-blue { background-color: #F0F8FF; }
+.content-box-gray { background-color: #e2e2e2; }
+.content-box-grey {	background-color: #e2e2e2; }
+.content-box-army {	background-color: #737a36; }
+.content-box-green { background-color: #d9edc2; }
+.content-box-purple { background-color: #e2e2f9; }
+.content-box-red { background-color: #ffcccc; }
+.content-box-yellow { background-color: #fef5c4; }
+.content-box-blue .remark-inline-code,
+.content-box-blue .remark-inline-code,
+.content-box-gray .remark-inline-code,
+.content-box-grey .remark-inline-code,
+.content-box-army .remark-inline-code,
+.content-box-green .remark-inline-code,
+.content-box-purple .remark-inline-code,
+.content-box-red .remark-inline-code,
+.content-box-yellow .remark-inline-code {
+  background: none;
+}
+
+.full-width {
+    display: flex;
+    width: 100%;
+    flex: 1 1 auto;
+}
+
+/*************************
+  Custom classes
+**************************/
+
+.pull-left-55 {
+  float: left;
+  width: 54%;
+}
+.pull-right-45 {
+  float: right;
+  width: 45%;
+}
+
+.pull-left-45 {
+  float: left;
+  width: 44%;
+}
+.pull-right-55 {
+  float: right;
+  width: 55%;
+}
+
+.pull-left-60 {
+  float: left;
+  width: 59%;
+}
+.pull-right-40 {
+  float: right;
+  width: 40%;
+}
+
+.pull-left-40 {
+  float: left;
+  width: 39%;
+}
+.pull-right-60 {
+  float: right;
+  width: 60%;
+}
+
+
+.pull-left-66 {
+  float: left;
+  width: 65%;
+}
+.pull-right-33 {
+  float: right;
+  width: 34%;
+}
+
+.pull-left-33 {
+  float: left;
+  width: 34%;
+}
+.pull-right-66 {
+  float: right;
+  width: 66%;
+}
+
+/* use to position text at the bottom */
+.pull-down {
+  position: absolute;
+  bottom: 50px;
+}
+
+/* Title slide */
+
+/* H1 fonts  */
+
+.title-slide h1 {
+  color: #ffffff;
+  font-weight: normal;
+  font-size: 60px;
+  padding: 20px;
+  text-align: left;
+  vertical-align: middle;
+  margin-bottom: 18px;
+}
+
+
+/* H2 fonts */
+
+.title-slide h2 {
+  color: #C0C0C0 !important; <!--  first of type is master brand red -->
+  font-size: 35px;
+  padding-left: 20px;
+  padding-bottom: 10px;
+  margin-top: 0px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+
+/* H3 fonts */
+
+.title-slide h3 {
+  font-size: 28px;
+  font-weight: normal;
+  color: #C0C0C0;
+  padding-left: 20px;
+  margin: 0px;
+  line-height: 1;
+  text-align: left;
+  vertical-align: middle;
+}
+
