@@ -1,54 +1,47 @@
 ---
 title: "Описание, проверка значимости и валидности линейных моделей"
-subtitle: ""
+subtitle: "Линейные модели..."
 author: "Марина Варфоломеева, Вадим Хайтов"
+date: "Осень `r format(Sys.Date(), '%Y')`"
 output:
   xaringan::moon_reader:
-    # self_contained: true
+    self_contained: true
     lib_dir: libs
-    # css: "assets/xaringan.css"
+    css: [ninjutsu, "assets/xaringan-themer.css", "assets/xaringan.css"]
+    df_print: default
     nature:
-      highlightStyle: github
+      highlightStyle: googlecode
       highlightLines: true
       countIncrementalSlides: false
-      titleSlideClass: [top, center, inverse]
+      titleSlideClass: [middle, left, inverse]
       beforeInit: "assets/macros.js"
     includes:
       in_header: "assets/xaringan_in_header.html"
       after_body: "assets/xaringan_after_body.html"
 ---
 
-<style>
-.remark-slide-content {
-  padding-top: 0px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 20px;
-}
-pre {
-    display: block;
-    font-family: monospace;
-    font-size: 20px;
-    white-space: pre;
-    margin: 0.5em 0px;
-    margin-top: 0em;
-    margin-right: 0px;
-    margin-bottom: 0em;
-    margin-left: 0px;
-}
-.remark-code, .remark-inline-code { font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace;
-                                    font-size: 80%;
-                                  }
-</style>
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE, fig.showtext = TRUE}
+source("assets/xaringan_setup.R")
+library(xaringanExtra)
+use_tile_view()
+use_scribble()
+use_search(show_icon = FALSE)
+use_progress_bar(color = "#6d2b5e", location = "bottom", height = "10px")
+use_freezeframe()
+# use_webcam()
+# use_panelset()
+# use_extra_styles(hover_code_line = TRUE)
 
-```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 70, scipen = 6, digits = 3)
-library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, 
-               fig.width = 9, fig.height = 3, fig.retina = 3,
-               warning = FALSE, message = FALSE)
+# http://tachyons.io/docs/
+# https://roperzh.github.io/tachyons-cheatsheet/
+use_tachyons()
+```
+
+```{r libs, include=FALSE, warning=FALSE}
+library("tidyverse")
+library("cowplot")
+library("ggplot2")
+theme_set(theme_bw(base_size = 22))
 ```
 
 # Описание и проверка значимости линейных моделей

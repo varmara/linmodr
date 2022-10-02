@@ -4,9 +4,24 @@
     <title>Описание, проверка значимости и валидности линейных моделей</title>
     <meta charset="utf-8" />
     <meta name="author" content="Марина Варфоломеева, Вадим Хайтов" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
-    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
-    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <meta name="date" content="2022-01-01" />
+    <script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
+    <link href="site_libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="site_libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="site_libs/tile-view-0.2.6/tile-view.js"></script>
+    <script src="site_libs/fabric-4.3.1/fabric.min.js"></script>
+    <link href="site_libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="site_libs/mark.js-8.11.1/mark.min.js"></script>
+    <link href="site_libs/xaringanExtra-search-0.0.1/search.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-search-0.0.1/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":false,"autoSearch":true}) })</script>
+    <script src="site_libs/xaringanExtra-progressBar-0.0.1/progress-bar.js"></script>
+    <script src="site_libs/freezeframe-5.0.2/freezeframe.min.js"></script>
+    <script src="site_libs/xaringanExtra-freezeframe-0.0.1/freezeframe-init.js"></script>
+    <script id="xaringanExtra-freezeframe-options" type="application/json">{"selector":"img[src$=\"gif\"]","trigger":"click","overlay":false,"responsive":true,"warnings":true}</script>
+    <link href="site_libs/tachyons-4.12.0/tachyons.min.css" rel="stylesheet" />
     <!-- https://github.com/fnaufel/xaringan-smartify-->
     <script
     			  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -14,39 +29,30 @@
     			  crossorigin="anonymous">
     </script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/fnaufel/xaringan-smartify/smartify.min.js"></script>
+    <link rel="stylesheet" href="assets/xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="assets/xaringan.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
-class: top, center, inverse, title-slide
+class: middle, left, inverse, title-slide
 
+.title[
 # Описание, проверка значимости и валидности линейных моделей
+]
+.subtitle[
+## Линейные модели…
+]
+.author[
 ### Марина Варфоломеева, Вадим Хайтов
+]
+.date[
+### 2022
+]
 
 ---
 
 
-&lt;style&gt;
-.remark-slide-content {
-  padding-top: 0px;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-bottom: 20px;
-}
-pre {
-    display: block;
-    font-family: monospace;
-    font-size: 20px;
-    white-space: pre;
-    margin: 0.5em 0px;
-    margin-top: 0em;
-    margin-right: 0px;
-    margin-bottom: 0em;
-    margin-left: 0px;
-}
-.remark-code, .remark-inline-code { font-family: 'Source Code Pro', 'Lucida Console', Monaco, monospace;
-                                    font-size: 80%;
-                                  }
-&lt;/style&gt;
+
 
 
 
@@ -105,24 +111,24 @@ class: middle, center, inverse
 
 
 ```
-## 
-## Call:
-## lm(formula = PIQ ~ MRINACount, data = brain)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-##  -39.6  -17.9   -1.6   17.0   42.3 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)  1.7437570 42.3923825    0.04    0.967  
-## MRINACount   0.0001203  0.0000465    2.59    0.014 *
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 21 on 38 degrees of freedom
-## Multiple R-squared:  0.15,	Adjusted R-squared:  0.127 
-## F-statistic: 6.69 on 1 and 38 DF,  p-value: 0.0137
+
+Call:
+lm(formula = PIQ ~ MRINACount, data = brain)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+ -39.6  -17.9   -1.6   17.0   42.3 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)  1.7437570 42.3923825    0.04    0.967  
+MRINACount   0.0001203  0.0000465    2.59    0.014 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 21 on 38 degrees of freedom
+Multiple R-squared:  0.15,	Adjusted R-squared:  0.127 
+F-statistic: 6.69 on 1 and 38 DF,  p-value: 0.0137
 ```
 
 ---
@@ -131,7 +137,7 @@ class: middle, center, inverse
 
 `$$PIQ_i = 1.744 + 0.0001202 \cdot MRINACount_i$$`
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-3-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -207,24 +213,24 @@ summary(brain_model)
 ```
 
 ```
-## 
-## Call:
-## lm(formula = PIQ ~ MRINACount, data = brain)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-##  -39.6  -17.9   -1.6   17.0   42.3 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)  1.7437570 42.3923825    0.04    0.967  
-## MRINACount   0.0001203  0.0000465    2.59    0.014 *
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 21 on 38 degrees of freedom
-## Multiple R-squared:  0.15,	Adjusted R-squared:  0.127 
-## F-statistic: 6.69 on 1 and 38 DF,  p-value: 0.0137
+
+Call:
+lm(formula = PIQ ~ MRINACount, data = brain)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+ -39.6  -17.9   -1.6   17.0   42.3 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)  1.7437570 42.3923825    0.04    0.967  
+MRINACount   0.0001203  0.0000465    2.59    0.014 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 21 on 38 degrees of freedom
+Multiple R-squared:  0.15,	Adjusted R-squared:  0.127 
+F-statistic: 6.69 on 1 and 38 DF,  p-value: 0.0137
 ```
 
 
@@ -245,7 +251,7 @@ class: middle, center, inverse
 
 Общая изменчивость `\(SS_{t}\)` --- это сумма квадратов отклонений наблюдаемых значений `\(y_i\)` от общего среднего `\(\bar y\)`
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-7-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -253,13 +259,13 @@ class: middle, center, inverse
 
 `$$SS_t = SS_r + SS_e$$`
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-8-1.png" width="720" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
 
 ---
 
 ## От изменчивостей к дисперсиям
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unnamed-chunk-9-1.png" width="720" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
 
 
 
@@ -314,7 +320,7 @@ class: middle, center, inverse
 Для простой линейной регрессии `\(df_{r} = 1\)` и `\(df_{e} = n - 2\)`
 
 
-&lt;img src="07_model_description_and_validation_files/figure-html/f-distr-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/f-distr-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -340,7 +346,7 @@ class: middle, center, inverse
 
 ## В чем различие между этими двумя моделями?
 
-&lt;img src="07_model_description_and_validation_files/figure-html/residuals-scatter-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/residuals-scatter-1.png)&lt;!-- --&gt;
 
 --
 
@@ -386,24 +392,24 @@ summary(brain_model)
 ```
 
 ```
-## 
-## Call:
-## lm(formula = PIQ ~ MRINACount, data = brain)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-##  -39.6  -17.9   -1.6   17.0   42.3 
-## 
-## Coefficients:
-##               Estimate Std. Error t value Pr(&gt;|t|)  
-## (Intercept)  1.7437570 42.3923825    0.04    0.967  
-## MRINACount   0.0001203  0.0000465    2.59    0.014 *
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 21 on 38 degrees of freedom
-## Multiple R-squared:  0.15,	Adjusted R-squared:  0.127 
-## F-statistic: 6.69 on 1 and 38 DF,  p-value: 0.0137
+
+Call:
+lm(formula = PIQ ~ MRINACount, data = brain)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+ -39.6  -17.9   -1.6   17.0   42.3 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)  1.7437570 42.3923825    0.04    0.967  
+MRINACount   0.0001203  0.0000465    2.59    0.014 *
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 21 on 38 degrees of freedom
+Multiple R-squared:  0.15,	Adjusted R-squared:  0.127 
+F-statistic: 6.69 on 1 and 38 DF,  p-value: 0.0137
 ```
 
 ---
@@ -448,11 +454,11 @@ coef(summary(fit))
 ```
 
 ```
-##    Estimate Std. Error t value Pr(&gt;|t|)
-## V2    0.986     0.1280    7.70 1.99e-14
-## V3    0.971     0.1266    7.67 2.50e-14
-## V4    0.861     0.1196    7.20 8.30e-13
-## V5    0.927     0.0833   11.13 4.78e-28
+   Estimate Std. Error t value Pr(&gt;|t|)
+V2    0.986     0.1280    7.70 1.99e-14
+V3    0.971     0.1266    7.67 2.50e-14
+V4    0.861     0.1196    7.20 8.30e-13
+V5    0.927     0.0833   11.13 4.78e-28
 ```
 
 Все значимо? Пишем статью?
@@ -479,7 +485,7 @@ library(car)
 residualPlot(fit, pch = ".")
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/bird-1.png" width="360" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/bird-1.png)&lt;!-- --&gt;
 
 [http://www4.stat.ncsu.edu/~stefanski/NSF_Supported/Hidden_Images/stat_res_plots.html](http://www4.stat.ncsu.edu/~stefanski/NSF_Supported/Hidden_Images/stat_res_plots.html)
 
@@ -666,9 +672,9 @@ head(brain_diag, 2)
 ```
 
 ```
-##   PIQ MRINACount   .hat .sigma  .cooksd .fitted .resid .stdresid
-## 1 124     816932 0.0664   20.9 0.049838     100  24.02    1.1840
-## 2 124    1001121 0.0669   21.3 0.000304     122   1.87    0.0921
+  PIQ MRINACount   .hat .sigma  .cooksd .fitted .resid .stdresid
+1 124     816932 0.0664   20.9 0.049838     100  24.02    1.1840
+2 124    1001121 0.0669   21.3 0.000304     122   1.87    0.0921
 ```
 
 - `.hat` --- "сила воздействия" данного наблюдения (leverage)
@@ -693,7 +699,7 @@ ggplot(brain_diag, aes(x = 1:nrow(brain_diag), y = .cooksd)) +
   geom_bar(stat = "identity")
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/gg-cook-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/gg-cook-1.png)&lt;!-- --&gt;
 
 --
 
@@ -713,7 +719,7 @@ gg_resid &lt;- ggplot(data = brain_diag, aes(x = .fitted, y = .stdresid)) +
 gg_resid
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/gg-resid-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/gg-resid-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -725,7 +731,7 @@ class: middle, center, inverse
 
 ## Нелинейность связи видно на графиках остатков
 
-&lt;img src="07_model_description_and_validation_files/figure-html/non-linear-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/non-linear-1.png)&lt;!-- --&gt;
 
 ### Проверка на линейность связи
 
@@ -750,11 +756,11 @@ class: middle, center, inverse
 
 ### Логарифмирование
 
-&lt;img src="07_model_description_and_validation_files/figure-html/log-transform-1.png" width="504" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/log-transform-1.png)&lt;!-- --&gt;
 
 ### Возведение в степень
 
-&lt;img src="07_model_description_and_validation_files/figure-html/power-transform-1.png" width="504" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/power-transform-1.png)&lt;!-- --&gt;
 
 и т.д.
 
@@ -762,7 +768,7 @@ class: middle, center, inverse
 
 ## При прочих равных не стоит трансформировать отклик  
 
-&lt;img src="07_model_description_and_validation_files/figure-html/dep-var-transform-1.png" width="504" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/dep-var-transform-1.png)&lt;!-- --&gt;
 
 __Осторожно!__ Вы рискуете изучить не то, что хотели:  
 
@@ -811,7 +817,7 @@ class: middle, center, inverse
 
 ## Нарушение условия независимости: Неучтенная переменная
 
-&lt;img src="07_model_description_and_validation_files/figure-html/unaccounted-var-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/unaccounted-var-1.png)&lt;!-- --&gt;
 
 --
 
@@ -825,7 +831,7 @@ class: middle, center, inverse
 В данном случае, наблюдения --- это временной ряд. 
 
 
-&lt;img src="07_model_description_and_validation_files/figure-html/autocorr-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/autocorr-1.png)&lt;!-- --&gt;
 
 
 На графиках остатков четко видно, что остатки не являются независимыми.
@@ -877,7 +883,7 @@ ggplot(data = brain_diag, aes(x = MRINACount, y = .stdresid)) +
   geom_hline(yintercept = 0)
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/resid-predict-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/resid-predict-1.png)&lt;!-- --&gt;
 
 
 ```r
@@ -901,7 +907,7 @@ class: middle, center, inverse
 
 ## 3. Нормальное распределение `\(y\)` (для каждого уровня значений `\(x\)`) 
 
-&lt;img src="07_model_description_and_validation_files/figure-html/gg-norm-tunnel-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/gg-norm-tunnel-1.png)&lt;!-- --&gt;
 
 Это условие невозможно проверить "в лоб", т.к. обычно каждому `\(x\)` соответствует лишь небольшое число `\(y\)` 
 ---
@@ -962,7 +968,7 @@ Cтьюдентизированные остатки --- t-распределе�
 qqPlot(brain_model, id = FALSE) # из пакета car
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/qqplot-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/qqplot-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -991,7 +997,7 @@ class: middle, center, inverse
 
 Это самое важное условие, поскольку многие тесты чувствительны к гетероскедастичности.
 
-&lt;img src="07_model_description_and_validation_files/figure-html/gg-norm-tunnel-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/gg-norm-tunnel-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1004,7 +1010,7 @@ class: middle, center, inverse
 
 Лучший способ проверки на гомогенность дисперсий --- график остатков.
 
-&lt;img src="07_model_description_and_validation_files/figure-html/homo-hetero-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/homo-hetero-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1016,7 +1022,7 @@ class: middle, center, inverse
 gg_resid
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/resid-plot-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/resid-plot-1.png)&lt;!-- --&gt;
 
 --
 
@@ -1027,7 +1033,7 @@ gg_resid
 ## Что делать если вы столкнулись с гетероскедастичностью?
 
 
-&lt;img src="07_model_description_and_validation_files/figure-html/hetero-log-transform-1.png" width="432" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/hetero-log-transform-1.png)&lt;!-- --&gt;
 
 Трансформация может помочь...
 
@@ -1102,7 +1108,7 @@ ggplot(dat1, aes(x = x1, y =  y1)) + geom_point()+
   geom_smooth(method="lm", alpha = 0.7)
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/block-1-task-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/block-1-task-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1110,9 +1116,9 @@ ggplot(dat1, aes(x = x1, y =  y1)) + geom_point()+
 
 ### Графики
 
-&lt;img src="07_model_description_and_validation_files/figure-html/block-1-1.png" width="720" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/block-1-1.png)&lt;!-- --&gt;
 
-&lt;img src="07_model_description_and_validation_files/figure-html/block-1-q-1.png" width="216" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/block-1-q-1.png)&lt;!-- --&gt;
 
 --
 
@@ -1164,16 +1170,16 @@ qqPlot(mod1, id = FALSE)
     geom_smooth(method = "lm")
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/block-2-task-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/block-2-task-1.png)&lt;!-- --&gt;
 
 ---
 
 ## Решение, блок 2
 
 
-&lt;img src="07_model_description_and_validation_files/figure-html/block-2-1.png" width="720" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/block-2-1.png)&lt;!-- --&gt;
 
-&lt;img src="07_model_description_and_validation_files/figure-html/block-2-q-1.png" width="216" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/block-2-q-1.png)&lt;!-- --&gt;
 
 --
 
@@ -1222,16 +1228,16 @@ dat3 &lt;- data.frame(x3, y3)
 ggplot(dat3, aes(x=x3, y=y3)) + geom_point() + geom_smooth(method="lm")
 ```
 
-&lt;img src="07_model_description_and_validation_files/figure-html/block-3-task-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/block-3-task-1.png)&lt;!-- --&gt;
 
 ---
 
 ## Решение, блок 3
 
 
-&lt;img src="07_model_description_and_validation_files/figure-html/block-3-1.png" width="720" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/block-3-1.png)&lt;!-- --&gt;
 
-&lt;img src="07_model_description_and_validation_files/figure-html/block-3-q-1.png" width="216" style="display: block; margin: auto;" /&gt;
+![](07_model_description_and_validation_files/figure-html/block-3-q-1.png)&lt;!-- --&gt;
 
 --
 
@@ -1304,8 +1310,9 @@ qqPlot(mod3, id = FALSE)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="assets/macros.js"></script>
 <script>var slideshow = remark.create({
-"highlightStyle": "github",
+"highlightStyle": "googlecode",
 "highlightLines": true,
 "countIncrementalSlides": false
 });
@@ -1348,6 +1355,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable
