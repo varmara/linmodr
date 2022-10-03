@@ -59,7 +59,7 @@ install.packages("car")
 install.packages("dplyr")
 ```
 
-<!-- - Презентация [04_hypothesis_testing.html](04_hypothesis_testing.html) -->
+- Презентация [04_hypothesis_testing.html](04_hypothesis_testing.html)
 - Код [04_hypothesis_testing_code.R](04_hypothesis_testing_code.R)
 - Данные [aml.csv](data/aml.csv)
 
