@@ -13,7 +13,7 @@
 
 <title>Презентации и данные</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/simplex.min.css" rel="stylesheet" />
@@ -42,6 +42,7 @@
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -120,13 +121,20 @@ code span.wa { color: #008000; font-weight: bold; } /* Warning */
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -162,6 +170,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -219,11 +230,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -455,26 +470,39 @@ href="02_intro_ggplot_training.html">02_intro_ggplot_training.html</a></li>
 <h3>03 Описательная статистика</h3>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;car&quot;</span>)</span></code></pre></div>
 <p>Часть 1</p>
-<!-- - Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html) -->
-<!-- - Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R) -->
-<!-- - Данные [diatome_count.csv](data/diatome_count.csv) -->
+<ul>
+<li>Презентация <a
+href="03.1_descriptive_statistics.html">03.1_descriptive_statistics.html</a></li>
+<li>Код <a
+href="03.1_descriptive_statistics_code.R">03.1_descriptive_statistics_code.R</a></li>
+<li>Данные <a href="data/diatome_count.csv">diatome_count.csv</a></li>
+</ul>
 <p>Часть 2</p>
-<!-- - Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html) -->
-<!-- - Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R) -->
+<ul>
+<li>Презентация <a
+href="03.2_descriptive_statistics_normal_d.html">03.2_descriptive_statistics_normal_d.html</a></li>
+<li>Код <a
+href="03.2_descriptive_statistics_normal_d_code.R">03.2_descriptive_statistics_normal_d_code.R</a></li>
+</ul>
 </div>
 <div id="тестирование-гипотез" class="section level3">
 <h3>04 Тестирование гипотез</h3>
-<!-- - Презентация [04_hypothesis_testing.html](04_hypothesis_testing.html) -->
-<!-- - Код [04_hypothesis_testing_code.R](04_hypothesis_testing_code.R) -->
-<!-- - Данные [aml.csv](data/aml.csv) -->
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;dplyr&quot;</span>)</span></code></pre></div>
+<ul>
+<li>Презентация <a
+href="04_hypothesis_testing.html">04_hypothesis_testing.html</a></li>
+<li>Код <a
+href="04_hypothesis_testing_code.R">04_hypothesis_testing_code.R</a></li>
+<li>Данные <a href="data/aml.csv">aml.csv</a></li>
+</ul>
 </div>
 </div>
 <div id="линейная-регрессия" class="section level2">
 <h2>Линейная регрессия</h2>
 <div id="простая-линейная-регрессия" class="section level3">
 <h3>05 Простая линейная регрессия</h3>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;gridExtra&quot;</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;gridExtra&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</span></code></pre></div>
 <!-- - Презентация: [05_LM.html](05_LM.html) -->
 <ul>
 <li>Код:
@@ -512,8 +540,8 @@ class="section level3">
 class="section level3">
 <h3>08 Множественная линейная регрессия. Выбор оптимальной модели</h3>
 <p>Часть 1. Множественная линейная регрессия</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;gridExtra&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ISwR&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;gridExtra&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ISwR&quot;</span>)</span></code></pre></div>
 <!-- - Презентация: [08.1_multiple_LM.html](08.1_multiple_LM.html) -->
 <!-- - Код: [08.1_multiple_LM_code.R](08.1_multiple_LM_code.R) -->
 <!-- - Данные: [loyn.csv](data/loyn.csv) -->
@@ -528,9 +556,9 @@ class="section level3">
 <div id="модели-с-непрерывными-и-дискретными-предикторами-ancova"
 class="section level3">
 <h3>09 Модели с непрерывными и дискретными предикторами (ANCOVA)</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;dplyr&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;dplyr&quot;</span>)</span></code></pre></div>
 <p>Часть 1. Модели с разными значениями отрезка (intercept) для
 групп</p>
 <!-- - Презентация: [09.1_LM_with_continuous_and_discrete_predictors_2.html](09.1_LM_with_continuous_and_discrete_predictors_2.html) -->
@@ -552,7 +580,7 @@ class="section level3">
 </div>
 <div id="однофакторный-дисперсионный-анализ" class="section level3">
 <h3>10 Однофакторный дисперсионный анализ</h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;DAAG&quot;</span>, <span class="st">&quot;multcomp&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;DAAG&quot;</span>, <span class="st">&quot;multcomp&quot;</span>))</span></code></pre></div>
 <!-- - Презентация: [10_anova.html](10_anova.html) -->
 <!-- - Код: -->
 <!--     + [10_anova_code.R](10_anova_code.R) -->
@@ -586,7 +614,7 @@ class="section level3">
 </div>
 <div id="glm-для-счетных-данных" class="section level3">
 <h3>13 GLM для счетных данных</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;AER&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;AER&quot;</span>)</span></code></pre></div>
 <!-- - Презентация: [13_GLM_count.html](13_GLM_count.html) -->
 <!-- - Код: [13_GLM_count_code.R](13_GLM_count_code.R) -->
 <!-- - Данные: [Pollinators_Montero-Castano, Vila, 2015.xlsx](data/Pollinators_Montero-Castano, Vila, 2015.xlsx) -->
@@ -597,8 +625,8 @@ class="section level3">
 <div id="glm-для-бинарных-данных-логистическая-регрессия"
 class="section level3">
 <h3>14 GLM для бинарных данных (=логистическая регрессия)</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;ISwR&quot;</span>, <span class="st">&quot;cowplot&quot;</span>))</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;catdata&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;ISwR&quot;</span>, <span class="st">&quot;cowplot&quot;</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;catdata&quot;</span>)</span></code></pre></div>
 <!-- - Презентация: [14_GLM_binary.pdf](14_GLM_binary.pdf) -->
 <!-- - Код: [14_GLM_binary_code.R](14_GLM_binary_code.R) -->
 <!-- - Задание: [14_GLM_binary_training.R](14_GLM_binary_training.R) -->
@@ -613,7 +641,7 @@ class="section level3">
 <div id="glmm-для-нормально-распределенных-данных"
 class="section level3">
 <h3>15 GLMM для нормально-распределенных данных</h3>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;lme4&quot;</span>, <span class="st">&quot;pbkrtest&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;lme4&quot;</span>, <span class="st">&quot;pbkrtest&quot;</span>))</span></code></pre></div>
 <!-- - Презентация: -->
 <!--     + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf) -->
 <!--     + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf) -->
@@ -635,7 +663,7 @@ class="section level3">
 <!-- - Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R) -->
 <!-- - Данные: -->
 <!--     + [mussel_juv_ad.csv](data/mussel_juv_ad.csv) -->
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;faraway&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;faraway&quot;</span>)</span></code></pre></div>
 </div>
 <div id="glmm-для-счетных-данных" class="section level3">
 <h3>17 GLMM для счетных данных</h3>
@@ -650,8 +678,8 @@ class="section level3">
 </div>
 <div id="glmm-для-бинарных-данных" class="section level3">
 <h3>18 GLMM для бинарных данных</h3>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;MASS&quot;</span>, <span class="st">&quot;glmmML&quot;</span>, <span class="st">&quot;lme4&quot;</span>, <span class="st">&quot;doBy&quot;</span>))</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;performance&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;MASS&quot;</span>, <span class="st">&quot;glmmML&quot;</span>, <span class="st">&quot;lme4&quot;</span>, <span class="st">&quot;doBy&quot;</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;performance&quot;</span>)</span></code></pre></div>
 <!-- - Презентация: [18_GLMM_binary.pdf](18_GLMM_binary.pdf) -->
 <!-- - Код: [18_GLMM_binary_code.R](18_GLMM_binary_code.R) -->
 <!-- - Данные: -->

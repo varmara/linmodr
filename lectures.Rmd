@@ -44,20 +44,24 @@ install.packages("car")
 
 Часть 1
 
-<!-- - Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html) -->
-<!-- - Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R) -->
-<!-- - Данные [diatome_count.csv](data/diatome_count.csv) -->
+- Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html)
+- Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R)
+- Данные [diatome_count.csv](data/diatome_count.csv)
 
 Часть 2
 
-<!-- - Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html) -->
-<!-- - Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R) -->
+- Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html)
+- Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R)
 
 ### 04 Тестирование гипотез
 
-<!-- - Презентация [04_hypothesis_testing.html](04_hypothesis_testing.html) -->
-<!-- - Код [04_hypothesis_testing_code.R](04_hypothesis_testing_code.R) -->
-<!-- - Данные [aml.csv](data/aml.csv) -->
+```{r eval=FALSE}
+install.packages("dplyr")
+```
+
+- Презентация [04_hypothesis_testing.html](04_hypothesis_testing.html)
+- Код [04_hypothesis_testing_code.R](04_hypothesis_testing_code.R)
+- Данные [aml.csv](data/aml.csv)
 
 ## Линейная регрессия
 
