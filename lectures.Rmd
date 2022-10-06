@@ -72,7 +72,7 @@ install.packages("gridExtra")
 install.packages("cowplot")
 ```
 
-<!-- - Презентация: [05_LM.html](05_LM.html) -->
+- Презентация: [05_LM.html](05_LM.html)
 
 - Код:
     + [05_LM_code.R](05_LM_code.R)
