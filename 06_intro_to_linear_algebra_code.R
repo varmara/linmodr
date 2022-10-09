@@ -390,6 +390,18 @@ MyData$CiUp  <- MyData$predicted + 1.96 *MyData$se
 
 MyData$CiLow  <- MyData$predicted - 1.96 *MyData$se
 
-ggplot(MyData, aes(x = speed, y = predicted)) +
+ggplot(MyData, aes(x = , y = )) +
+
+
+
+
+
+
+
+
+
+
+
+
 
 

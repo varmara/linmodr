@@ -85,7 +85,7 @@ install.packages("cowplot")
 ### 06 Основы линейной алгебры
 
 <!-- - Презентация: [06_Introduction_to_linear_algebra.html](06_intro_to_linear_algebra.html) -->
-<!-- - Код: [06_Introduction_to_linear_algebra_code.R](06_intro_to_linear_algebra_code.R) -->
+- Код: [06_Introduction_to_linear_algebra_code.R](06_intro_to_linear_algebra_code.R)
 
 ### 07 Описание, проверка значимости и валидности линейной модели
 
