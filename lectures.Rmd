@@ -28,7 +28,7 @@ install.packages("tidyr")
 install.packages("MASS")
 ```
 
-<!-- - Презентация: [Основы ggplot2](02_intro_ggplot.html) -->
+- Презентация: [Основы ggplot2](02_intro_ggplot.html)
 - Код: [02_intro_ggplot.R](02_intro_ggplot.R)
 - Данные: [Titanic.csv](data/Titanic.csv)
 - Данные: [fev.xls](data/fev.xls)
@@ -44,20 +44,24 @@ install.packages("car")
 
 Часть 1
 
-<!-- - Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html) -->
-<!-- - Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R) -->
-<!-- - Данные [diatome_count.csv](data/diatome_count.csv) -->
+- Презентация [03.1_descriptive_statistics.html](03.1_descriptive_statistics.html)
+- Код [03.1_descriptive_statistics_code.R](03.1_descriptive_statistics_code.R)
+- Данные [diatome_count.csv](data/diatome_count.csv)
 
 Часть 2
 
-<!-- - Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html) -->
-<!-- - Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R) -->
+- Презентация [03.2_descriptive_statistics_normal_d.html](03.2_descriptive_statistics_normal_d.html)
+- Код [03.2_descriptive_statistics_normal_d_code.R](03.2_descriptive_statistics_normal_d_code.R)
 
 ### 04 Тестирование гипотез
 
-<!-- - Презентация [04_hypothesis_testing.html](04_hypothesis_testing.html) -->
-<!-- - Код [04_hypothesis_testing_code.R](04_hypothesis_testing_code.R) -->
-<!-- - Данные [aml.csv](data/aml.csv) -->
+```{r eval=FALSE}
+install.packages("dplyr")
+```
+
+- Презентация [04_hypothesis_testing.html](04_hypothesis_testing.html)
+- Код [04_hypothesis_testing_code.R](04_hypothesis_testing_code.R)
+- Данные [aml.csv](data/aml.csv)
 
 ## Линейная регрессия
 
@@ -68,20 +72,20 @@ install.packages("gridExtra")
 install.packages("cowplot")
 ```
 
-<!-- - Презентация: [05_LM.html](05_LM.html) -->
+- Презентация: [05_LM.html](05_LM.html)
 
-<!-- - Код: -->
-<!--     + [05_LM_code.R](05_LM_code.R) -->
-<!--     + [05_LM_task.R](05_LM_task.R) -->
-<!-- - Данные: -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!--     + [secher.xls](data/secher.xls) -->
+- Код:
+    + [05_LM_code.R](05_LM_code.R)
+    + [05_LM_task.R](05_LM_task.R)
+- Данные:
+    + [IQ_brain.csv](data/IQ_brain.csv)
+    + [secher.xls](data/secher.xls)
 
 
 ### 06 Основы линейной алгебры
 
 <!-- - Презентация: [06_Introduction_to_linear_algebra.html](06_intro_to_linear_algebra.html) -->
-<!-- - Код: [06_Introduction_to_linear_algebra_code.R](06_intro_to_linear_algebra_code.R) -->
+- Код: [06_Introduction_to_linear_algebra_code.R](06_intro_to_linear_algebra_code.R)
 
 ### 07 Описание, проверка значимости и валидности линейной модели
 
