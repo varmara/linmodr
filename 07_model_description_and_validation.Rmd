@@ -35,13 +35,14 @@ use_freezeframe()
 # http://tachyons.io/docs/
 # https://roperzh.github.io/tachyons-cheatsheet/
 use_tachyons()
+# use_broadcast()
 ```
 
 ```{r libs, include=FALSE, warning=FALSE}
 library("tidyverse")
 library("cowplot")
 library("ggplot2")
-theme_set(theme_bw(base_size = 22))
+theme_set(theme_bw(base_size = 20))
 ```
 
 # Описание и проверка значимости линейных моделей
@@ -138,7 +139,7 @@ $$PIQ_i = 1.744 + 0.0001202 \cdot MRINACount_i$$
 
 ```{r echo=FALSE, purl=TRUE}
 library(ggplot2)
-theme_set(theme_bw())
+theme_set(theme_bw(base_size = 22))
 ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
   geom_point() + 
   geom_smooth(method = "lm")
@@ -176,7 +177,7 @@ class: middle, center, inverse
 
 class: middle, center, inverse
 
-# Тестирование гипотез с помощью t-критерия  
+# Тестирование гипотез <br/>с помощью t-критерия  
 
 ---
 
@@ -202,7 +203,7 @@ class: middle, center, inverse
 
 $$t=\frac{b_k - \beta_k}{SE_{b_k}} = \frac{b_k - 0}{SE_{b_k}} = \frac{b_k}{SE_{b_k}}$$
 
-Число степеней свободы: $df = n − p$, где $n$ --- объем выборки, $p$ --- число параметров модели, $k$ --- конкретный коэффициент регрессии. 
+Число степеней свободы: $df = n − p$, где $n$ — объем выборки, $p$ — число параметров модели, $k$ — конкретный коэффициент регрессии. 
 
 Для простой линейной регрессии с одним предиктором $df = n - 2$.
 
@@ -232,7 +233,7 @@ t_crit <- qt(p = 0.95, df = 38)
 
 class: middle, center, inverse
 
-# Тестирование гипотез при помощи F-критерия
+# Тестирование гипотез <br/>при помощи F-критерия
 
 ```{r echo=FALSE}
 lims <- range(brain$PIQ) + c(-1, 1)
@@ -243,6 +244,8 @@ Y <- 150
 Y_hat <- predict(brain_model, newdata = brain[brain$PIQ == 150, ])
 X <- brain$MRINACount[brain$PIQ == 150]
 
+th_smaller_title <- theme(title = element_text(size = 14))
+
 # Общая изменчивость
 pl_tot <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
   geom_hline(yintercept = gmean, size = 1) + 
@@ -250,9 +253,9 @@ pl_tot <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +
                    xend = MRINACount, yend = gmean), colour = "grey70") + 
   geom_point() +
     annotate("text", label = "Общее\nсреднее", 
-             x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
+             x = 1050000, y = gmean - 8, size = 5, hjust = 0.7) + 
   ggtitle("Общая изменчивость") + 
-  annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 6) 
+  annotate("text", label = "SS[t] == sum((y[i] - bar(y)))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 7) + th_smaller_title
 
 # Когда есть зависимость
 pl_all <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +  
@@ -264,8 +267,8 @@ pl_all <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +
              x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
   annotate("segment", x = X - 1500, y = Y, xend = X - 1500, yend = gmean, colour = "grey70", size = 2) + 
   annotate("segment", x = X + 2000, y = Y, xend = X + 2000, yend = Y_hat, colour = "#009E73", size = 2) +
-  annotate("segment", x = X + 2000, y = Y_hat, xend = X + 2000, yend = gmean, colour = "#E69F00", size = 2) +
-  geom_point(size = 2)
+  annotate("segment", x = X + 2000, y = Y_hat, xend = X + 2000, yend = gmean, colour = "blue", size = 2) +
+  geom_point(size = 2) + th_smaller_title
 
 # Когда нет зависимости
 pl_no <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +  
@@ -273,23 +276,23 @@ pl_no <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +
                    xend = MRINACount, yend = gmean), colour = "grey70") +  
   geom_hline(yintercept = gmean, size = 5) + 
       annotate("text", label = "Общее среднее", 
-             x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
+             x = 1050000, y = gmean - 8, size = 5, hjust = 0.7) + 
     geom_hline(yintercept = gmean, size = 2, colour = "dodgerblue1") + 
   annotate("segment", x = X - 1500, y = Y, xend = X - 1500, yend = gmean, colour = "grey70", size = 2) + 
   annotate("segment", x = X + 2000, y = Y, xend = X + 2000, yend = gmean, colour = "#009E73", size = 2) +
-  geom_point(size = 2)
+  geom_point(size = 2) + th_smaller_title
 
 # Объясненная изменчивость
 pl_exp <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
   geom_smooth(method = "lm", se = F, size = 1.3) + 
   geom_hline(yintercept = gmean, size = 1) + 
   geom_segment(aes(x = MRINACount, y = gmean, 
-                   xend = MRINACount, yend = fitted(brain_model)), colour = "#E69F00") + 
+                   xend = MRINACount, yend = fitted(brain_model)), colour = "blue") + 
   geom_point() +
   annotate("text", label = "Общее\nсреднее", 
-           x = 1050000, y = gmean - 8, size = 4, hjust = 0.7) + 
+           x = 1050000, y = gmean - 8, size = 5, hjust = 0.7) + 
   ggtitle("Объясненная изменчивость") +
-      annotate("text", label = "SS[r] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 6)
+      annotate("text", label = "SS[r] == sum((hat(y)[i] - bar(y)))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 7) + th_smaller_title
 
 # Остаточная изменчивость
 pl_res <- ggplot(brain, aes(x = MRINACount, y = PIQ)) + 
@@ -298,14 +301,14 @@ pl_res <- ggplot(brain, aes(x = MRINACount, y = PIQ)) +
                    xend = MRINACount, yend = fitted(brain_model)), colour = "#009E73") + 
   geom_point() +
   ggtitle("Случайная изменчивость") +
-  annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 6)
+  annotate("text", label = "SS[e] == sum((y [i] - hat(y)[i]))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 7) + th_smaller_title
 ```
 
 ---
 
 ## Общая изменчивость
 
-Общая изменчивость $SS_{t}$ --- это сумма квадратов отклонений наблюдаемых значений $y_i$ от общего среднего $\bar y$
+Общая изменчивость $SS_{t}$ — это сумма квадратов отклонений наблюдаемых значений $y_i$ от общего среднего $\bar y$
 
 ```{r echo=FALSE}
 pl_tot
@@ -315,30 +318,34 @@ pl_tot
 
 ## Структура общей изменчивости
 
-$$SS_t = SS_r + SS_e$$
+$$SS_t = \color{blue}{SS_r} + \color{green}{SS_e}$$
 
-```{r echo=FALSE, fig.height=5.5, fig.width=10}
-library(gridExtra)
-lay <- rbind(c(NA, 1, 1, 1, 1, NA),
-             c(2, 2, 3, 3, 4, 4))
-grid.arrange(pl_all, pl_tot, pl_exp, pl_res, layout_matrix = lay, heights = c(0.42, 0.58))
+```{r echo=FALSE, opts.label='fig.large'}
+plot_grid(
+  plot_grid(ggplot() + theme_void(), 
+            pl_all, 
+            ggplot() + theme_void(),
+            nrow = 1, rel_widths = c(1, 2, 1)),
+  plot_grid(pl_tot, pl_exp, pl_res, 
+            nrow = 1, rel_widths = c(1, 1.05, 1)), 
+  ncol = 1, rel_heights = c(1, 1.1))
 ```
 
 ---
 
 ## От изменчивостей к дисперсиям
 
-```{r echo=FALSE, fig.height=2.8, fig.width=10}
-library(gridExtra)
-grid.arrange(pl_tot, pl_exp, pl_res, nrow = 1)
+```{r echo=FALSE, opts.label='fig.wide'}
+plot_grid(pl_tot, pl_exp, pl_res, 
+          nrow = 1, rel_widths = c(1, 1.05, 1))
 ```
 
 
 
-| $MS_t$, полная дисперсия | $MS_r$, дисперсия, <br /> объясненная регрессией  | $MS_e$, остаточная дисперсия | 
+| $MS_t$, полная дисперсия | $\color{blue}{MS_r}$, дисперсия, <br /> объясненная регрессией  | $\color{green}{MS_e}$, остаточная дисперсия | 
 |-----|-----|-----|
-| $MS_{t} =\frac{SS_{t}}{df_{t}}$ | $MS_{r} =\frac{SS_{r}}{df_{r}}$ | $MS_{e} =\frac{SS_{e}}{df_{e}}$ |
-| $SS_{t}=\sum{(\bar{y}-y_i)^2}$ | $SS_{r}=\sum{(\hat{y}-\bar{y})^2}$ | $SS_{e}=\sum{(\hat{y}-y_i)^2}$ |
+| $MS_{t} =\frac{SS_{t}}{df_{t}}$ | $\color{blue}{MS_{r}} =\frac{\color{blue}{SS_{r}}}{df_{r}}$ | $\color{green}{MS_{e}} =\frac{\color{green}{SS_{e}}}{df_{e}}$ |
+| $SS_{t}=\sum{(y_i - \bar{y})^2}$ | $\color{blue}{SS_{r}}=\sum{(\hat{y}-\bar{y})^2}$ | $\color{green}{SS_{e}}=\sum{(y_i - \hat{y})^2}$ |
 | $df_{t} = n-1$ | $df_{r} = 1$ | $df_{e} = n-2$  |
 
 ---
@@ -347,43 +354,48 @@ grid.arrange(pl_tot, pl_exp, pl_res, nrow = 1)
 
 Если дисперсии остатков для всех значений x равны, то
 
-$E(MS_r) = \sigma^2 + \beta_1^2\sum(x_i - \bar x)^2$ 
+$E(\color{blue}{MS_r}) = \color{green}{\sigma^2} + \color{red}{\beta_1}^2\sum(x_i - \bar x)^2$ 
 --
-$= \sigma^2 + \sigma_{x}^2$
+$= \color{green}{\sigma^2} + \sigma_{x}^2$
 
-$E(MS_e) =\sigma^2$
+$E(\color{green}{MS_e}) = \color{green}{\sigma^2}$
 
 <br/>
 
 --
 
-Если зависимости нет, то $\beta_1 = 0$, и тогда 
---
-$MS_r \approx MS_e$
+Если зависимости нет, то $\color{red}{\beta_1} = 0$, и тогда 
 
 --
 
-Значит, $MS_r \approx MS_e$
+$\color{blue}{MS_r} \approx \color{green}{MS_e}$
 
 <br/>
 
 --
 
-- $H_0: \beta_1 = 0$
-- $H_A: \beta_1 \ne 0$
+Мы хотим протестировать гипотезы:
 
-$$F_{df_r, df_e}= \frac{MS _{r}}{MS_{e}}$$
+- $H_0: \color{red}{\beta_1} = 0$
+- $H_A: \color{red}{\beta_1} \ne 0$
+
+--
+
+$$F_{df_r, df_e}= \frac{\color{blue}{MS _{r}}}{\color{green}{MS_{e}}}$$
+Поздравляю, вы только что изобрели _F_-критерий!
 
 ---
 
 ## Тестирование значимости коэффициентов регрессии при помощи F-критерия
 
-- $H_0: \beta_1 = 0$
-- $H_A: \beta_1 \ne 0$
+.pull-left-60[
+- $H_0: \color{red}{\beta_1} = 0$
+- $H_A: \color{red}{\beta_1} \ne 0$
 
-$$F_{df_r, df_e}= \frac{MS _{r}}{MS_{e}}$$
+$$F_{df_r, df_e}= \frac{\color{blue}{MS _{r}}}{\color{green}{MS_{e}}}$$
 
-Для простой линейной регрессии $df_{r} = 1$ и $df_{e} = n - 2$
+Для простой линейной регрессии  
+$df_{r} = 1$ и $df_{e} = n - 2$
 
 
 ```{r f-distr, echo=FALSE, purl=FALSE}
@@ -394,8 +406,18 @@ dfr <- data.frame(f = seq(-0.01, 2, 0.001))
 ggplot(dfr, aes(x = f)) + 
   stat_function(fun = df, args = list(df1 = 1, df2 = 38), size = 1.3) + 
 labs(title = expression(bold(paste("F-распределение,", ~df[1]==1, ", ", ~ df[2]==38))),
-     x = "F", y = "Плотность вероятности")
+     x = "F", y = "Плотность вероятности") + th_smaller_title
 ```
+
+]
+
+--
+
+.pull-right-40[
+
+F-тест будет односторонним, т.к. соотношение дисперсий может быть только положительным.
+
+]
 
 ---
 
@@ -403,9 +425,9 @@ labs(title = expression(bold(paste("F-распределение,", ~df[1]==1, "
 
 | Источник изменчивости  | df | SS | MS | F  | 
 | ----- | ----- | ----- | ----- | ----- | 
-| Регрессия | $df _r = 1$ | $SS _r = \sum{(\bar y - \hat y _i)^2}$ | $MS _r = \frac{SS _r}{df _r}$ | $F _{df _r, df _e} = \frac{MS _r}{MS _e}$ | 
-| Остаточная|  $df _e = n - 2$ | $SS _e = \sum{(y _i - \hat y _i)^2}$ | $MS _e = \frac{SS _e}{df _e}$ | 
-| Общая | $df _t = n - 1$ | $SS _t = \sum {(\bar y - y _i)^2}$ | 
+| .blue[Регрессия] | $df _r = 1$ | $\color{blue}{SS _r} = \sum{(\hat y _i - \bar y)^2}$ | $\color{blue}{MS _r} = \frac{\color{blue}{SS _r}}{df _r}$ | $F _{df _r, df _e} = \frac{\color{blue}{MS _r}}{\color{green}{MS _e}}$ | 
+| .green[Остаточная]|  $df _e = n - 2$ | $\color{green}{SS _e} = \sum{(y _i - \hat y _i)^2}$ | $\color{green}{MS _e} = \frac{\color{green}{SS _e}}{df _e}$ | 
+| Общая | $df _t = n - 1$ | $SS _t = \sum {(y _i - \bar y)^2}$ | 
 
 <br/><br/>
 
@@ -421,7 +443,7 @@ class: middle, center, inverse
 
 ## В чем различие между этими двумя моделями?
 
-```{r residuals-scatter, echo=FALSE}
+```{r residuals-scatter, echo=FALSE, opts.label='fig.wide'}
 x <- rnorm(200, 20, 5)
 y1 <- 10 * x + 5 + rnorm(100, 0, 5)
 y2 <- 10 * x + 5 + rnorm(100, 0, 30)
@@ -430,7 +452,7 @@ pl_R1 <- ggplot(d, aes(x = x, y = y1)) + geom_point() +
   geom_smooth(method = "lm", se = F)
 pl_R2 <- ggplot(d, aes(x = x, y = y2)) + geom_point() + 
   geom_smooth(method = "lm", se = F)
-grid.arrange (pl_R1, pl_R2, nrow = 1)
+plot_grid(pl_R1, pl_R2, nrow = 1)
 ```
 
 --
@@ -442,22 +464,20 @@ grid.arrange (pl_R1, pl_R2, nrow = 1)
 
 ---
 
-## Коэффициент детерминации --- мера качества подгонки модели
+## Коэффициент детерминации — мера качества подгонки модели
 
-### Коэффициент детерминации
+__Коэффициент детерминации__ описывает какую долю дисперсии зависимой переменной объясняет модель
 
-описывает какую долю дисперсии зависимой переменной объясняет модель
-
-$$R^2 = \frac{SS_{r}}{SS_{t}}$$
+$$R^2 = \frac{\color{blue}{SS_{r}}}{SS_{t}}$$
 
 - $0 < R^2 < 1$
-- $R^2 = r^2$ --- для простой линейной регрессии коэффициент детерминации равен квадрату коэффициента Пирсоновской корреляции
+- $R^2 = r^2$ — для простой линейной регрессии коэффициент детерминации равен квадрату коэффициента Пирсоновской корреляции
 
 ---
 
 ## Если в модели много предикторов, нужно внести поправку
 
-###  Скорректированный коэффициет детерминации (adjusted R-squared)
+__Скорректированный коэффициет детерминации__ (adjusted R-squared)
 
 Применяется если необходимо сравнить две модели с разным количеством параметров  
 
@@ -475,19 +495,20 @@ $p$ - количество параметров в модели
 summary(brain_model)
 ```
 
+--
+
+Модель зависимости IQ от размеров мозга на МРТ объясняет всего лишь `r round(summary(brain_model)$r.squared * 100, 1)` % общей изменчивости IQ в этих данных. 
+
+Ценность такой модели сомнительна.
+
 ---
 
 ## Как записываются результаты регрессионного анализа в тексте статьи?
 
 Мы показали, что связь между результатами теста на IQ и размером головного мозга на МРТ описывается моделью вида
 <br/>
-IQ = 1.74 + 0.00012 MRINACount ( $F_{1,38}$ = 6.686, p = 0.0136, $R^2$ = 0.149)
-<br/>
-<br/>
+IQ = 1.74 + 0.00012 MRINACount ( $F_{1,38}$ = 6.686, p = 0.014, $R^2$ = `r round(summary(brain_model)$r.squared, 2)`)
 
---
-
-Неужели уже пора писать статью?
 
 ---
 
@@ -503,11 +524,11 @@ IQ = 1.74 + 0.00012 MRINACount ( $F_{1,38}$ = 6.686, p = 0.0136, $R^2$ = 0.149)
 
 class: middle, center, inverse
 
-# Зачем нужна диагностика линейных моделей
+# Зачем нужна диагностика <br/>линейных моделей
 
 ---
 
-## Зачем нужна диагностика модели? Разве тестов было недостаточно?
+## Зачем нужна диагностика модели? <br/>Разве тестов было недостаточно?
 
 ```{r}
 dat <- read.table('data/orly_owl_Lin_4p_5_flat.txt')
@@ -519,7 +540,7 @@ coef(summary(fit))
 
 ---
 
-## Задание 3
+## Остатки модели
 
 Постройте график зависимости остатков от предсказанных значений при помощи этого кода
 
@@ -564,43 +585,43 @@ class: middle, center, inverse
 --
 
 ### "Сырые" остатки
-$$e_i = y_i - \hat{y_i}$$
+$$\color{green}{e_i} = y_i - \color{blue}{\hat{y_i}}$$
 
 --
 
 ### Стандартизованные (стьюдентизированные) остатки
 
-$$s_i = \frac{e_i}{\sqrt{MS_e(1-h_{ii})}}$$
+$$s_i = \frac{\color{green}{e_i}}{\sqrt{MS_e(1-\color{purple}{h_{ii}})}}$$
 
 - легко сравнивать (стандартизованы), учитывают силу влияния наблюдений
 
 
 <hr />
 
-- $\sqrt{MS_e}$ --- стандартное отклонение остатков
-- $h_{ii}$ --- "сила воздействия" отдельных наблюдений (leverage, рычаг проекционной матрицы)
+- $\sqrt{MS_e}$ — стандартное отклонение остатков
+- $\color{purple}{h_{ii}}$ — "сила воздействия" отдельных наблюдений (leverage, рычаг проекционной матрицы)
 
 ---
 
 ## Что такое проекционная матрица?
 
-По определению, остатки $\mathbf{e} = \mathbf{Y} - \hat{\mathbf{Y}}$.
+По определению, остатки $\color{green}{\mathbf{e}} = \mathbf{Y} - \color{blue}{\hat{\mathbf{Y}}}$.
 
-Тогда $\mathbf{e} = \mathbf{Y} - \hat{\mathbf{Y}} = \mathbf{Y} - \mathbf{X} \mathbf{b} = \mathbf{Y} - \mathbf{X}[\mathbf{X}'\mathbf{X}]^{-1}\mathbf{X}'\mathbf{Y}$.
-
-<br/>
-
-Обозначим  $\mathbf{H} \equiv  \mathbf{X}[\mathbf{X}'\mathbf{X}]^{-1}\mathbf{X}'$.
-
-Матрица $\mathbf{H}$ --- называется __"хэт"-матрица__ (hat-matrix) или проекционная матрица, т.к. __она позволяет получить предсказанные значения из наблюдаемых__.
-
-$\hat{\mathbf{Y}} = \mathbf{H}\mathbf{Y}$
+Тогда $\color{green}{\mathbf{e}} = \mathbf{Y} - \mathbf{X} \mathbf{b} = \mathbf{Y} - \mathbf{X}[\mathbf{X}'\mathbf{X}]^{-1}\mathbf{X}'\mathbf{Y}$.
 
 <br/>
 
-Тогда остатки можно получить как $\mathbf{e} = \mathbf{Y} - \mathbf{H}\mathbf{Y} = (\mathbf{I} - \mathbf{H})\mathbf{Y}$.
+Обозначим  $\color{purple}{\mathbf{H}} \equiv  \mathbf{X}[\mathbf{X}'\mathbf{X}]^{-1}\mathbf{X}'$.
 
-Диагональные элементы проекционной матрицы --- это мера воздействия точек на ход линии регрессии.
+Матрица $\color{purple}{\mathbf{H}}$ — называется __"хэт"-матрица__ (_hat-matrix_) или __проекционная матрица__, т.к. она позволяет получить предсказанные значения из наблюдаемых.
+
+$\color{blue}{\hat{\mathbf{Y}}} = \color{purple}{\mathbf{H}}\mathbf{Y}$
+
+<br/>
+
+Тогда остатки можно получить как $\color{green}{\mathbf{e}} = \mathbf{Y} - \color{purple}{\mathbf{H}}\mathbf{Y} = (\mathbf{I} - \color{purple}{\mathbf{H}})\mathbf{Y}$.
+
+Диагональные элементы проекционной матрицы $\color{purple}{h_{ii}}$ — это мера __воздействия__ точек на ход линии регрессии.
 
 ---
 
@@ -610,9 +631,9 @@ class: middle, center, inverse
 
 ---
 
-## Влиятельные наблюдения
+## Влиятельные наблюдения (influential points)
 
-Влиятельные наблюдения --- это наблюдения, которые вносят слишком большой вклад в оценку параметров (коэффициентов) модели.
+Влиятельные наблюдения — это наблюдения, которые вносят слишком большой вклад в оценку параметров (коэффициентов) модели.
 
 ![](images/leverage.png)
 
@@ -622,15 +643,15 @@ class: middle, center, inverse
 
 --
 
-- Точка 1 почти не повлияет, т.к. у нее маленький остаток, хоть и большой $X$
+- Точка 1 почти не повлияет, т.к. у нее маленький остаток, хоть и экстремальное значение $X$
 - Точка 2 почти не повлияет, т.к. ее $X$ близок к среднему, хоть и большой остаток
-- Точка 3 повлияет сильно, т.к. у нее не только большой остаток, но и большой $X$
+- Точка 3 повлияет сильно, т.к. у нее не только большой остаток, но и экстремальное значение $X$
 
 ---
 
-## Воздействие точек $h_{ii}$ (leverage)
+## Воздействие точек (leverage)
 
-показывает силу влияния значений $x_i$ на ход линии регрессии, то есть на $\hat{y_i}$
+__Воздействие__ точек $\color{purple}{h_{ii}}$ (_leverage_) показывает силу влияния значений $x_i$ на ход линии регрессии, то есть на $\color{blue}{\hat{y_i}}$
 
 .pull-left[
 
@@ -642,7 +663,7 @@ class: middle, center, inverse
 
 .pull-right[
 
-![](images/seasaw-Weighing-Machine-by-neys-fadzil-on-Flickr.jpg)
+![:scale 80%](images/seasaw-Weighing-Machine-by-neys-fadzil-on-Flickr.jpg)
 
 <small>Weighing Machine by neys fadzil on Flickr</small>
 
@@ -650,10 +671,10 @@ class: middle, center, inverse
 
 --
 
-Точки, располагающиеся дальше от $\bar{x}$, оказывают более сильное влияние на $\hat{y_i}$
+Точки, располагающиеся дальше от $\bar{x}$, оказывают более сильное влияние на $\color{blue}{\hat{y_i}}$
 
-- $h_{ii}$ варьирует в промежутке от $1/n$ до 1  
-- Если  $h_{ii} > 2(p/n)$, то надо внимательно посмотреть на данное значение ( $p$ --- число параметров, $n$ --- объем выборки)
+- $\color{purple}{h_{ii}}$ варьирует в промежутке от $1/n$ до 1  
+- Если  $\color{purple}{h_{ii}} > 2(p/n)$, то надо внимательно посмотреть на данное значение ( $p$ — число параметров, $n$ — объем выборки)
 
 ---
 
@@ -661,23 +682,33 @@ class: middle, center, inverse
 
 описывает, как повлияет на модель удаление данного наблюдения
 
-$$D_i = \frac{\sum{(\hat y_j-\hat{y}_{j(i)})^2}}{p \; MS_e} = \frac{e_i^2}{p \; MS_e} \; \frac {h_{ii}} {(1 - h_{ii}) ^ 2}$$
+$$D_i = \frac{\sum{( \color{blue}{\hat{y_{j}}} - \color{red}{\hat{y}_{j(i)}})^2}}{p \; MS_e}$$
 
-- $\hat{y_j}$ - значение предсказанное полной моделью
-- $\hat{y}_{j(i)}$ - значение, предсказанное моделью, построенной без учета $i$-го значения предиктора
-- $p$ - количество параметров в модели
-- $MSe$ - среднеквадратичная ошибка модели ( $\hat\sigma^2$ )
-- $h_{ii}$ --- "сила воздействия" отдельных наблюдений (leverage)
+- $\color{blue}{\hat{y_j}}$ — значение предсказанное полной моделью
+- $\color{red}{\hat{y}_{j(i)}}$ — значение, предсказанное моделью, построенной без учета $i$-го значения предиктора
+- $p$ — количество параметров в модели
+- $MS_{e}$ — среднеквадратичная ошибка модели ( $\hat\sigma^2$ )
 
---
 
-<hr />
+---
 
-- Зависит одновременно от величины остатков и "силы воздействия" наблюдений.
+## Расстояние Кука покажет оба аспекта влиятельности
 
-- Условное пороговое значение. Наблюдение является выбросом (outlier), если:
-    - $D_i > 1$ --- это "мягкий" порог
-    - $D_i > 4/(n - p)$ ( $n$ --- объем выборки, $p$ --- число параметров) --- это "жесткий" порог
+Формулу расстояния Кука для данного $i$-того наблюдения можно расписать:
+
+$$D_i = \frac{\color{green}{e_i}^2}{p \; MS_e} \cdot \frac { \color{purple}{h_{ii}} } {(1 - \color{purple}{h_{ii}}) ^ 2}$$
+
+Видно, что $D_i$ зависит сразу от
+
+- $\color{green}{e_i}$ — это величина остатков
+- $\color{purple}{h_{ii}}$ — это воздействие наблюдений
+
+При каком значении $D_i$ будем считать наблюдение выбросом?
+
+Два варианта:
+
+- $D_i > 1$ — "мягкий" порог (для простоты в этом курсе такой)
+- $D_i > \frac{4}{(n - p)}$ —  "жесткий" порог ( $n$ — объем выборки, $p$ — число параметров)
 
 ---
 
@@ -718,11 +749,11 @@ brain_diag <- fortify(brain_model)
 head(brain_diag, 2)
 ```
 
-- `.hat` --- "сила воздействия" данного наблюдения (leverage)
-- `.cooksd` --- расстояние Кука
-- `.fitted` --- предсказанные значения
-- `.resid` --- остатки
-- `.stdresid` --- стандартизованные остатки
+- `.hat` — "сила воздействия" данного наблюдения (leverage)
+- `.cooksd` — расстояние Кука
+- `.fitted` — предсказанные значения
+- `.resid` — остатки
+- `.stdresid` — стандартизованные остатки
 
 ---
 
@@ -730,7 +761,7 @@ head(brain_diag, 2)
 
 Проверяем наличие влиятельных наблюдений в `brain_model`.
 
-Значения на графике расстояния Кука приведены в том же порядке, что и в исходных данных.
+Порядок значений на графике такой же как в исходных данных.
 ```{r echo=FALSE, purl=FALSE}
 cook_cutoff <- 4 / (nrow(brain) - length(coef(brain_model)))
 ```
@@ -769,7 +800,6 @@ class: middle, center, inverse
 ## Нелинейность связи видно на графиках остатков
 
 ```{r non-linear, echo=FALSE, purl=FALSE, fig.height=5}
-library(gridExtra)
 
 set.seed(39484)
 x <- rnorm(100, 10, 3)
@@ -788,10 +818,10 @@ pl_2 <- ggplot(data.frame(x = x2, y = y2), aes(x = x, y = y)) + geom_point()
 lm2 <- lm(y2 ~ x2)
 pl_2res <- ggplot(data.frame(fit = fitted(lm2), res = residuals(lm2)), aes(x = fit, y = res)) + geom_point() + geom_hline(yintercept = 0) + xlab("Fitted") + ylab("Residuals") 
 
-grid.arrange(pl_1, pl_2, pl_1res, pl_2res)
+plot_grid(pl_1, pl_2, pl_1res, pl_2res, nrow = 2)
 ```
 
-### Проверка на линейность связи
+__Проверка на линейность связи__
 
 - График зависимости $y$ от $x$ (и от других переменных, не включенных в модель)
 - График остатков от предсказанных значений
@@ -838,25 +868,23 @@ pl_raw1 <- gg_tr %+% data.frame(x4, y4) + aes(x = x4, y = y4)
 pl_pwr <- gg_tr %+% data.frame(x4, y4) + aes(x = x4, y = log(y4))
 ```
 
-### Логарифмирование
+__Логарифмирование__
 
-```{r log-transform, echo=FALSE, purl=FALSE, fig.width=7, fig.height=2}
-grid.arrange(pl_raw, pl_log, ncol = 2, widths = c(0.52, 0.48))
+```{r log-transform, echo=FALSE, purl=FALSE, opts.label='fig.wider.smaller'}
+plot_grid(pl_raw, pl_log, ncol = 2, rel_widths = c(0.52, 0.48))
 ```
 
-### Возведение в степень
+__Возведение в степень__, и т.д.
 
-```{r power-transform, echo=FALSE, purl=FALSE, fig.width=7, fig.height=2}
-grid.arrange(pl_raw1, pl_pwr, ncol = 2, widths = c(0.52, 0.48))
+```{r power-transform, echo=FALSE, purl=FALSE, opts.label='fig.wider.smaller'}
+plot_grid(pl_raw1, pl_pwr, ncol = 2, rel_widths = c(0.52, 0.48))
 ```
-
-и т.д.
 
 ---
 
-## При прочих равных не стоит трансформировать отклик  
+## Не стоит трансформировать отклик!
 
-```{r dep-var-transform, echo=FALSE, purl=FALSE, fig.height=3, fig.width=7}
+```{r dep-var-transform, echo=FALSE, purl=FALSE, opts.label='fig.wider.small'}
 set.seed(475)
 x <- runif(100, 2, 5)
 eps <- rnorm(100, 0, 10 + abs(x) ^ (3))
@@ -870,7 +898,7 @@ pl_log <- ggplot(data.frame(x = (x), y = log(y + 1)), aes(x = x, y = y)) +
   geom_point() + 
   geom_smooth(method = "lm", alpha = 0.7) + ylab("Log (y)")
 
-grid.arrange(pl_raw, pl_log, ncol = 2)
+plot_grid(pl_raw, pl_log, ncol = 2)
 ```
 
 __Осторожно!__ Вы рискуете изучить не то, что хотели:  
@@ -882,7 +910,6 @@ $E(log(y_i)) = b_0 + b_1x_{1i} + ... + e_i$.
 
 --
 
-<br/>
 Вместо трансформации отклика лучше использовать обобщенную линейную модель с подходящей функцией связи, например:
 
 $log(E(y_i)) =  b_0 + b_1x_{1i}+ ... + e_i$
@@ -918,9 +945,9 @@ class: middle, center, inverse
 
 ---
 
-## Нарушение условия независимости: Неучтенная переменная
+## Нарушение независимости: Неучтенная переменная
 
-```{r unaccounted-var, echo=FALSE, purl=FALSE, fig.height=5}
+```{r unaccounted-var, echo=FALSE, purl=FALSE, fig.width=12, fig.height=6.75}
 set.seed(239874)
 x1 <- runif(100, 20, 50)
 x2 <- runif(100, 8, 22)
@@ -971,8 +998,9 @@ gg_res4 <- ggplot(data.frame(fit = fitted(mod2),
   geom_hline(yintercept = 0) + 
   xlab("X2") + ylab("Residuals")
 
-grid.arrange(gg_lm1, gg_lm2, gg_res1, gg_res3, 
-             gg_res2, gg_res4, ncol = 2)
+plot_grid(gg_lm1, gg_lm2, gg_res1, gg_res3, 
+             gg_res2, gg_res4, ncol = 2, 
+          rel_heights = c(1.1, 1, 1))
 ```
 
 --
@@ -982,12 +1010,12 @@ grid.arrange(gg_lm1, gg_lm2, gg_res1, gg_res3,
 
 ---
 
-## Нарушение условия независимости: Автокорреляция
+## Нарушение независимости: Автокорреляция
 
-В данном случае, наблюдения --- это временной ряд. 
+В данном случае, наблюдения — это временной ряд <br/>или ряд наблюдений в пространстве.
 
 
-```{r autocorr, echo=FALSE, purl=FALSE, fig.height=5}
+```{r autocorr, echo=FALSE, purl=FALSE, opts.label='fig.medium.taller'}
 x3 <- seq(1, 100, 1)
 
 y3 <-  diffinv(rnorm(99)) + rnorm(100, 0, 2)
@@ -996,7 +1024,8 @@ y3 <- y3[1:100]
 pl_3 <- ggplot(data.frame(x = x3, y = y3), 
                aes(x = x, y = y)) +
   geom_point() +
-  geom_smooth(method = "lm", alpha = 0.7)
+  geom_smooth(method = "lm", alpha = 0.7) +
+  labs(x = "Time or space")
 
 lm3 <- lm(y3 ~ x3)
 
@@ -1008,11 +1037,12 @@ pl_3res <- ggplot(data.frame(fit = fitted(lm3),
   geom_hline(yintercept = 0) +
   xlab("Fitted") + ylab("Residuals")
 
-grid.arrange(pl_3, pl_3res, nrow = 2)
+plot_grid(pl_3, pl_3res, nrow = 2)
 ```
 
+--
 
-На графиках остатков четко видно, что остатки не являются независимыми.
+На графиках остатков четко видно, что остатки не являются независимыми. Наблюдения, расположенные на определенном расстоянии друг от друга, имеют остатки похожей величины.
 
 ---
 
@@ -1079,9 +1109,11 @@ class: middle, center, inverse
 
 ---
 
-## 3. Нормальное распределение $y$ (для каждого уровня значений $x$) 
+## 3. Нормальное распределение $y$ <br/>(для каждого уровня значений $x$) 
 
-```{r gg-norm-tunnel, echo=FALSE, fig.height=7, purl=FALSE}
+.pull-left-60[
+
+```{r gg-norm-tunnel, echo=FALSE, purl=FALSE}
 ## Based on code by Arthur Charpentier:
 ## http://freakonometrics.hypotheses.org/9593
 ## TODO: wrap it into a function and adapt it for use with other distributions
@@ -1096,6 +1128,7 @@ dfr <- data.frame(X, Y)
 # regression
 reggig <- glm(Y ~ X, data = dfr, family = gaussian(link = "identity"))
 
+op <- par(mar = c(0, 0, 0, 0))
 # empty plot
 vX <- seq(min(X) - 0.5, max(X) + 0.5, length = n)
 vY <- seq(min(Y) - 50, max(Y) + 50, length = n)
@@ -1154,9 +1187,17 @@ for(j in n:1){
   C <- trans3d(x, y, z, mat)
   lines(C, col = "steelblue")
 }
+par(op)
 ```
 
+]
+
+.pull-right-40[
+
 Это условие невозможно проверить "в лоб", т.к. обычно каждому $x$ соответствует лишь небольшое число $y$ 
+
+]
+
 ---
 
 ## Проверка нормальности распределения остатков
@@ -1173,7 +1214,7 @@ $$y_i = b_0 + b_1x_{1i} + \cdots + e_i$$
 
 --
 
-то остатки от этой модели --- тоже нормально распределенная случайная величина 
+то остатки от этой модели — тоже нормально распределенная случайная величина 
 
 $$e_i \sim N(0, \sigma)$$
 
@@ -1193,21 +1234,23 @@ $$e_i \sim N(0, \sigma)$$
 
 --
 
-Лучший способ проверки --- квантильный график остатков.
+Лучший способ проверки — квантильный график остатков.
 
 ---
 
 ## Квантильный график остатков
 
-По оси Х --- квантили теоретического распределения, по оси Y --- квантили остатков модели. Если наблюдаемое распределение соответствует теоретическому, то точки должны лечь вдоль прямой по диагонали графика.
+По оси Х — квантили теоретического распределения, по оси Y — квантили остатков модели. Если наблюдаемое распределение соответствует теоретическому, то точки должны лечь вдоль прямой по диагонали графика.
+
+<br/>
 
 --
 
-Обычные остатки должны подчиняться нормальному распределению $e \sim N(0, \sigma)$.
+Обычные остатки должны подчиняться нормальному распределению $e \sim N(0, \sigma)$
 
 --
 
-Cтьюдентизированные остатки --- t-распределению.
+Cтьюдентизированные остатки — t-распределению
 
 ```{r qqplot}
 # library(car)
@@ -1237,12 +1280,19 @@ class: middle, center, inverse
 
 ---
 
-## 4. Постоянство дисперсии (= гомогенность дисперсии, гомоскедастичность)
+## 4. Постоянство дисперсии <br/>(= гомогенность дисперсии, гомоскедастичность)
 
-Это самое важное условие, поскольку многие тесты чувствительны к гетероскедастичности.
+.pull-left-60[
 
 ```{r gg-norm-tunnel, echo=FALSE, fig.height=7, purl=FALSE}
 ```
+
+]
+.pull-right-40[
+
+Это самое важное условие, поскольку многие тесты чувствительны к гетероскедастичности.
+
+]
 
 ---
 
@@ -1253,9 +1303,15 @@ class: middle, center, inverse
 - у формальных тестов тоже есть свои условия применимости, и многие сами неустойчивы к гетероскедастичности
 - при больших выборках формальные тесты покажут, что значима даже небольшая гетероскедастичность
 
-Лучший способ проверки на гомогенность дисперсий --- график остатков.
+--
 
-```{r homo-hetero, echo=FALSE, purl=FALSE, fig.height=4}
+Лучший способ проверки на гомогенность дисперсий — график остатков от предсказанных значений.
+
+---
+
+## Проверка гомогенности дисперсий
+
+```{r homo-hetero, echo=FALSE, purl=FALSE, opts.label='fig.wide.taller'}
 N <- 300
 b_0 <- 0.5
 b_1 <- 8
@@ -1281,9 +1337,9 @@ dat_diag_2 <- fortify(lm(y_2 ~ x, data = dat))
 pl_hom_resid <- ggplot(dat_diag_1, aes(x = .fitted, y = .stdresid)) + geom_point(alpha = 0.5) + geom_smooth(se=FALSE, method = "loess")
 pl_heter_resid <- pl_hom_resid %+% dat_diag_2
 
-grid.arrange (pl_hom, pl_heter, 
-              pl_hom_resid, pl_heter_resid, 
-              ncol=2, heights = c(0.55, 0.45))
+plot_grid(pl_hom, pl_heter, 
+          pl_hom_resid, pl_heter_resid, 
+          ncol = 2, rel_heights = c(0.55, 0.45))
 
 ```
 
@@ -1292,6 +1348,7 @@ grid.arrange (pl_hom, pl_heter,
 ## Проверка на гетероскедастичность
 
 Этот график у нас уже есть
+
 ```{r resid-plot}
 gg_resid
 ```
@@ -1302,19 +1359,20 @@ gg_resid
 
 ---
 
-## Что делать если вы столкнулись с гетероскедастичностью?
+## Что делать, если найдена гетероскедастичность?
 
-
-```{r hetero-log-transform, fig.width=6, fig.height=6, echo=FALSE, purl=FALSE}
+```{r hetero-log-transform, echo=FALSE, purl=FALSE, opts.label='fig.wide.taller'}
 dat_diag2 <- fortify(lm(log_y~x, data=dat))
 pl_heter2 <- ggplot(dat, aes(x=x, y=log_y)) + geom_point() + geom_smooth(method = "lm", alpha = 0.7)
 pl_heter_resid2 <- ggplot(dat_diag2, aes(x = .fitted, y = .stdresid)) + geom_point() + geom_smooth(se = FALSE, method = "loess")
 pl_heter <- pl_heter + ggtitle("No transformation")
 pl_heter2 <- pl_heter2 + ggtitle("Log transformed Y")
-grid.arrange (pl_heter, pl_heter2,  pl_heter_resid, pl_heter_resid2,  nrow=2)
+plot_grid(pl_heter, pl_heter2, pl_heter_resid, pl_heter_resid2,  nrow = 2)
 ```
 
-Трансформация может помочь...
+--
+
+Трансформация может помочь, но лучше изменить модель.
 
 ---
 
@@ -1339,28 +1397,31 @@ class: middle, center, inverse
 
 ## Некоторые частые паттерны на графиках остатков
 
-.pull-left[
+.pull-left-60[
 
-![](images/Residuals.png)
+![:scale 100%](images/Residuals.png)
 
-<small>Из кн. Logan, 2010, стр. 174</small>
+.tiny[Из кн. Logan, 2010, стр. 174]
 
 ]
 
 --
 
-.pull-right[
+.pull-right-40[
 
-- Рис. a --- Условия применимости соблюдаются, модель хорошая
-- Рис. b --- Клиновидный паттерн. Есть гетероскедастичность. Модель плохая
-- Рис. c --- Остатки рассеяны равномерно, но нужны дополнительные предикторы
-- Рис. d --- Нелинейный паттерн. Линейная модель использована некорректно
+- Рис. a — Условия применимости соблюдаются, модель хорошая
+
+- Рис. b — Клиновидный паттерн. Есть гетероскедастичность. Модель плохая
+
+- Рис. c — Остатки рассеяны равномерно, но нужны дополнительные предикторы
+
+- Рис. d — Нелинейный паттерн. Линейная модель использована некорректно
 
 ]
 
 ---
 
-## Задание 4
+## Задание 3
 
 Выполните три блока кода
 
@@ -1375,7 +1436,7 @@ class: middle, center, inverse
 
 ---
 
-## Задание 4, блок 1
+## Задание 3, блок 1
 
 ```{r block-1-task}
 set.seed(90829)
@@ -1392,22 +1453,19 @@ ggplot(dat1, aes(x = x1, y =  y1)) + geom_point()+
 
 ### Графики
 
-```{r block-1, fig.show='hold', purl=FALSE, fig.width=10, fig.height=2.2, echo=FALSE}
+```{r block-1, fig.show='hold', purl=FALSE, echo=FALSE, opts.label='fig.wide.taller'}
 mod1 <- lm(y1 ~ x1, data = dat1)
 mod1_diag <- fortify(mod1)
-library(gridExtra)
-grid.arrange(
+library(cowplot)
+plot_grid(
   ggplot(mod1_diag, aes(x = 1:nrow(mod1_diag), y = .cooksd)) + 
     geom_bar(stat = "identity"),
   ggplot(data = mod1_diag, aes(x = .fitted, y = .stdresid)) + 
     geom_point() + geom_hline(yintercept = 0),
   ggplot(data = mod1_diag, aes(x = x1, y = .stdresid)) + 
     geom_point() + geom_hline(yintercept = 0),
-  nrow = 1)
-```
-
-```{r block-1-q, purl=FALSE, fig.width=3, fig.height=3, echo=FALSE}
-qqPlot(mod1, id = FALSE)   
+  function(){par(mar = c(4, 4, 1, 1)); qqPlot(mod1, id = FALSE)},
+  nrow = 2)
 ```
 
 --
@@ -1443,7 +1501,7 @@ qqPlot(mod1, id = FALSE)
 
 ---
 
-## Задание 4, блок 2
+## Задание 3, блок 2
 
 ```{r block-2-task}
   set.seed(7657674)
@@ -1463,21 +1521,18 @@ qqPlot(mod1, id = FALSE)
 ## Решение, блок 2
 
 
-```{r block-2, fig.show='hold', purl=FALSE, fig.width=10, fig.height=2.2, echo=FALSE}
+```{r block-2, fig.show='hold', purl=FALSE, echo=FALSE, opts.label='fig.wide.taller'}
 mod2 <- lm(y2 ~ x2, data = dat2)
 mod2_diag <- fortify(mod2)
-grid.arrange(
+plot_grid(
   ggplot(mod2_diag, aes(x = 1:nrow(mod2_diag), y = .cooksd)) + 
     geom_bar(stat = "identity"),
   ggplot(data = mod2_diag, aes(x = .fitted, y = .stdresid)) + 
     geom_point() + geom_hline(yintercept = 0),
   ggplot(data = mod2_diag, aes(x = x2, y = .stdresid)) + 
     geom_point() + geom_hline(yintercept = 0),
-  nrow = 1)
-```
-
-```{r block-2-q, purl=FALSE, fig.width=3, fig.height=3, echo=FALSE}
-qqPlot(mod2, id = FALSE)   
+  function(){par(mar = c(4, 4, 1, 1)); qqPlot(mod2, id = FALSE)},
+  nrow = 2)
 ```
 
 --
@@ -1513,7 +1568,7 @@ qqPlot(mod2, id = FALSE)
 
 ---
 
-## Задание 4, блок 3
+## Задание 3, блок 3
 
 ```{r block-3-task}
 set.seed(9283)
@@ -1530,27 +1585,24 @@ ggplot(dat3, aes(x=x3, y=y3)) + geom_point() + geom_smooth(method="lm")
 ## Решение, блок 3
 
 
-```{r block-3, fig.show='hold', purl=FALSE, fig.width=10, fig.height=2.2, echo=FALSE}
+```{r block-3, fig.show='hold', purl=FALSE, echo=FALSE, opts.label='fig.wide.taller'}
 mod3 <- lm(y3 ~ x3, data = dat3)
 mod3_diag <- fortify(mod3)
-grid.arrange(
+plot_grid(
   ggplot(mod3_diag, aes(x = 1:nrow(mod3_diag), y = .cooksd)) + 
     geom_bar(stat = "identity"),
   ggplot(data = mod3_diag, aes(x = .fitted, y = .stdresid)) + 
     geom_point() + geom_hline(yintercept = 0),
   ggplot(data = mod3_diag, aes(x = x3, y = .stdresid)) + 
     geom_point() + geom_hline(yintercept = 0),
-  nrow = 1)
-```
-
-```{r block-3-q, purl=FALSE, fig.width=3, fig.height=3, echo=FALSE}
-qqPlot(mod3, id = FALSE)   
+  function(){par(mar = c(4, 4, 1, 1)); qqPlot(mod2, id = FALSE)},
+  nrow = 2)
 ```
 
 --
 
 - 100-е наблюдение сильно влияет на ход регрессии
-- Зависимость нелинейна
+- Зависимость может быть нелинейна
 
 ---
 
@@ -1580,9 +1632,9 @@ qqPlot(mod3, id = FALSE)
 
 ---
 
-## Задание 5
+## Задание 4
 
-Выполните задание 3 в одном из этих файлов:
+Выполните последнее задание в одном из этих файлов:
 - 07_task_assumptions_catsM.R
 - 07_task_assumptions_GAG.R
 
@@ -1597,7 +1649,7 @@ qqPlot(mod3, id = FALSE)
 
 --
 
-- У линейных моделей есть условия применимости, поэтому не спешите описывать результаты --- сначала проверьте.
+- У линейных моделей есть условия применимости, поэтому не спешите описывать результаты — сначала проверьте.
 
 --
 

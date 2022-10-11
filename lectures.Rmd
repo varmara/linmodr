@@ -91,15 +91,15 @@ install.packages("cowplot")
 
 <!-- - Презентация: [07_model_description_and_validation.html](07_model_description_and_validation.html) -->
 
-<!-- - Код: -->
-<!--     + [07_model_description_and_validation_code.R](07_model_description_and_validation_code.R) -->
-<!--     + [07_task_assumptions_catsM.R](07_task_assumptions_catsM.R) -->
-<!--     + [07_task_assumptions_GAG.R](07_task_assumptions_GAG.R) -->
-<!-- - Данные: -->
-<!--     + [IQ_brain.csv](data/IQ_brain.csv) -->
-<!--     + [catsM.xlsx](data/catsM.xlsx) -->
-<!--     + [GAGurine.xlsx](data/GAGurine.xlsx) -->
-<!--     + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt) -->
+- Код:
+    + [07_model_description_and_validation_code.R](07_model_description_and_validation_code.R)
+    + [07_task_assumptions_catsM.R](07_task_assumptions_catsM.R)
+    + [07_task_assumptions_GAG.R](07_task_assumptions_GAG.R)
+- Данные:
+    + [IQ_brain.csv](data/IQ_brain.csv)
+    + [catsM.xlsx](data/catsM.xlsx)
+    + [GAGurine.xlsx](data/GAGurine.xlsx)
+    + [orly_owl_Lin_4p_5_flat.txt](data/orly_owl_Lin_4p_5_flat.txt)
 
 ### 08 Множественная линейная регрессия. Выбор оптимальной модели
 
