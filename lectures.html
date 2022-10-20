@@ -13,7 +13,7 @@
 
 <title>Презентации и данные</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.17/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/simplex.min.css" rel="stylesheet" />
@@ -42,6 +42,7 @@
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -120,13 +121,20 @@ code span.wa { color: #008000; font-weight: bold; } /* Warning */
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -162,6 +170,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -219,11 +230,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -252,8 +267,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -261,16 +276,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -569,13 +577,14 @@ class="section level3">
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;dplyr&quot;</span>)</span></code></pre></div>
 <p>Часть 1. Модели с разными значениями отрезка (intercept) для
 групп</p>
-<!-- - Презентация: [09.1_LM_with_continuous_and_discrete_predictors_2.html](09.1_LM_with_continuous_and_discrete_predictors_2.html) -->
 <ul>
-<li>Код: <a
-href="09.1_LM_with_continuous_and_discrete_predictors_code_2.R">09.1_LM_with_continuous_and_discrete_predictors_code.R</a></li>
-<li>Код: <a
-href="09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R">09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R</a></li>
-<li>Данные:
+<li><p>Презентация: <a
+href="09.1_LM_with_continuous_and_discrete_predictors_2.html">09.1_LM_with_continuous_and_discrete_predictors_2.html</a></p></li>
+<li><p>Код: <a
+href="09.1_LM_with_continuous_and_discrete_predictors_code_2.R">09.1_LM_with_continuous_and_discrete_predictors_code.R</a></p></li>
+<li><p>Код: <a
+href="09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R">09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R</a></p></li>
+<li><p>Данные:</p>
 <ul>
 <li><a href="data/goats.xlsx">goats.xlsx</a></li>
 <li><a href="data/tlc.csv">tlc.csv</a></li>
@@ -584,14 +593,17 @@ href="09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R">09.1_LM_wit
 </ul></li>
 </ul>
 <p>Часть 2. Модели с разными значениями угла наклона для групп</p>
-<!-- - Презентация: [09.2_LM_with_continuous_and_discrete_predictors_interactions.html](09.2_LM_with_continuous_and_discrete_predictors_interactions.html) -->
 <ul>
+<li>Презентация: <a
+href="09.2_LM_with_continuous_and_discrete_predictors_interactions.html">09.2_LM_with_continuous_and_discrete_predictors_interactions.html</a></li>
 <li>Код:
 <ul>
 <li><a
 href="09.2_LM_with_continuous_and_discrete_predictors_interactions.R">09.2_LM_with_continuous_and_discrete_predictors_interactions.R</a></li>
 <li><a
 href="09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R">09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R</a></li>
+<li><a
+href="09.2_LM_with_continuous_and_discrete_predictors_Practicum.R">09.2_LM_with_continuous_and_discrete_predictors_Practicum_solution.R</a></li>
 </ul></li>
 <li>Данные:
 <ul>
