@@ -31,7 +31,7 @@ fix_Anova <- function(anova_obj, rown = NULL, coln = NULL){
   anova_obj[, 4] <- pvals
   anova_obj[, c(1, 3)] <- format(anova_obj[, c(1, 3)], digits = 1, nsmall = 1)
   anova_obj$F.value[nrow(anova_obj)] <- NA
-  anova_obj[, 2] <- format(anova_obj[, 2], digits = 0)
+  # anova_obj[, 2] <- format(anova_obj[, 2], digits = 0)
   if(!is.null(rown)){
     rownames(anova_obj) <- rown
   }

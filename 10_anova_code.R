@@ -93,7 +93,7 @@ mod_diag <- fortify(mod_treatment)
 
 # 1) График расстояния Кука
 ggplot(mod_diag, aes(x = 1:nrow(mod_diag), y = .cooksd)) +
-  geom_bar(stat = "identity")
+  geom_col()
 
 # 2) График остатков от предсказанных значений
 # У нас один единственный дискретный предиктор, поэтому удобнее сразу боксплот
@@ -140,7 +140,7 @@ MyData$lwr <- MyData$ -  * MyData$
 # Дополните код, чтобы получить столбчатый график с предсказаниями линейной модели.
 # Заливкой покажите вид птиц-хозяев. Подпишите оси. Спрячьте легенду.
 gg_bars <- ggplot(data = , aes(x = , y = )) +
-  geom_bar(stat = "", aes(), width = 0.5) +
+  geom_col(aes(), width = 0.5) +
   geom_errorbar(aes(ymin = , ymax = ), width = 0.1) +
   labs( = "Вид хозяев",  = "Длина яиц кукушек, мм") +
   scale_fill_brewer(name = "Вид \nхозяев", palette = "Dark2") +
@@ -168,6 +168,8 @@ eggs_contrtext <- glht(mod_treatment,
                     linfct = mcp(sp = c("БелТряс - ЛугКон = 0",
                                         "ЛесЗав - ЛугКон = 0")))
 summary(eggs_contrtext)
+
+
 
 # 2 способ. Запись матрицы контрастов.
 # Зная коэффициенты модели и ее параметризацию,

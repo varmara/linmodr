@@ -4,9 +4,23 @@
     <title>Дисперсионный анализ, часть 2</title>
     <meta charset="utf-8" />
     <meta name="author" content="Марина Варфоломеева, Вадим Хайтов" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
-    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
-    <link href="libs/remark-css-0.0.1/tamu-fonts.css" rel="stylesheet" />
+    <script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
+    <link href="site_libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="site_libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="site_libs/tile-view-0.2.6/tile-view.js"></script>
+    <script src="site_libs/fabric-4.3.1/fabric.min.js"></script>
+    <link href="site_libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="site_libs/mark.js-8.11.1/mark.min.js"></script>
+    <link href="site_libs/xaringanExtra-search-0.0.1/search.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-search-0.0.1/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":false,"autoSearch":true}) })</script>
+    <script src="site_libs/xaringanExtra-progressBar-0.0.1/progress-bar.js"></script>
+    <script src="site_libs/freezeframe-5.0.2/freezeframe.min.js"></script>
+    <script src="site_libs/xaringanExtra-freezeframe-0.0.1/freezeframe-init.js"></script>
+    <script id="xaringanExtra-freezeframe-options" type="application/json">{"selector":"img[src$=\"gif\"]","trigger":"click","overlay":false,"responsive":true,"warnings":true}</script>
+    <link href="site_libs/tachyons-4.12.0/tachyons.min.css" rel="stylesheet" />
     <!-- https://github.com/fnaufel/xaringan-smartify-->
     <script
     			  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -14,16 +28,30 @@
     			  crossorigin="anonymous">
     </script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/fnaufel/xaringan-smartify/smartify.min.js"></script>
+    <link rel="stylesheet" href="assets/xaringan-themer.css" type="text/css" />
     <link rel="stylesheet" href="assets/xaringan.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
-class: top, center, inverse, title-slide
+class: middle, left, inverse, title-slide
 
+.title[
 # Дисперсионный анализ, часть 2
+]
+.subtitle[
+## Линейные модели…
+]
+.author[
 ### Марина Варфоломеева, Вадим Хайтов
+]
+.date[
+### Осень 2022
+]
 
 ---
+
+
+
 
 
 
@@ -80,10 +108,10 @@ str(fert)
 ```
 
 ```
-## 'data.frame':	29 obs. of  3 variables:
-##  $ TREAT   : chr  "control" "control" "control" "control" ...
-##  $ TIME    : int  2 2 2 2 2 4 4 4 4 4 ...
-##  $ RICHNESS: int  5 7 5 7 5 20 18 20 18 17 ...
+'data.frame':	29 obs. of  3 variables:
+ $ TREAT   : chr  "control" "control" "control" "control" ...
+ $ TIME    : int  2 2 2 2 2 4 4 4 4 4 ...
+ $ RICHNESS: int  5 7 5 7 5 20 18 20 18 17 ...
 ```
 
 ```r
@@ -104,8 +132,8 @@ colSums(is.na(fert))
 ```
 
 ```
-##    treat     time richness 
-##        0        0        0
+   treat     time richness 
+       0        0        0 
 ```
 
 --
@@ -122,11 +150,11 @@ table(fert$time, fert$treat)
 ```
 
 ```
-##    
-##     control nutrient
-##   2       5        5
-##   4       5        5
-##   6       4        5
+   
+    control nutrient
+  2       5        5
+  4       5        5
+  6       4        5
 ```
 
 --
@@ -146,7 +174,7 @@ gg_rich &lt;- ggplot(data = fert, aes(x = time, y = richness, colour = treat)) +
 gg_rich
 ```
 
-&lt;img src="11_two-way_anova_and_interactions_files/figure-html/gg-mean-ci-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](11_two-way_anova_and_interactions_files/figure-html/gg-mean-ci-1.png)&lt;!-- --&gt;
 
 --
 
@@ -301,9 +329,9 @@ contr.treatment(levels(fert$treat))
 ```
 
 ```
-##          nutrient
-## control         0
-## nutrient        1
+         nutrient
+control         0
+nutrient        1
 ```
 
 --
@@ -316,10 +344,10 @@ contr.treatment(levels(fert$time))
 ```
 
 ```
-##   4 6
-## 2 0 0
-## 4 1 0
-## 6 0 1
+  4 6
+2 0 0
+4 1 0
+6 0 1
 ```
 
 ---
@@ -327,6 +355,8 @@ contr.treatment(levels(fert$time))
 ## Переменные-индикаторы
 
 Дополнительные переменные понадобятся, чтобы учесть взаимодействие факторов.
+
+Фрагмент модельной матрицы:
 
 treat &lt;br/&gt;  | time &lt;br/&gt;  | treatnutrient &lt;br/&gt;  `\(x_1\)`  | time4 &lt;br/&gt; `\(x_2\)` | time6 &lt;br/&gt; `\(x_3\)`| treatnutrient:time4 &lt;br/&gt; `\(x_4\)` | treatnutrient:time6 &lt;br/&gt; `\(x_5\)`
 ---- | ---- | ---- | ---- | ---- | ---- | ---- 
@@ -363,15 +393,15 @@ mod_treatment
 ```
 
 ```
-## 
-## Call:
-## lm(formula = log_rich ~ treat * time, data = fert)
-## 
-## Coefficients:
-##         (Intercept)        treatnutrient                time4  
-##              0.8281               0.0504               0.4633  
-##               time6  treatnutrient:time4  treatnutrient:time6  
-##              0.6031               0.1381               0.0462
+
+Call:
+lm(formula = log_rich ~ treat * time, data = fert)
+
+Coefficients:
+        (Intercept)        treatnutrient                time4                time6  
+             0.8281               0.0504               0.4633               0.6031  
+treatnutrient:time4  treatnutrient:time6  
+             0.1381               0.0462  
 ```
 
 Общее уравнение модели
@@ -399,9 +429,9 @@ contr.sum(levels(fert$treat))
 ```
 
 ```
-##          [,1]
-## control     1
-## nutrient   -1
+         [,1]
+control     1
+nutrient   -1
 ```
 
 --
@@ -414,10 +444,10 @@ contr.sum(levels(fert$time))
 ```
 
 ```
-##   [,1] [,2]
-## 2    1    0
-## 4    0    1
-## 6   -1   -1
+  [,1] [,2]
+2    1    0
+4    0    1
+6   -1   -1
 ```
 
 ---
@@ -425,6 +455,8 @@ contr.sum(levels(fert$time))
 ## Переменные-эффекты
 
 Дополнительные переменные понадобятся, чтобы учесть взаимодействие факторов.
+
+Фрагмент модельной матрицы:
 
 treat | time | treat1 &lt;br/&gt; `\(x_1\)` | time1 &lt;br/&gt; `\(x_2\)` | time2 &lt;br/&gt; `\(x_3\)` | treat1:time1 &lt;br/&gt; `\(x_4\)` | treat1:time2 &lt;br/&gt; `\(x_5\)`
 ---- | ---- | ---- | ---- | ---- | ---- | ----
@@ -461,16 +493,14 @@ mod_sum
 ```
 
 ```
-## 
-## Call:
-## lm(formula = log_rich ~ treat * time, data = fert, contrasts = list(treat = "contr.sum", 
-##     time = "contr.sum"))
-## 
-## Coefficients:
-##  (Intercept)        treat1         time1         time2  treat1:time1  
-##       1.2395       -0.0559       -0.3862        0.1462        0.0307  
-## treat1:time2  
-##      -0.0383
+
+Call:
+lm(formula = log_rich ~ treat * time, data = fert, contrasts = list(treat = "contr.sum", 
+    time = "contr.sum"))
+
+Coefficients:
+ (Intercept)        treat1         time1         time2  treat1:time1  treat1:time2  
+      1.2395       -0.0559       -0.3862        0.1462        0.0307       -0.0383  
 ```
 
 Общее уравнение модели
@@ -498,12 +528,12 @@ head(mod_treatment_diag, 2)
 ```
 
 ```
-##   log_rich   treat time .hat .sigma .cooksd .fitted .resid
-## 1    0.778 control    2  0.2 0.0567  0.0405   0.828 -0.050
-## 2    0.903 control    2  0.2 0.0551  0.0911   0.828  0.075
-##   .stdresid
-## 1    -0.986
-## 2     1.479
+  log_rich   treat time .hat  .sigma .cooksd .fitted
+1   0.7782 control    2  0.2 0.05671 0.04050  0.8281
+2   0.9031 control    2  0.2 0.05512 0.09112  0.8281
+    .resid .stdresid
+1 -0.04998   -0.9859
+2  0.07496    1.4788
 ```
 
 ---
@@ -516,7 +546,7 @@ ggplot(mod_treatment_diag, aes(x = 1:nrow(mod_treatment_diag), y = .cooksd)) +
   geom_bar(stat = 'identity')
 ```
 
-&lt;img src="11_two-way_anova_and_interactions_files/figure-html/cooksd-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](11_two-way_anova_and_interactions_files/figure-html/cooksd-1.png)&lt;!-- --&gt;
 
 --
 
@@ -534,7 +564,7 @@ gg_resid &lt;- ggplot(data = mod_treatment_diag, aes(x = .fitted, y = .stdresid)
 gg_resid
 ```
 
-&lt;img src="11_two-way_anova_and_interactions_files/figure-html/resid-fitted-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](11_two-way_anova_and_interactions_files/figure-html/resid-fitted-1.png)&lt;!-- --&gt;
 
 --
 
@@ -544,6 +574,7 @@ gg_resid
 
 ## График зависимости остатков от предикторов в модели
 
+.pull-left[
 
 
 ```r
@@ -551,16 +582,22 @@ ggplot(data = mod_treatment_diag, aes(x = treat, y = .stdresid, colour = time)) 
   geom_boxplot() + geom_hline(yintercept = 0)
 ```
 
-&lt;img src="11_two-way_anova_and_interactions_files/figure-html/resid-predictors-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](11_two-way_anova_and_interactions_files/figure-html/resid-predictors-1.png)&lt;!-- --&gt;
 
 
 Удобнее смотреть на боксплот.
 
+]
+
 --
+
+.pull-right[
 
 - Видна гетерогенность дисперсии. 
 
 В данном случае это не страшно, т.к. дисперсионный анализ устойчив к ситуации, когда в одной из групп разброс меньше, чем в других (особенно, если данные не слишком несбалансированные) (Underwood, 1997, McGuinness, 2002)
+
+]
 
 ---
 
@@ -572,7 +609,7 @@ library(car)
 qqPlot(mod_treatment, id = FALSE) # функция из пакета car
 ```
 
-&lt;img src="11_two-way_anova_and_interactions_files/figure-html/qq-plot1-1.png" width="396" style="display: block; margin: auto;" /&gt;
+![](11_two-way_anova_and_interactions_files/figure-html/qq-plot1-1.png)&lt;!-- --&gt;
 
 --
 
@@ -580,7 +617,7 @@ qqPlot(mod_treatment, id = FALSE) # функция из пакета car
 
 ---
 
-class: middle, center, inverse
+class: segue-yellow
 
 # Несбалансированные данные, типы сумм квадратов
 
@@ -718,16 +755,16 @@ Anova(mod_treatment, type = 'II')
 ```
 
 ```
-## Anova Table (Type II tests)
-## 
-## Response: log_rich
-##            Sum Sq Df F value   Pr(&gt;F)    
-## treat       0.091  1   28.42 0.000021 ***
-## time        2.216  2  344.88  &lt; 2e-16 ***
-## treat:time  0.025  2    3.84    0.036 *  
-## Residuals   0.074 23                     
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Anova Table (Type II tests)
+
+Response: log_rich
+           Sum Sq Df F value   Pr(&gt;F)    
+treat       0.091  1   28.42 0.000021 ***
+time        2.216  2  344.88  &lt; 2e-16 ***
+treat:time  0.025  2    3.84    0.036 *  
+Residuals   0.074 23                     
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ---
@@ -757,17 +794,17 @@ Anova(mod_sum, type = 3)
 ```
 
 ```
-## Anova Table (Type III tests)
-## 
-## Response: log_rich
-##             Sum Sq Df  F value   Pr(&gt;F)    
-## (Intercept)   44.2  1 13776.11  &lt; 2e-16 ***
-## treat          0.1  1    28.04 0.000022 ***
-## time           2.2  2   344.75  &lt; 2e-16 ***
-## treat:time     0.0  2     3.84    0.036 *  
-## Residuals      0.1 23                      
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Anova Table (Type III tests)
+
+Response: log_rich
+            Sum Sq Df  F value   Pr(&gt;F)    
+(Intercept)   44.2  1 13776.11  &lt; 2e-16 ***
+treat          0.1  1    28.04 0.000022 ***
+time           2.2  2   344.75  &lt; 2e-16 ***
+treat:time     0.0  2     3.84    0.036 *  
+Residuals      0.1 23                      
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ---
@@ -786,10 +823,10 @@ vif(mod_treatment)
 ```
 
 ```
-##       treatnutrient               time4               time6 treatnutrient:time4 
-##                2.90                2.62                2.79                3.31 
-## treatnutrient:time6 
-##                3.52
+            GVIF Df GVIF^(1/(2*Df))
+treat      2.897  1           1.702
+time       4.345  2           1.444
+treat:time 8.517  2           1.708
 ```
 
 --
@@ -802,13 +839,15 @@ vif(mod_sum)
 ```
 
 ```
-##       treat1        time1        time2 treat1:time1 treat1:time2 
-##         1.01         1.29         1.29         1.29         1.29
+            GVIF Df GVIF^(1/(2*Df))
+treat      1.006  1           1.003
+time       1.009  2           1.002
+treat:time 1.009  2           1.002
 ```
 
 ---
 
-class: middle, center, inverse
+class: segue-yellow
 
 # Пост хок тест для взаимодействия факторов
 
@@ -871,34 +910,34 @@ summary(dat_tukey)
 
 
 ```
-## 
-## 	 Simultaneous Tests for General Linear Hypotheses
-## 
-## Multiple Comparisons of Means: Tukey Contrasts
-## 
-## 
-## Fit: lm(formula = log_rich ~ treat_time - 1, data = fert)
-## 
-## Linear Hypotheses:
-##                              Estimate Std. Error t value Pr(&gt;|t|)    
-## nutrient.2 - control.2 == 0    0.0504     0.0358    1.41    0.723    
-## control.4 - control.2 == 0     0.4633     0.0358   12.93   &lt;0.001 ***
-## nutrient.4 - control.2 == 0    0.6519     0.0358   18.19   &lt;0.001 ***
-## control.6 - control.2 == 0     0.6031     0.0380   15.86   &lt;0.001 ***
-## nutrient.6 - control.2 == 0    0.6997     0.0358   19.52   &lt;0.001 ***
-## control.4 - nutrient.2 == 0    0.4129     0.0358   11.52   &lt;0.001 ***
-## nutrient.4 - nutrient.2 == 0   0.6015     0.0358   16.78   &lt;0.001 ***
-## control.6 - nutrient.2 == 0    0.5527     0.0380   14.54   &lt;0.001 ***
-## nutrient.6 - nutrient.2 == 0   0.6493     0.0358   18.11   &lt;0.001 ***
-## nutrient.4 - control.4 == 0    0.1885     0.0358    5.26   &lt;0.001 ***
-## control.6 - control.4 == 0     0.1398     0.0380    3.68    0.014 *  
-## nutrient.6 - control.4 == 0    0.2364     0.0358    6.59   &lt;0.001 ***
-## control.6 - nutrient.4 == 0   -0.0488     0.0380   -1.28    0.791    
-## nutrient.6 - nutrient.4 == 0   0.0478     0.0358    1.33    0.763    
-## nutrient.6 - control.6 == 0    0.0966     0.0380    2.54    0.153    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## (Adjusted p values reported -- single-step method)
+
+	 Simultaneous Tests for General Linear Hypotheses
+
+Multiple Comparisons of Means: Tukey Contrasts
+
+
+Fit: lm(formula = log_rich ~ treat_time - 1, data = fert)
+
+Linear Hypotheses:
+                             Estimate Std. Error t value Pr(&gt;|t|)    
+nutrient.2 - control.2 == 0    0.0504     0.0358    1.41    0.723    
+control.4 - control.2 == 0     0.4633     0.0358   12.93   &lt;0.001 ***
+nutrient.4 - control.2 == 0    0.6519     0.0358   18.19   &lt;0.001 ***
+control.6 - control.2 == 0     0.6031     0.0380   15.86   &lt;0.001 ***
+nutrient.6 - control.2 == 0    0.6997     0.0358   19.52   &lt;0.001 ***
+control.4 - nutrient.2 == 0    0.4129     0.0358   11.52   &lt;0.001 ***
+nutrient.4 - nutrient.2 == 0   0.6015     0.0358   16.78   &lt;0.001 ***
+control.6 - nutrient.2 == 0    0.5527     0.0380   14.54   &lt;0.001 ***
+nutrient.6 - nutrient.2 == 0   0.6493     0.0358   18.11   &lt;0.001 ***
+nutrient.4 - control.4 == 0    0.1885     0.0358    5.26   &lt;0.001 ***
+control.6 - control.4 == 0     0.1398     0.0380    3.68    0.014 *  
+nutrient.6 - control.4 == 0    0.2364     0.0358    6.59   &lt;0.001 ***
+control.6 - nutrient.4 == 0   -0.0488     0.0380   -1.28    0.791    
+nutrient.6 - nutrient.4 == 0   0.0478     0.0358    1.33    0.763    
+nutrient.6 - control.6 == 0    0.0966     0.0380    2.54    0.153    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+(Adjusted p values reported -- single-step method)
 ```
 
 ---
@@ -923,13 +962,13 @@ MyData
 ```
 
 ```
-##      treat time   fit   lwr   upr richness   LWR   UPR
-## 1  control    2 0.828 0.776 0.881     5.73  4.97  6.60
-## 2 nutrient    2 0.879 0.826 0.931     6.56  5.70  7.53
-## 3  control    4 1.291 1.239 1.344    18.56 16.34 21.07
-## 4 nutrient    4 1.480 1.428 1.532    29.20 25.76 33.07
-## 5  control    6 1.431 1.373 1.490    25.99 22.58 29.89
-## 6 nutrient    6 1.528 1.475 1.580    32.71 28.88 37.04
+     treat time    fit    lwr    upr richness    LWR    UPR
+1  control    2 0.8281 0.7757 0.8806    5.732  4.966  6.596
+2 nutrient    2 0.8785 0.8261 0.9310    6.560  5.700  7.530
+3  control    4 1.2914 1.2390 1.3439   18.563 16.339 21.074
+4 nutrient    4 1.4800 1.4276 1.5324   29.199 25.764 33.073
+5  control    6 1.4312 1.3726 1.4898   25.991 22.583 29.891
+6 nutrient    6 1.5278 1.4754 1.5802   32.713 28.879 37.040
 ```
 
 ---
@@ -963,13 +1002,13 @@ MyData
 
 
 ```
-##      treat time   fit     se   lwr   upr richness   LWR   UPR
-## 1  control    2 0.828 0.0253 0.777 0.879     5.73  4.99  6.57
-## 2 nutrient    2 0.879 0.0253 0.828 0.929     6.56  5.73  7.50
-## 3  control    4 1.291 0.0253 1.241 1.342    18.56 16.41 20.99
-## 4 nutrient    4 1.480 0.0253 1.429 1.531    29.20 25.87 32.94
-## 5  control    6 1.431 0.0283 1.375 1.488    25.99 22.69 29.75
-## 6 nutrient    6 1.528 0.0253 1.477 1.578    32.71 29.00 36.89
+     treat time    fit      se    lwr    upr richness    LWR    UPR
+1  control    2 0.8281 0.02535 0.7774 0.8788    5.732  4.990  6.565
+2 nutrient    2 0.8785 0.02535 0.8278 0.9292    6.560  5.727  7.496
+3  control    4 1.2914 0.02535 1.2408 1.3421   18.563 16.408 20.985
+4 nutrient    4 1.4800 0.02535 1.4293 1.5307   29.199 25.872 32.937
+5  control    6 1.4312 0.02834 1.3745 1.4879   25.991 22.689 29.753
+6 nutrient    6 1.5278 0.02535 1.4771 1.5785   32.713 28.999 36.887
 ```
 
 ---
@@ -994,13 +1033,13 @@ MyData
 ```
 
 ```
-##      treat time   fit     se   lwr   upr richness   LWR   UPR
-## 1  control    2 0.828 0.0253 0.777 0.879     5.73  4.99  6.57
-## 2 nutrient    2 0.879 0.0253 0.828 0.929     6.56  5.73  7.50
-## 3  control    4 1.291 0.0253 1.241 1.342    18.56 16.41 20.99
-## 4 nutrient    4 1.480 0.0253 1.429 1.531    29.20 25.87 32.94
-## 5  control    6 1.431 0.0283 1.375 1.488    25.99 22.69 29.75
-## 6 nutrient    6 1.528 0.0253 1.477 1.578    32.71 29.00 36.89
+     treat time    fit      se    lwr    upr richness    LWR    UPR
+1  control    2 0.8281 0.02535 0.7774 0.8788    5.732  4.990  6.565
+2 nutrient    2 0.8785 0.02535 0.8278 0.9292    6.560  5.727  7.496
+3  control    4 1.2914 0.02535 1.2408 1.3421   18.563 16.408 20.985
+4 nutrient    4 1.4800 0.02535 1.4293 1.5307   29.199 25.872 32.937
+5  control    6 1.4312 0.02834 1.3745 1.4879   25.991 22.689 29.753
+6 nutrient    6 1.5278 0.02535 1.4771 1.5785   32.713 28.999 36.887
 ```
 
 ---
@@ -1020,7 +1059,7 @@ gg_linep &lt;- ggplot(data = , aes()) +
 gg_linep
 ```
 
-&lt;img src="11_two-way_anova_and_interactions_files/figure-html/gg-lineplot-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](11_two-way_anova_and_interactions_files/figure-html/gg-lineplot-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1037,7 +1076,7 @@ gg_linep &lt;- ggplot(data = MyData, aes(x = time, y = richness,
 gg_linep
 ```
 
-&lt;img src="11_two-way_anova_and_interactions_files/figure-html/gg-lineplot-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](11_two-way_anova_and_interactions_files/figure-html/gg-lineplot-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1051,7 +1090,7 @@ gg_final &lt;- gg_linep + labs(x = 'Экспозиция',  y = 'Число ви
 gg_final
 ```
 
-&lt;img src="11_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-20-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](11_two-way_anova_and_interactions_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -1078,8 +1117,9 @@ gg_final
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="assets/macros.js"></script>
 <script>var slideshow = remark.create({
-"highlightStyle": "vs",
+"highlightStyle": "googlecode",
 "highlightLines": true,
 "countIncrementalSlides": false
 });
@@ -1122,6 +1162,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

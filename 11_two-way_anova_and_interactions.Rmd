@@ -1,33 +1,51 @@
 ---
 title: "Дисперсионный анализ, часть 2"
-subtitle: ""
+subtitle: "Линейные модели..."
 author: "Марина Варфоломеева, Вадим Хайтов"
+date: "Осень `r format(Sys.Date(), '%Y')`"
 output:
   xaringan::moon_reader:
-    self-contained: true
+    self_contained: true
     lib_dir: libs
-    css: [default, tamu-fonts, "assets/xaringan.css"]
+    css: [ninjutsu, "assets/xaringan-themer.css", "assets/xaringan.css"]
     df_print: default
     nature:
-      highlightStyle: vs
+      highlightStyle: googlecode
       highlightLines: true
       countIncrementalSlides: false
-      titleSlideClass: [top, center, inverse]
+      titleSlideClass: [middle, left, inverse]
       beforeInit: "assets/macros.js"
     includes:
       in_header: "assets/xaringan_in_header.html"
       after_body: "assets/xaringan_after_body.html"
 ---
 
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE, fig.showtext = TRUE}
+source("assets/xaringan_setup.R")
+library(xaringanExtra)
+use_tile_view()
+use_scribble()
+use_search(show_icon = FALSE)
+use_progress_bar(color = "#6d2b5e", location = "bottom", height = "10px")
+use_freezeframe()
+# use_webcam()
+# use_panelset()
+# use_extra_styles(hover_code_line = TRUE)
 
-```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 80, scipen = 4, digits = 3)
-library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, 
-               fig.width = 9, fig.height = 3, fig.retina = 3,
-               warning = FALSE, message = FALSE)
+# http://tachyons.io/docs/
+# https://roperzh.github.io/tachyons-cheatsheet/
+use_tachyons()
+# use_broadcast()
+```
+
+```{r libs, include=FALSE, warning=FALSE}
+library("tidyverse")
+library("cowplot")
+library("ggplot2")
+theme_set(theme_bw(base_size = 20))
+```
+
+```{r setup1, include = FALSE, cache = FALSE, purl = FALSE}
 options(knitr.kable.NA = '')
 source("support_linmodr.R")
 ```
@@ -286,6 +304,8 @@ contr.treatment(levels(fert$time))
 
 Дополнительные переменные понадобятся, чтобы учесть взаимодействие факторов.
 
+Фрагмент модельной матрицы:
+
 treat <br/>  | time <br/>  | treatnutrient <br/>  $x_1$  | time4 <br/> $x_2$ | time6 <br/> $x_3$| treatnutrient:time4 <br/> $x_4$ | treatnutrient:time6 <br/> $x_5$
 ---- | ---- | ---- | ---- | ---- | ---- | ---- 
 control   |  2   | 0 | 0 | 0 | 0 | 0          
@@ -355,6 +375,8 @@ contr.sum(levels(fert$time))
 ## Переменные-эффекты
 
 Дополнительные переменные понадобятся, чтобы учесть взаимодействие факторов.
+
+Фрагмент модельной матрицы:
 
 treat | time | treat1 <br/> $x_1$ | time1 <br/> $x_2$ | time2 <br/> $x_3$ | treat1:time1 <br/> $x_4$ | treat1:time2 <br/> $x_5$
 ---- | ---- | ---- | ---- | ---- | ---- | ----
@@ -444,6 +466,7 @@ gg_resid
 
 ## График зависимости остатков от предикторов в модели
 
+.pull-left[
 
 ```{r resid-predictors}
 ggplot(data = mod_treatment_diag, aes(x = treat, y = .stdresid, colour = time)) +
@@ -453,11 +476,17 @@ ggplot(data = mod_treatment_diag, aes(x = treat, y = .stdresid, colour = time)) 
 
 Удобнее смотреть на боксплот.
 
+]
+
 --
+
+.pull-right[
 
 - Видна гетерогенность дисперсии. 
 
 В данном случае это не страшно, т.к. дисперсионный анализ устойчив к ситуации, когда в одной из групп разброс меньше, чем в других (особенно, если данные не слишком несбалансированные) (Underwood, 1997, McGuinness, 2002)
+
+]
 
 ---
 
@@ -481,7 +510,7 @@ par(op)
 
 ---
 
-class: middle, center, inverse
+class: segue-yellow
 
 # Несбалансированные данные, типы сумм квадратов
 
@@ -666,7 +695,7 @@ vif(mod_sum)
 
 ---
 
-class: middle, center, inverse
+class: segue-yellow
 
 # Пост хок тест для взаимодействия факторов
 
