@@ -110,17 +110,17 @@ install.packages("gridExtra")
 install.packages("ISwR")
 ```
 
-<!-- - Презентация: [08.1_multiple_LM.html](08.1_multiple_LM.html) -->
+- Презентация: [08.1_multiple_LM.html](08.1_multiple_LM.html)
 
-<!-- - Код: [08.1_multiple_LM_code.R](08.1_multiple_LM_code.R) -->
-<!-- - Данные: [loyn.csv](data/loyn.csv) -->
+- Код: [08.1_multiple_LM_code.R](08.1_multiple_LM_code.R)
+- Данные: [loyn.csv](data/loyn.csv)
 
 Часть 2. Выбор оптимальной модели
 
-<!-- - Презентация: [08.2_model_selection.html](08.2_model_selection.html) -->
+- Презентация: [08.2_model_selection.html](08.2_model_selection.html)
 
-<!-- - Код: [08.2_model_selection_code.R](08.2_model_selection_code.R) -->
-<!-- - Данные: [loyn.csv](data/loyn.csv) -->
+- Код: [08.2_model_selection_code.R](08.2_model_selection_code.R)
+- Данные: [loyn.csv](data/loyn.csv)
 
 ## Общие линейные модели
 
@@ -134,24 +134,27 @@ install.packages("dplyr")
 
 Часть 1. Модели с разными значениями отрезка (intercept) для групп
 
-<!-- - Презентация: [09.1_LM_with_continuous_and_discrete_predictors_2.html](09.1_LM_with_continuous_and_discrete_predictors_2.html) -->
-<!-- - Код: [09.1_LM_with_continuous_and_discrete_predictors_code.R](09.1_LM_with_continuous_and_discrete_predictors_code_2.R) -->
-<!-- - Код: [09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R](09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R) -->
-<!-- - Данные: -->
-<!--     + [goats.xlsx](data/goats.xlsx) -->
-<!--     + [tlc.csv](data/tlc.csv) -->
-<!--     + [Puromycin.xlsx](data/Puromycin.xlsx) -->
-<!--     + [birthwt.csv](data/birthwt.csv) -->
+- Презентация: [09.1_LM_with_continuous_and_discrete_predictors_2.html](09.1_LM_with_continuous_and_discrete_predictors_2.html)
+
+- Код: [09.1_LM_with_continuous_and_discrete_predictors_code.R](09.1_LM_with_continuous_and_discrete_predictors_code_2.R)
+- Код: [09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R](09.1_LM_with_continuous_and_discrete_predictors_code_ANCOVA.R)
+- Данные:
+    + [goats.xlsx](data/goats.xlsx)
+    + [tlc.csv](data/tlc.csv)
+    + [Puromycin.xlsx](data/Puromycin.xlsx)
+    + [birthwt.csv](data/birthwt.csv)
 
 Часть 2. Модели с разными значениями угла наклона для групп
 
-<!-- - Презентация: [09.2_LM_with_continuous_and_discrete_predictors_interactions.html](09.2_LM_with_continuous_and_discrete_predictors_interactions.html) -->
-<!-- - Код: -->
-<!--     + [09.2_LM_with_continuous_and_discrete_predictors_interactions.R](09.2_LM_with_continuous_and_discrete_predictors_interactions.R) -->
-<!--     + [09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R) -->
-<!-- - Данные: -->
-<!--     + [loyn.csv](data/loyn.csv) -->
-<!--     + [birthwt.csv](data/birthwt.csv) -->
+- Презентация: [09.2_LM_with_continuous_and_discrete_predictors_interactions.html](09.2_LM_with_continuous_and_discrete_predictors_interactions.html)
+- Код:
+    + [09.2_LM_with_continuous_and_discrete_predictors_interactions.R](09.2_LM_with_continuous_and_discrete_predictors_interactions.R)
+    + [09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R](09.2_LM_with_continuous_and_discrete_predictors_Practicum_without_solution.R)
+    + [09.2_LM_with_continuous_and_discrete_predictors_Practicum_solution.R](09.2_LM_with_continuous_and_discrete_predictors_Practicum.R)
+    
+- Данные:
+    + [loyn.csv](data/loyn.csv)
+    + [birthwt.csv](data/birthwt.csv)
 
 
 ### 10 Однофакторный дисперсионный анализ
