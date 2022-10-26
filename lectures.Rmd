@@ -181,8 +181,8 @@ install.packages(c("DAAG", "multcomp"))
     + [11_two-way_anova_practice_rice.R](11_two-way_anova_practice_rice.R)
 - Данные:
     + [hall.csv](data/hall.csv)
-    + [hall.csv](data/rice.csv)
-    + [hall.csv](data/SandwichAnts.csv)
+    + [rice.csv](data/rice.csv)
+    + [SandwichAnts.csv](data/SandwichAnts.csv)
 
 
 ## Обобщенные линейные модели (GLM)
