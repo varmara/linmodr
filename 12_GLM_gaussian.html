@@ -4,10 +4,23 @@
     <title>Обобщенные линейные модели с нормальным распределением остатков</title>
     <meta charset="utf-8" />
     <meta name="author" content="Марина Варфоломеева, Вадим Хайтов" />
-    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
-    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
-    <link href="libs/remark-css-0.0.1/tamu-fonts.css" rel="stylesheet" />
-    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
+    <link href="site_libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="site_libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="site_libs/tile-view-0.2.6/tile-view.js"></script>
+    <script src="site_libs/fabric-4.3.1/fabric.min.js"></script>
+    <link href="site_libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="site_libs/mark.js-8.11.1/mark.min.js"></script>
+    <link href="site_libs/xaringanExtra-search-0.0.1/search.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-search-0.0.1/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":false,"autoSearch":true}) })</script>
+    <script src="site_libs/xaringanExtra-progressBar-0.0.1/progress-bar.js"></script>
+    <script src="site_libs/freezeframe-5.0.2/freezeframe.min.js"></script>
+    <script src="site_libs/xaringanExtra-freezeframe-0.0.1/freezeframe-init.js"></script>
+    <script id="xaringanExtra-freezeframe-options" type="application/json">{"selector":"img[src$=\"gif\"]","trigger":"click","overlay":false,"responsive":true,"warnings":true}</script>
+    <link href="site_libs/tachyons-4.12.0/tachyons.min.css" rel="stylesheet" />
     <!-- https://github.com/fnaufel/xaringan-smartify-->
     <script
     			  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -15,16 +28,32 @@
     			  crossorigin="anonymous">
     </script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/fnaufel/xaringan-smartify/smartify.min.js"></script>
+    <link rel="stylesheet" href="assets/xaringan-themer.css" type="text/css" />
     <link rel="stylesheet" href="assets/xaringan.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
-class: top, center, inverse, title-slide
+class: middle, left, inverse, title-slide
 
+.title[
 # Обобщенные линейные модели с нормальным распределением остатков
+]
+.subtitle[
+## Линейные модели…
+]
+.author[
 ### Марина Варфоломеева, Вадим Хайтов
+]
+.date[
+### Осень 2022
+]
 
 ---
+
+
+
+
+
 
 
 
@@ -37,7 +66,7 @@ class: top, center, inverse, title-slide
 
 Предикторы в такой модели могут быть дискретными и непрерывными.
 
-&lt;img src="12_GLM_gaussian_files/figure-html/glm-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/glm-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -106,7 +135,7 @@ class: top, center, inverse, title-slide
 
 .pull-left[
 
-&lt;img src="12_GLM_gaussian_files/figure-html/norm-distr-1.png" width="396" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/norm-distr-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -138,7 +167,7 @@ Faraway J.J. (2017) Extending the linear model with R, p.154 - написано 
 
 .pull-left[
 
-&lt;img src="12_GLM_gaussian_files/figure-html/gamma-distr-1.png" width="396" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/gamma-distr-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -168,7 +197,7 @@ Faraway J.J. (2017) Extending the linear model with R, p.154 - написано 
 
 .pull-left[
 
-&lt;img src="12_GLM_gaussian_files/figure-html/binomial-distr-1.png" width="396" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/binomial-distr-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -179,7 +208,7 @@ Faraway J.J. (2017) Extending the linear model with R, p.154 - написано 
 Параметры:
 
 - `\(n\)` -- число объектов в испытании  
-- `\(\pi\)` -- вероятность того, что `\(y = 1\)`
+- `\(\pi\)` -- вероятность успеха в одном испытании
 
 
 &lt;br/&gt;
@@ -198,7 +227,7 @@ Faraway J.J. (2017) Extending the linear model with R, p.154 - написано 
 
 .pull-left[
 
-&lt;img src="12_GLM_gaussian_files/figure-html/poisson-distr-1.png" width="396" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/poisson-distr-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -228,7 +257,7 @@ Faraway J.J. (2017) Extending the linear model with R, p.154 - написано 
 
 .pull-left[
 
-&lt;img src="12_GLM_gaussian_files/figure-html/neg-binomial-distr-1.png" width="396" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/neg-binomial-distr-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -269,95 +298,135 @@ Faraway J.J. (2017) Extending the linear model with R, p.154 - написано 
 
 ---
 
-## Чем отличается обобщенная линейная модель от общей?
+## Отличия обобщенной линейной модели от общей
 
-На примере нормального распределения `\(f(y_i|\theta) = N(\mu_i, \sigma)\)`
+На примере нормального распределения `\(\color{purple}{f(y_i|\theta) = N(\mu_i, \sigma)}\)`
 
 --
 
 ### Общая линейная модель состоит из двух компонентов
 
-`\(y_i \sim f(y_i|\theta)\)`
+`\(\color{purple}{y_i \sim f(y_i|\theta)}\)`
 
-`\(E(y_i) = \mu_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}\)`
+`\(\color{teal}{E(y_i) = \mu_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}\)`
 
 --
 
 ### Обобщенная линейная модель состоит из трех компонентов
 
-`\(y_i \sim f(y_i|\theta)\)` 
+`\(\color{purple}{y_i \sim f(y_i|\theta)}\)` 
 
-`\(E(y_i) = \mu_i = g^{-1}(\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i})\)`
+`\(\color{green}{E(y_i) = \mu_i = g^{-1}(\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i})}\)`
 
-`\(g(\mu_i) = \eta_i\)`
+`\(\color{red}{g(\mu_i) = \eta_i}\)`
 
-`\(\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}\)`
+`\(\color{blue}{\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}\)`
 
-- Случайная часть --- `\(y_i \sim f(y_i|\theta)\)` --- распределение из семейства экспоненциальных с параметрами `\(\theta\)`.  
-- Фиксированная часть.
-- `\(g()\)` --- функция связи, которая появляется в GLM и трансформирует мат. ожидание отклика в линейный предиктор (обратная функция обозначается `\(g^{-1}()\)`).
+- Случайная часть --- `\(\color{purple}{y_i \sim f(y_i|\theta)}\)` --- распределение из семейства экспоненциальных с параметрами `\(\theta\)`.  
+- Фиксированная часть: `\(\color{red}{g()}\)` --- .red[функция связи], трансформирует .green[мат. ожидание отклика] в .blue[линейный предиктор] `\(\color{blue}{\eta_i}\)` (обратная функция связи обозначается `\(\color{green}{g^{-1}()}\)`).
 
 ---
 
-class: split-two
-
-.row.bg-main1[.content[
-
 ## Функция связи
 
-`\(y_i \sim f(y_i|\theta)\)` 
+.content-box[
+`\(\color{purple}{y_i \sim f(y_i|\theta)}\)` 
 
-`\(E(y_i) = \mu_i = g^{-1}(\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i})\)`
+`\(\color{green}{E(y_i) = \mu_i = g^{-1}(\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i})}\)`
 
-`\(\color{red} {g(\mu_i) = \eta_i}\)`
+`\(\color{red}{g(\mu_i) = \eta_i}\)`
 
-`\(\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}\)`
+`\(\color{blue}{\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}\)`
+]
 
 &lt;br/&gt;
 
-Функция связи `\(g(\mu)\)` используется разная в зависимости от распределения `\(f(y_i|\theta)\)`
+.red[Функция связи] `\(\color{red}{g(\mu)}\)` разная в зависимости .purple[от распределения отклика] `\(\color{purple}{f(y_i|\theta)}\)`
 
-]]
+---
 
---
+## Функция связи: идентичность
 
-.row.bg-main2[
-.split-three[
-.column[
+.content-box[
+`\(\color{purple}{y_i \sim f(y_i|\theta)}\)` 
 
-**Идентичность:**
+`\(\color{green}{E(y_i) = \mu_i = g^{-1}(\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i})}\)`
 
-`\(E(y_i) = \mu_i \phantom{\frac{e^{\beta_0}}{1 + e^{\beta_0}}}\)`
+`\(\color{red}{g(\mu_i) = \eta_i}\)`
 
-`\(\color{red} {\mu_i = \eta_i}\)`
-
-`\(\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \\+ \beta_{p-1}x_{p-1\,i}\)`
-
+`\(\color{blue}{\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}\)`
 ]
 
-.column[
+&lt;br/&gt;
 
-**Логарифм:**
+.red[Функция связи] `\(\color{red}{g(\mu)}\)` разная в зависимости .purple[от распределения отклика] `\(\color{purple}{f(y_i|\theta)}\)`
 
-`\(E(y_i) = e^{\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}} \phantom{\frac{e^{\beta_0}}{1 + e^{\beta_0}}}\)`
+&lt;br/&gt;
 
-`\(\color{red} {ln(\mu_i) = \eta_i}\)`
+`\(\color{purple}{y_i \sim N(\mu_i, \sigma)}\)` 
 
-`\(\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \\+ \beta_{p-1}x_{p-1\,i}\)`
+`\(\color{green}{E(y_i) = \mu_i \phantom{\frac{e^{\beta_0}}{1 + e^{\beta_0}}}}\)`
 
+`\(\color{red}{\mu_i = \eta_i}\)` .red[— идентичность]
+
+`\(\color{blue}{\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}\)`
+
+---
+
+## Функция связи: логарифм
+
+.content-box[
+`\(\color{purple}{y_i \sim f(y_i|\theta)}\)` 
+
+`\(\color{green}{E(y_i) = \mu_i = g^{-1}(\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i})}\)`
+
+`\(\color{red}{g(\mu_i) = \eta_i}\)`
+
+`\(\color{blue}{\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}\)`
 ]
 
-.column[
 
-**Логит:** 
+&lt;br/&gt;
 
-`\(E(y_i) = \frac{e^{\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}}{1 + e^{\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}}\)`
+.red[Функция связи] `\(\color{red}{g(\mu)}\)` разная в зависимости .purple[от распределения отклика] `\(\color{purple}{f(y_i|\theta)}\)`
 
-`\(\color{red} {ln\big(\frac{\mu_i}{1 - \mu_i}\big) = \eta_i}\)`
+&lt;br/&gt;
 
-`\(\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \\+ \beta_{p-1}x_{p-1\,i}\)`
+Например, `\(\color{purple}{y_i \sim Poisson(\mu_i)}\)` 
 
-]]]
+`\(\color{green}{E(y_i) = e^{\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}} \phantom{\frac{e^{\beta_0}}{1 + e^{\beta_0}}}}\)`
+
+`\(\color{red} {ln(\mu_i) = \eta_i}\)` .red[— логарифм]
+
+`\(\color{blue}{\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}\)`
+
+---
+
+## Функция связи: логит
+
+.content-box-grey[
+`\(\color{purple}{y_i \sim f(y_i|\theta)}\)` 
+
+`\(\color{green}{E(y_i) = \mu_i = g^{-1}(\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i})}\)`
+
+`\(\color{red}{g(\mu_i) = \eta_i}\)`
+
+`\(\color{blue}{\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}\)`
+]
+
+&lt;br/&gt;
+
+.red[Функция связи] `\(\color{red}{g(\mu)}\)` разная в зависимости .purple[от распределения отклика] `\(\color{purple}{f(y_i|\theta)}\)`
+
+&lt;br/&gt;
+
+Например, `\(\color{purple}{y_i \sim Binomial(n = 1, \pi_i)}\)` 
+
+`\(\color{green}{E(y_i) = \cfrac{e^{\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}}{1 + e^{\beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}}}\)`
+
+`\(\color{red} {ln\big(\cfrac{\mu_i}{1 - \mu_i}\big) = \eta_i}\)` .red[— логит]
+
+`\(\color{blue}{\eta_i = \beta_0 + \beta_1 x_{1i} + ... + \beta_{p-1}x_{p-1\,i}}\)`
 
 ---
 
@@ -365,33 +434,32 @@ class: split-two
 
 Правдоподобие (likelihood) --- измеряет соответствие реально наблюдаемых данных тем, что можно получить из модели при определенных значениях параметров.
 
-.pull-left[
+.pull-left-45[
 
-&lt;img src="12_GLM_gaussian_files/figure-html/gg-norm-tunnel0-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/gg-norm-tunnel0-1.png)&lt;!-- --&gt;
 
 ]
-.pull-right[
+
+.pull-right-55[
 
 
-Это произведение вероятностей получения каждой из точек данных:
+Это произведение вероятностей данных:
 
-`$$L(\theta| \text{data}) = \Pi^n _{i = 1}f(\text{data}| \theta)$$`
-
-- `\(f(\text{data}| \theta)\)` --- функция распределения с параметрами `\(\theta\)`
+`$$L(\theta| y_i) = \Pi^n _{i = 1}\color{purple}{f(y_i| \theta)}$$`
 
 ]
 
 --
 
-Нужно найти параметры  `\(\theta\)`, которые максимизируют правдоподобие:
+Нужно найти параметры  `\(\theta\)`, максимизирующие правдоподобие:
 
-`$$L(\theta | \text{data}) \longrightarrow \text{max}$$`
+`$$L(\theta | y_i) \longrightarrow \text{max}$$`
 
 --
 
 Вычислительно проще работать с логарифмами правдоподобий (loglikelihood): 
 
-`$$lnL(\theta| \text{data}) \longrightarrow \text{max}$$`
+`$$lnL(\theta| y_i) \longrightarrow \text{max}$$`
 
 Редко можно решить аналитически, обычно используются численные решения.
 
@@ -442,11 +510,11 @@ str(FishEggs)
 ```
 
 ```
-## 'data.frame':	35 obs. of  4 variables:
-##  $ Age  : int  7 8 8 9 9 9 9 10 10 11 ...
-##  $ PctDM: num  37.4 38 37.5 39 37.9 ...
-##  $ Month: Factor w/ 2 levels "Nov","Sep": 1 1 1 1 1 1 1 1 1 1 ...
-##  $ Sept : int  0 0 0 0 0 0 0 0 0 0 ...
+'data.frame':	35 obs. of  4 variables:
+ $ Age  : int  7 8 8 9 9 9 9 10 10 11 ...
+ $ PctDM: num  37.4 38 37.5 39 37.9 ...
+ $ Month: Factor w/ 2 levels "Nov","Sep": 1 1 1 1 1 1 1 1 1 1 ...
+ $ Sept : int  0 0 0 0 0 0 0 0 0 0 ...
 ```
 
 Нет ли пропущенных значений?
@@ -457,8 +525,8 @@ colSums(is.na(FishEggs))
 ```
 
 ```
-##   Age PctDM Month  Sept 
-##     0     0     0     0
+  Age PctDM Month  Sept 
+    0     0     0     0 
 ```
 
 ---
@@ -473,7 +541,7 @@ levels(FishEggs$Month)
 ```
 
 ```
-## [1] "Nov" "Sep"
+[1] "Nov" "Sep"
 ```
 
 Делаем базовым уровнем сентябрь.
@@ -491,7 +559,7 @@ levels(FishEggs$Month)
 ```
 
 ```
-## [1] "Sep" "Nov"
+[1] "Sep" "Nov"
 ```
 
 ---
@@ -504,9 +572,9 @@ table(FishEggs$Month)
 ```
 
 ```
-## 
-## Sep Nov 
-##  14  21
+
+Sep Nov 
+ 14  21 
 ```
 
 ---
@@ -527,7 +595,7 @@ plot_grid(gg_dot + aes(x = Age),
           gg_dot + aes(x = PctDM), nrow = 1)
 ```
 
-&lt;img src="12_GLM_gaussian_files/figure-html/dotplots-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/dotplots-1.png)&lt;!-- --&gt;
 
 
 ---
@@ -552,12 +620,10 @@ plot_grid(gg_dot + aes(x = Age),
 `\(\mu_i = \eta_i\)`  
 `\(\eta_i = \beta_0 + \beta_1 Age_{i} + \beta_2 Month_{Nov\,i} + \beta_{3} Age_{i} Month_{Nov\,i}\)`
 
-.small[
-
 - `\(PctDM_i\)` -- содержание сухого вещества в икре
 - `\(Age_{i}\)` -- возраст рыбы
 - `\(Month_{Nov\,i}\)` -- переменная-индикатор для уровня `\(Month_{Nov\,i} = 1\)`
-]
+
 
 ???
 
@@ -576,16 +642,16 @@ mod
 ```
 
 ```
-## 
-## Call:  glm(formula = PctDM ~ Age * Month, data = FishEggs)
-## 
-## Coefficients:
-##  (Intercept)           Age      MonthNov  Age:MonthNov  
-##      38.1211       -0.2396        1.2762        0.0214  
-## 
-## Degrees of Freedom: 34 Total (i.e. Null);  31 Residual
-## Null Deviance:	    84 
-## Residual Deviance: 47.8 	AIC: 120
+
+Call:  glm(formula = PctDM ~ Age * Month, data = FishEggs)
+
+Coefficients:
+ (Intercept)           Age      MonthNov  Age:MonthNov  
+     38.1211       -0.2396        1.2762        0.0214  
+
+Degrees of Freedom: 34 Total (i.e. Null);  31 Residual
+Null Deviance:	    84 
+Residual Deviance: 47.8 	AIC: 120
 ```
 
 --
@@ -597,7 +663,7 @@ sigma(mod)
 ```
 
 ```
-## [1] 1.24
+[1] 1.242
 ```
 
 --
@@ -650,8 +716,8 @@ resid(mod, type = 'response')[1:5]
 ```
 
 ```
-##      1      2      3      4      5 
-## -0.520  0.398 -0.202  1.517  0.467
+      1       2       3       4       5 
+-0.5198  0.3984 -0.2016  1.5166  0.4666 
 ```
 ]
 
@@ -662,8 +728,8 @@ resid(mod, type = 'pearson')[1:5]
 ```
 
 ```
-##      1      2      3      4      5 
-## -0.520  0.398 -0.202  1.517  0.467
+      1       2       3       4       5 
+-0.5198  0.3984 -0.2016  1.5166  0.4666 
 ```
 ]
 
@@ -696,8 +762,8 @@ vif(update(mod, . ~ . - Age:Month))
 ```
 
 ```
-##   Age Month 
-##  1.01  1.01
+  Age Month 
+1.007 1.007 
 ```
 
 --
@@ -715,13 +781,13 @@ head(mod_diag)
 ```
 
 ```
-##   PctDM Age Month   .hat .sigma  .cooksd .fitted .resid .stdresid
-## 1  37.4   7   Nov 0.1582   1.26 0.009775    37.9 -0.520    -0.456
-## 2  38.0   8   Nov 0.1155   1.26 0.003796    37.7  0.398     0.341
-## 3  37.5   8   Nov 0.1155   1.26 0.000973    37.7 -0.202    -0.173
-## 4  39.0   9   Nov 0.0832   1.23 0.036874    37.4  1.517     1.275
-## 5  37.9   9   Nov 0.0832   1.26 0.003490    37.4  0.467     0.392
-## 6  36.5   9   Nov 0.0832   1.25 0.015505    37.4 -0.983    -0.827
+  PctDM Age Month    .hat .sigma   .cooksd .fitted  .resid .stdresid
+1 37.35   7   Nov 0.15819  1.258 0.0097750   37.87 -0.5198   -0.4561
+2 38.05   8   Nov 0.11550  1.260 0.0037963   37.65  0.3984    0.3410
+3 37.45   8   Nov 0.11550  1.262 0.0009725   37.65 -0.2016   -0.1726
+4 38.95   9   Nov 0.08317  1.229 0.0368744   37.43  1.5166    1.2751
+5 37.90   9   Nov 0.08317  1.260 0.0034902   37.43  0.4666    0.3923
+6 36.45   9   Nov 0.08317  1.249 0.0155048   37.43 -0.9834   -0.8269
 ```
 
 ---
@@ -735,7 +801,7 @@ ggplot(mod_diag, aes(x = 1:nrow(mod_diag), y = .cooksd)) +
   geom_hline(yintercept = 1, linetype = 2)
 ```
 
-&lt;img src="12_GLM_gaussian_files/figure-html/cooksd-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/cooksd-1.png)&lt;!-- --&gt;
 
 Влиятельных наблюдений нет.
 
@@ -751,7 +817,7 @@ gg_resid &lt;- ggplot(data = mod_diag, aes(x = .fitted, y = .stdresid)) +
 gg_resid
 ```
 
-&lt;img src="12_GLM_gaussian_files/figure-html/resid-fitted-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/resid-fitted-1.png)&lt;!-- --&gt;
 
 --
 
@@ -771,7 +837,7 @@ ggplot(data = mod_diag, aes(x = Month, y = .stdresid)) +
   geom_boxplot() + geom_hline(yintercept = 0)
 ```
 
-&lt;img src="12_GLM_gaussian_files/figure-html/resid-predictors-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/resid-predictors-1.png)&lt;!-- --&gt;
 
 --
 
@@ -826,30 +892,30 @@ summary(mod)
 ```
 
 ```
-## 
-## Call:
-## glm(formula = PctDM ~ Age * Month, data = FishEggs)
-## 
-## Deviance Residuals: 
-##    Min      1Q  Median      3Q     Max  
-## -2.956  -0.558   0.231   0.752   2.503  
-## 
-## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)   38.1211     1.0644   35.82   &lt;2e-16 ***
-## Age           -0.2396     0.0913   -2.62    0.013 *  
-## MonthNov       1.2762     1.5119    0.84    0.405    
-## Age:MonthNov   0.0214     0.1278    0.17    0.868    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for gaussian family taken to be 1.54)
-## 
-##     Null deviance: 83.962  on 34  degrees of freedom
-## Residual deviance: 47.829  on 31  degrees of freedom
-## AIC: 120.3
-## 
-## Number of Fisher Scoring iterations: 2
+
+Call:
+glm(formula = PctDM ~ Age * Month, data = FishEggs)
+
+Deviance Residuals: 
+   Min      1Q  Median      3Q     Max  
+-2.956  -0.558   0.231   0.752   2.503  
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   38.1211     1.0644   35.82   &lt;2e-16 ***
+Age           -0.2396     0.0913   -2.62    0.013 *  
+MonthNov       1.2762     1.5119    0.84    0.405    
+Age:MonthNov   0.0214     0.1278    0.17    0.868    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for gaussian family taken to be 1.543)
+
+    Null deviance: 83.962  on 34  degrees of freedom
+Residual deviance: 47.829  on 31  degrees of freedom
+AIC: 120.3
+
+Number of Fisher Scoring iterations: 2
 ```
 
 ]
@@ -975,15 +1041,15 @@ anova(null_model, mod, test = 'Chi')
 ```
 
 ```
-## Analysis of Deviance Table
-## 
-## Model 1: PctDM ~ 1
-## Model 2: PctDM ~ Age * Month
-##   Resid. Df Resid. Dev Df Deviance Pr(&gt;Chi)    
-## 1        34       84.0                         
-## 2        31       47.8  3     36.1 0.000033 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Analysis of Deviance Table
+
+Model 1: PctDM ~ 1
+Model 2: PctDM ~ Age * Month
+  Resid. Df Resid. Dev Df Deviance Pr(&gt;Chi)    
+1        34       84.0                         
+2        31       47.8  3     36.1 0.000033 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 
@@ -1000,13 +1066,13 @@ drop1(mod, test = 'Chi')
 ```
 
 ```
-## Single term deletions
-## 
-## Model:
-## PctDM ~ Age * Month
-##           Df Deviance AIC scaled dev. Pr(&gt;Chi)
-## &lt;none&gt;           47.8 120                     
-## Age:Month  1     47.9 118      0.0317     0.86
+Single term deletions
+
+Model:
+PctDM ~ Age * Month
+          Df Deviance AIC scaled dev. Pr(&gt;Chi)
+&lt;none&gt;           47.8 120                     
+Age:Month  1     47.9 118      0.0317     0.86
 ```
 
 **2. Тестируем значимость предикторов, когда взаимодействие удалено**
@@ -1018,16 +1084,16 @@ drop1(mod_no_int, test = 'Chi')
 ```
 
 ```
-## Single term deletions
-## 
-## Model:
-## PctDM ~ Age + Month
-##        Df Deviance AIC scaled dev. Pr(&gt;Chi)    
-## &lt;none&gt;        47.9 118                         
-## Age     1     67.6 128        12.1  0.00051 ***
-## Month   1     67.1 128        11.8  0.00058 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Single term deletions
+
+Model:
+PctDM ~ Age + Month
+       Df Deviance AIC scaled dev. Pr(&gt;Chi)    
+&lt;none&gt;        47.9 118                         
+Age     1     67.6 128        12.1  0.00051 ***
+Month   1     67.1 128        11.8  0.00058 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 ---
@@ -1050,25 +1116,25 @@ drop1(mod_no_int, test = 'Chi')
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; - &lt;/td&gt;
    &lt;td style="text-align:right;"&gt;  &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 47.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 47.83 &lt;/td&gt;
    &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Возраст:Месяц &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 47.9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 47.87 &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; 0.86 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Возраст &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 67.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.64 &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; &amp;lt;0.01 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
    &lt;td style="text-align:left;"&gt; Месяц &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 67.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.13 &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; &amp;lt;0.01 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
@@ -1084,8 +1150,6 @@ class: middle, center, inverse
 ---
 
 ## Доля объясненной девиансы
-
-Аналог `\(R^2\)`, одна из характеристик качества подгонки модели.
 
 **Остаточная девианса**
 
@@ -1105,6 +1169,10 @@ class: middle, center, inverse
 
 --
 
+Доля объясненной девиансы — аналог `\(R^2\)`, одна из характеристик качества подгонки модели.
+
+--
+
 Долю объясненной девиансы легко вычислить
 
 
@@ -1113,7 +1181,7 @@ class: middle, center, inverse
 ```
 
 ```
-## [1] 0.43
+[1] 0.4303
 ```
 
 Модель объясняет 43% девиансы.
@@ -1145,16 +1213,16 @@ head(New_Data)
 ```
 
 ```
-## # A tibble: 6 × 2
-## # Groups:   Month [1]
-##   Month   Age
-##   &lt;fct&gt; &lt;dbl&gt;
-## 1 Sep    7   
-## 2 Sep    7.11
-## 3 Sep    7.22
-## 4 Sep    7.33
-## 5 Sep    7.44
-## 6 Sep    7.56
+# A tibble: 6 × 2
+# Groups:   Month [1]
+  Month   Age
+  &lt;fct&gt; &lt;dbl&gt;
+1 Sep    7   
+2 Sep    7.11
+3 Sep    7.22
+4 Sep    7.33
+5 Sep    7.44
+6 Sep    7.56
 ```
 
 ---
@@ -1174,16 +1242,16 @@ head(New_Data)
 ```
 
 ```
-## # A tibble: 6 × 6
-## # Groups:   Month [1]
-##   Month   Age   fit    se   lwr   upr
-##   &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1 Sep    7     36.4 0.499  35.4  37.5
-## 2 Sep    7.11  36.4 0.491  35.4  37.4
-## 3 Sep    7.22  36.4 0.484  35.4  37.4
-## 4 Sep    7.33  36.4 0.476  35.4  37.3
-## 5 Sep    7.44  36.3 0.469  35.4  37.3
-## 6 Sep    7.56  36.3 0.462  35.4  37.3
+# A tibble: 6 × 6
+# Groups:   Month [1]
+  Month   Age   fit    se   lwr   upr
+  &lt;fct&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1 Sep    7     36.4 0.499  35.4  37.5
+2 Sep    7.11  36.4 0.491  35.4  37.4
+3 Sep    7.22  36.4 0.484  35.4  37.4
+4 Sep    7.33  36.4 0.476  35.4  37.3
+5 Sep    7.44  36.3 0.469  35.4  37.3
+6 Sep    7.56  36.3 0.462  35.4  37.3
 ```
 
 ---
@@ -1204,16 +1272,16 @@ head(New_Data)
 ```
 
 ```
-## # A tibble: 6 × 6
-## # Groups:   Month [1]
-##   Month   Age fit[,1]    se lwr[,1] upr[,1]
-##   &lt;fct&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
-## 1 Sep    7       36.4 0.499    35.4    37.5
-## 2 Sep    7.11    36.4 0.491    35.4    37.4
-## 3 Sep    7.22    36.4 0.484    35.4    37.4
-## 4 Sep    7.33    36.4 0.476    35.4    37.3
-## 5 Sep    7.44    36.3 0.469    35.4    37.3
-## 6 Sep    7.56    36.3 0.462    35.4    37.3
+# A tibble: 6 × 6
+# Groups:   Month [1]
+  Month   Age fit[,1]    se lwr[,1] upr[,1]
+  &lt;fct&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1 Sep    7       36.4 0.499    35.4    37.5
+2 Sep    7.11    36.4 0.491    35.4    37.4
+3 Sep    7.22    36.4 0.484    35.4    37.4
+4 Sep    7.33    36.4 0.476    35.4    37.3
+5 Sep    7.44    36.3 0.469    35.4    37.3
+6 Sep    7.56    36.3 0.462    35.4    37.3
 ```
 
 ---
@@ -1229,7 +1297,7 @@ Plot_egg &lt;- ggplot(New_Data, aes(x = Age, y = fit)) +
 Plot_egg
 ```
 
-&lt;img src="12_GLM_gaussian_files/figure-html/predictions-1.png" width="648" style="display: block; margin: auto;" /&gt;
+![](12_GLM_gaussian_files/figure-html/predictions-1.png)&lt;!-- --&gt;
 
 
 ---
@@ -1257,16 +1325,16 @@ drop1(mod_no_int, test = 'Chi')
 ```
 
 ```
-## Single term deletions
-## 
-## Model:
-## PctDM ~ Age + Month
-##        Df Deviance AIC scaled dev. Pr(&gt;Chi)    
-## &lt;none&gt;        47.9 118                         
-## Age     1     67.6 128        12.1  0.00051 ***
-## Month   1     67.1 128        11.8  0.00058 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Single term deletions
+
+Model:
+PctDM ~ Age + Month
+       Df Deviance AIC scaled dev. Pr(&gt;Chi)    
+&lt;none&gt;        47.9 118                         
+Age     1     67.6 128        12.1  0.00051 ***
+Month   1     67.1 128        11.8  0.00058 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 Если мы решили "сократить" модель, то теперь придется описать модель `mod_no_int`
@@ -1283,16 +1351,16 @@ mod_no_int
 ```
 
 ```
-## 
-## Call:  glm(formula = PctDM ~ Age + Month, data = FishEggs)
-## 
-## Coefficients:
-## (Intercept)          Age     MonthNov  
-##      38.000       -0.229        1.519  
-## 
-## Degrees of Freedom: 34 Total (i.e. Null);  32 Residual
-## Null Deviance:	    84 
-## Residual Deviance: 47.9 	AIC: 118
+
+Call:  glm(formula = PctDM ~ Age + Month, data = FishEggs)
+
+Coefficients:
+(Intercept)          Age     MonthNov  
+     38.000       -0.229        1.519  
+
+Degrees of Freedom: 34 Total (i.e. Null);  32 Residual
+Null Deviance:	    84 
+Residual Deviance: 47.9 	AIC: 118
 ```
 
 .pull-left[
@@ -1303,7 +1371,7 @@ sigma(mod_no_int)
 ```
 
 ```
-## [1] 1.22
+[1] 1.223
 ```
 ]
 
@@ -1380,7 +1448,7 @@ __В GLM с нормальным распределением отклика ч�
 ```
 
 ```
-## [1] 4
+[1] 4
 ```
 
 ```r
@@ -1388,7 +1456,7 @@ logLik(mod_no_int)         # Логарифм правдоподобия
 ```
 
 ```
-## 'log Lik.' -55.1 (df=4)
+'log Lik.' -55.14 (df=4)
 ```
 
 ```r
@@ -1396,7 +1464,7 @@ as.numeric(-2 * logLik(mod_no_int) + 2 * p)
 ```
 
 ```
-## [1] 118
+[1] 118.3
 ```
 
 ```r
@@ -1404,7 +1472,7 @@ AIC(mod_no_int) # Есть готовая функция
 ```
 
 ```
-## [1] 118
+[1] 118.3
 ```
 
 
@@ -1428,11 +1496,11 @@ AIC(mod, mod_no_int, mod_age, mod_month)
 ```
 
 ```
-##            df AIC
-## mod         5 120
-## mod_no_int  4 118
-## mod_age     3 128
-## mod_month   3 128
+           df   AIC
+mod         5 120.3
+mod_no_int  4 118.3
+mod_age     3 128.1
+mod_month   3 128.4
 ```
 
 
@@ -1476,8 +1544,9 @@ AIC(mod, mod_no_int, mod_age, mod_month)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="assets/macros.js"></script>
 <script>var slideshow = remark.create({
-"highlightStyle": "vs",
+"highlightStyle": "googlecode",
 "highlightLines": true,
 "countIncrementalSlides": false
 });
@@ -1520,6 +1589,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable
