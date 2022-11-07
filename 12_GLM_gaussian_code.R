@@ -131,7 +131,7 @@ head(New_Data)
 Predictions <- predict(mod, newdata = New_Data, se.fit = TRUE)
 New_Data$fit <- Predictions$fit  # Предсказанные значения
 New_Data$se <- Predictions$se.fit # Стандартные ошибки
-t_crit <- qt(0.975, df = nrow(FishEggs) - length(coef(mod))) # t для дов. инт.
+t_crit <- qt(0.975, df = nrow(FishEggs) - length(coef(mod)) - 1) # t для дов. инт.
 New_Data$lwr <- New_Data$fit - t_crit * New_Data$se
 New_Data$upr <- New_Data$fit + t_crit * New_Data$se
 
