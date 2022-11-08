@@ -3,7 +3,7 @@
 options(rmarkdown.paste_image_dir = 'img')
 
 # output options
-options(width = 90, scipen = 6, digits = 4)
+options(width = 87, scipen = 6, digits = 4)
 
 library(knitr)
 knitr::opts_template$set(
