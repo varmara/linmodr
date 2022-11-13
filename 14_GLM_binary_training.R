@@ -90,5 +90,6 @@ liz <- read.csv("data/polis.csv")
 
 library(catdata)
 data("unemployment")
+help(unemployment)
 
 vignette("tree-unemployment")

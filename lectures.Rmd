@@ -216,13 +216,14 @@ install.packages("catdata")
 ```
 
 <!-- - Презентация: [14_GLM_binary.pdf](14_GLM_binary.pdf) -->
-<!-- - Код: [14_GLM_binary_code.R](14_GLM_binary_code.R) -->
-<!-- - Задание: [14_GLM_binary_training.R](14_GLM_binary_training.R) -->
 
-<!-- - Данные: -->
-<!--     + [aster_mussel.csv](data/aster_mussel.csv) -->
-<!--     + [polis.csv](data/polis.csv) -->
-<!--     + [ICU.csv](data/ICU.csv) -->
+- Код: [14_GLM_binary_code.R](14_GLM_binary_code.R)
+- Задание: [14_GLM_binary_training.R](14_GLM_binary_training.R)
+
+- Данные:
+    + [aster_mussel.csv](data/aster_mussel.csv)
+    + [polis.csv](data/polis.csv)
+    + [ICU.csv](data/ICU.csv)
 
 
 ## Смешанные модели (GLMM)
