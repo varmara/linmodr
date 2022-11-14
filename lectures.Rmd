@@ -215,7 +215,7 @@ install.packages(c("ISwR", "cowplot"))
 install.packages("catdata")
 ```
 
-<!-- - Презентация: [14_GLM_binary.pdf](14_GLM_binary.pdf) -->
+- Презентация: [14_GLM_binary.pdf](14_GLM_binary.pdf)
 
 - Код: [14_GLM_binary_code.R](14_GLM_binary_code.R)
 - Задание: [14_GLM_binary_training.R](14_GLM_binary_training.R)
