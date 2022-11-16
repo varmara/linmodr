@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Смешанные линейные модели (вложенные случайные факторы)</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Марина Варфоломеева, Вадим Хайтов" />
+    <script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
+    <link href="site_libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="site_libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="site_libs/tile-view-0.2.6/tile-view.js"></script>
+    <script src="site_libs/fabric-4.3.1/fabric.min.js"></script>
+    <link href="site_libs/xaringanExtra-scribble-0.0.1/scribble.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-scribble-0.0.1/scribble.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', function() { window.xeScribble = new Scribble({"pen_color":["#FF0000"],"pen_size":3,"eraser_size":30,"palette":[]}) })</script>
+    <script src="site_libs/mark.js-8.11.1/mark.min.js"></script>
+    <link href="site_libs/xaringanExtra-search-0.0.1/search.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-search-0.0.1/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":false,"autoSearch":true}) })</script>
+    <script src="site_libs/xaringanExtra-progressBar-0.0.1/progress-bar.js"></script>
+    <script src="site_libs/freezeframe-5.0.2/freezeframe.min.js"></script>
+    <script src="site_libs/xaringanExtra-freezeframe-0.0.1/freezeframe-init.js"></script>
+    <script id="xaringanExtra-freezeframe-options" type="application/json">{"selector":"img[src$=\"gif\"]","trigger":"click","overlay":false,"responsive":true,"warnings":true}</script>
+    <link href="site_libs/tachyons-4.12.0/tachyons.min.css" rel="stylesheet" />
+    <!-- https://github.com/fnaufel/xaringan-smartify-->
+    <script
+    			  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    			  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+    			  crossorigin="anonymous">
+    </script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/fnaufel/xaringan-smartify/smartify.min.js"></script>
+    <link rel="stylesheet" href="assets/xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="assets/xaringan.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: middle, left, inverse, title-slide
+
+.title[
+# Смешанные линейные модели (вложенные случайные факторы)
+]
+.subtitle[
+## Линейные модели…
+]
+.author[
+### Марина Варфоломеева, Вадим Хайтов
+]
+.date[
+### Осень 2022
+]
+
+---
+
+
+
+
+
+
+
+
+## Вы узнаете
+
+- Что такое вложенные случайные факторы и в каких случаях они применяются
+
+### Вы сможете
+
+- Объяснить, что такое вложенные случайные факторы
+- Привести примеры иерархических случайных факторов
+- Вычислить коэффициент внутриклассовой корреляции для  случая с двумя вложенными случайными факторами
+- Подобрать смешанную линейную модель со вложенными случайными факторами
+
+---
+
+class: middle, center, inverse
+
+# Смешанные модели со вложенными случайными факторами
+
+---
+
+## Вложенные факторы (Nested effects)
+
+--
+
+### Факторы образуют иерархическую последовательность вложенности
+
+- лес --&gt;  дерево в лесу --&gt; ветка на дереве --&gt; наблюдение (личинки насекомых)
+
+--
+
+### Внутри каждого уровня главного фактора будут разные (нестрого сопоставимые) уровни вложенного фактора
+
+Деревья, с которых собирали личинок, будут разные в разных лесах (разные экземпляры).  
+
+--
+
+### Уровни вложенных факторов описывают иерархию взаимного сходства наблюдений
+
+Личинки с разных деревьев из одного леса имеют право быть похожими друг на друга больше, чем на личинок из другого леса  
+Личинки на одном дереве имеют право быть похожими друг на друга больше, чем на личинок с другого дерева  
+И т.п.
+
+## Другие примеры вложенных факторов
+
+- регион --&gt; город --&gt; больница --&gt; наблюдение (пациент)
+
+- самка --&gt; выводок --&gt; наблюдение (особь)
+
+- лес --&gt; дерево в лесу --&gt; гнездо на дереве --&gt; наблюдение (птенец)
+
+- улитка --&gt; спороциста в улитке --&gt; наблюдение (редия)
+
+
+## Пример: Высота растений и выпас скота
+
+Вообще-то, статья Gennet et al. 2017 о птицах, но чтобы про них что-то лучше понять, нужно разобраться с их местообитанием.
+
+Как в разные годы высота растительного покрова зависит от выпаса скота, экспозиции склона и проективного покрытия местных растений?
+
+Зависимая переменная:
+
+- **height** - высота растительного покрова
+
+Предикторы:
+
+- **graze** - выпас коров (0, 1)
+- **AspectCat** - экспозиция (S, N)
+- **nativecov** - покрытие местной флоры %
+- **slope** - наклон
+- **year** - год наблюдений
+- **Park** - парк
+- **plotID** - уникальный идентификатор участка
+
+.tiny[
+Данные:
+Gennet, S., Spotswood, E., Hammond, M. and Bartolome, J.W., 2017. Livestock grazing supports native plants and songbirds in a California annual grassland. PloS one, 12(6), p.e0176367.
+]
+
+## Открываем данные
+
+Исходные данные не опрятны (this data is not tidy)! Каждый участок в каждом году фигурирует два раза (т.к. информация о присутствии-отсутствии каких-то видов на участке записана в разных строчках).
+Откроем и переформатируем данные так, чтобы не было дублирования и каждому участку соответствовала одна строчка.
+
+
+```r
+library(readxl)
+library(tidyr)
+gr &lt;- read_excel("data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx")
+graz &lt;- gr %&gt;% spread(Species, presence)
+```
+
+---
+
+## Знакомство с данными
+
+Есть ли пропущенные значения?
+
+
+```r
+sum(is.na(graz))
+```
+
+```
+[1] 0
+```
+
+Сколько участков было в каждом парке в каждый год?
+
+
+```r
+with(graz, table(Park, year))
+```
+
+```
+    year
+Park 2004 2005 2006 2007 2008 2009 2010 2011
+  MT    6   10   10   10   10   10   10   10
+  PR    6    6    6    6    6    6    6    6
+  SU    0    9    9    9    9    9    9    9
+  VC   10   10   10   10   11   11   11   11
+```
+
+---
+
+## Как закодированы переменные?
+
+
+```r
+str(graz)
+```
+
+```
+tibble [271 × 18] (S3: tbl_df/tbl/data.frame)
+ $ plotID     : chr [1:271] "MT1" "MT2" "MT3" "MT4" ...
+ $ Plot       : num [1:271] 1 2 3 4 5 6 4 5 6 7 ...
+ $ Park       : chr [1:271] "MT" "MT" "MT" "MT" ...
+ $ year       : num [1:271] 2004 2004 2004 2004 2004 ...
+ $ graze      : num [1:271] 0 0 0 1 1 1 1 1 1 1 ...
+ $ Aspect     : num [1:271] 146 250 262 190 274 ...
+ $ AspectCat  : chr [1:271] "S" "S" "S" "S" ...
+ $ heatloadrel: num [1:271] 0.03 1.35 2.06 0.31 1.83 0.95 0.03 2.06 0.7 1.22 ...
+ $ slope      : num [1:271] 37.8 41.1 35.4 28 58.9 ...
+ $ nativecov  : num [1:271] 0 0.36 1.43 0 1.07 ...
+ $ litt       : num [1:271] 28.21 31.43 11.07 8.93 18.57 ...
+ $ bare       : num [1:271] 0 0.357 9.286 4.643 7.857 ...
+ $ height     : num [1:271] 29.2 26.2 23.2 11.9 19.3 ...
+ $ htstdev    : num [1:271] 16.14 15.41 15.47 8.25 10.45 ...
+ $ cov        : num [1:271] 0.553 0.587 0.666 0.695 0.541 ...
+ $ GRSP       : num [1:271] 0 0 0 0 1 0 1 1 0 0 ...
+ $ HOLA       : num [1:271] 0 0 0 1 1 1 1 1 0 0 ...
+ $ WEME       : num [1:271] 0 1 0 1 1 0 0 1 0 1 ...
+```
+
+---
+
+## Наводим порядок
+
+Сделаем факторами переменные, которые понадобятся для модели
+
+
+```r
+graz$graze_f &lt;- factor(graz$graze)
+graz$AspectCat &lt;- factor(graz$AspectCat)
+graz$year_f &lt;- factor(graz$year)
+```
+
+Извлечем корень из обилия местных видов
+
+
+```r
+graz$nativecov_sq &lt;- sqrt(graz$nativecov) 
+```
+
+---
+
+## Модель
+
+Вспомним главный вопрос исследования и подберем модель
+
+Как в разные годы высота растительного покрова зависит от выпаса скота, экспозиции склона и проективного покрытия местных растений?
+
+--
+
+Нам нужно учесть, что в разные годы из-за кучи разных причин высота растений может различаться
+
+Кроме того, нужно учесть, что в разных парках и на разных участках растения будут расти сходным образом в разные годы. У нас есть иерархические факторы парк и участок в парке
+
+Подбираем модель методом максимального правдоподобия, т.к. она нам понадобится, чтобы проверить значимость фиксированных эффектов при помощи теста отношения правдоподобий.
+
+
+```r
+library(lme4)
+ML1 &lt;- lmer(height ~ graze_f*AspectCat + year_f + 
+              nativecov_sq + slope + (1|Park/plotID), 
+          data = graz, REML = FALSE)
+```
+
+---
+
+## Анализ остатков
+
+
+```r
+# Данные для анализа остатков
+ML1_diag &lt;- data.frame(
+  graz,
+  .pear_res = residuals(ML1, type = "pearson"),
+  .fitted = fitted(ML1, type = "response"))
+```
+
+---
+
+## График остатков
+
+
+```r
+library(ggplot2); library(cowplot); theme_set(theme_bw())
+gg_res &lt;- ggplot(data = ML1_diag, aes(y = .pear_res))
+gg_res + geom_point(aes(x = .fitted)) +
+  geom_smooth(aes(x = .fitted))
+```
+
+![](15.2_GLMM_gaussian_nested_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+---
+
+## Графики остатков от переменных в модели
+
+
+```r
+plot_grid(gg_res + geom_boxplot(aes(x = graze_f)),
+gg_res + geom_boxplot(aes(x = AspectCat)),
+gg_res + geom_boxplot(aes(x = year_f)),
+gg_res + geom_point(aes(x = nativecov_sq)),
+gg_res + geom_point(aes(x = slope)),
+ncol = 3)
+```
+
+![](15.2_GLMM_gaussian_nested_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+&gt;- Паттерн на графике `nativecov_sq`. Возможно, здесь нужно использовать GAMM.
+
+---
+
+## Графики остатков от переменных не в модели
+
+
+```r
+plot_grid(
+  gg_res + geom_point(aes(x = heatloadrel)),
+  gg_res + geom_point(aes(x = sqrt(litt))),
+  gg_res + geom_point(aes(x = sqrt(bare))),
+  ncol = 3)
+```
+
+![](15.2_GLMM_gaussian_nested_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+- Паттерн на графике `heatloadrel`
+- Возможно, есть тренд на графике `sqrt(litt)`
+
+
+---
+
+## Тесты отношения правдоподобий для полной модели
+
+Модель `ML1` была подобрана при помощи ML, поэтому можно применять тесты отношения правдоподобий прямо к ней
+
+
+```r
+drop1(ML1, test = 'Chi')
+```
+
+```
+Single term deletions
+
+Model:
+height ~ graze_f * AspectCat + year_f + nativecov_sq + slope + 
+    (1 | Park/plotID)
+                  npar  AIC   LRT Pr(Chi)    
+&lt;none&gt;                 1729                  
+year_f               7 1820 104.4  &lt;2e-16 ***
+nativecov_sq         1 1729   1.5  0.2240    
+slope                1 1728   0.4  0.5025    
+graze_f:AspectCat    1 1736   9.0  0.0028 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Высота растительного покрова:
+
+- на склонах разной экспозиции по-разному зависит от выпаса скота (достоверное взаимодействие)
+- различается в разные годы
+- не зависит от покрытия местных растений и крутизны склона
+
+---
+
+## Задание 1
+
+Рассчитайте внутриклассовую корреляцию
+
+- Для наблюдений на одном и том же участке
+- Для наблюдений в одном и том же парке
+
+---
+
+## Внутриклассовая корреляция
+
+Для расчета внутриклассовой корреляции нужна модель, подобранная при помощи REML
+
+
+```r
+REML1 &lt;- lmer(height ~ graze_f*AspectCat + year_f + 
+                nativecov_sq + slope + (1|Park/plotID),
+           data = graz, REML = TRUE)
+```
+
+.scroll-box-20[
+
+
+```r
+summary(REML1)
+```
+
+```
+Linear mixed model fit by REML ['lmerMod']
+Formula: height ~ graze_f * AspectCat + year_f + nativecov_sq + slope +  
+    (1 | Park/plotID)
+   Data: graz
+
+REML criterion at convergence: 1678
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-2.924 -0.637 -0.082  0.433  4.796 
+
+Random effects:
+ Groups      Name        Variance Std.Dev.
+ plotID:Park (Intercept) 11.36    3.37    
+ Park        (Intercept)  2.48    1.57    
+ Residual                26.35    5.13    
+Number of obs: 271, groups:  plotID:Park, 36; Park, 4
+
+Fixed effects:
+                    Estimate Std. Error t value
+(Intercept)          18.4491     3.0923    5.97
+graze_f1             -5.2543     2.7131   -1.94
+AspectCatS            8.5716     2.7556    3.11
+year_f2005            6.8075     1.4239    4.78
+year_f2006            4.0797     1.4162    2.88
+year_f2007           -0.5873     1.4226   -0.41
+year_f2008           -2.7038     1.4100   -1.92
+year_f2009           -2.6919     1.4100   -1.91
+year_f2010           -2.6919     1.4100   -1.91
+year_f2011            3.7290     1.4189    2.63
+nativecov_sq         -0.5312     0.3785   -1.40
+slope                -0.0282     0.0525   -0.54
+graze_f1:AspectCatS  -9.4449     3.2175   -2.94
+```
+]
+
+---
+
+## Внутриклассовая корреляция
+
+Для наблюдений на одном и том же участке `\(\sigma_{plotID}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)\)`
+
+
+```r
+3.370^2 / (1.574^2 + 3.370^2 + 5.133^2)
+```
+
+```
+[1] 0.2826
+```
+
+Для наблюдений в одном и том же парке `\(\sigma_{Park}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)\)`
+
+
+```r
+1.574^2 / (1.574^2 + 3.370^2 + 5.133^2)
+```
+
+```
+[1] 0.06166
+```
+
+```
+В результатах summary(REML1)
+Random effects:
+ Groups      Name        Variance Std.Dev.
+ plotID:Park (Intercept) 11.358   3.370   
+ Park        (Intercept)  2.478   1.574   
+ Residual                26.351   5.133   
+Number of obs: 271, groups:  plotID:Park, 36; Park, 4
+```
+
+- Значения высоты травяного покрова похожи внутри участка. Сходство наблюдений внутри одного парка слабее.
+
+---
+
+## Результаты полной модели
+
+.scroll-box-24[
+
+```r
+summary(REML1)
+```
+
+```
+Linear mixed model fit by REML ['lmerMod']
+Formula: height ~ graze_f * AspectCat + year_f + nativecov_sq + slope +  
+    (1 | Park/plotID)
+   Data: graz
+
+REML criterion at convergence: 1678
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-2.924 -0.637 -0.082  0.433  4.796 
+
+Random effects:
+ Groups      Name        Variance Std.Dev.
+ plotID:Park (Intercept) 11.36    3.37    
+ Park        (Intercept)  2.48    1.57    
+ Residual                26.35    5.13    
+Number of obs: 271, groups:  plotID:Park, 36; Park, 4
+
+Fixed effects:
+                    Estimate Std. Error t value
+(Intercept)          18.4491     3.0923    5.97
+graze_f1             -5.2543     2.7131   -1.94
+AspectCatS            8.5716     2.7556    3.11
+year_f2005            6.8075     1.4239    4.78
+year_f2006            4.0797     1.4162    2.88
+year_f2007           -0.5873     1.4226   -0.41
+year_f2008           -2.7038     1.4100   -1.92
+year_f2009           -2.6919     1.4100   -1.91
+year_f2010           -2.6919     1.4100   -1.91
+year_f2011            3.7290     1.4189    2.63
+nativecov_sq         -0.5312     0.3785   -1.40
+slope                -0.0282     0.0525   -0.54
+graze_f1:AspectCatS  -9.4449     3.2175   -2.94
+```
+]
+
+---
+
+## Данные для графика предсказаний фиксированной части модели
+
+Используем для визуализации модель, подобранную при помощи REML
+
+
+```r
+# Исходные данные
+NewData_REML1 &lt;- expand.grid(graze_f = levels(graz$graze_f),
+            AspectCat = levels(graz$AspectCat),
+            year_f = levels(graz$year_f))
+NewData_REML1$nativecov_sq &lt;- mean(graz$nativecov_sq)
+NewData_REML1$slope &lt;- mean(graz$slope)
+
+# Предсказанные значения при помощи матриц
+X &lt;- model.matrix(~ graze_f * AspectCat + year_f + nativecov_sq + slope, 
+                  data = NewData_REML1)
+betas = fixef(REML1)
+NewData_REML1$fit &lt;- X %*% betas
+
+# Cтандартные ошибки и дов. интервалы
+NewData_REML1$se &lt;- sqrt( diag(X %*% vcov(REML1) %*% t(X)) )
+NewData_REML1$lwr &lt;- NewData_REML1$fit - 2 * NewData_REML1$se
+NewData_REML1$upr &lt;- NewData_REML1$fit + 2 * NewData_REML1$se
+```
+
+---
+
+## График предсказаний фиксированной части модели
+
+На южных склонах высота травы выше там, где не пасут скот, а на северных нет. (Строго говоря, нужен еще пост хок тест, чтобы это утверждать.)
+
+
+```r
+ggplot(data = NewData_REML1, aes(x = year_f, y = fit, colour = graze_f)) +
+  geom_pointrange(aes(ymin = lwr, ymax = upr)) +
+  facet_wrap(~ AspectCat) +
+  geom_jitter(data = graz, aes(y = height), alpha = 0.35, size = 1) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+![](15.2_GLMM_gaussian_nested_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+
+---
+
+class: middle, center, inverse
+
+# Вариант решения с подбором оптимальной модели (самостоятельно)
+
+---
+
+## Задание 2
+
+Оптимизируйте модель с предыдущего шага
+
+Сделайте анализ остатков
+
+Опишите и визуализируйте финальную модель
+
+---
+
+## Решение: Подбор оптимальной модели (1)
+
+Для подбора оптимальной модели воспользуемся тестами отношения правдоподобий. Для него нужно использовать модели, подобранные при помощи ML
+
+
+```r
+drop1(ML1, test = "Chi")
+```
+
+```
+Single term deletions
+
+Model:
+height ~ graze_f * AspectCat + year_f + nativecov_sq + slope + 
+    (1 | Park/plotID)
+                  npar  AIC   LRT Pr(Chi)    
+&lt;none&gt;                 1729                  
+year_f               7 1820 104.4  &lt;2e-16 ***
+nativecov_sq         1 1729   1.5  0.2240    
+slope                1 1728   0.4  0.5025    
+graze_f:AspectCat    1 1736   9.0  0.0028 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+
+## Решение: Подбор оптимальной модели (2)
+
+
+```r
+ML1.1 &lt;- update(ML1, .~.-slope)
+drop1(ML1.1, test = "Chi")
+```
+
+```
+Single term deletions
+
+Model:
+height ~ graze_f + AspectCat + year_f + nativecov_sq + (1 | Park/plotID) + 
+    graze_f:AspectCat
+                  npar  AIC   LRT Pr(Chi)    
+&lt;none&gt;                 1728                  
+year_f               7 1818 104.3  &lt;2e-16 ***
+nativecov_sq         1 1728   1.7  0.1948    
+graze_f:AspectCat    1 1734   8.5  0.0035 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+
+## Решение: Подбор оптимальной модели (3)
+
+
+```r
+ML1.2 &lt;- update(ML1.1, .~.-nativecov_sq)
+drop1(ML1.2, test = "Chi")
+```
+
+```
+Single term deletions
+
+Model:
+height ~ graze_f + AspectCat + year_f + (1 | Park/plotID) + graze_f:AspectCat
+                  npar  AIC   LRT Pr(Chi)    
+&lt;none&gt;                 1728                  
+year_f               7 1819 105.2  &lt;2e-16 ***
+graze_f:AspectCat    1 1734   8.1  0.0045 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+
+## Решение: Анализ остатков
+
+
+```r
+# Данные для анализа остатков
+ML1.2_diag &lt;- data.frame(
+  graz,
+  .pear_res = residuals(ML1.2, type = "pearson"),
+  .fitted = fitted(ML1.2, type = "response"))
+```
+
+---
+
+## Решение: График остатков
+
+
+```r
+gg_res &lt;- ggplot(data = ML1.2_diag, aes(y = .pear_res))
+gg_res + geom_point(aes(x = .fitted)) +
+  geom_smooth(aes(x = .fitted))
+```
+
+![](15.2_GLMM_gaussian_nested_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+
+---
+
+## Решение: Графики остатков от переменных в модели
+
+
+```r
+plot_grid(gg_res + geom_boxplot(aes(x = graze_f)),
+gg_res + geom_boxplot(aes(x = AspectCat)),
+gg_res + geom_boxplot(aes(x = year_f)),
+ncol = 3)
+```
+
+![](15.2_GLMM_gaussian_nested_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+
+---
+
+## Решение: Графики остатков от переменных не в модели
+
+
+```r
+plot_grid(
+  gg_res + geom_point(aes(x = heatloadrel)),
+  gg_res + geom_point(aes(x = sqrt(litt))),
+  gg_res + geom_point(aes(x = sqrt(bare))),
+  gg_res + geom_point(aes(x = nativecov_sq)),
+  gg_res + geom_point(aes(x = slope)),
+  ncol = 3)
+```
+
+![](15.2_GLMM_gaussian_nested_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+- Паттерн на графике `heatloadrel`, `nativecov_sq`
+
+---
+
+## Решение: Тестируем влияние факторов в финальной модели
+
+Для тестов отношения правдоподобий используем финальную модель, подобранную при помощи ML
+
+
+```r
+drop1(ML1.2, test = 'Chi')
+```
+
+```
+Single term deletions
+
+Model:
+height ~ graze_f + AspectCat + year_f + (1 | Park/plotID) + graze_f:AspectCat
+                  npar  AIC   LRT Pr(Chi)    
+&lt;none&gt;                 1728                  
+year_f               7 1819 105.2  &lt;2e-16 ***
+graze_f:AspectCat    1 1734   8.1  0.0045 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Высота растительного покрова:
+
+- на склонах разной экспозиции по-разному зависит от выпаса скота (достоверное взаимодействие)
+- различается в разные годы
+- не зависит от покрытия местных растений и крутизны склона
+
+---
+
+## Решение: Описываем результаты
+
+Для описания результатов используем модель, подобранную при помощи REML, т.к. он дает более точные оценки случайных эффектов
+
+
+```r
+REML1.2 &lt;- update(ML1.2, REML = TRUE)
+```
+
+---
+
+## Решение: Результаты
+
+.scroll-box-24[
+
+```r
+summary(REML1.2)
+```
+
+```
+Linear mixed model fit by REML ['lmerMod']
+Formula: height ~ graze_f + AspectCat + year_f + (1 | Park/plotID) + graze_f:AspectCat
+   Data: graz
+
+REML criterion at convergence: 1676
+
+Scaled residuals: 
+   Min     1Q Median     3Q    Max 
+-2.917 -0.631 -0.079  0.426  4.985 
+
+Random effects:
+ Groups      Name        Variance Std.Dev.
+ plotID:Park (Intercept) 13.76    3.71    
+ Park        (Intercept)  1.38    1.18    
+ Residual                25.92    5.09    
+Number of obs: 271, groups:  plotID:Park, 36; Park, 4
+
+Fixed effects:
+                    Estimate Std. Error t value
+(Intercept)           16.408      2.777    5.91
+graze_f1              -5.678      2.760   -2.06
+AspectCatS             9.441      2.875    3.28
+year_f2005             6.626      1.404    4.72
+year_f2006             4.131      1.404    2.94
+year_f2007            -0.368      1.404   -0.26
+year_f2008            -2.704      1.398   -1.93
+year_f2009            -2.690      1.398   -1.92
+year_f2010            -2.690      1.398   -1.92
+year_f2011             3.987      1.398    2.85
+graze_f1:AspectCatS   -9.643      3.373   -2.86
+
+Correlation of Fixed Effects:
+            (Intr) grz_f1 AspcCS y_2005 y_2006 y_2007 y_2008 y_2009 y_2010 y_2011
+graze_f1    -0.807                                                               
+AspectCatS  -0.787  0.795                                                        
+year_f2005  -0.306 -0.011 -0.015                                                 
+year_f2006  -0.306 -0.011 -0.015  0.625                                          
+year_f2007  -0.306 -0.011 -0.015  0.625  0.625                                   
+year_f2008  -0.305 -0.012 -0.021  0.627  0.627  0.627                            
+year_f2009  -0.305 -0.012 -0.021  0.627  0.627  0.627  0.632                     
+year_f2010  -0.305 -0.012 -0.021  0.627  0.627  0.627  0.632  0.632              
+year_f2011  -0.305 -0.012 -0.021  0.627  0.627  0.627  0.632  0.632  0.632       
+grz_f1:AsCS  0.654 -0.825 -0.849  0.016  0.016  0.016  0.021  0.021  0.021  0.021
+```
+]
+
+---
+
+## Решение: Внутриклассовая корреляция
+
+
+Для расчета нужна модель, подобранная при помощи REML
+
+```
+Random effects:
+ Groups      Name        Variance Std.Dev.
+ plotID:Park (Intercept) 13.761   3.710   
+ Park        (Intercept)  1.384   1.177   
+ Residual                25.916   5.091   
+Number of obs: 271, groups:  plotID:Park, 36; Park, 4
+```
+
+Для наблюдений на одном и том же участке `\(\sigma_{plotID}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)\)`
+
+
+```r
+3.710^2 / (1.177^2 + 3.710^2 + 5.091^2)
+```
+
+```
+[1] 0.3352
+```
+
+Для наблюдений в одном и том же парке `\(\sigma_{Park}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)\)`
+
+
+```r
+1.177^2 / (1.177^2 + 3.7010^2 + 5.091^2)
+```
+
+```
+[1] 0.03379
+```
+
+- Значения высоты травяного покрова похожи внутри участка. Сходство наблюдений внутри одного парка слабее.
+
+---
+
+## Решение: Данные для графика предсказаний фиксированной части модели
+
+Используем для визуализации модель, подобранную при помощи REML
+
+
+```r
+# Исходные данные
+NewData_REML1.2 &lt;- expand.grid(graze_f = levels(graz$graze_f),
+            AspectCat = levels(graz$AspectCat),
+            year_f = levels(graz$year_f))
+NewData_REML1.2$nativecov_sq &lt;- mean(graz$nativecov_sq)
+NewData_REML1.2$slope &lt;- mean(graz$slope)
+
+# Предсказанные значения при помощи матриц
+X &lt;- model.matrix(~ graze_f * AspectCat + year_f, data = NewData_REML1.2)
+betas = fixef(REML1.2)
+NewData_REML1.2$fit &lt;- X %*% betas
+
+# Cтандартные ошибки и дов. интервалы
+NewData_REML1.2$se &lt;- sqrt( diag(X %*% vcov(REML1.2) %*% t(X)) )
+NewData_REML1.2$lwr &lt;- NewData_REML1.2$fit - 2 * NewData_REML1.2$se
+NewData_REML1.2$upr &lt;- NewData_REML1.2$fit + 2 * NewData_REML1.2$se
+```
+
+---
+
+## Решение: График предсказаний фиксированной части модели
+
+На южных склонах высота травы выше там, где не пасут скот, а на северных нет. (Строго говоря, нужен еще пост хок тест, чтобы это утверждать)
+
+График похож на предыдущий, т.к. удаленные факторы и так не влияли.
+
+
+```r
+ggplot(data = NewData_REML1.2, aes(x = year_f, y = fit, colour = graze_f)) +
+  geom_pointrange(aes(ymin = lwr, ymax = upr)) +
+  facet_wrap(~ AspectCat) +
+  geom_jitter(data = graz, aes(y = height), alpha = 0.35, size = 1) +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+![](15.2_GLMM_gaussian_nested_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+
+---
+
+## Take-home messages
+
+- Случайные факторы в смешанных моделях могут быть вложены друг в друга
+- Есть два способа подбора коэффициентов в смешанных моделях: ML и REML. Для разных этапов анализа важно, каким именно способом подобрана модель.
+
+---
+
+## Дополнительные ресурсы
+
+- Crawley, M.J. (2007). The R Book (Wiley).
+- __Faraway, J. J. (2017). Extending the linear model with R: generalized linear, mixed effects and nonparametric regression models (Vol. 124). CRC press.__
+- Zuur, A. F., Hilbe, J., &amp; Ieno, E. N. (2013). A Beginner's Guide to GLM and GLMM with R: A Frequentist and Bayesian Perspective for Ecologists. Highland Statistics.
+- __Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer)__
+- Pinheiro, J., Bates, D. (2000). Mixed-Effects Models in S and S-PLUS. Springer
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="assets/macros.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "googlecode",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<!-- https://github.com/fnaufel/xaringan-smartify-->
+<script type="text/javascript">
+  smartify();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

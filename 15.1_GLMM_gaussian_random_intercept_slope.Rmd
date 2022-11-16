@@ -1,32 +1,56 @@
 ---
 title: "Смешанные линейные модели (случайный интерсепт и случайный угол наклона)"
-subtitle: ""
+subtitle: "Линейные модели..."
 author: "Марина Варфоломеева, Вадим Хайтов"
+date: "Осень `r format(Sys.Date(), '%Y')`"
 output:
   xaringan::moon_reader:
-    self-contained: true
+    self_contained: true
     lib_dir: libs
-    css: [default, tamu-fonts, ninjutsu, "assets/sydney.css", "assets/xaringan.css"]
+    css: [ninjutsu, "assets/xaringan-themer.css", "assets/xaringan.css"]
     df_print: default
     nature:
-      highlightStyle: vs
+      highlightStyle: googlecode
       highlightLines: true
       countIncrementalSlides: false
-      titleSlideClass: [top, center, inverse]
+      titleSlideClass: [middle, left, inverse]
       beforeInit: "assets/macros.js"
     includes:
       in_header: "assets/xaringan_in_header.html"
       after_body: "assets/xaringan_after_body.html"
 ---
 
-```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 80, scipen = 4, digits = 3)
-library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, 
-               fig.width = 9, fig.height = 4, fig.retina = 3,
-               warning = FALSE, message = FALSE)
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE, fig.showtext = TRUE}
+source("assets/xaringan_setup.R")
+library(xaringanExtra)
+use_tile_view()
+use_scribble()
+use_search(show_icon = FALSE)
+use_progress_bar(color = "#6d2b5e", location = "bottom", height = "10px")
+use_freezeframe()
+# use_webcam()
+# use_panelset()
+# use_extra_styles(hover_code_line = TRUE)
+
+# http://tachyons.io/docs/
+# https://roperzh.github.io/tachyons-cheatsheet/
+use_tachyons()
+# use_broadcast()
+
+# library(renderthis)
+# to_pdf(from = "15.1_GLMM_gaussian_random_intercept_slope.html",
+#        to = "15.1_GLMM_gaussian_random_intercept_slope.pdf",
+#        complex_slides = TRUE, partial_slides = TRUE)
+```
+
+```{r libs, include=FALSE, warning=FALSE}
+library("tidyverse")
+library("cowplot")
+library("ggplot2")
+theme_set(theme_bw(base_size = 20))
+```
+
+```{r setup1, include = FALSE, cache = FALSE, purl = FALSE}
 options(knitr.kable.NA = '')
 source("support_linmodr.R")
 ```
@@ -593,7 +617,7 @@ head(data.frame(NewData, exampPreds))
 
 ---
 
-## Предсказания для каждого уровня случайного фактора
+## Предсказания для уровней случайного фактора
 
 
 ```{r eval=FALSE, include=FALSE}
@@ -884,20 +908,22 @@ MS1 <- lmer(Reaction ~ Days + ( 1 + Days|Subject), data = sl)
 
 ---
 
-## Запишем уравнение модели со случайным отрезком и углом наклона
+## Уравнение модели со случайным отрезком и углом наклона
 
-.scroll-box-22[
+.scroll-box-18[
 ```{r}
 summary(MS1)
 ```
 ]
 
+.small[
 $Reaction_{ij} = 251.4 + 10.5 Days_{ij} + b_{i} + c_{ij} Days_{ij} + \varepsilon_{ij}$
   
 $b_{i} \sim N(0, 24.74)$ --- случайный интерсепт для субъекта  
 $c_{ij} \sim N(0, 5.92)$ --- случайный угол наклона для субъекта  
 $\varepsilon_{ij} \sim N(0, 25.59)$ --- остатки модели  
 $i$ --- субъекты, $j$ --- дни
+]
 
 ---
 
@@ -954,7 +980,7 @@ $\widehat{Reaction}_{ij} = 251.4 + 10.5 Days_{ij}$
 
 ---
 
-## Предсказания для каждого уровня случайного фактора
+## Предсказания для уровней случайного фактора
 
 ```{r eval=FALSE, include=FALSE, purl=FALSE}
 NewData$fit_subj <- predict(MS1, NewData, type = 'response')
@@ -1097,15 +1123,16 @@ Faraway, 2017, p.196
 
 ## Метод максимального правдоподобия, ML
 
-Правдоподобие (likelihood) --- способ измерить соответствие имеющихся данных тому, что можно получить при определенных значениях параметров модели.
+Правдоподобие (likelihood) --- измеряет соответствие реально наблюдаемых данных тем, что можно получить из модели при определенных значениях параметров.
 
+.pull-left-45[
 
-```{r gg-norm-tunnel0, echo=FALSE, fig.height=4, purl=FALSE}
-# Based on code by Arthur Charpentier:
-# http://freakonometrics.hypotheses.org/9593
-# TODO: wrap it into a function and adapt it for use with other distributions
-# as Markus Gesmann has done here
-# http://www.magesblog.com/2015/08/visualising-theoretical-distributions.html
+```{r gg-norm-tunnel0, echo=FALSE, purl=FALSE}
+## Based on code by Arthur Charpentier:
+## http://freakonometrics.hypotheses.org/9593
+## TODO: wrap it into a function and adapt it for use with other distributions
+## as Markus Gesmann has done here
+## http://www.magesblog.com/2015/08/visualising-theoretical-distributions.html
 library(boot)
 data(catsM)
 cat <- catsM
@@ -1118,6 +1145,7 @@ df <- data.frame(X,Y)
 # regression
 reggig <- glm(Y ~ X, data = df, family = gaussian(link = "identity"))
 
+op <- par(mar = c(0, 0, 0, 0))
 # empty plot
 vX <- seq(min(X) - 0.1, max(X) + 0.1, length = n)
 vY <- seq(min(Y) - 10, max(Y) + 10, length = n)
@@ -1175,20 +1203,26 @@ for(j in n:1){
   C <- trans3d(x, y, z0, mat)
   lines(C, lty = 2, col = "grey60")
   C <- trans3d(x, y, z, mat)
-  lines(C, col = "steelblue")
+  lines(C, col = "grey20")
 }
 par(op)
 ```
 
-Это произведение вероятностей получения каждой из точек данных:
+]
 
-$$L(\theta| \text{data}) = \Pi^n _{i = 1}f(\text{data}| \theta)$$
+.pull-right-55[
 
-- $f(\text{data}| \theta)$ --- функция распределения с параметрами $\theta$
 
-Параметры модели должны максимизировать значение логарифма правдоподобия
+Это произведение вероятностей данных:
 
-$$lnL(\theta| \text{data}) \longrightarrow \text{max}$$
+$$L(\theta| y_i) = \Pi^n _{i = 1}\color{purple}{f(y_i| \theta)}$$
+
+]
+
+Параметры модели должны максимизировать значение логарифма правдоподобия (loglikelihood): 
+
+$$lnL(\theta| y_i) \longrightarrow \text{max}$$
+
 
 ---
 
@@ -1493,9 +1527,9 @@ ggplot(data = NewData, aes(x = Days, y = fit)) +
 ## Дополнительные ресурсы
 
 - Crawley, M.J. (2007). The R Book (Wiley).
-- Faraway, J. J. (2017). Extending the linear model with R: generalized linear, mixed effects and nonparametric regression models (Vol. 124). CRC press.
+- __Faraway, J. J. (2017). Extending the linear model with R: generalized linear, mixed effects and nonparametric regression models (Vol. 124). CRC press.__
 - Zuur, A. F., Hilbe, J., & Ieno, E. N. (2013). A Beginner's Guide to GLM and GLMM with R: A Frequentist and Bayesian Perspective for Ecologists. Highland Statistics.
-- Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer)
+- __Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer)__
 - Pinheiro, J., Bates, D. (2000). Mixed-Effects Models in S and S-PLUS. Springer
 
 

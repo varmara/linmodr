@@ -2,31 +2,56 @@
 title: "Смешанные линейные модели (вложенные случайные факторы)"
 subtitle: "Линейные модели..."
 author: "Марина Варфоломеева, Вадим Хайтов"
-institute: "Кафедра Зоологии беспозвоночных, Биологический факультет, СПбГУ"
-fontsize: 10pt
-classoption: 't,xcolor=table'
-language: russian, english
+date: "Осень `r format(Sys.Date(), '%Y')`"
 output:
-  beamer_presentation:
-    theme: default
-    toc: no
-    colortheme: beaver
-    latex_engine: xelatex
-    slide_level: 2
-    fig_crop: false
-    highlight: tango
+  xaringan::moon_reader:
+    self_contained: true
+    lib_dir: libs
+    css: [ninjutsu, "assets/xaringan-themer.css", "assets/xaringan.css"]
+    df_print: default
+    nature:
+      highlightStyle: googlecode
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: [middle, left, inverse]
+      beforeInit: "assets/macros.js"
     includes:
-      in_header: ./includes/header.tex
+      in_header: "assets/xaringan_in_header.html"
+      after_body: "assets/xaringan_after_body.html"
 ---
 
-```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# to render
-# rmarkdown::render("10_GLMM_gaussian.Rmd", output_format = "beamer_presentation")
-# options(width = 70, scipen = 6, digits = 3)
-library(knitr)
-# chunk default options
-opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
-# library("extrafont")
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE, fig.showtext = TRUE}
+source("assets/xaringan_setup.R")
+library(xaringanExtra)
+use_tile_view()
+use_scribble()
+use_search(show_icon = FALSE)
+use_progress_bar(color = "#6d2b5e", location = "bottom", height = "10px")
+use_freezeframe()
+# use_webcam()
+# use_panelset()
+# use_extra_styles(hover_code_line = TRUE)
+
+# http://tachyons.io/docs/
+# https://roperzh.github.io/tachyons-cheatsheet/
+use_tachyons()
+# use_broadcast()
+
+# library(renderthis)
+# to_pdf(from = "15.2_GLMM_gaussian_nested.html",
+#        to = "15.2_GLMM_gaussian_nested.pdf",
+#        complex_slides = TRUE, partial_slides = TRUE)
+```
+
+```{r libs, include=FALSE, warning=FALSE}
+library("tidyverse")
+library("cowplot")
+library("ggplot2")
+theme_set(theme_bw(base_size = 20))
+```
+
+```{r setup1, include = FALSE, cache = FALSE, purl = FALSE}
+options(knitr.kable.NA = '')
 source("support_linmodr.R")
 ```
 
@@ -41,24 +66,29 @@ source("support_linmodr.R")
 - Вычислить коэффициент внутриклассовой корреляции для  случая с двумя вложенными случайными факторами
 - Подобрать смешанную линейную модель со вложенными случайными факторами
 
+---
+
+class: middle, center, inverse
+
 # Смешанные модели со вложенными случайными факторами
 
+---
 
 ## Вложенные факторы (Nested effects)
 
-\pause
+--
 
 ### Факторы образуют иерархическую последовательность вложенности
 
 - лес -->  дерево в лесу --> ветка на дереве --> наблюдение (личинки насекомых)
 
-\pause
+--
 
 ### Внутри каждого уровня главного фактора будут разные (нестрого сопоставимые) уровни вложенного фактора
 
 Деревья, с которых собирали личинок, будут разные в разных лесах (разные экземпляры).  
 
-\pause
+--
 
 ### Уровни вложенных факторов описывают иерархию взаимного сходства наблюдений
 
@@ -83,8 +113,6 @@ source("support_linmodr.R")
 
 Как в разные годы высота растительного покрова зависит от выпаса скота, экспозиции склона и проективного покрытия местных растений?
 
-\small
-
 Зависимая переменная:
 
 - **height** - высота растительного покрова
@@ -99,10 +127,10 @@ source("support_linmodr.R")
 - **Park** - парк
 - **plotID** - уникальный идентификатор участка
 
-\tiny
-
+.tiny[
 Данные:
 Gennet, S., Spotswood, E., Hammond, M. and Bartolome, J.W., 2017. Livestock grazing supports native plants and songbirds in a California annual grassland. PloS one, 12(6), p.e0176367.
+]
 
 ## Открываем данные
 
@@ -115,6 +143,8 @@ library(tidyr)
 gr <- read_excel("data/Grazing_native_plants_Gennet_et_al._2017_S1.xlsx")
 graz <- gr %>% spread(Species, presence)
 ```
+
+---
 
 ## Знакомство с данными
 
@@ -130,11 +160,15 @@ sum(is.na(graz))
 with(graz, table(Park, year))
 ```
 
+---
+
 ## Как закодированы переменные?
 
 ```{r}
 str(graz)
 ```
+
+---
 
 ## Наводим порядок
 
@@ -152,13 +186,15 @@ graz$year_f <- factor(graz$year)
 graz$nativecov_sq <- sqrt(graz$nativecov) 
 ```
 
+---
+
 ## Модель
 
 Вспомним главный вопрос исследования и подберем модель
 
 Как в разные годы высота растительного покрова зависит от выпаса скота, экспозиции склона и проективного покрытия местных растений?
 
-\pause
+--
 
 Нам нужно учесть, что в разные годы из-за кучи разных причин высота растений может различаться
 
@@ -173,6 +209,8 @@ ML1 <- lmer(height ~ graze_f*AspectCat + year_f +
           data = graz, REML = FALSE)
 ```
 
+---
+
 ## Анализ остатков
 
 ```{r}
@@ -183,6 +221,8 @@ ML1_diag <- data.frame(
   .fitted = fitted(ML1, type = "response"))
 ```
 
+---
+
 ## График остатков
 
 ```{r}
@@ -191,6 +231,8 @@ gg_res <- ggplot(data = ML1_diag, aes(y = .pear_res))
 gg_res + geom_point(aes(x = .fitted)) +
   geom_smooth(aes(x = .fitted))
 ```
+
+---
 
 ## Графики остатков от переменных в модели
 
@@ -206,6 +248,8 @@ ncol = 3)
 
 >- Паттерн на графике `nativecov_sq`. Возможно, здесь нужно использовать GAMM.
 
+---
+
 ## Графики остатков от переменных не в модели
 
 ```{r}
@@ -218,6 +262,8 @@ plot_grid(
 - Паттерн на графике `heatloadrel`
 - Возможно, есть тренд на графике `sqrt(litt)`
 
+
+---
 
 ## Тесты отношения правдоподобий для полной модели
 
@@ -233,6 +279,8 @@ drop1(ML1, test = 'Chi')
 - различается в разные годы
 - не зависит от покрытия местных растений и крутизны склона
 
+---
+
 ## Задание 1
 
 Рассчитайте внутриклассовую корреляцию
@@ -240,11 +288,11 @@ drop1(ML1, test = 'Chi')
 - Для наблюдений на одном и том же участке
 - Для наблюдений в одном и том же парке
 
+---
+
 ## Внутриклассовая корреляция
 
 Для расчета внутриклассовой корреляции нужна модель, подобранная при помощи REML
-
-\small
 
 ```{r purl=FALSE}
 REML1 <- lmer(height ~ graze_f*AspectCat + year_f + 
@@ -252,13 +300,16 @@ REML1 <- lmer(height ~ graze_f*AspectCat + year_f +
            data = graz, REML = TRUE)
 ```
 
+.scroll-box-20[
+
 ```{r purl=FALSE}
 summary(REML1)
 ```
+]
+
+---
 
 ## Внутриклассовая корреляция
-
-\small
 
 Для наблюдений на одном и том же участке $\sigma_{plotID}^2 / (\sigma_{plotID}^2 + \sigma_{Park}^2 + \sigma^2)$
 
@@ -284,13 +335,17 @@ Number of obs: 271, groups:  plotID:Park, 36; Park, 4
 
 - Значения высоты травяного покрова похожи внутри участка. Сходство наблюдений внутри одного парка слабее.
 
+---
+
 ## Результаты полной модели
 
-\small
-
+.scroll-box-24[
 ```{r}
 summary(REML1)
 ```
+]
+
+---
 
 ## Данные для графика предсказаний фиксированной части модели
 
@@ -316,6 +371,8 @@ NewData_REML1$lwr <- NewData_REML1$fit - 2 * NewData_REML1$se
 NewData_REML1$upr <- NewData_REML1$fit + 2 * NewData_REML1$se
 ```
 
+---
+
 ## График предсказаний фиксированной части модели
 
 На южных склонах высота травы выше там, где не пасут скот, а на северных нет. (Строго говоря, нужен еще пост хок тест, чтобы это утверждать.)
@@ -328,7 +385,13 @@ ggplot(data = NewData_REML1, aes(x = year_f, y = fit, colour = graze_f)) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
+---
+
+class: middle, center, inverse
+
 # Вариант решения с подбором оптимальной модели (самостоятельно)
+
+---
 
 ## Задание 2
 
@@ -338,6 +401,8 @@ ggplot(data = NewData_REML1, aes(x = year_f, y = fit, colour = graze_f)) +
 
 Опишите и визуализируйте финальную модель
 
+---
+
 ## Решение: Подбор оптимальной модели (1)
 
 Для подбора оптимальной модели воспользуемся тестами отношения правдоподобий. Для него нужно использовать модели, подобранные при помощи ML
@@ -346,6 +411,7 @@ ggplot(data = NewData_REML1, aes(x = year_f, y = fit, colour = graze_f)) +
 drop1(ML1, test = "Chi")
 ```
 
+---
 
 ## Решение: Подбор оптимальной модели (2)
 
@@ -354,6 +420,7 @@ ML1.1 <- update(ML1, .~.-slope)
 drop1(ML1.1, test = "Chi")
 ```
 
+---
 
 ## Решение: Подбор оптимальной модели (3)
 
@@ -361,6 +428,8 @@ drop1(ML1.1, test = "Chi")
 ML1.2 <- update(ML1.1, .~.-nativecov_sq)
 drop1(ML1.2, test = "Chi")
 ```
+
+---
 
 ## Решение: Анализ остатков
 
@@ -372,6 +441,8 @@ ML1.2_diag <- data.frame(
   .fitted = fitted(ML1.2, type = "response"))
 ```
 
+---
+
 ## Решение: График остатков
 
 ```{r purl=FALSE}
@@ -379,6 +450,8 @@ gg_res <- ggplot(data = ML1.2_diag, aes(y = .pear_res))
 gg_res + geom_point(aes(x = .fitted)) +
   geom_smooth(aes(x = .fitted))
 ```
+
+---
 
 ## Решение: Графики остатков от переменных в модели
 
@@ -389,6 +462,7 @@ gg_res + geom_boxplot(aes(x = year_f)),
 ncol = 3)
 ```
 
+---
 
 ## Решение: Графики остатков от переменных не в модели
 
@@ -403,6 +477,7 @@ plot_grid(
 ```
 - Паттерн на графике `heatloadrel`, `nativecov_sq`
 
+---
 
 ## Решение: Тестируем влияние факторов в финальной модели
 
@@ -418,6 +493,7 @@ drop1(ML1.2, test = 'Chi')
 - различается в разные годы
 - не зависит от покрытия местных растений и крутизны склона
 
+---
 
 ## Решение: Описываем результаты
 
@@ -427,17 +503,20 @@ drop1(ML1.2, test = 'Chi')
 REML1.2 <- update(ML1.2, REML = TRUE)
 ```
 
+---
+
 ## Решение: Результаты
 
-\small
-
+.scroll-box-24[
 ```{r purl=FALSE}
 summary(REML1.2)
 ```
+]
+
+---
 
 ## Решение: Внутриклассовая корреляция
 
-\small
 
 Для расчета нужна модель, подобранная при помощи REML
 
@@ -464,6 +543,8 @@ Number of obs: 271, groups:  plotID:Park, 36; Park, 4
 
 - Значения высоты травяного покрова похожи внутри участка. Сходство наблюдений внутри одного парка слабее.
 
+---
+
 ## Решение: Данные для графика предсказаний фиксированной части модели
 
 Используем для визуализации модель, подобранную при помощи REML
@@ -487,11 +568,13 @@ NewData_REML1.2$lwr <- NewData_REML1.2$fit - 2 * NewData_REML1.2$se
 NewData_REML1.2$upr <- NewData_REML1.2$fit + 2 * NewData_REML1.2$se
 ```
 
+---
+
 ## Решение: График предсказаний фиксированной части модели
 
 На южных склонах высота травы выше там, где не пасут скот, а на северных нет. (Строго говоря, нужен еще пост хок тест, чтобы это утверждать)
 
-Не удивляйтесь тому, что график похож на предыдущий, т.к. те факторы, которые мы удалили из модели и так не влияли.
+График похож на предыдущий, т.к. удаленные факторы и так не влияли.
 
 ```{r purl=FALSE}
 ggplot(data = NewData_REML1.2, aes(x = year_f, y = fit, colour = graze_f)) +
@@ -501,19 +584,21 @@ ggplot(data = NewData_REML1.2, aes(x = year_f, y = fit, colour = graze_f)) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
+---
 
 ## Take-home messages
 
 - Случайные факторы в смешанных моделях могут быть вложены друг в друга
 - Есть два способа подбора коэффициентов в смешанных моделях: ML и REML. Для разных этапов анализа важно, каким именно способом подобрана модель.
 
+---
 
 ## Дополнительные ресурсы
 
 - Crawley, M.J. (2007). The R Book (Wiley).
-- Faraway, J. J. (2017). Extending the linear model with R: generalized linear, mixed effects and nonparametric regression models (Vol. 124). CRC press.
+- __Faraway, J. J. (2017). Extending the linear model with R: generalized linear, mixed effects and nonparametric regression models (Vol. 124). CRC press.__
 - Zuur, A. F., Hilbe, J., & Ieno, E. N. (2013). A Beginner's Guide to GLM and GLMM with R: A Frequentist and Bayesian Perspective for Ecologists. Highland Statistics.
-- Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer)
+- __Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., and Smith, G.M. (2009). Mixed Effects Models and Extensions in Ecology With R (Springer)__
 - Pinheiro, J., Bates, D. (2000). Mixed-Effects Models in S and S-PLUS. Springer
 
 
