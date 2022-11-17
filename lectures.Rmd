@@ -235,8 +235,8 @@ install.packages(c("lme4", "pbkrtest"))
 ```
 
 - Презентация:
-    + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.pdf)
-    + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.pdf)
+    + [15.1_GLMM_gaussian_random_intercept_slope.pdf](15.1_GLMM_gaussian_random_intercept_slope.html)
+    + [15.2_GLMM_gaussian_nested.pdf](15.2_GLMM_gaussian_nested.html)
 
 - Код:
     + [15.1_GLMM_gaussian_random_intercept_slope_code.R](15.1_GLMM_gaussian_random_intercept_slope_code.R)
