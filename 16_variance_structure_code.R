@@ -47,8 +47,8 @@ library(car)
 Anova(M1)
 
 
-M1_diagn <- fortify(M1)
-ggplot(M1_diagn, aes(x = .fitted, y = .stdresid)) + geom_point() + geom_hline(yintercept = 0)
+M1_diagn <- fortify( )
+ggplot( , aes(x = , y = )) + geom_point() + geom_hline(yintercept = 0)
 
 
 ##########################################################################
