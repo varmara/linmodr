@@ -253,7 +253,7 @@ install.packages(c("lme4", "pbkrtest"))
 
 ### 16 Моделирование структуры дисперсии в смешанных моделях
 
-<!-- - Презентация: [16_variance_structure.pdf](16_variance_structure.pdf) -->
+- Презентация: [16_variance_structure.pdf](16_variance_structure.pdf)
 - Код: [16_variance_structure_code.R](16_variance_structure_code.R)
 - Код: [16_variance_structure_code_practice.R](16_variance_structure_code_practice.R)
 - Данные:
