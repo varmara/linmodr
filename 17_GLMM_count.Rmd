@@ -1,32 +1,56 @@
 ---
 title       : "Смешанные линейные модели<br/>для счетных данных"
-subtitle    : ""
+subtitle: "Линейные модели..."
 author: "Марина Варфоломеева, Вадим Хайтов"
+date: "Осень `r format(Sys.Date(), '%Y')`"
 output:
   xaringan::moon_reader:
-    self-contained: true
+    self_contained: true
     lib_dir: libs
-    css: [default, tamu-fonts, ninjutsu, "assets/sydney.css", "assets/xaringan.css"]
+    css: [ninjutsu, "assets/xaringan-themer.css", "assets/xaringan.css"]
     df_print: default
     nature:
-      highlightStyle: vs
+      highlightStyle: googlecode
       highlightLines: true
       countIncrementalSlides: false
-      titleSlideClass: [top, center, inverse]
+      titleSlideClass: [middle, left, inverse]
       beforeInit: "assets/macros.js"
     includes:
       in_header: "assets/xaringan_in_header.html"
       after_body: "assets/xaringan_after_body.html"
 ---
 
-```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 80, scipen = 4, digits = 3)
-library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, 
-               fig.width = 9, fig.height = 4, fig.retina = 3,
-               warning = FALSE, message = FALSE)
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE, fig.showtext = TRUE}
+source("assets/xaringan_setup.R")
+library(xaringanExtra)
+use_tile_view()
+use_scribble()
+use_search(show_icon = FALSE)
+use_progress_bar(color = "#6d2b5e", location = "bottom", height = "10px")
+use_freezeframe()
+# use_webcam()
+# use_panelset()
+# use_extra_styles(hover_code_line = TRUE)
+
+# http://tachyons.io/docs/
+# https://roperzh.github.io/tachyons-cheatsheet/
+use_tachyons()
+# use_broadcast()
+
+# library(renderthis)
+# to_pdf(from = "15.1_GLMM_gaussian_random_intercept_slope.html",
+#        to = "15.1_GLMM_gaussian_random_intercept_slope.pdf",
+#        complex_slides = TRUE, partial_slides = TRUE)
+```
+
+```{r libs, include=FALSE, warning=FALSE}
+library("tidyverse")
+library("cowplot")
+library("ggplot2")
+theme_set(theme_bw(base_size = 20))
+```
+
+```{r setup1, include = FALSE, cache = FALSE, purl = FALSE}
 options(knitr.kable.NA = '')
 source("support_linmodr.R")
 ```
