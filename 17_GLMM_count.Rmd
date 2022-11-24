@@ -38,8 +38,8 @@ use_tachyons()
 # use_broadcast()
 
 # library(renderthis)
-# to_pdf(from = "15.1_GLMM_gaussian_random_intercept_slope.html",
-#        to = "15.1_GLMM_gaussian_random_intercept_slope.pdf",
+# to_pdf(from = "17_GLMM_count.html",
+#        to = "17_GLMM_count.pdf",
 #        complex_slides = TRUE, partial_slides = TRUE)
 ```
 
