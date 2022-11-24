@@ -267,13 +267,13 @@ install.packages("faraway")
 
 ### 17 GLMM для счетных данных
 
-<!-- - Презентация: [17_GLMM_count.html](17_GLMM_count.html) -->
+- Презентация: [17_GLMM_count.html](17_GLMM_count.html)
 
 - Код:
     + [17_GLMM_count_code.R](17_GLMM_count_code.R)
     + Задание [17_GLMM_count_Ants_practice.R](17_GLMM_count_Ants_practice.R)
 
-<!-- + Решение [17_GLMM_count_Ants_practice_solution.R](17_GLMM_count_Ants_practice_solution.R) -->
++ Решение [17_GLMM_count_Ants_practice_solution.R](17_GLMM_count_Ants_practice_solution.R)
     
 - Данные:
     + [Roulin_Bersier_2007_Owls.csv](data/Roulin_Bersier_2007_Owls.csv)
