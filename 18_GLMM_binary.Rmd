@@ -453,11 +453,10 @@ model1_ri <- glmer(Out ~ L_scaled*Sp*Year +
 Характер связи зависимой переменной с предикторами может меняться от контейнера к контейнеру и от эксперимента к эксперименту. Мы должны проверить не улучшит ли это модель.
 
 ```{r, warning=TRUE}
-model1_rsi_1<- glmer(Out ~ L_scaled * Sp * Year + (1 + Sp|Experiment/Box) , 
-               data = astr2, family = binomial(link = "logit"))
 
-model1_rsi_2 <- glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box) , 
+model1_rsi_1<-  glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box) , 
             data = astr2, family = binomial(link = "logit"))
+
 ```
 
 Обе модели не сошлись. 
@@ -470,26 +469,24 @@ model1_rsi_2 <- glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box
 В данном случае мы увеличили количество итераций. 
 
 ```{r, warning=TRUE}
-model1_rsi_1<- glmer(Out ~ L_scaled * Sp * Year + (1 + Sp|Experiment/Box) , 
-               data = astr2, family = binomial(link = "logit"),
-               control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 
-model1_rsi_2 <- glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box) , 
+model1_rsi_1<- glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box) , 
             data = astr2, family = binomial(link = "logit"),
             control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
+
 ```
 
 Сработало. Но не факт, что сработает в других моделях.
 
 
 
-## Сравниваем три модели
+## Сравниваем две модели
 
 \pause
 
 
 ```{r}
-AIC(model1_ri, model1_rsi_1, model1_rsi_2)
+AIC(model1_ri, model1_rsi_1)
 ```
 
 Останавливаем выбор на модели со случайным отрезком `model1_ri`
@@ -515,7 +512,6 @@ ggplot(model1_diagn, aes(x = .fitted, y = .scresid)) + geom_point() +
 ## Диагностика модели: избыточность дисперсии
 
 
-
 ```{r}
 overdisp_fun <- function(model) {
     rdf <- df.residual(model)
@@ -528,6 +524,15 @@ overdisp_fun <- function(model) {
 
 overdisp_fun(model1_ri)
 ```
+
+Второй способ проверки
+
+```{r}
+library(performance)
+check_overdispersion(model1_ri)
+
+```
+
 
 Избыточной дисперсии нет
 
@@ -666,7 +671,7 @@ SpTr         1.05869    0.15626   6.775 1.24e-11 ***
 
 ICC можно интерпретировать, как долю изменчивости объясненной наличием группирующего фактора. 
 
-В случае GLMM (при биномиальном или пуассоновском распределении отклика) величина дисперсии закономерно связана с матожиданием, следовательно она изменяется вместе с изменением предикторов, входящих в фиксированную часть модели. Это не позволяет вычислить  напрямую, как мы это делали в случае LMM.
+В случае GLMM (при биномиальном или пуассоновском распределении отклика) величина дисперсии закономерно связана с матожиданием, следовательно она изменяется вместе с изменением предикторов, входящих в фиксированную часть модели. Это не позволяет вычислить ICC напрямую, как мы это делали в случае LMM.
 
 ## Приблизительные значения ICC 
 

@@ -64,11 +64,7 @@ model1_rsi_2 <- glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box
 
 
 
-model1_rsi_1<- glmer(Out ~ L_scaled * Sp * Year + (1 + Sp|Experiment/Box) ,
-                     data = astr2, family = binomial(link = "logit"),
-                     control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
-
-model1_rsi_2 <- glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box) ,
+model1_rsi_1<- glmer(Out ~ L_scaled * Sp * Year + (1 + L_scaled |Experiment/Box) ,
                       data = astr2, family = binomial(link = "logit"),
                       control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5)))
 
@@ -192,9 +188,62 @@ model6_unscaled <- glmer(Out ~ L + Sp +
 
 
 
+
+##################################################################
+
+# Пример построения модели для данных, где события даны в виде частот
+
 library(partR2)
 data("Grasshoppers")
 
+# BIO18 = precipitation of warmest quarter
+
+
+Mod_gh <- glmer(cbind(nGreen, nBrown) ~ Sex + Bio18 + (1|SiteID), data = Grasshoppers, family = binomial(link = "logit") )
+
+
+Mod_gh <- glmer(cbind(nGreen, nBrown) ~  Sex + scale(Bio18) + (1|SiteID) , data = Grasshoppers, family = binomial(link = "logit") )
+
+
+vif(Mod_gh)
+
+library(performance)
+check_overdispersion(Mod_gh)
+
+
+
+Mod_gh_diagn <- fortify.merMod(Mod_gh)
+
+ggplot(Mod_gh_diagn, aes(x = .fitted, y = .scresid)) + geom_point() + geom_smooth() + geom_hline(yintercept = 0)
+
+ggplot(Mod_gh_diagn, aes(x = Sex, y = .scresid)) + geom_point() + geom_boxplot()
+
+ggplot(Mod_gh_diagn, aes(x = Bio18, y = .scresid)) + geom_point() + geom_smooth() + geom_hline(yintercept = 0)
+
+
+# summary(Mod_gh)
+
+
+
+library(mgcv)
+Grasshoppers$SiteID = factor(Grasshoppers$SiteID)
+Grasshoppers$Sex = factor(Grasshoppers$Sex)
+
+
+Mod_gh_gam <- gam(cbind(nGreen, nBrown) ~ s(Bio18)  + Sex + s(SiteID, bs = "re", k = 42), data = Grasshoppers, family = binomial(link = "logit"), method = "REML" )
+
+plot(Mod_gh_gam)
+
+
+qplot(x = fitted(Mod_gh_gam), y = residuals(Mod_gh_gam, type = "pearson")) +
+  geom_smooth() +
+  geom_hline(yintercept = 0)
+
+
+qplot(x = (Grasshoppers$Bio18), y = residuals(Mod_gh_gam, type = "pearson")) + geom_smooth()
+
+
+summary(Mod_gh_gam)
 
 
 
@@ -209,8 +258,28 @@ data("Grasshoppers")
 bal <- read.table("data/Yakovis2.csv", header = TRUE, sep = ";")
 
 
+
+#
+# Site -точка сбора материала
+# Sample - квдарат 1х1 м, на котором производился сбор друз
+# BorN - количество Boreotrophon clathratus на квадрате
+# Substrate_ID - Номер друзы
+# ALength - Диаметр апертуры
+# Age - Возраст балянуса
+# Position - Расположение балянуса (первичный субстрат/вторичный субстрат)
+# Status - живой/мертвый
+#
+# Drill - Зависимая переменная (0 - нет следов сверления; 1 - есть следы сверления)
+#
+# Для ответа на поставленный вопрос целесообразно работать с мертвыми особями
+
+
+
+
+# Вопрос: от каких факторов зависит будет ли атакован балянус хищником?
 # Задание: Как связана вероятность гибели балнуса от
-# BorN ALength  Position  Site
+# BorN ALength Age Position  Site
+
 
 #Some housekeeping
 bal$Site <- factor(bal$Site)
@@ -221,6 +290,7 @@ bal$Substrate_ID <- factor(bal$Substrate_ID)
 #Доля живых со следами сверления
 sum(bal[bal$Status == "live_barnacle", ]$Drill)/length(bal[bal$Status == "live_barnacle", ]$Drill)
 
+
 mean(bal[bal$Status == "live_barnacle", ]$Drill)
 
 mean(bal[bal$Status == "live_barnacle", ]$Drill == 1)
@@ -230,15 +300,21 @@ mean(bal[bal$Status == "live_barnacle", ]$Drill == 1)
 mean(bal[bal$Status == "empty_test", ]$Drill)
 
 
+
+
 bal2 <- bal[bal$Status == "empty_test", ]
 
 
+library(lme4)
+M1_glmer <- glmer(Drill ~     , data = bal2, family = )
 
 
 
 
 
 
+
+###################################################
 #Задание 2. Можно ли использовать морфологический маркер для идентификации криптических видов мидий
 # Данные взяты из работы M.Katolikova, V.Khaitov, R.Väinölä, M.Gantsevich, P.Strelkov "Genetic, Ecological and Morphological Distinctness of the Blue Mussels Mytilus trossulus Gould and M. edulis L. in the White Sea" PLOS ONE DOI:10.1371/journal.pone.0152963
 
