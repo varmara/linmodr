@@ -290,9 +290,9 @@ install.packages("blmeco")
 
 ```
 
-<!-- - Презентация: [18_GLMM_binary.pdf](18_GLMM_binary.pdf) -->
+- Презентация: [18_GLMM_binary.pdf](18_GLMM_binary.pdf)
 
-<!-- - Старая презентация, в которой есть разбор самостоятельной работы про балянусов: [18_GLMM_binary.pdf](18_GLMM_binary.pdf) -->
+- Старая презентация, в которой есть разбор самостоятельной работы про балянусов: [15_GLMM_binary_old_presentaton.html](15_GLMM_binary_old_presentaton.html)
 
 
 
