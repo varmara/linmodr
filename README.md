@@ -3,8 +3,13 @@
 ## En: Linear Models, ANOVA, and Regression Analysis using R (Archived)
 
 ```diff
-- This repository contains an archived version of the course "Linear Models, ANOVA, and Regression Analysis with R." The last time it was taught by this team of instructors was in Fall 2022 at the Biology Faculty, St. Petersburg State University.
-- The current version of the course is available here: https://polydora.github.io/linmodr/
+- This repository contains an archived version of the course  
+"Linear Models, ANOVA, and Regression Analysis with R."  
+The last time it was taught by this team of instructors was in Fall 2022  
+at the Biology Faculty, St. Petersburg State University.
+
+- The current version of the course is available here:  
+https://polydora.github.io/linmodr/
 ```
 
 **Instructors**: Marina Varfolomeeva, Vadim Khaitov
