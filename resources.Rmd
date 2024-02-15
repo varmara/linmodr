@@ -12,6 +12,11 @@ output:
     css: my_styles.css
 ---
 
+<span style="color: red; font-size:20pt">
+Это архивная версия курса. Последний раз таким составом авторов курс был прочитан осенью 2022г.</span>
+
+Современная версия [здесь](https://polydora.github.io/linmodr/)
+
 ## R --- базовые знания
 
 - [Cheat-sheet по RStudio](https://raw.githubusercontent.com/rstudio/cheatsheets/main/rstudio-ide.pdf) от [RStudio](https://www.rstudio.com)

@@ -14,6 +14,13 @@ output:
 
 ## Анализ мощности (на примере t-критерия)
 
+<span style="color: red; font-size:20pt">
+Это архивная версия курса. Последний раз таким составом авторов курс был прочитан осенью 2022г.</span>
+
+Современная версия [здесь](https://polydora.github.io/linmodr/)
+
+---
+
 - Презентация [html](supplement/power.html) | [pdf]
 - [код R](supplement/code_power.R)
 - Данные

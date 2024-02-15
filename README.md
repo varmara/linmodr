@@ -1,99 +1,53 @@
-# Как работать с кодом этого сайта
+# linmodr
 
-Дорогие коллабораторы, этот сайт построен с помощью RMarkdown. Подробнее можно прочитать здесь http://rmarkdown.rstudio.com/rmarkdown_websites.html
+## En: Linear Models, ANOVA, and Regression Analysis using R (Archived)
 
-Презентации сделаны в формате ioslides.
-
-Удобнее всего работать с проектом RStudio __linmodr.Rproj__
-
-## git pull
-
-Нас много, поэтому перед началом работы --- __git pull__
-
-После того, как поработали (сделали несколько локальных коммитов) --- __git pull__
-
-И только потом уже (возможно, после разрешения конфликтов слияния) --- __git push__
-
-## Особенности форматирования презентаций.
-
-__Не нужно без крайней необходимости уменьшать текст при помощи__ `.smaller`. Шрифты итак очень мелкие --- будет не видно, если экран в аудитории небольшой. Если что-то не помещается, лучше разбить на несколько слайдов.
-
-__При двухколоночной верстке избегайте формул в колонках__, т.к. в браузере Chrome пропадает большинство элементов. Формулы можно помещать до начала двухколоночного `<div class="columns-2"><\div>`
-
-__При двухколоночной верстке размещайте иллюстрации слева__, иначе в браузере Chrome не происходит разделения на две колонки.
-
-__В презентации лучше вставлять ссылки на данные на github__. Например, так
-
-```
-library(downloader)
-
-# в рабочем каталоге создаем суб-директорию для данных,
-# если ее еще не было 
-if(!dir.exists("data")) dir.create("data")
-
-# скачиваем файл
-download(
-  url = "https://varmara.github.io/mathmethr/data/minch.xls", 
-  destfile = "data/minch.xls")
+```diff
+- This repository contains an archived version of the course "Linear Models, ANOVA, and Regression Analysis with R." The last time it was taught by this team of instructors was in Fall 2022 at the Biology Faculty, St. Petersburg State University.
+- The current version of the course is available here: https://polydora.github.io/linmodr/
 ```
 
-## Обновление ioslides презентации --- из командной строки
+**Instructors**: Marina Varfolomeeva, Vadim Khaitov
 
-Если кодировка файла совпадает с кодировкой системы
+**Description**:
 
-```
-rmarkdown::render("02_filename.Rmd", output_format = "ioslides_presentation")
-```
+This course introduces students to the application of various linear models in biological research, including regression analysis, covariance analysis, ANOVA, logistic regression, and mixed linear models. By the end of the course, you will be able to:
 
-Если кодировка исходного файла другая --- указываем правильную
-```
-rmarkdown::render("02_filename.Rmd", output_format = "ioslides_presentation", encoding = "Windows-1251")
+Critically evaluate the use of statistical methods in scientific articles.
+Independently analyze data using R scripts.
+Present and interpret analysis results visually.
+Write scientific reports summarizing your findings.
 
-# или
+**Software Requirements**:
 
-rmarkdown::render("02_filename.Rmd", output_format = "ioslides_presentation", encoding = "Utf-8")
-```
+- R: Download the appropriate version for your operating system from [r-project.org](https://www.r-project.org/).
+- RTools (Windows only): If you're using Windows, you'll need RTools to install packages that require compilation. Get it from the R Project website.
+- [RStudio](https://rstudio.com/products/rstudio/download/).
+- Шf you encounter issues installing R/RStudio locally, you can use [the cloud version](https://posit.cloud/) as a temporary alternative.
 
-## Генерация кода для студентов из Rmd--- из командной строки
+**Grading**:
 
-- Отметьте ненужные студентам чанки опцией `purl=FALSE`
-- Экстрагируйте код из файла. Весь обычный текст будет закомментирован. ВНИМАНИЕ: пока нам не лень, код помечаем словом `code` после номера занятия: у многих студентов скрыты расширения файлов.
+To pass the course, you must complete all weekly and final tests on Stepik (the link will be provided in the course support chat on Telegram). Detailed passing criteria are available on the course website.
 
-```
-purl("02_filename.Rmd", documentation = 2, output = "02_code_filename.R")
-```
-- Удалите вручную ненужный текст, решения задач. Оставьте только необходимые заголовки.
-- Проверьте,  есть ли ссылка на файл с кодом в файле `lectures.Rmd`.
-- Закомитьте (и запушьте, если надо) изменения
+## Ru: Курс Линейные модели, дисперсионный и регрессионный анализ с использованием R (архив)
 
+В этом репозитории хранится архивная версия курса. Последний раз таким составом авторов курс был прочитан осенью 2022г на биологическом факультете Санкт Петербургского Государственного Университета. 
 
-## Обновление простой html-страницы --- из командной строки
+Современная версия находится [здесь](https://polydora.github.io/linmodr/)
 
-```
-rmarkdown::render_site("filename.Rmd")
-```
-Если кодировка исходного файла не совпадает с кодировкой системы --- указываем его правильную кодировку
+**Преподаватели**: Марина Варфоломеева, Вадим Хайтов
 
-```
-rmarkdown::render_site("filename.Rmd", encoding = "Windows-1251")
+**Описание**: 
 
-# или
+Курс знакомит с применением различных вариантов линейных моделей в биологии (регрессионный анализ, анализ ковариаций, дисперсионный анализ, логистическая регрессия, смешанные линейные модели). В итоге, вы сможете критически оценивать корректность применения методов статистики в научных статьях, самостоятельно анализировать данные с использованием скриптов на языке статистического программирования R, представлять в наглядном виде результаты анализов, интерпретировать их и представлять в виде научного отчета.
 
-rmarkdown::render_site("filename.Rmd", encoding = "Utf-8")
-```
+**Для занятий потребуется установить**:
 
-## Обновление сайта целиком
+- R для вашей ОС можно установить с сайта [r-project.org](https://www.r-project.org/).
+- пользователям Windows понадобится утилита RTools (с того же сайта) для установки пакетов, требующих компиляции из исходного кода.
+- среда разработки [RStudio](https://rstudio.com/products/rstudio/download/).
+- Eсли вдруг возникли проблемы с установкой R / RStudio, на первое время его можно заменить облачным [RStudio](https://posit.cloud/).
 
-  - через интерфейс RStudio --- на вкладке _Build_
-  - из командной строки `rmarkdown::render_site()`
+**Оценки**:
 
-__Осторожно!__ Это может не сработать, т.к. у нас есть файлы в разных кодировках. Лучше обновлять постранично.
-
-## Публикация сайта
-
-Сайт располагается на github pages. Чтобы изменения появились на сайте, достаточно запушить свои коммиты в бренч master
-
-```
-git push origin master
-```
-
+ДЛЯ ЗАЧЕТА нужно решить все еженедельные и финальный тесты на Stepik (ссылка в чате поддержки курса в Телеграм). Условия для зачета на сайте курса. 

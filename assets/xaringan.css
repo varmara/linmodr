@@ -82,17 +82,7 @@ code.hljs {
 }
 
 /******************
- * Slide scrolling
- * (non-functional)
- * not sure if it is a good idea anyway
-slides > slide {
-  overflow: scroll;
- padding: 5px 40px;
-}
-.scrollable-slide .remark-slide {
-  height: 400px;
-  overflow: scroll !important;
-}
+ * Scrolling *
  ******************/
 
 .scroll-box-8 {
@@ -235,7 +225,6 @@ slides > slide {
   float: right;
   width: 60%;
 }
-
 
 .pull-left-66 {
   float: left;
