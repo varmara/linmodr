@@ -1,0 +1,5 @@
+*.Rmd linguist-language=RMarkdown
+*.R linguist-language=R
+*.html linguist-vendored
+*.css linguist-vendored
+*.js linguist-vendored
