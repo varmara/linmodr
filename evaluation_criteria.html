@@ -1,64 +1,57 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
 
 <title>Критерии оценки домашних заданий</title>
 
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/simplex.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 
-
-
-
 <style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+
+
+
 
 <link rel="stylesheet" href="my_styles.css" type="text/css" />
 
-</head>
 
-<body>
 
 <style type = "text/css">
 .main-container {
@@ -66,58 +59,71 @@ h6 {
   margin-left: auto;
   margin-right: auto;
 }
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
-}
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
 }
 </style>
 
 
 <style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 41px;
-  padding-bottom: 40px;
+.dropdown-submenu {
+  position: relative;
 }
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 46px;
-  margin-top: -46px;
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
 }
-
-.section h2 {
-  padding-top: 46px;
-  margin-top: -46px;
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
 }
-.section h3 {
-  padding-top: 46px;
-  margin-top: -46px;
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
 }
-.section h4 {
-  padding-top: 46px;
-  margin-top: -46px;
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
 }
-.section h5 {
-  padding-top: 46px;
-  margin-top: -46px;
+.dropdown-submenu.pull-left {
+  float: none;
 }
-.section h6 {
-  padding-top: 46px;
-  margin-top: -46px;
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
-<script>
+<script type="text/javascript">
 // manage active state of menu based on current page
 $(document).ready(function () {
   // active menu anchor
@@ -127,55 +133,83 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.parent().addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
 });
 </script>
-
-
-<div class="container-fluid main-container">
 
 <!-- tabsets -->
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-</script>
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
 
 <!-- code folding -->
 
 
-
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = false;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <style type="text/css">
 
@@ -189,6 +223,12 @@ $(document).ready(function ()  {
 }
 }
 
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
 
 .toc-content {
   padding-left: 30px;
@@ -224,8 +264,6 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -241,8 +279,18 @@ div.tocify {
 
 </style>
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
 <!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
+<div class="row">
 <div class="col-xs-12 col-sm-4 col-md-3">
 <div id="TOC" class="tocify">
 </div>
@@ -280,7 +328,8 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<div class="fluid-row" id="header">
+
+<div id="header">
 
 
 
@@ -290,48 +339,83 @@ div.tocify {
 
 
 <p><a href="example-report.zip">Пример решения домашнего задания</a></p>
-<p>Минимальный набор файлов в решенном домашнем задании — код и отчет.</p>
-<div id="--" class="section level2">
+<p>Минимальный набор файлов в решенном домашнем задании — код и
+отчет.</p>
+<div id="требования-к-коду" class="section level2">
 <h2>Требования к коду</h2>
-<p>Код - это программа, выполнив которую, можно воспроизвести ваши результаты (с минимальной заменой путей к файлам с исходными данными). Внимание: код прикладывайте в виде отдельного файла .R, без вывода консоли!</p>
+<p>Код - это программа, выполнив которую, можно воспроизвести ваши
+результаты (с минимальной заменой путей к файлам с исходными данными).
+Внимание: код прикладывайте в виде отдельного файла .R, без вывода
+консоли!</p>
 <ul>
 <li><a href="coding_practices.html">Правила хорошего кода</a></li>
 </ul>
 </div>
-<div id="--" class="section level2">
+<div id="требования-к-отчету" class="section level2">
 <h2>Требования к отчету</h2>
 <p>Отчет должен быть выдержан в форме научной мини-статьи.</p>
 <p>Разделы:</p>
 <ul>
-<li>Введение — Объясните, зачем затевалось исследование и почему оно важно. Сформулируйте исследовательский вопрос и гипотезы, которые необходимо проверить. (Кратко, 2-5 предложений)</li>
-<li>Материалы и методы — Объясните, что и зачем делали во время исследования. Опишите дизайн исследования, особенности данных, порядок применения статистических методов. Например, здесь стоит сказать, какие условия применимости методов вы проверяли и каким способом, что показали результаты проверки и как они повлияли на дальнейший анализ. Обязательно должны быть ссылки на литературу с описанием метода, на использованные статистические пакеты. (Этот пункт запросто может занять пару-тройку абзацев).</li>
-<li>Результаты и обсуждение — Визуализируйте результаты, опишите и поясните их, по возможности, кратко. Описание результатов статистических тестов можно давать в скобках в тексте, в виде таблиц. У рисунков и таблиц должны быть осмысленные подписи, и в тексте на них должны быть ссылки.</li>
+<li>Введение — Объясните, зачем затевалось исследование и почему оно
+важно. Сформулируйте исследовательский вопрос и гипотезы, которые
+необходимо проверить. (Кратко, 2-5 предложений)</li>
+<li>Материалы и методы — Объясните, что и зачем делали во время
+исследования. Опишите дизайн исследования, особенности данных, порядок
+применения статистических методов. Например, здесь стоит сказать, какие
+условия применимости методов вы проверяли и каким способом, что показали
+результаты проверки и как они повлияли на дальнейший анализ. Обязательно
+должны быть ссылки на литературу с описанием метода, на использованные
+статистические пакеты. (Этот пункт запросто может занять пару-тройку
+абзацев).</li>
+<li>Результаты и обсуждение — Визуализируйте результаты, опишите и
+поясните их, по возможности, кратко. Описание результатов статистических
+тестов можно давать в скобках в тексте, в виде таблиц. У рисунков и
+таблиц должны быть осмысленные подписи, и в тексте на них должны быть
+ссылки.</li>
 <li>Выводы — Сформулируйте выводы.</li>
 <li>Список литературы</li>
 </ul>
 </div>
-<div class="section level2">
+<div id="оценки" class="section level2">
 <h2>Оценки</h2>
-<p>Качество отчета оценивается по анкете. Оценки за каждый из пунктов: 1/3 балла - да, все, что нужно; 1/6 балла - да, но не все, что нужно; 0 - нет/ничего. За 6 выполненных заданий можно набрать <span class="math inline">\(1/3 \times 15 \times 6 = 30\)</span> баллов, плюс еще 6 дополнительных, если задание сдано в срок.</p>
-<p>Анкета для оценки заданий составлена по мотивам критериев оценки от <a href="http://www.biostat.jhsph.edu/~jleek/research.html">Джеффа Лика</a> в курсе Data Analysis на <a href="http:/coursera.org">Coursera</a>.</p>
+<p>Качество отчета оценивается по анкете. Оценки за каждый из пунктов:
+1/3 балла - да, все, что нужно; 1/6 балла - да, но не все, что нужно; 0
+- нет/ничего. За 6 выполненных заданий можно набрать <span
+class="math inline">\(1/3 \times 15 \times 6 = 30\)</span> баллов, плюс
+еще 6 дополнительных, если задание сдано в срок.</p>
+<p>Анкета для оценки заданий составлена по мотивам критериев оценки от
+<a href="http://www.biostat.jhsph.edu/~jleek/research.html">Джеффа
+Лика</a> в курсе Data Analysis на <a
+href="http:/coursera.org">Coursera</a>.</p>
 </div>
-<div id="-----" class="section level2">
+<div id="анкета-по-которой-оценивается-домашнее-задание"
+class="section level2">
 <h2>Анкета, по которой оценивается домашнее задание</h2>
 <p>Оценка ХХ + ХХ = XX из 5 возможных баллов</p>
-<div id="a.---." class="section level3">
+<div id="a.-самостоятельность-выполнения-задания."
+class="section level3">
 <h3>A. Самостоятельность выполнения задания.</h3>
 <ol style="list-style-type: decimal">
-<li>Самостоятельно ли написан текст домашнего задания? В случае обнаружения явных заимствований или не оформленных цитат все баллы “сгорают”</li>
+<li>Самостоятельно ли написан текст домашнего задания? В случае
+обнаружения явных заимствований или не оформленных цитат все баллы
+“сгорают”</li>
 </ol>
 </div>
-<div id="b.-----" class="section level3">
+<div id="b.-описание-анализа-данных-и-результатов"
+class="section level3">
 <h3>B. Описание анализа данных и результатов</h3>
 <ol style="list-style-type: decimal">
-<li>Есть ли в отчете разделы (Введение, Материалы и методы, Результаты и Обсуждение, Выводы, Список литературы) и соответствует ли их содержание заголовкам?</li>
-<li>Описаны ли в тексте вопросы, на которые нужно дать ответ или гипотезы, которые нужно проверить?</li>
-<li>Описаны ли в тексте особенности применения статистических методов?</li>
-<li>Содержит ли текст ссылки на использованные статистические методы и программное обеспечение?</li>
-<li>Упоминаются ли переменные простыми словами, а не кодовыми наименованиями?</li>
+<li>Есть ли в отчете разделы (Введение, Материалы и методы, Результаты и
+Обсуждение, Выводы, Список литературы) и соответствует ли их содержание
+заголовкам?</li>
+<li>Описаны ли в тексте вопросы, на которые нужно дать ответ или
+гипотезы, которые нужно проверить?</li>
+<li>Описаны ли в тексте особенности применения статистических
+методов?</li>
+<li>Содержит ли текст ссылки на использованные статистические методы и
+программное обеспечение?</li>
+<li>Упоминаются ли переменные простыми словами, а не кодовыми
+наименованиями?</li>
 <li>Указаны ли объемы выборок?</li>
 <li>Корректно ли применены статистические процедуры?</li>
 <li>Правильно ли интерпретированы результаты анализа?</li>
@@ -339,14 +423,16 @@ div.tocify {
 <li>Есть ли в тексте пронумерованные ссылки на рисунки и таблицы?</li>
 </ol>
 </div>
-<div id="c.----" class="section level3">
+<div id="c.-рисунки-таблицы-и-подписи" class="section level3">
 <h3>C. Рисунки, таблицы и подписи</h3>
 <ol style="list-style-type: decimal">
-<li>Достаточно ли подписи к рисунку/таблице, чтобы можно было понять его в отрыве от основного текста?</li>
-<li>Подписаны ли на рисунке оси, достаточно ли велик шрифт, чтобы его было удобно читать?</li>
+<li>Достаточно ли подписи к рисунку/таблице, чтобы можно было понять его
+в отрыве от основного текста?</li>
+<li>Подписаны ли на рисунке оси, достаточно ли велик шрифт, чтобы его
+было удобно читать?</li>
 </ol>
 </div>
-<div id="d.-r-" class="section level3">
+<div id="d.-r-код" class="section level3">
 <h3>D. R-код</h3>
 <ol style="list-style-type: decimal">
 <li>Разделен ли код на логические блоки примечаниями?</li>
@@ -356,7 +442,9 @@ div.tocify {
 </div>
 
 <p><small>
+<!--
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">linmodr</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="varmara.github.io/linmodr/" property="cc:attributionName" rel="cc:attributionURL">Marina Varfolomeeva, Vadim Khaitov, and Yuta tamberg</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+-->
 </small></p>
 
 
@@ -369,13 +457,59 @@ div.tocify {
 
 // add bootstrap table styles to pandoc tables
 function bootstrapStylePandocTables() {
-  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
 }
 $(document).ready(function () {
   bootstrapStylePandocTables();
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
