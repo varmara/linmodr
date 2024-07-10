@@ -151,3 +151,41 @@ summary(pmod)
 # Осторожно! Обращайте внимание на предупреждения об ошибках.
 # Результаты могут быть смещенными, если модели не сошлись
 
+
+# График предсказаний модели с бутстрепными доверительными интервалами #########
+
+NewData <- sl %>% group_by(Subject) %>%
+  do(data.frame(Days = seq(min(.$Days), max(.$Days), length = 10)))
+NewData$fit <- predict(m1, NewData, type = 'response', re.form = NA)
+
+# Многократно симулируем данные из модели и получаем для них предсказанные значения
+# ВНИМАНИЕ!!! Увеличте число итераций бутстрепа для финального анализа до 10000
+bm1 <- bootMer(x = m1,
+               FUN = function(x) predict(x, new_data = NewData, re.form = NA),
+               nsim = 100)
+
+# (A) Квантильный подход к расчету дов. интервалов предсказаний ---------
+
+# Рассчитываем квантили предсказанных значений для всех итераций бутстрепа
+b_se <- apply(X = bm1$t,
+              MARGIN = 2,
+              FUN = function(x) quantile(x, probs = c(0.025, 0.975), na.rm = TRUE))
+# Доверительная зона для предсказанных значений
+NewData$lwr <- b_se[1, ]
+NewData$upr <- b_se[2, ]
+
+ggplot(data = NewData, aes(x = Days, y = fit)) +
+  geom_ribbon(alpha = 0.35, aes(ymin = lwr, ymax = upr)) +
+  geom_line() + geom_point(data = sl, aes(x = Days, y = Reaction))
+
+
+# (B) SE из бутстрепных моделей ------
+
+std_error <- apply(bm1$t, 2, sd)
+NewData$lwr_1 <- NewData$fit - std_error * 1.96
+NewData$upr_1 <- NewData$fit + std_error * 1.96
+
+ggplot(data = NewData, aes(x = Days, y = fit)) +
+  geom_ribbon(alpha = 0.35, aes(ymin = lwr_1, ymax = upr_1)) +
+  geom_line() + geom_point(data = sl, aes(x = Days, y = Reaction))
+
